@@ -43,9 +43,6 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             [FromQuery] int page = 0, 
             [FromQuery] int pageSize = Constants.DefaultPageSize)
         {
-            //TODO: Make swagger allow optional parameter
-            //https://www.seeleycoder.com/blog/optional-route-parameters-with-swagger-asp-net-core/
-
             //TODO: Deal with exception or empty result from checking postcode - return a not found with "invalid postcode"?
             var providers = await _providerDataService.FindProviders(postCode);
             return providers != null

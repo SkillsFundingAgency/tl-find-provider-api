@@ -5,7 +5,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Sfa.Tl.Find.Provider.Api.Filters
 {
-    //Adapted from https://github.com/fooberichu150/swagger-optional-route-parameters
+    //Adapted from:
+    //  https://github.com/fooberichu150/swagger-optional-route-parameters
+    //  https://www.seeleycoder.com/blog/optional-route-parameters-with-swagger-asp-net-core/
     public class OptionalRouteParameterOperationFilter : IOperationFilter
     {
         private const string CaptureName = "routeParameter";
@@ -20,9 +22,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             if (routeWithOptional == null)
                 return;
 
-            //TODO: Allow for :int after name
-            var regex = $"{{(?<{CaptureName}>\\w+)\\?}}";
-
+            var regex = $"{{(?<{CaptureName}>\\w+(:\\w+)*)\\?}}";
             var matches = Regex.Matches(routeWithOptional.Template, regex);
 
             foreach (Match match in matches)

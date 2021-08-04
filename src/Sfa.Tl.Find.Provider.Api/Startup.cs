@@ -31,10 +31,12 @@ namespace Sfa.Tl.Find.Provider.Api
             {
                 c.OperationFilter<OptionalRouteParameterOperationFilter>();
 
-                c.SwaggerDoc("v1", 
-                    new OpenApiInfo { 
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo
+                    {
                         Title = "T Levels Find a Provider Api",
-                        Version = "v1" });
+                        Version = "v1"
+                    });
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
