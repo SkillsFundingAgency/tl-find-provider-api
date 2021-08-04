@@ -10,10 +10,16 @@ namespace Sfa.Tl.Find.Provider.Api.Services
     public class ProviderDataService : IProviderDataService
     {
         private readonly ILogger<ProviderDataService> _logger;
+        private readonly IProviderRepository _providerRepository;
+        private readonly IQualificationRepository _qualificationRepository;
 
         public ProviderDataService(
+            IProviderRepository providerRepository,
+            IQualificationRepository qualificationRepository,
             ILogger<ProviderDataService> logger)
         {
+            _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
+            _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -21,26 +27,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         {
             _logger.LogDebug("Getting qualifications");
 
-            //TODO: Move to QualificationDataRepository 
-            return new Qualification[] 
-            {
-                new() { Id = 45, Name = "Building Services Engineering for Construction" },
-                new() { Id = 36, Name = "Design, Surveying and Planning for Construction" },
-                new() { Id = 39, Name = "Digital Business Services" },
-                new() { Id = 37, Name = "Digital Production, Design and Development" },
-                new() { Id = 40, Name = "Digital Support Services" },
-                new() { Id = 38, Name = "Education and Childcare" },
-                new() { Id = 41, Name = "Health" },
-                new() { Id = 42, Name = "Healthcare Science" },
-                new() { Id = 44, Name = "Onsite Construction" },
-                new() { Id = 43, Name = "Science" },
-                new() { Id = 46, Name = "Finance" },
-                new() { Id = 47, Name = "Accounting" },
-                new() { Id = 48, Name = "Design and development for engineering and manufacturing" },
-                new() { Id = 49, Name = "Maintenance, installation and repair for engineering and manufacturing" },
-                new() { Id = 50, Name = "Engineering, manufacturing, processing and control" },
-                new() { Id = 51, Name = "Management and administration" }
-            };
+            return await _qualificationRepository.GetAllQualifications();
         }
         
         public async Task<IEnumerable<Models.Provider>> FindProviders(
@@ -51,15 +38,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         {
             _logger.LogDebug($"Searching for postcode {postCode}");
 
-            //TODO: Move to ProviderDataRepository 
-            return new Models.Provider[] 
-            {
-                new()
-                {
-                    UkPrn = 10000001,
-                    Name = "Test provider"
-                }
-            };
+            return await _providerRepository.GetAllProviders();
         }
     }
 }

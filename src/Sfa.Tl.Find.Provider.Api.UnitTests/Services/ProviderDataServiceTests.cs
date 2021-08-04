@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
+using NSubstitute;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestEHelpers.Extensions;
@@ -28,7 +31,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task GetQualifications_Returns_Expected_List()
         {
-            var controller = new ProviderDataServiceBuilder().Build();
+            var qualificationRepository = Substitute.For<IQualificationRepository>();
+            qualificationRepository.GetAllQualifications()
+                .Returns(new QualificationBuilder().BuildList().AsQueryable());
+
+            var controller = new ProviderDataServiceBuilder()
+                .Build(qualificationRepository: qualificationRepository);
 
             var results = await controller.GetQualifications();
             results.Should().NotBeNullOrEmpty();
@@ -37,7 +45,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task GetProviders_Returns_Expected_List()
         {
-            var service = new ProviderDataServiceBuilder().Build();
+            var providerRepository = Substitute.For<IProviderRepository>();
+            providerRepository.GetAllProviders()
+                .Returns(new ProviderBuilder().BuildList().AsQueryable());
+
+            var service = new ProviderDataServiceBuilder().Build(providerRepository);
 
             var results = await service.FindProviders(TestPostCode);
             results.Should().NotBeNullOrEmpty();

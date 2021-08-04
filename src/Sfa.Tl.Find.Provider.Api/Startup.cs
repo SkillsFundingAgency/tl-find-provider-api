@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Sfa.Tl.Find.Provider.Api.Data;
+using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Services;
 
@@ -27,7 +29,7 @@ namespace Sfa.Tl.Find.Provider.Api
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.OperationFilter<Filters.OptionalRouteParameterOperationFilter>();
+                c.OperationFilter<OptionalRouteParameterOperationFilter>();
 
                 c.SwaggerDoc("v1", 
                     new OpenApiInfo { 
@@ -41,6 +43,8 @@ namespace Sfa.Tl.Find.Provider.Api
             });
 
             services.AddTransient<IProviderDataService, ProviderDataService>();
+            services.AddTransient<IProviderRepository, ProviderRepository>();
+            services.AddTransient<IQualificationRepository, QualificationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
