@@ -32,7 +32,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 
         //    var httpClientFactory = Substitute.For<IHttpClientFactory>();
         //    httpClientFactory
-        //        .CreateClient()
+        //        .CreateClient(nameof(PostcodeLookupService))
         //        .Returns(new TestHttpClientFactory()
         //            .CreateHttpClient(targetUri,
         //                dataBuilder.Build()));
@@ -54,7 +54,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 
             var httpClientFactory = Substitute.For<IHttpClientFactory>();
             httpClientFactory
-                .CreateClient()
+                .CreateClient(nameof(PostcodeLookupService))
                 .Returns(new TestHttpClientFactory()
                     .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri));
 
@@ -76,7 +76,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 
             var httpClientFactory = Substitute.For<IHttpClientFactory>();
             httpClientFactory
-                .CreateClient()
+                .CreateClient(nameof(PostcodeLookupService))
                 .Returns(new TestHttpClientFactory()
                     .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri));
 
