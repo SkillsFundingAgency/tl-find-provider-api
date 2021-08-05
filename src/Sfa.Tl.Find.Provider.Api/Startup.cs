@@ -26,6 +26,8 @@ namespace Sfa.Tl.Find.Provider.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -44,6 +46,7 @@ namespace Sfa.Tl.Find.Provider.Api
                 c.IncludeXmlComments(xmlPath);
             });
 
+            services.AddTransient<IPostcodeLookupService, PostcodeLookupService>();
             services.AddTransient<IProviderDataService, ProviderDataService>();
             services.AddTransient<IProviderRepository, ProviderRepository>();
             services.AddTransient<IQualificationRepository, QualificationRepository>();
