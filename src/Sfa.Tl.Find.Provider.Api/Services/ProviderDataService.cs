@@ -31,12 +31,12 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         }
         
         public async Task<IEnumerable<Models.Provider>> FindProviders(
-            string postCode,
+            string postcode,
             int? qualificationId = null,
             int page = 0,
             int pageSize = Constants.DefaultPageSize)
         {
-            _logger.LogDebug($"Searching for postcode {postCode}");
+            _logger.LogDebug($"Searching for postcode {postcode}");
 
             return await _providerRepository.GetAllProviders();
         }

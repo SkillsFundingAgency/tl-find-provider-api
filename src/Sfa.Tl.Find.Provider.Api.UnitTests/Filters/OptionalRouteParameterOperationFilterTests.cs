@@ -50,7 +50,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Filters
         [Fact]
         public void OptionalRouteParameterOperationFilter_Does_Not_Set_Required_To_False_For_Non_Optional_Path_Parameter()
         {
-            const string targetParameterName = "postCode";
+            const string targetParameterName = "postcode";
 
             var operation = new OpenApiOperation
             {

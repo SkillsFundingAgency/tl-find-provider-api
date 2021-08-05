@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
-using Sfa.Tl.Find.Provider.Api.UnitTests.TestEHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data

@@ -8,14 +8,14 @@ using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
-using Sfa.Tl.Find.Provider.Api.UnitTests.TestEHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 {
     public class FindProvidersControllerTests
     {
-        private const string TestPostCode = "AB1 2XY";
+        private const string TestPostcode = "AB1 2XY";
 
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
@@ -73,11 +73,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         public async Task GetProviders_Returns_Expected_List()
         {
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(TestPostCode).Returns(new ProviderBuilder().BuildList());
+            dataService.FindProviders(TestPostcode).Returns(new ProviderBuilder().BuildList());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-            var result = await controller.GetProviders(TestPostCode);
+            var result = await controller.GetProviders(TestPostcode);
 
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
@@ -93,11 +93,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
             var providers = new ProviderBuilder().BuildList().Take(1).ToList();
 
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(TestPostCode).Returns(providers);
+            dataService.FindProviders(TestPostcode).Returns(providers);
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-            var result = await controller.GetProviders(TestPostCode);
+            var result = await controller.GetProviders(TestPostcode);
 
             var results = ((result as OkObjectResult)?.Value as IEnumerable<Models.Provider>)?.ToList();
             results.Should().NotBeNullOrEmpty();

@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
         Task<IQueryable<Models.Provider>> GetAllProviders();
 
         //Task<IQueryable<Models.Provider>> FindProviders(
-        //    string postCode,
+        //    string postcode,
         //    int? qualificationId,
         //    int page,
         //    int pageSize);

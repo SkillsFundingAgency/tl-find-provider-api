@@ -5,14 +5,14 @@ using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
-using Sfa.Tl.Find.Provider.Api.UnitTests.TestEHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 {
     public class ProviderDataServiceTests
     {
-        private const string TestPostCode = "AB1 2XY";
+        private const string TestPostcode = "AB1 2XY";
         
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
@@ -35,10 +35,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             qualificationRepository.GetAllQualifications()
                 .Returns(new QualificationBuilder().BuildList().AsQueryable());
 
-            var controller = new ProviderDataServiceBuilder()
+            var service = new ProviderDataServiceBuilder()
                 .Build(qualificationRepository: qualificationRepository);
 
-            var results = await controller.GetQualifications();
+            var results = await service.GetQualifications();
             results.Should().NotBeNullOrEmpty();
         }
 
@@ -51,7 +51,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 
             var service = new ProviderDataServiceBuilder().Build(providerRepository);
 
-            var results = await service.FindProviders(TestPostCode);
+            var results = await service.FindProviders(TestPostcode);
             results.Should().NotBeNullOrEmpty();
         }
     }

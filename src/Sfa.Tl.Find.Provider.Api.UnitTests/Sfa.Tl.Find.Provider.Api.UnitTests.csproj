@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Builders\Assets\invalidpostcoderesponse.json" />
+    <None Remove="Builders\Assets\postcodenotfoundresponse.json" />
+    <None Remove="Builders\Assets\terminatedpostcoderesponse.json" />
+    <None Remove="Builders\Assets\validpostcoderesponse.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Builders\Assets\postcodenotfoundresponse.json" />
+    <EmbeddedResource Include="Builders\Assets\invalidpostcoderesponse.json" />
+    <EmbeddedResource Include="Builders\Assets\validpostcoderesponse.json" />
+    <EmbeddedResource Include="Builders\Assets\terminatedpostcoderesponse.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.17.0" />
     <PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.17.0" />
     <PackageReference Include="AutoFixture.Idioms" Version="4.17.0" />
@@ -27,6 +41,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Api\Sfa.Tl.Find.Provider.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Builders\Assets\invalidpostcoderesponse.json" />
+    <Resource Include="Builders\Assets\validpostcoderesponse.json" />
+    <Resource Include="Builders\Assets\terminatedpostcoderesponse.json" />
   </ItemGroup>
 
 </Project>
