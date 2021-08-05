@@ -10,14 +10,17 @@ namespace Sfa.Tl.Find.Provider.Api.Services
     public class ProviderDataService : IProviderDataService
     {
         private readonly ILogger<ProviderDataService> _logger;
+        private readonly IPostcodeLookupService _postcodeLookupService;
         private readonly IProviderRepository _providerRepository;
         private readonly IQualificationRepository _qualificationRepository;
-
+        
         public ProviderDataService(
+            IPostcodeLookupService postcodeLookupService,
             IProviderRepository providerRepository,
             IQualificationRepository qualificationRepository,
             ILogger<ProviderDataService> logger)
         {
+            _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
             _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
             _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -37,6 +40,9 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             int pageSize = Constants.DefaultPageSize)
         {
             _logger.LogDebug($"Searching for postcode {postcode}");
+
+            var postcodeLocation = await _postcodeLookupService.GetPostcode(postcode);
+            //TODO: Check the postcode was valid and perform search
 
             return await _providerRepository.GetAllProviders();
         }

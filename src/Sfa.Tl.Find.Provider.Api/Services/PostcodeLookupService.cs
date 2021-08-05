@@ -26,9 +26,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
         public async Task<PostcodeLocation> GetPostcode(string postcode)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            //httpClient.DefaultRequestHeaders.Accept.Clear();
-            //httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var httpClient = _httpClientFactory.CreateClient(nameof(PostcodeLookupService));
 
             var responseMessage = await httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
 

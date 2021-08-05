@@ -49,7 +49,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             providerRepository.GetAllProviders()
                 .Returns(new ProviderBuilder().BuildList().AsQueryable());
 
-            var service = new ProviderDataServiceBuilder().Build(providerRepository);
+            var service = new ProviderDataServiceBuilder().Build(providerRepository: providerRepository);
 
             var results = await service.FindProviders(TestPostcode);
             results.Should().NotBeNullOrEmpty();

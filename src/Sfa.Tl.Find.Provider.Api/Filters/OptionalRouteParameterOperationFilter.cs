@@ -22,7 +22,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             if (routeWithOptional == null)
                 return;
 
-            var regex = $"{{(?<{CaptureName}>\\w+(:\\w+)*)\\?}}";
+            var regex = $"{{(?<{CaptureName}>\\w+)(:\\w+)*\\?}}";
             var matches = Regex.Matches(routeWithOptional.Template, regex);
 
             foreach (Match match in matches)

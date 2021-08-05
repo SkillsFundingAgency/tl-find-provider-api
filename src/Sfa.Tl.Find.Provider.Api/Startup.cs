@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Http.Headers;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,9 +8,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Polly;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Services;
 
 namespace Sfa.Tl.Find.Provider.Api
@@ -28,6 +31,14 @@ namespace Sfa.Tl.Find.Provider.Api
         {
             services.AddApplicationInsightsTelemetry();
 
+            var postcodeApiSettings = new PostcodeApiSettings();
+            var postcodeApiConfiguration = _configuration.GetSection(nameof(PostcodeApiSettings));
+            postcodeApiConfiguration.Bind(postcodeApiSettings);
+
+            services
+                .AddOptions<PostcodeApiSettings>()
+                .Bind(postcodeApiConfiguration);
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -45,6 +56,8 @@ namespace Sfa.Tl.Find.Provider.Api
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+
+            AddHttpClients(services, postcodeApiSettings);
 
             services.AddTransient<IPostcodeLookupService, PostcodeLookupService>();
             services.AddTransient<IProviderDataService, ProviderDataService>();
@@ -72,6 +85,49 @@ namespace Sfa.Tl.Find.Provider.Api
             {
                 endpoints.MapControllers();
             });
+        }
+        
+        private IServiceCollection AddHttpClients(IServiceCollection services, PostcodeApiSettings postcodeApiSettings)
+        {
+            services
+                .AddHttpClient<IPostcodeLookupService, PostcodeLookupService>(
+                    nameof(PostcodeLookupService),
+                    (serviceProvider, client) =>
+                    {
+                        //var postcodeApiSettings = serviceProvider
+                        //    .GetRequiredService<IOptions<PostcodeApiSettings>>()
+                        //    .Value;
+
+                        client.BaseAddress =
+                            postcodeApiSettings.BaseUri.EndsWith("/")
+                                ? new Uri(postcodeApiSettings.BaseUri)
+                                : new Uri(postcodeApiSettings.BaseUri + "/");
+
+                        //client.DefaultRequestHeaders.Add("Accept", "application/json");
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        //client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                        //client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                    }
+                )
+                //.ConfigurePrimaryHttpMessageHandler(_ =>
+                //{
+                //    var handler = new HttpClientHandler();
+                //    if (handler.SupportsAutomaticDecompression)
+                //    {
+                //        handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+                //    }
+                //    return handler;
+                //})
+                .AddTransientHttpErrorPolicy(policy =>
+                    policy.WaitAndRetryAsync(new[] {
+                        TimeSpan.FromMilliseconds(200),
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(10),
+                    }))
+                ;
+
+            return services;
         }
     }
 }
