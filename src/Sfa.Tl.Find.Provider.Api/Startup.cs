@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -7,8 +8,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Polly;
+using Polly.Extensions.Http;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -19,7 +23,7 @@ namespace Sfa.Tl.Find.Provider.Api
 {
     public class Startup
     {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         public Startup(IConfiguration configuration)
         {
@@ -40,6 +44,7 @@ namespace Sfa.Tl.Find.Provider.Api
                 .Bind(postcodeApiConfiguration);
 
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.OperationFilter<OptionalRouteParameterOperationFilter>();
@@ -57,9 +62,8 @@ namespace Sfa.Tl.Find.Provider.Api
                 c.IncludeXmlComments(xmlPath);
             });
 
-            AddHttpClients(services, postcodeApiSettings);
+            AddHttpClients(services);
 
-            services.AddTransient<IPostcodeLookupService, PostcodeLookupService>();
             services.AddTransient<IProviderDataService, ProviderDataService>();
             services.AddTransient<IProviderRepository, ProviderRepository>();
             services.AddTransient<IQualificationRepository, QualificationRepository>();
@@ -86,17 +90,19 @@ namespace Sfa.Tl.Find.Provider.Api
                 endpoints.MapControllers();
             });
         }
-        
-        private IServiceCollection AddHttpClients(IServiceCollection services, PostcodeApiSettings postcodeApiSettings)
+
+        private IServiceCollection AddHttpClients(IServiceCollection services)
         {
+            //https://www.stevejgordon.co.uk/ihttpclientfactory-patterns-using-typed-clients-from-singleton-services
+            //https://github.com/dotnet/runtime/issues/45035
+            //https://www.parksq.co.uk/dotnet-core/dependency-injection-httpclient-and-ihttpclientfactory
             services
                 .AddHttpClient<IPostcodeLookupService, PostcodeLookupService>(
-                    nameof(PostcodeLookupService),
-                    (serviceProvider, client) =>
+                (serviceProvider, client) =>
                     {
-                        //var postcodeApiSettings = serviceProvider
-                        //    .GetRequiredService<IOptions<PostcodeApiSettings>>()
-                        //    .Value;
+                        var postcodeApiSettings = serviceProvider
+                            .GetRequiredService<IOptions<PostcodeApiSettings>>()
+                            .Value;
 
                         client.BaseAddress =
                             postcodeApiSettings.BaseUri.EndsWith("/")

@@ -12,28 +12,26 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 {
     public class PostcodeLookupService : IPostcodeLookupService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
         private readonly ILogger<PostcodeLookupService> _logger;
 
         public PostcodeLookupService(
-            IHttpClientFactory httpClientFactory,
+            HttpClient httpClient,
             ILogger<PostcodeLookupService> logger)
         {
-            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<PostcodeLocation> GetPostcode(string postcode)
         {
-            var httpClient = _httpClientFactory.CreateClient(nameof(PostcodeLookupService));
-
-            var responseMessage = await httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
+            var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
 
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
                 //Fallback to terminated postcode search
-                responseMessage = await httpClient.GetAsync($"terminated_postcodes/{postcode.FormatPostcodeForUri()}");
+                responseMessage = await _httpClient.GetAsync($"terminated_postcodes/{postcode.FormatPostcodeForUri()}");
 
                 if (responseMessage.StatusCode != HttpStatusCode.OK)
                 {

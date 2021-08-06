@@ -15,7 +15,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions
 
             if (stream == null)
             {
-                // Stream for 'Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Assets.validpostcoderesponse.json
                 throw new Exception($"Stream for '{resourcePath}' not found.");
             }
 

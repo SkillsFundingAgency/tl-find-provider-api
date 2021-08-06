@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -14,73 +15,43 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
         private static readonly Uri PostcodeRetrieverApiBaseUri = new(PostcodeRetrieverApiBaseAbsoluteUri);
 
         public PostcodeLookupService Build(
-            IHttpClientFactory httpClientFactory = null,
+            HttpClient httpClient = null,
             ILogger<PostcodeLookupService> logger = null)
         {
-            httpClientFactory ??= Substitute.For<IHttpClientFactory>();
+            httpClient ??= Substitute.For<HttpClient>();
             logger ??= Substitute.For<ILogger<PostcodeLookupService>>();
 
-            return new PostcodeLookupService(httpClientFactory, logger);
+            return new PostcodeLookupService(httpClient, logger);
         }
-
-        //public PostcodeLookupService Build(
-        //    string targetUriFragment,
-        //    PostcodeLookupJsonBuilder dataBuilder,
-        //    ILogger<PostcodeLookupService> logger = null)
-        //{
-        //    var targetUri = new Uri(baseUri, targetUriFragment);
-
-        //    var httpClientFactory = Substitute.For<IHttpClientFactory>();
-        //    httpClientFactory
-        //        .CreateClient(nameof(PostcodeLookupService))
-        //        .Returns(new TestHttpClientFactory()
-        //            .CreateHttpClient(targetUri,
-        //                dataBuilder.Build()));
-
-        //    return Build(httpClientFactory, logger);
-        //}
 
         public PostcodeLookupService Build(
             IDictionary<string, HttpResponseMessage> responseMessages,
             ILogger<PostcodeLookupService> logger = null)
         {
-            var responsesWithUri = new Dictionary<Uri, HttpResponseMessage>();
-            foreach (var item in responseMessages)
-            {
-                responsesWithUri.Add(
-                    new Uri(PostcodeRetrieverApiBaseUri, item.Key),
-                    item.Value);
-            }
+            var responsesWithUri = responseMessages
+                .ToDictionary(
+                    item => new Uri(PostcodeRetrieverApiBaseUri, item.Key),
+                    item => item.Value);
 
-            var httpClientFactory = Substitute.For<IHttpClientFactory>();
-            httpClientFactory
-                .CreateClient(nameof(PostcodeLookupService))
-                .Returns(new TestHttpClientFactory()
-                    .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri));
+            var httpClient = new TestHttpClientFactory()
+                .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri);
 
-            return Build(httpClientFactory, logger);
-
+            return Build(httpClient, logger);
         }
 
         public PostcodeLookupService Build(
             IDictionary<string, string> responseMessages,
             ILogger<PostcodeLookupService> logger = null)
         {
-            var responsesWithUri = new Dictionary<Uri, string>();
-            foreach (var item in responseMessages)
-            {
-                responsesWithUri.Add(
-                    new Uri(PostcodeRetrieverApiBaseUri, item.Key),
-                    item.Value);
-            }
+            var responsesWithUri = responseMessages
+                .ToDictionary(
+                    item => new Uri(PostcodeRetrieverApiBaseUri, item.Key),
+                    item => item.Value);
 
-            var httpClientFactory = Substitute.For<IHttpClientFactory>();
-            httpClientFactory
-                .CreateClient(nameof(PostcodeLookupService))
-                .Returns(new TestHttpClientFactory()
-                    .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri));
+            var httpClient = new TestHttpClientFactory()
+                    .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri);
 
-            return Build(httpClientFactory, logger);
+            return Build(httpClient, logger);
         }
     }
 }
