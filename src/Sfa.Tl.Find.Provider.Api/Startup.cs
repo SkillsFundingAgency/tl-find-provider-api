@@ -25,6 +25,8 @@ namespace Sfa.Tl.Find.Provider.Api
     {
         private readonly IConfiguration _configuration;
 
+        private const string CorsPolicyName = "CorsPolicy";
+
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -62,6 +64,8 @@ namespace Sfa.Tl.Find.Provider.Api
                 c.IncludeXmlComments(xmlPath);
             });
 
+            AddCorsPolicy(services);
+
             AddHttpClients(services);
 
             services.AddTransient<IProviderDataService, ProviderDataService>();
@@ -83,12 +87,29 @@ namespace Sfa.Tl.Find.Provider.Api
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            if (!string.IsNullOrWhiteSpace(_configuration["AllowedOrigins"]))
+                app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private IServiceCollection AddCorsPolicy(IServiceCollection services)
+        {
+            var allowedOrigins = _configuration["AllowedOrigins"];
+            if(!string.IsNullOrWhiteSpace(allowedOrigins))
+            {
+                var corsOrigins = allowedOrigins.Split(new[] { ';', ',' });
+                services.AddCors(options => options.AddPolicy(CorsPolicyName, builder =>
+                    builder
+                        .WithMethods(HttpMethod.Get.Method)
+                        .AllowAnyHeader()
+                        .WithOrigins(corsOrigins)));
+            }
+
+            return services;
         }
 
         private IServiceCollection AddHttpClients(IServiceCollection services)
@@ -133,7 +154,7 @@ namespace Sfa.Tl.Find.Provider.Api
                                 TimeSpan.FromSeconds(5),
                                 TimeSpan.FromSeconds(10)
                             },
-                            onRetry: (outcome, timespan, retryAttempt, context) =>
+                            (outcome, timespan, retryAttempt, context) =>
                             {
                                 serviceProvider
                                     .GetService<ILogger<PostcodeLookupService>>()?
