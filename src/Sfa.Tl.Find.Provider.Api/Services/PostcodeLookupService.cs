@@ -39,9 +39,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                 }
             }
 
-            var result = ReadPostcodeLocationFromResponse(responseMessage);
-
-            return result.Result;
+            return await ReadPostcodeLocationFromResponse(responseMessage);
         }
 
         private async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(HttpResponseMessage response)
