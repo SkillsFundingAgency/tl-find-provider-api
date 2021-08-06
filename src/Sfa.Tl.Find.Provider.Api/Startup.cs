@@ -115,23 +115,31 @@ namespace Sfa.Tl.Find.Provider.Api
                         //client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
                     }
                 )
-                //.ConfigurePrimaryHttpMessageHandler(_ =>
-                //{
-                //    var handler = new HttpClientHandler();
-                //    if (handler.SupportsAutomaticDecompression)
-                //    {
-                //        handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-                //    }
-                //    return handler;
-                //})
-                .AddTransientHttpErrorPolicy(policy =>
-                    policy.WaitAndRetryAsync(new[] {
-                        TimeSpan.FromMilliseconds(200),
-                        TimeSpan.FromSeconds(1),
-                        TimeSpan.FromSeconds(5),
-                        TimeSpan.FromSeconds(10),
-                    }))
-                ;
+                .ConfigurePrimaryHttpMessageHandler(_ =>
+                {
+                    var handler = new HttpClientHandler();
+                    //if (handler.SupportsAutomaticDecompression)
+                    //{
+                    //    handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+                    //}
+                    return handler;
+                })
+                .AddPolicyHandler((serviceProvider, _) =>
+                    HttpPolicyExtensions.HandleTransientHttpError()
+                        .WaitAndRetryAsync(new[]
+                            {
+                                TimeSpan.FromMilliseconds(200),
+                                TimeSpan.FromSeconds(1),
+                                TimeSpan.FromSeconds(5),
+                                TimeSpan.FromSeconds(10)
+                            },
+                            onRetry: (outcome, timespan, retryAttempt, context) =>
+                            {
+                                serviceProvider
+                                    .GetService<ILogger<PostcodeLookupService>>()?
+                                    .LogWarning($"Transient HTTP error in {nameof(PostcodeLookupService)}. Delaying for {timespan.TotalMilliseconds}ms, then making retry {retryAttempt}.");
+                            }
+                ));
 
             return services;
         }
