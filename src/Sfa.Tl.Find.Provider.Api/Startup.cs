@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -8,13 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using Polly;
-using Polly.Extensions.Http;
 using Sfa.Tl.Find.Provider.Api.Data;
-using Sfa.Tl.Find.Provider.Api.Filters;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Services;
@@ -47,24 +42,13 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddControllers();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.OperationFilter<OptionalRouteParameterOperationFilter>();
+            services.AddSwagger("v1",
+                "T Levels Find a Provider Api",
+                "v1",
+                $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"
+                );
 
-                c.SwaggerDoc("v1",
-                    new OpenApiInfo
-                    {
-                        Title = "T Levels Find a Provider Api",
-                        Version = "v1"
-                    });
-
-                // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
-            });
-
-            AddCorsPolicy(services);
+            services.AddCorsPolicy(CorsPolicyName, _configuration["AllowedOrigins"]);
 
             AddHttpClients(services);
 
@@ -96,22 +80,7 @@ namespace Sfa.Tl.Find.Provider.Api
             });
         }
 
-        private IServiceCollection AddCorsPolicy(IServiceCollection services)
-        {
-            var allowedOrigins = _configuration["AllowedOrigins"];
-            if(!string.IsNullOrWhiteSpace(allowedOrigins))
-            {
-                var corsOrigins = allowedOrigins.Split(new[] { ';', ',' });
-                services.AddCors(options => options.AddPolicy(CorsPolicyName, builder =>
-                    builder
-                        .WithMethods(HttpMethod.Get.Method)
-                        .AllowAnyHeader()
-                        .WithOrigins(corsOrigins)));
-            }
-
-            return services;
-        }
-
+        // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddHttpClients(IServiceCollection services)
         {
             //https://www.stevejgordon.co.uk/ihttpclientfactory-patterns-using-typed-clients-from-singleton-services
@@ -119,7 +88,7 @@ namespace Sfa.Tl.Find.Provider.Api
             //https://www.parksq.co.uk/dotnet-core/dependency-injection-httpclient-and-ihttpclientfactory
             services
                 .AddHttpClient<IPostcodeLookupService, PostcodeLookupService>(
-                (serviceProvider, client) =>
+                    (serviceProvider, client) =>
                     {
                         var postcodeApiSettings = serviceProvider
                             .GetRequiredService<IOptions<PostcodeApiSettings>>()
@@ -131,7 +100,8 @@ namespace Sfa.Tl.Find.Provider.Api
                                 : new Uri(postcodeApiSettings.BaseUri + "/");
 
                         //client.DefaultRequestHeaders.Add("Accept", "application/json");
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Accept.Add(
+                            new MediaTypeWithQualityHeaderValue("application/json"));
                         //client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
                         //client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
                     }
@@ -145,23 +115,8 @@ namespace Sfa.Tl.Find.Provider.Api
                     //}
                     return handler;
                 })
-                .AddPolicyHandler((serviceProvider, _) =>
-                    HttpPolicyExtensions.HandleTransientHttpError()
-                        .WaitAndRetryAsync(new[]
-                            {
-                                TimeSpan.FromMilliseconds(200),
-                                TimeSpan.FromSeconds(1),
-                                TimeSpan.FromSeconds(5),
-                                TimeSpan.FromSeconds(10)
-                            },
-                            (outcome, timespan, retryAttempt, context) =>
-                            {
-                                serviceProvider
-                                    .GetService<ILogger<PostcodeLookupService>>()?
-                                    .LogWarning($"Transient HTTP error in {nameof(PostcodeLookupService)}. Delaying for {timespan.TotalMilliseconds}ms, then making retry {retryAttempt}.");
-                            }
-                ));
-
+                .AddRetryPolicyHandler<PostcodeLookupService>();
+                
             return services;
         }
     }
