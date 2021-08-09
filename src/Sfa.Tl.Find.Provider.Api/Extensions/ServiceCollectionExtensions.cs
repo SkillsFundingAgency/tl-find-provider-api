@@ -3,7 +3,6 @@ using System.IO;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Sfa.Tl.Find.Provider.Api.Filters;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions
 {
@@ -36,8 +35,6 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         {
             services.AddSwaggerGen(c =>
             {
-                c.OperationFilter<OptionalRouteParameterOperationFilter>();
-
                 c.SwaggerDoc(name,
                     new OpenApiInfo
                     {
