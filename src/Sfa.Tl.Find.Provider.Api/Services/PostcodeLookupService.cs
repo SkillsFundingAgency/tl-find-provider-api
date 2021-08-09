@@ -42,9 +42,9 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             return await ReadPostcodeLocationFromResponse(responseMessage);
         }
 
-        private async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(HttpResponseMessage response)
+        private async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(HttpResponseMessage responseMessage)
         {
-            var jsonDocument = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+            var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
 
             var resultElement = jsonDocument
                 .RootElement

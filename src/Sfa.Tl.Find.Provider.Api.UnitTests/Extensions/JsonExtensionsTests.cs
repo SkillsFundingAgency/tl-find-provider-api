@@ -27,7 +27,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("notANumber", false)]
         [InlineData("myTrueBool", true)]
         [InlineData("myFalseBool", false)]
-        public void JsonElementSafeGetBooleanDataTests(string propertyName, bool expectedResult)
+        public void JsonElement_SafeGetBoolean_Data_Tests(string propertyName, bool expectedResult)
         {
             var prop = _jsonDoc.RootElement.GetProperty("anElement");
             var result = prop.SafeGetBoolean(propertyName);
@@ -42,7 +42,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("notANumber", 0)]
         [InlineData("myTrueBool", 0)]
         [InlineData("myFalseBool", 0)]
-        public void JsonElementSafeGetInt32DataTests(string propertyName, int expectedResult)
+        public void JsonElement_SafeGetInt32_Data_Tests(string propertyName, int expectedResult)
         {
             var prop = _jsonDoc.RootElement.GetProperty("anElement");
             var result = prop.SafeGetInt32(propertyName);
@@ -59,7 +59,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("notANumber", 0)]
         [InlineData("myTrueBool", 0)]
         [InlineData("myFalseBool", 0)]
-        public void JsonElementSafeGetInt64DataTests(string propertyName, long expectedResult)
+        public void JsonElement_SafeGetInt64_Data_Tests(string propertyName, long expectedResult)
         {
             var prop = _jsonDoc.RootElement.GetProperty("anElement");
             var result = prop.SafeGetInt64(propertyName);
@@ -76,7 +76,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("notANumber", 0)]
         [InlineData("myTrueBool", 0)]
         [InlineData("myFalseBool", 0)]
-        public void JsonElementSafeGetDoubleDataTests(string propertyName, double expectedResult)
+        public void JsonElement_SafeGetDouble_Data_Tests(string propertyName, double expectedResult)
         {
             var prop = _jsonDoc.RootElement.GetProperty("anElement");
             var result = prop.SafeGetDouble(propertyName);
@@ -92,7 +92,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("notAString", null)]
         [InlineData("myTrueBool", null)]
         [InlineData("myFalseBool", null)]
-        public void JsonElementSafeGetStringDataTests(string propertyName, string expectedResult)
+        public void JsonElement_SafeGetString_Data_Tests(string propertyName, string expectedResult)
         {
             var prop = _jsonDoc.RootElement.GetProperty("anElement");
             var result = prop.SafeGetString(propertyName);

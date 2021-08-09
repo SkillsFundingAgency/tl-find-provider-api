@@ -37,10 +37,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 
             var jsonBuilder = new PostcodeLookupJsonBuilder();
 
-            //var responses = new Dictionary<string, HttpResponseMessage>
-            //{
-            //    { postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(builder.BuildValidPostcodeResponse()) }
-            //};
             var responses = new Dictionary<string, string>
             {
                 { postcodeUriFragment, jsonBuilder.BuildValidPostcodeResponse() }

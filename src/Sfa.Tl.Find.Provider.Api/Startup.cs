@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -32,13 +33,7 @@ namespace Sfa.Tl.Find.Provider.Api
         {
             services.AddApplicationInsightsTelemetry();
 
-            var postcodeApiSettings = new PostcodeApiSettings();
-            var postcodeApiConfiguration = _configuration.GetSection(nameof(PostcodeApiSettings));
-            postcodeApiConfiguration.Bind(postcodeApiSettings);
-
-            services
-                .AddOptions<PostcodeApiSettings>()
-                .Bind(postcodeApiConfiguration);
+            AddConfigurationOptions(services);
 
             services.AddControllers();
 
@@ -81,11 +76,22 @@ namespace Sfa.Tl.Find.Provider.Api
         }
 
         // ReSharper disable once UnusedMethodReturnValue.Local
+        private IServiceCollection AddConfigurationOptions(IServiceCollection services)
+        {
+            services
+                .AddOptions<PostcodeApiSettings>()
+                .Bind(_configuration.GetSection(nameof(PostcodeApiSettings)));
+
+            services
+                .AddOptions<CourseDirectoryApiSettings>()
+                .Bind(_configuration.GetSection(nameof(CourseDirectoryApiSettings)));
+
+            return services;
+        }
+        
+        // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddHttpClients(IServiceCollection services)
         {
-            //https://www.stevejgordon.co.uk/ihttpclientfactory-patterns-using-typed-clients-from-singleton-services
-            //https://github.com/dotnet/runtime/issues/45035
-            //https://www.parksq.co.uk/dotnet-core/dependency-injection-httpclient-and-ihttpclientfactory
             services
                 .AddHttpClient<IPostcodeLookupService, PostcodeLookupService>(
                     (serviceProvider, client) =>
@@ -99,24 +105,44 @@ namespace Sfa.Tl.Find.Provider.Api
                                 ? new Uri(postcodeApiSettings.BaseUri)
                                 : new Uri(postcodeApiSettings.BaseUri + "/");
 
-                        //client.DefaultRequestHeaders.Add("Accept", "application/json");
                         client.DefaultRequestHeaders.Accept.Add(
                             new MediaTypeWithQualityHeaderValue("application/json"));
-                        //client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                        //client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                    }
+                )
+                .AddRetryPolicyHandler<PostcodeLookupService>();
+
+            services
+                .AddHttpClient<ICourseDirectoryService, CourseDirectoryService>(
+                    (serviceProvider, client) =>
+                    {
+                        var courseDirectoryApiSettings = serviceProvider
+                            .GetRequiredService<IOptions<CourseDirectoryApiSettings>>()
+                            .Value;
+
+                        client.BaseAddress =
+                            courseDirectoryApiSettings.BaseUri.EndsWith("/")
+                                ? new Uri(courseDirectoryApiSettings.BaseUri)
+                                : new Uri(courseDirectoryApiSettings.BaseUri + "/");
+
+                        client.DefaultRequestHeaders.Accept.Add(
+                            new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", courseDirectoryApiSettings.ApiKey);
+
+                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
                     }
                 )
                 .ConfigurePrimaryHttpMessageHandler(_ =>
                 {
                     var handler = new HttpClientHandler();
-                    //if (handler.SupportsAutomaticDecompression)
-                    //{
-                    //    handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-                    //}
+                    if (handler.SupportsAutomaticDecompression)
+                    {
+                        handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+                    }
                     return handler;
                 })
-                .AddRetryPolicyHandler<PostcodeLookupService>();
-                
+                .AddRetryPolicyHandler<CourseDirectoryService>();
+
             return services;
         }
     }

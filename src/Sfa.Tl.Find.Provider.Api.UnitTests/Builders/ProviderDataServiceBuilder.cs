@@ -8,18 +8,21 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
     public class ProviderDataServiceBuilder
     {
         public ProviderDataService Build(
+            ICourseDirectoryService courseDirectoryService = null,
             IPostcodeLookupService postcodeLookupService = null,
             IProviderRepository providerRepository = null,
             IQualificationRepository qualificationRepository = null,
             ILogger<ProviderDataService> logger = null)
         {
+            courseDirectoryService ??= Substitute.For<ICourseDirectoryService>();
             postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
             providerRepository ??= Substitute.For<IProviderRepository>();
             qualificationRepository ??= Substitute.For<IQualificationRepository>();
             logger ??= Substitute.For<ILogger<ProviderDataService>>();
 
             return new ProviderDataService(
-                postcodeLookupService, 
+                courseDirectoryService, 
+                postcodeLookupService,
                 providerRepository, 
                 qualificationRepository, 
                 logger);

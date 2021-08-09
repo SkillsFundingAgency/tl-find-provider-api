@@ -7,28 +7,30 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
     {
         public string BuildValidPostcodeResponse()
         {
-            return GetAsset("validpostcoderesponse.json");
+            return typeof(PostcodeLookupJsonBuilder)
+                .ReadManifestResourceStreamAsString(
+                    "Assets.validpostcoderesponse.json");
         }
 
         public string BuildInvalidPostcodeResponse()
         {
-            return GetAsset("invalidpostcoderesponse.json");
+            return typeof(PostcodeLookupJsonBuilder)
+                .ReadManifestResourceStreamAsString(
+                    "Assets.invalidpostcoderesponse.json");
         }
 
         public string BuildPostcodeNotFoundResponse()
         {
-            return GetAsset("postcodenotfoundresponse.json");
+            return typeof(PostcodeLookupJsonBuilder)
+                .ReadManifestResourceStreamAsString(
+                    "Assets.postcodenotfoundresponse.json");
         }
 
         public string BuildTerminatedPostcodeResponse()
         {
-            return GetAsset("terminatedpostcoderesponse.json");
-        }
-
-        private string GetAsset(string assetName)
-        {
-            return $"{GetType().Namespace}.Assets.{assetName}"
-                .ReadManifestResourceStreamAsString();
+            return typeof(PostcodeLookupJsonBuilder)
+                .ReadManifestResourceStreamAsString(
+                    "Assets.terminatedpostcoderesponse.json");
         }
     }
 }
