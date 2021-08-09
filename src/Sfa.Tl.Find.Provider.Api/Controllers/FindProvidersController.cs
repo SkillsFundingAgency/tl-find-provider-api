@@ -33,15 +33,18 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// <param name="pageSize">Number of items to return on a page.</param>
         /// <returns>Json with providers.</returns>
         [HttpGet]
-        [Route("providers/{postcode}/{qualificationId:int?}", Name = "GetProviders")]
+        [Route("providers/{postcode}", Name = "GetProviders")]
         [ProducesResponseType(typeof(IEnumerable<Models.Provider>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProviders(
-            string postcode, 
-            int? qualificationId = null, 
-            [FromQuery] int page = 0, 
+            string postcode,
+            [FromQuery] int? qualificationId = null,
+            [FromQuery] int page = 0,
             [FromQuery] int pageSize = Constants.DefaultPageSize)
         {
+            _logger.LogDebug($"GetProviders called with qualificationId={qualificationId}, " +
+                             $"page={page}, pageSize={pageSize}");
+
             //TODO: Deal with exception or empty result from checking postcode - return a not found with "invalid postcode"?
             var providers = await _providerDataService.FindProviders(postcode);
             return providers != null
