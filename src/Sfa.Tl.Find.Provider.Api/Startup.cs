@@ -19,13 +19,13 @@ namespace Sfa.Tl.Find.Provider.Api
 {
     public class Startup
     {
-        private readonly IConfiguration _configuration;
+        private readonly SiteConfiguration _configuration;
 
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration.LoadConfigurationOptions();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -43,7 +43,7 @@ namespace Sfa.Tl.Find.Provider.Api
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"
                 );
 
-            services.AddCorsPolicy(CorsPolicyName, _configuration["AllowedOrigins"]);
+            services.AddCorsPolicy(CorsPolicyName, _configuration.AllowedOrigins);
 
             AddHttpClients(services);
 
@@ -66,7 +66,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             app.UseRouting();
 
-            if (!string.IsNullOrWhiteSpace(_configuration["AllowedOrigins"]))
+            if (!string.IsNullOrWhiteSpace(_configuration.AllowedOrigins))
                 app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
@@ -78,17 +78,20 @@ namespace Sfa.Tl.Find.Provider.Api
         // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddConfigurationOptions(IServiceCollection services)
         {
-            services
-                .AddOptions<PostcodeApiSettings>()
-                .Bind(_configuration.GetSection(nameof(PostcodeApiSettings)));
+            services.Configure<PostcodeApiSettings>(x =>
+            {
+                x.BaseUri = _configuration.PostcodeApiSettings.BaseUri;
+            });
 
-            services
-                .AddOptions<CourseDirectoryApiSettings>()
-                .Bind(_configuration.GetSection(nameof(CourseDirectoryApiSettings)));
+            services.Configure<CourseDirectoryApiSettings>(x =>
+            {
+                x.BaseUri = _configuration.CourseDirectoryApiSettings.BaseUri;
+                x.ApiKey = _configuration.CourseDirectoryApiSettings.ApiKey;
+            });
 
             return services;
         }
-        
+
         // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddHttpClients(IServiceCollection services)
         {

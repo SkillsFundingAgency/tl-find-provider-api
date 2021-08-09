@@ -2,7 +2,7 @@
 {
     public class CourseDirectoryApiSettings
     {
-        public string ApiKey { get; init; }
-        public string BaseUri { get; init; }
+        public string ApiKey { get; set; }
+        public string BaseUri { get; set; }
     }
 }

@@ -27,7 +27,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
             BaseUri = postcodeRetrieverUri
         };
 
-        internal ConfigurationOptions BuildConfigurationOptions(
+        internal SiteConfiguration BuildConfigurationOptions(
             PostcodeApiSettings postcodeApiSettings = null,
             string sqlConnectionString = "TestConnection") => new()
             {
