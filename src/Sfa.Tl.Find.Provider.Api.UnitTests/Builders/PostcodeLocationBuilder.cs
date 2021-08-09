@@ -1,4 +1,5 @@
-﻿using Sfa.Tl.Find.Provider.Api.Models;
+﻿using System.Threading.Tasks;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
@@ -26,6 +27,15 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                 Postcode = "S70 2YW",
                 Latitude = 53.551618,
                 Longitude = -1.482797
+            };
+
+        public PostcodeLocation BuildPostcodeLocation(
+            string postcode = "CV1 2WT") =>
+            new()
+            {
+                Postcode = postcode,
+                Latitude = 50.0,
+                Longitude = -1.0
             };
     }
 }

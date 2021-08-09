@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,6 +37,12 @@ namespace Sfa.Tl.Find.Provider.Api
             AddConfigurationOptions(services);
 
             services.AddControllers();
+
+            services.AddMemoryCache(options =>
+            {
+                //TODO: Set a bigger size limit - this is for testing
+                options.SizeLimit = 2;
+            });
 
             services.AddSwagger("v1",
                 "T Levels Find a Provider Api",
