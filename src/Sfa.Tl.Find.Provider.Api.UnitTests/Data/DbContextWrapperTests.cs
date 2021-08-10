@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
@@ -7,22 +6,22 @@ using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
 {
-    public class ProviderRepositoryTests
+    public class DbContextWrapperTests
     {
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
         {
-            typeof(ProviderRepository)
+            typeof(DbContextWrapper)
                 .ShouldNotAcceptNullConstructorArguments();
         }
-        
-        [Fact]
-        public async Task GetProviders_Returns_Expected_List()
-        {
-            var repository = new ProviderRepositoryBuilder().Build();
 
-            var results = await repository.GetAll();
-            results.Should().NotBeNullOrEmpty();
+        [Fact]
+        public void GetQualifications_Returns_Expected_List()
+        {
+            var repository = new DbContextWrapperBuilder().Build();
+
+            var connection = repository.CreateConnection();
+            connection.Should().NotBeNull();
         }
     }
 }

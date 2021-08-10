@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 
@@ -6,7 +7,14 @@ namespace Sfa.Tl.Find.Provider.Api.Data
 {
     public class ProviderRepository : IProviderRepository
     {
-        public async Task<IQueryable<Models.Provider>> GetAllProviders()
+        private readonly IDbContextWrapper _dbContextWrapper;
+
+        public ProviderRepository(IDbContextWrapper dbContextWrapper)
+        {
+            _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
+        }
+
+        public async Task<IEnumerable<Models.Provider>> GetAll()
         {
             return new Models.Provider[]
             {
@@ -21,7 +29,11 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                     Name = "Test provider 2"
                 }
 
-            }.AsQueryable();
+            };
+        }
+
+        public async Task Save(IEnumerable<Models.Provider> providers)
+        {
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         public async Task GetQualifications_Returns_Expected_List()
         {
             var qualificationRepository = Substitute.For<IQualificationRepository>();
-            qualificationRepository.GetAllQualifications()
+            qualificationRepository.GetAll()
                 .Returns(new QualificationBuilder().BuildList().AsQueryable());
 
             var service = new ProviderDataServiceBuilder()
@@ -51,7 +51,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         public async Task GetProviders_Returns_Expected_List_For_Valid_Postcode()
         {
             var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.GetAllProviders()
+            providerRepository.GetAll()
                 .Returns(new ProviderBuilder().BuildList().AsQueryable());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -72,7 +72,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         public async Task GetProviders_Returns_Expected_List_For_Valid_Postcode_From_Cache()
         {
             var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.GetAllProviders()
+            providerRepository.GetAll()
                 .Returns(new ProviderBuilder().BuildList().AsQueryable());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -104,7 +104,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         public async Task GetProviders_Throws_Exception_For_Bad_Postcode()
         {
             var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.GetAllProviders()
+            providerRepository.GetAll()
                 .Returns(new ProviderBuilder().BuildList().AsQueryable());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();

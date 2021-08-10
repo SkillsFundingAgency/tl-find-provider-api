@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -27,7 +25,7 @@ namespace Sfa.Tl.Find.Provider.Api.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            _logger.LogInformation($"{nameof(CourseDataImportJob)} job triggered. {context?.Trigger?.Description}");
+            _logger.LogInformation($"{nameof(CourseDataImportJob)} job triggered. {context?.Trigger?.JobKey?.Name}");
 
             try
             {

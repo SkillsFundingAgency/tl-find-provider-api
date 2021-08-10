@@ -41,7 +41,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             //Temp for testing - load qualifications from API first
             await _courseDirectoryService.ImportQualifications();
 
-            return await _qualificationRepository.GetAllQualifications();
+            return await _qualificationRepository.GetAll();
         }
         
         public async Task<IEnumerable<Models.Provider>> FindProviders(
@@ -54,7 +54,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var postcodeLocation = await GetPostcode(postcode);
 
-            return await _providerRepository.GetAllProviders();
+            return await _providerRepository.GetAll();
         }
 
         private async Task<PostcodeLocation> GetPostcode(string postcode)

@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,6 +54,8 @@ namespace Sfa.Tl.Find.Provider.Api
             AddHttpClients(services);
 
             services
+                .AddScoped<IDbContextWrapper>(_ =>
+                    new DbContextWrapper(_configuration.GetConnectionString("SqlConnectionString")))
                 .AddTransient<IProviderDataService, ProviderDataService>()
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();

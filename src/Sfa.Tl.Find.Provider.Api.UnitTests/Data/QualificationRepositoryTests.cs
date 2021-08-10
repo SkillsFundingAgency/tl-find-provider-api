@@ -1,6 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Data;
+using System.Threading.Tasks;
 using FluentAssertions;
+using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Data;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
@@ -19,9 +23,18 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         [Fact]
         public async Task GetQualifications_Returns_Expected_List()
         {
-            var repository = new QualificationRepositoryBuilder().Build();
+            var dbConnection = Substitute.For<IDbConnection>();
+            var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+            dbContextWrapper
+                .CreateConnection()
+                .Returns(dbConnection);
+            dbContextWrapper
+                .QueryAsync<Qualification>(dbConnection, Arg.Any<string>())
+                .Returns(new QualificationBuilder().BuildList());
 
-            var results = await repository.GetAllQualifications();
+            var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
+
+            var results = await repository.GetAll();
             results.Should().NotBeNullOrEmpty();
         }
     }
