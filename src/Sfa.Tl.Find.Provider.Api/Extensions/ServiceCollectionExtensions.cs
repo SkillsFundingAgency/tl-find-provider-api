@@ -3,14 +3,16 @@ using System.IO;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Quartz;
+using Sfa.Tl.Find.Provider.Api.Jobs;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions
 {
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddCorsPolicy(
-            this IServiceCollection services, 
-            string policyName, 
+            this IServiceCollection services,
+            string policyName,
             string allowedOrigins)
         {
             if (!string.IsNullOrWhiteSpace(allowedOrigins))
@@ -27,8 +29,8 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         }
 
         public static IServiceCollection AddSwagger(
-            this IServiceCollection services, 
-            string name, 
+            this IServiceCollection services,
+            string name,
             string title,
             string version,
             string xmlFile = null)
@@ -51,5 +53,42 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
 
             return services;
         }
-  }
+
+        public static IServiceCollection AddHostedQuartzServices(
+            this IServiceCollection services)
+        {
+            services.AddQuartz(q =>
+            {
+                // Normally would take this from appsettings.json, just show it's possible
+                q.SchedulerName = "Example Quartz Scheduler";
+
+                // Use a Scoped container for creating IJobs
+                q.UseMicrosoftDependencyInjectionJobFactory();
+
+                //q.UsePersistentStore(s =>
+                //{
+                //    s.UseSqlServer(connectionString);
+                //    s.UseClustering();
+                //    s.UseProperties = true;
+                //    s.UseJsonSerializer();
+                //});
+
+                var jobKey = new JobKey("Import Course Data");
+                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(jobKey));
+
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .StartNow()
+                    //.WithSchedule(new CronScheduleBuilder(cronSchedule)
+                    .WithSimpleSchedule(x => x
+                        .WithInterval(TimeSpan.FromMinutes(5))
+                        .RepeatForever())
+                );
+            });
+
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+            return services;
+        }
+    }
 }

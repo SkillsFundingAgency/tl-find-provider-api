@@ -54,9 +54,12 @@ namespace Sfa.Tl.Find.Provider.Api
 
             AddHttpClients(services);
 
-            services.AddTransient<IProviderDataService, ProviderDataService>();
-            services.AddTransient<IProviderRepository, ProviderRepository>();
-            services.AddTransient<IQualificationRepository, QualificationRepository>();
+            services
+                .AddTransient<IProviderDataService, ProviderDataService>()
+                .AddTransient<IProviderRepository, ProviderRepository>()
+                .AddTransient<IQualificationRepository, QualificationRepository>();
+
+            services.AddHostedQuartzServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -54,7 +54,17 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             servicesAfter.Should().NotBeEmpty();
             servicesAfter.Should().Contain(t => t.ServiceType.Name == "ISwaggerProvider");
+        }
 
+        [Fact]
+        public void AddHostedQuartzServices_Should_AddService()
+        {
+            var services = new ServiceCollection();
+
+            var servicesAfter = services.AddHostedQuartzServices();
+
+            servicesAfter.Should().NotBeEmpty();
+            servicesAfter.Should().Contain(t => t.ImplementationType != null && t.ImplementationType.Name == "QuartzHostedService");
         }
     }
 }
