@@ -14,6 +14,7 @@
 	[Latitude] DECIMAL(9, 6) NULL,
 	[Longitude] DECIMAL(9, 6) NULL,
 	[Location] GEOGRAPHY NULL, 
+	[IsDeleted] BIT NOT NULL DEFAULT (0),
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (getutcdate()),
 	[ModifiedOn] DATETIME2(7) NULL
     CONSTRAINT [PK_Location] PRIMARY KEY ([Id])

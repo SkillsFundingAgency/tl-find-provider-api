@@ -11,6 +11,7 @@
 	[Email] NVARCHAR(320) NOT NULL,
 	[Telephone] NVARCHAR(150) NULL,
 	[Website] NVARCHAR(100) NULL,
+	[IsDeleted] BIT NOT NULL DEFAULT (0),
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (getutcdate()),
 	[ModifiedOn] DATETIME2(7) NULL
     CONSTRAINT [PK_Provider] PRIMARY KEY ([Id])
