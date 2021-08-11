@@ -25,7 +25,7 @@ namespace Sfa.Tl.Find.Provider.Api.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            _logger.LogInformation($"{nameof(CourseDataImportJob)} job triggered. {context?.Trigger?.JobKey?.Name}");
+            _logger.LogInformation($"{nameof(CourseDataImportJob)} job triggered. {context?.Trigger.JobKey.Name}");
 
             try
             {
