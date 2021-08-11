@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -46,27 +48,33 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
                 .BuildList()
                 .ToList();
 
+            var changeResult = new DataBaseChangeResultBuilder()
+                .WithInserts(3)
+                .WithUpdates(2)
+                .WithDeletes(1)
+                .Build();
+
             var dbConnection = Substitute.For<IDbConnection>();
             var dbContextWrapper = Substitute.For<IDbContextWrapper>();
             dbContextWrapper
                 .CreateConnection()
                 .Returns(dbConnection);
             dbContextWrapper
-                .ExecuteAsync(dbConnection, 
+                .QueryAsync<(string Change, int ChangeCount)>(dbConnection, 
                     "UpdateQualifications",
                     Arg.Any<object>(),
                     commandType: CommandType.StoredProcedure
                     )
-                .Returns(qualifications.Count);
+                .Returns(changeResult);
 
             var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
 
             var results = await repository.Save(qualifications);
 
             results.Should().NotBeNull();
-            results.Inserted.Should().Be(qualifications.Count);
-            results.Updated.Should().Be(0);
-            results.Deleted.Should().Be(0);
+            results.Inserted.Should().Be(3);
+            results.Updated.Should().Be(2);
+            results.Deleted.Should().Be(1);
         }
     }
 }

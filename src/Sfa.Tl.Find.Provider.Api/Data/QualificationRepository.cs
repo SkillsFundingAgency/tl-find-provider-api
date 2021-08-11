@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using Dapper;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
@@ -33,16 +32,17 @@ namespace Sfa.Tl.Find.Provider.Api.Data
         public async Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Qualification> qualifications)
         {
             using var connection = _dbContextWrapper.CreateConnection();
-            var rowsAffected = await _dbContextWrapper.ExecuteAsync(
-                connection, 
-                "UpdateQualifications",
-                new
-                {
-                    data = qualifications.AsTableValuedParameter("dbo.QualificationDataTableType")
-                },
-                commandType: CommandType.StoredProcedure);
+            var updateResult = await _dbContextWrapper
+                .QueryAsync<(string Change, int ChangeCount)>(
+                    connection, 
+                    "UpdateQualifications",
+                    new
+                    {
+                        data = qualifications.AsTableValuedParameter("dbo.QualificationDataTableType")
+                    },
+                    commandType: CommandType.StoredProcedure);
 
-            return ( rowsAffected, 0, 0 );
+            return updateResult.ConvertToTuple();
         }
     }
 }

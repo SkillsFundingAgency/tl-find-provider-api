@@ -49,7 +49,12 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var qualifications = await ReadTLevelQualificationsFromResponse(responseMessage);
 
-            return await _qualificationRepository.Save(qualifications);
+            var results = await _qualificationRepository.Save(qualifications);
+
+            _logger.LogInformation(
+                $"Saved qualifications - inserted {results.Inserted}, updated {results.Updated}, deleted {results.Deleted}.");
+
+            return results;
         }
 
         public async Task<(int Saved, int Updated, int Deleted)> ImportProviders()

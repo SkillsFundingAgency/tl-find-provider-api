@@ -1,7 +1,13 @@
 ﻿CREATE PROCEDURE [dbo].[UpdateQualifications]
-  @data [dbo].[QualificationDataTableType] READONLY
+	@data [dbo].[QualificationDataTableType] READONLY
 AS
 	SET NOCOUNT ON;
+
+	DECLARE @ChangeSummary TABLE(
+		Change VARCHAR(20),
+		Id INT,
+		IsDeleted BIT
+	);
 
 	MERGE INTO [dbo].[Qualification] AS t
 	USING @data AS s
@@ -10,11 +16,9 @@ AS
 	  t.[Id] = s.[Id]
 	)
 	WHEN MATCHED 
-		 AND (t.[Id] <> s.[Id] 
-			  OR t.[Name] <> s.[Name]
-			  OR t.[IsDeleted] = 0)
+		 AND (t.[Name] <> s.[Name]
+			  OR t.[IsDeleted] = 1) --To undelete
 	THEN UPDATE SET
-	  t.[Id]  = s.[Id],
 	  t.[Name] = s.[Name],
 	  t.[IsDeleted] = 0,
 	  t.[ModifiedOn] = GETUTCDATE()
@@ -32,4 +36,21 @@ AS
 	WHEN NOT MATCHED BY SOURCE THEN 
 	UPDATE SET
 	  t.[IsDeleted] = 1	  ,
-	  t.[ModifiedOn] = GETUTCDATE(); --Soft delete
+	  t.[ModifiedOn] = GETUTCDATE() --Soft delete
+
+	OUTPUT $action, 
+		INSERTED.Id, 
+		INSERTED.IsDeleted
+	INTO @ChangeSummary	;
+
+	WITH cte (Change) AS
+	(SELECT	CASE
+				WHEN Change = 'UPDATE' AND IsDeleted = 1
+				THEN 'DELETE'
+				ELSE Change
+			END
+		FROM @ChangeSummary)
+		SELECT	Change, 
+				COUNT(*) AS CountPerChange	 
+		FROM cte
+		GROUP BY Change;
