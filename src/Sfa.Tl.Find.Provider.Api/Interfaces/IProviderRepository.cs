@@ -13,6 +13,6 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
         //    int page,
         //    int pageSize);
 
-        Task Save(IEnumerable<Models.Provider> providers);
+        Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Models.Provider> providers);
     }
 }

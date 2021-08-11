@@ -26,18 +26,23 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                 connection,
                 "SELECT Id, Name " +
                 "FROM dbo.Qualification " +
+                "WHERE IsDeleted = 0 " +
                 "ORDER BY Name");
         }
 
-        public async Task Save(IEnumerable<Qualification> qualifications)
+        public async Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Qualification> qualifications)
         {
             using var connection = _dbContextWrapper.CreateConnection();
-            await connection.ExecuteAsync("UpdateQualifications",
+            var rowsAffected = await _dbContextWrapper.ExecuteAsync(
+                connection, 
+                "UpdateQualifications",
                 new
                 {
                     data = qualifications.AsTableValuedParameter("dbo.QualificationDataTableType")
                 },
                 commandType: CommandType.StoredProcedure);
+
+            return ( rowsAffected, 0, 0 );
         }
     }
 }

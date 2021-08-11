@@ -8,5 +8,11 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
     {
         IDbConnection CreateConnection();
         Task<IEnumerable<T>> QueryAsync<T>(IDbConnection connection, string sql);
+
+        Task<int> ExecuteAsync(IDbConnection connection, string sql, 
+            object param = null, 
+            IDbTransaction transaction = null, 
+            int? commandTimeout = null, 
+            CommandType? commandType = null);
     }
 }

@@ -26,5 +26,11 @@ namespace Sfa.Tl.Find.Provider.Api.Data
         {
             return await connection.QueryAsync<T>(sql);
         }
+
+        public async Task<int> ExecuteAsync(IDbConnection connection, string sql, object param = null,
+            IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        {
+            return await connection.ExecuteAsync(sql, param, transaction, commandTimeout, commandType);
+        }
     }
 }

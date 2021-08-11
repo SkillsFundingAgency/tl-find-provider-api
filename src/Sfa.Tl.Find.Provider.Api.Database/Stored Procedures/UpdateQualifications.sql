@@ -16,7 +16,8 @@ AS
 	THEN UPDATE SET
 	  t.[Id]  = s.[Id],
 	  t.[Name] = s.[Name],
-	  t.[IsDeleted] = 0
+	  t.[IsDeleted] = 0,
+	  t.[ModifiedOn] = GETUTCDATE()
 
 	WHEN NOT MATCHED BY TARGET THEN INSERT
 	(
@@ -30,4 +31,5 @@ AS
 	)
 	WHEN NOT MATCHED BY SOURCE THEN 
 	UPDATE SET
-	  t.[IsDeleted] = 1; --Soft delete
+	  t.[IsDeleted] = 1	  ,
+	  t.[ModifiedOn] = GETUTCDATE(); --Soft delete

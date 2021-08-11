@@ -8,6 +8,6 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
     {
         Task<IEnumerable<Qualification>> GetAll();
 
-        Task Save(IEnumerable<Qualification> qualifications);
+        Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Qualification> qualifications);
     }
 }

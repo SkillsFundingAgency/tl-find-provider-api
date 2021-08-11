@@ -17,7 +17,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         }
         
         [Fact]
-        public async Task GetProviders_Returns_Expected_List()
+        public async Task GetAll_Returns_Expected_List()
         {
             var repository = new ProviderRepositoryBuilder().Build();
 

@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NSubstitute;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
@@ -27,9 +30,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportQualifications_Returns_Expected_Result()
         {
-            var validQualifications = new PostcodeLocationBuilder().BuildValidPostcodeLocation();
-
-            var getTLevelDefinitionsUriFragment = "tleveldefinitions";
+            const string getTLevelDefinitionsUriFragment = "tleveldefinitions";
 
             var jsonBuilder = new CourseDirectoryJsonBuilder();
 
@@ -38,20 +39,24 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 { getTLevelDefinitionsUriFragment, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
             };
 
+            var qualificationRepository = Substitute.For<IQualificationRepository>();
+            qualificationRepository.Save(Arg.Any<IEnumerable<Qualification>>())
+                .Returns((10, 5, 2));
+
             var service = new CourseDirectoryServiceBuilder()
-                .Build(responses);
+                .Build(responses, qualificationRepository: qualificationRepository);
 
             var result = await service.ImportQualifications();
 
-            result.Saved.Should().Be(16);
-            result.Deleted.Should().Be(0);
-            //Verify(result, );
+            result.Saved.Should().Be(10);
+            result.Updated.Should().Be(5);
+            result.Deleted.Should().Be(2);
         }
 
         [Fact]
         public async Task ImportProviders_Returns_Expected_Result()
         {
-            var getTLevelCoursesFragment = "tlevels";
+            const string getTLevelCoursesFragment = "tlevels";
 
             var jsonBuilder = new CourseDirectoryJsonBuilder();
 
@@ -60,13 +65,21 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 { getTLevelCoursesFragment, jsonBuilder.BuildValidTLevelsResponse() }
             };
 
+            var providerRepository = Substitute.For<IProviderRepository>();
+            providerRepository.Save(Arg.Any<IEnumerable<Models.Provider>>())
+                .Returns((20, 10, 5));
+
             var service = new CourseDirectoryServiceBuilder()
-                .Build(responses);
+                .Build(responses, providerRepository);
 
             var result = await service.ImportProviders();
 
             result.Saved.Should().Be(0);
+            result.Updated.Should().Be(0);
             result.Deleted.Should().Be(0);
+            //result.Saved.Should().Be(20);
+            //result.Updated.Should().Be(10);
+            //result.Deleted.Should().Be(5);
         }
     }
 }

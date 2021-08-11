@@ -35,7 +35,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<(int Saved, int Deleted)> ImportQualifications()
+        public async Task<(int Saved, int Updated, int Deleted)> ImportQualifications()
         {
             var responseMessage = await _httpClient.GetAsync(QualificationsEndpoint);
 
@@ -49,12 +49,12 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var qualifications = await ReadTLevelQualificationsFromResponse(responseMessage);
 
-            return (qualifications.Count(), 0);
+            return await _qualificationRepository.Save(qualifications);
         }
 
-        public async Task<(int Saved, int Deleted)> ImportProviders()
+        public async Task<(int Saved, int Updated, int Deleted)> ImportProviders()
         {
-            return (0, 0);
+            return (0, 0, 0);
         }
 
         private static async Task<IEnumerable<Qualification>> ReadTLevelQualificationsFromResponse(HttpResponseMessage responseMessage)

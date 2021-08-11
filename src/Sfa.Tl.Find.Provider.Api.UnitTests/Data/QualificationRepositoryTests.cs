@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
@@ -21,7 +22,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         }
         
         [Fact]
-        public async Task GetQualifications_Returns_Expected_List()
+        public async Task GetAll_Returns_Expected_List()
         {
             var dbConnection = Substitute.For<IDbConnection>();
             var dbContextWrapper = Substitute.For<IDbContextWrapper>();
@@ -36,6 +37,36 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
 
             var results = await repository.GetAll();
             results.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task Save_Returns_Expected_Result()
+        {
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .ToList();
+
+            var dbConnection = Substitute.For<IDbConnection>();
+            var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+            dbContextWrapper
+                .CreateConnection()
+                .Returns(dbConnection);
+            dbContextWrapper
+                .ExecuteAsync(dbConnection, 
+                    "UpdateQualifications",
+                    Arg.Any<object>(),
+                    commandType: CommandType.StoredProcedure
+                    )
+                .Returns(qualifications.Count);
+
+            var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
+
+            var results = await repository.Save(qualifications);
+
+            results.Should().NotBeNull();
+            results.Inserted.Should().Be(qualifications.Count);
+            results.Updated.Should().Be(0);
+            results.Deleted.Should().Be(0);
         }
     }
 }

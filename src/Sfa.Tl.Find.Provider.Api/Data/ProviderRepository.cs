@@ -32,8 +32,9 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             };
         }
 
-        public async Task Save(IEnumerable<Models.Provider> providers)
+        public async Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Models.Provider> providers)
         {
+            return (0, 0, 0);
         }
     }
 }
