@@ -289,6 +289,10 @@ __pycache__/
 *.xsd.cs
 .DS_Store
 
+#Include Database publish xml file so that we can use it during the build and deploy
+!**.Database.publish.xml
+!**Database.Local.publish.xml
+
 # Local development settings files - may contain secrets
 appsettings.Development.json
 
