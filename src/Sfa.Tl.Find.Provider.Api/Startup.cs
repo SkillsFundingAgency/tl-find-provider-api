@@ -46,8 +46,7 @@ namespace Sfa.Tl.Find.Provider.Api
             services.AddSwagger("v1",
                 "T Levels Find a Provider Api",
                 "v1",
-                $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"
-                );
+                $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
             services.AddCorsPolicy(CorsPolicyName, _configuration["AllowedOrigins"]);
 
@@ -69,9 +68,12 @@ namespace Sfa.Tl.Find.Provider.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sfa.Tl.Find.Provider.Api v1"));
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint(
+                "/swagger/v1/swagger.json",
+                "T Levels Find a Provider.Api v1"));
 
             app.UseHttpsRedirection();
 
@@ -99,7 +101,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             return services;
         }
-        
+
         // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddHttpClients(IServiceCollection services)
         {
