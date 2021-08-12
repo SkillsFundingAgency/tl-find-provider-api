@@ -13,6 +13,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
 {
     public class ProviderRepositoryTests
     {
+        private const string TestPostcode = "CV1 2WT";
+
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
         {
@@ -20,15 +22,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
                 .ShouldNotAcceptNullConstructorArguments();
         }
         
-        [Fact]
-        public async Task GetAll_Returns_Expected_List()
-        {
-            var repository = new ProviderRepositoryBuilder().Build();
-
-            var results = await repository.GetAll();
-            results.Should().NotBeNullOrEmpty();
-        }
-
         [Fact]
         public async Task Save_Returns_Expected_Result()
         {
@@ -63,6 +56,35 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             results.Inserted.Should().Be(10);
             results.Updated.Should().Be(5);
             results.Deleted.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task Search_Returns_Expected_List()
+        {
+            var providers = new ProviderBuilder()
+                .BuildList()
+                .ToList();
+
+            var dbConnection = Substitute.For<IDbConnection>();
+            var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+            dbContextWrapper
+                .CreateConnection()
+                .Returns(dbConnection);
+            dbContextWrapper
+                .QueryAsync<Models.Provider>(dbConnection,
+                    "SearchProviders",
+                    Arg.Any<object>(),
+                    commandType: CommandType.StoredProcedure
+                )
+                .Returns(providers);
+
+            var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
+
+            var searchResults = await repository.Search(TestPostcode, null, 0, 0);
+
+            var searchResultsList = searchResults.ToList();
+            searchResultsList.Count.Should().Be(providers.Count);
+            searchResultsList.Should().BeEquivalentTo(providers);
         }
     }
 }

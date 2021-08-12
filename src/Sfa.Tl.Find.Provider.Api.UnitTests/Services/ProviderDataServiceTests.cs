@@ -48,10 +48,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         }
 
         [Fact]
-        public async Task GetProviders_Returns_Expected_List_For_Valid_Postcode()
+        public async Task FindProviders_Returns_Expected_List_For_Valid_Postcode()
         {
             var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.GetAll()
+            providerRepository.Search(
+                    TestPostcode,
+                    Arg.Any<int?>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>())
                 .Returns(new ProviderBuilder().BuildList().AsQueryable());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -69,17 +73,22 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         }
 
         [Fact]
-        public async Task GetProviders_Returns_Expected_List_For_Valid_Postcode_From_Cache()
+        public async Task FindProviders_Returns_Expected_List_For_Valid_Postcode_From_Cache()
         {
             var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.GetAll()
+            providerRepository.Search(
+                    TestPostcode,
+                    Arg.Any<int?>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>())
                 .Returns(new ProviderBuilder().BuildList().AsQueryable());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
-            
+
             var cache = Substitute.For<IMemoryCache>();
             cache.TryGetValue(Arg.Any<string>(), out Arg.Any<PostcodeLocation>())
-                .Returns(x => {
+                .Returns(x =>
+                {
                     if (((string)x[0]).Contains(TestPostcode.Replace(" ", "")))
                     {
                         x[1] = new PostcodeLocationBuilder().BuildPostcodeLocation(TestPostcode);
@@ -101,10 +110,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         }
 
         [Fact]
-        public async Task GetProviders_Throws_Exception_For_Bad_Postcode()
+        public async Task FindProviders_Throws_Exception_For_Bad_Postcode()
         {
             var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.GetAll()
+            providerRepository.Search(TestPostcode,
+                    Arg.Any<int?>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>())
                 .Returns(new ProviderBuilder().BuildList().AsQueryable());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();

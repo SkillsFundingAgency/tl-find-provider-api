@@ -75,5 +75,6 @@
     <Build Include="Types\QualificationDataTableType.sql" />
     <Build Include="Types\ProviderDataTableType.sql" />
     <Build Include="Stored Procedures\UpdateProviders.sql" />
+    <Build Include="Stored Procedures\SearchProviders.sql" />
   </ItemGroup>
 </Project>

@@ -16,23 +16,6 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
         }
 
-        public async Task<IEnumerable<Models.Provider>> GetAll()
-        {
-            return new Models.Provider[]
-            {
-                new()
-                {
-                    UkPrn = 10000001,
-                    Name = "Test provider 1"
-                },
-                new()
-                {
-                    UkPrn = 10000001,
-                    Name = "Test provider 2"
-                }
-            };
-        }
-
         public async Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Models.Provider> providers)
         {
             using var connection = _dbContextWrapper.CreateConnection();
@@ -51,6 +34,26 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             //transaction.Commit();
 
             return updateResult.ConvertToTuple();
+        }
+
+        public async Task<IEnumerable<Models.Provider>> Search(string postcode, int? qualificationId, int page, int pageSize)
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var providers = await _dbContextWrapper
+                .QueryAsync<Models.Provider>(
+                    connection,
+                    "SearchProviders",
+                    new
+                    {
+                        postcode,
+                        qualificationId,
+                        page,
+                        pageSize
+                    },
+                    commandType: CommandType.StoredProcedure);
+
+            return providers;
         }
     }
 }

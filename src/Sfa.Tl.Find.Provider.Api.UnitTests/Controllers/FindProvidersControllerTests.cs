@@ -126,7 +126,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
             result.Should().BeOfType(typeof(NotFoundObjectResult));
             var notFoundObjectResult = result as NotFoundObjectResult;
 
-            //var message = (result as NotFoundObjectResult)?.Value as string;
             var message = notFoundObjectResult!.Value as string;
             message.Should().Be($"Postcode {InvalidPostcode} was not found");
         }
