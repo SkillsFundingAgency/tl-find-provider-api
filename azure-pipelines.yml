@@ -1,0 +1,24 @@
+resources:
+  repositories:
+    - repository: self
+      persistCredentials: true
+      clean: true
+
+    - repository: devopsTemplates
+      type: github
+      endpoint: DfE-Digital
+      name: DFE-Digital/operations-devops-pipeline-templates
+
+trigger:
+  branches:
+    include:
+    - master
+    - feature/*
+    - bugs/*
+pr:
+  - master
+
+variables:
+  applicationName: findproviderapi
+stages:
+  - template: ./yaml/stages/findproviderapi-master-stage.yml

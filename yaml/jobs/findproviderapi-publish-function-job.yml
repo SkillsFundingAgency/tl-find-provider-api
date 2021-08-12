@@ -1,0 +1,31 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: sharedEnvironmentId
+    type: string
+jobs:
+- job: PublishFunction
+  variables:
+    WorkerFunctionAppName: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.WorkerFunctionAppName'] ]
+
+  pool:
+    name: 'Azure Pipelines'
+    vmImage: 'windows-2019'
+  dependsOn: 
+    - DeployfindproviderapiInfrastructure
+    - GenerateConfigs
+  steps:
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'current'
+      downloadType: 'single'
+      artifactName: 'appdrop'
+      downloadPath: '$(System.ArtifactsDirectory)'
+  
+  - task: AzureFunctionApp@1
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      appType: 'functionApp'
+      appName: '$(WorkerFunctionAppName)'
+      package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.findproviderapi.Functions.zip'
+      deploymentMethod: 'auto'
