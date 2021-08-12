@@ -35,13 +35,35 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public async Task<(int Saved, int Updated, int Deleted)> ImportProviders()
+        {
+            var responseMessage = await _httpClient.GetAsync(CourseDetailEndpoint);
+
+            if (responseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.LogError($"Course Directory API call to '{CourseDetailEndpoint}' failed with " +
+                                 $"{responseMessage.StatusCode} - {responseMessage.ReasonPhrase}");
+            }
+
+            responseMessage.EnsureSuccessStatusCode();
+
+            var providers = await ReadTLevelProvidersFromResponse(responseMessage);
+
+            var results = await _providerRepository.Save(providers);
+
+            _logger.LogInformation(
+                $"Saved providers - inserted {results.Inserted}, updated {results.Updated}, deleted {results.Deleted}.");
+            
+            return results;
+        }
+
         public async Task<(int Saved, int Updated, int Deleted)> ImportQualifications()
         {
             var responseMessage = await _httpClient.GetAsync(QualificationsEndpoint);
 
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
-                _logger.LogError("Course Directory API call failed with " +
+                _logger.LogError($"Course Directory API call to '{QualificationsEndpoint}' failed with " +
                                  $"{responseMessage.StatusCode} - {responseMessage.ReasonPhrase}");
             }
 
@@ -57,12 +79,60 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             return results;
         }
 
-        public async Task<(int Saved, int Updated, int Deleted)> ImportProviders()
+        private async Task<IEnumerable<Models.Provider>> ReadTLevelProvidersFromResponse(
+            HttpResponseMessage responseMessage)
         {
-            return (0, 0, 0);
+            var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+
+            var providers = new List<Models.Provider>();
+
+            foreach (var courseElement in jsonDocument.RootElement
+                .GetProperty("tLevels")
+                .EnumerateArray()
+                .Where(courseElement => courseElement.SafeGetString("offeringType") == "TLevel"))
+            {
+                var tLevelId = courseElement.SafeGetString("tLevelId");
+
+                if (!courseElement.TryGetProperty("provider", out var providerProperty))
+                {
+                    _logger.LogWarning($"Could not find provider property for course record with tLevelId {tLevelId}.");
+                    continue;
+                }
+
+                if (!int.TryParse(providerProperty.SafeGetString("ukprn"), out var ukPrn))
+                {
+                    _logger.LogWarning($"Could not find ukprn property for course record with tLevelId {tLevelId}.");
+                    continue;
+                }
+
+                //var providerName = providerProperty.SafeGetString("providerName");
+
+                var provider = providers.FirstOrDefault(p => p.UkPrn == ukPrn);
+
+                if (provider == null)
+                {
+                    provider = new Models.Provider
+                    {
+                        UkPrn = ukPrn,
+                        Name = providerProperty.SafeGetString("providerName"),
+                        AddressLine1 = providerProperty.SafeGetString("addressLine1"),
+                        AddressLine2 = providerProperty.SafeGetString("addressLine2"),
+                        Town = providerProperty.SafeGetString("town"),
+                        County = providerProperty.SafeGetString("county"),
+                        Postcode = providerProperty.SafeGetString("postcode"),
+                        Email = providerProperty.SafeGetString("email"),
+                        Telephone = providerProperty.SafeGetString("telephone"),
+                        Website = providerProperty.SafeGetString("website"),
+                        //Locations = new List<Location>()
+                    };
+                    providers.Add(provider);
+                }
+            }
+
+            return providers;
         }
 
-        private static async Task<IEnumerable<Qualification>> ReadTLevelQualificationsFromResponse(HttpResponseMessage responseMessage)
+        private async Task<IEnumerable<Qualification>> ReadTLevelQualificationsFromResponse(HttpResponseMessage responseMessage)
         {
             var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
 

@@ -73,5 +73,7 @@
     <Build Include="Indexes\SPATIAL_Location_Location.sql" />
     <Build Include="Stored Procedures\UpdateQualifications.sql" />
     <Build Include="Types\QualificationDataTableType.sql" />
+    <Build Include="Types\ProviderDataTableType.sql" />
+    <Build Include="Stored Procedures\UpdateProviders.sql" />
   </ItemGroup>
 </Project>
