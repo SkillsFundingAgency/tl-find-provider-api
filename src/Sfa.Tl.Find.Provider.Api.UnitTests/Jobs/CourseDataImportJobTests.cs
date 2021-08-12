@@ -27,7 +27,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Jobs
         [Fact]
         public async Task Execute_Job_Works_As_Expected()
         {
+            var trigger = Substitute.For<ITrigger>();
+            trigger.JobKey.Returns(new JobKey("Test"));
             var jobContext = Substitute.For<IJobExecutionContext>();
+            jobContext.Trigger.Returns(trigger);
 
             var job = new CourseDataImportJobBuilder()
                 .Build();
