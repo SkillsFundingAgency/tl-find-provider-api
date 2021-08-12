@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
@@ -16,6 +20,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
     public class FindProvidersControllerTests
     {
         private const string TestPostcode = "AB1 2XY";
+        private const string InvalidPostcode = "CV99 XXX";
 
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
@@ -105,6 +110,43 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             results.Single().UkPrn.Should().Be(providers.Single().UkPrn);
             results.Single().Name.Should().Be(providers.Single().Name);
+        }
+
+        [Fact]
+        public async Task GetProviders_Returns_Not_Found_Result_For_Invalid_Postcode()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(InvalidPostcode)
+                .Throws(new PostcodeNotFoundException(InvalidPostcode));
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(InvalidPostcode);
+
+            result.Should().BeOfType(typeof(NotFoundObjectResult));
+            var notFoundObjectResult = result as NotFoundObjectResult;
+
+            //var message = (result as NotFoundObjectResult)?.Value as string;
+            var message = notFoundObjectResult!.Value as string;
+            message.Should().Be($"Postcode {InvalidPostcode} was not found");
+        }
+
+        [Fact]
+        public async Task GetProviders_Returns_Error_Result_For_Internal_Error()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(InvalidPostcode)
+                .Throws(new Exception("Test exception"));
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(InvalidPostcode);
+
+            result.Should().BeOfType(typeof(StatusCodeResult));
+            var statusCodeResult = result as StatusCodeResult;
+
+            statusCodeResult!.StatusCode.Should().Be(500);
+            statusCodeResult!.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers
 {
@@ -36,6 +37,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         [Route("providers/{postcode}", Name = "GetProviders")]
         [ProducesResponseType(typeof(IEnumerable<Models.Provider>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(
             string postcode,
             [FromQuery] int? qualificationId = null,
@@ -45,11 +47,23 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             _logger.LogDebug($"GetProviders called with qualificationId={qualificationId}, " +
                              $"page={page}, pageSize={pageSize}");
 
-            //TODO: Deal with exception or empty result from checking postcode - return a not found with "invalid postcode"?
-            var providers = await _providerDataService.FindProviders(postcode);
-            return providers != null
-                ? Ok(providers)
-                : NotFound();
+            try
+            {
+                var providers = await _providerDataService.FindProviders(postcode);
+                return providers != null
+                    ? Ok(providers)
+                    : NotFound();
+            }
+            catch (PostcodeNotFoundException pex)
+            {
+                _logger.LogError(pex, $"Postcode {pex.Postcode} was not found. Returning a Not Found result.");
+                return NotFound(pex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>

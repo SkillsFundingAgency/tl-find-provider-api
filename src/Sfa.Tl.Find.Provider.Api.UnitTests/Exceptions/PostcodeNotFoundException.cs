@@ -17,6 +17,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Exceptions
 
             exception.Message.Should().Be(expectedMessage);
             exception.InnerException.Should().BeNull();
+            exception.Postcode.Should().Be(postcode);
         }
 
         [Fact]
@@ -30,6 +31,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Exceptions
 
             exception.Message.Should().Be(expectedMessage);
             exception.InnerException.Should().Be(innerException);
+            exception.Postcode.Should().Be(postcode);
         }
     }
 }
