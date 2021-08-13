@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using Dapper.Contrib.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Models
 {
+    [DebuggerDisplay("{" + nameof(Postcode) + "}" +
+                     " {" + nameof(Name) + ", nq}")]
     public class Location
     {
         public string Name { get; init; }
@@ -16,6 +20,7 @@ namespace Sfa.Tl.Find.Provider.Api.Models
         public double Latitude { get; init; }
         public double Longitude { get; init; }
 
+        [Write(false)]
         public ICollection<DeliveryYear> DeliveryYears { get; init; }
     }
 }

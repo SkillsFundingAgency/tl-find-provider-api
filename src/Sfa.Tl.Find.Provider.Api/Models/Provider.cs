@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using Dapper.Contrib.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Models
 {
@@ -19,6 +19,7 @@ namespace Sfa.Tl.Find.Provider.Api.Models
         public string Telephone { get; init; }
         public string Website { get; init; }
 
+        [Write(false)]
         public ICollection<Location> Locations { get; init; }
     }
 }

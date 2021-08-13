@@ -2,6 +2,8 @@
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using Dapper.Contrib.Extensions;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions
 {
@@ -23,7 +25,11 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
             else
             {
                 var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                var readableProperties = properties.Where(w => w.CanRead).ToArray();
+                var readableProperties = properties.Where(w => 
+                        w.CanRead && 
+                        !w.HasAttribute<WriteAttribute>() //Not to be written via Dapper
+                    ).ToArray();
+
                 var columnNames = (orderedColumnNames ?? readableProperties.Select(s => s.Name)).ToArray();
                 foreach (var name in columnNames)
                 {
