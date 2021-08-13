@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
@@ -10,12 +11,46 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                 new()
                 {
                     UkPrn = 10000001,
-                    Name = "Provider 1"
+                    Name = "Provider 1",
+                    Postcode = "AA1 1AA",
+                    AddressLine1 = "Provider 1 Address Line 1",
+                    AddressLine2 = "Provider 1 Address Line",
+                    Town = "Provider 1 Town",
+                    County = "Provider 1 County",
+                    Email = "email.address@provider1.ac.uk",
+                    Telephone = "011 111 1111",
+                    Website= "https://www.provider1.ac.uk",
+                    Locations = new List<Location>
+                    {
+                        new Location
+                            {
+                                Postcode = "AA1 1AA",
+                                AddressLine1 = "Provider 1 Address Line 1",
+                                AddressLine2 = "Provider 1 Address Line",
+                                Town = "Provider 1 Town",
+                                County = "Provider 1 County",
+                                Email = "email.address@provider1.ac.uk",
+                                Telephone = "011 111 1111",
+                                Website= "https://www.provider1.ac.uk",
+                                Latitude = 50.0,
+                                Longitude = 1.0
+                            }
+                    }
                 },
                 new()
                 {
                     UkPrn = 10000002,
-                    Name = "Provider 2"
+                    Name = "Provider 2",
+                    AddressLine1 = "Provider 2 Address Line 1",
+                    AddressLine2 = "Provider 2 Address Line",
+                    Town = "Provider 2 Town",
+                    County = "Provider 2 County",
+                    Postcode = "BB2 2BB",
+                    Email = "email.address@provider2.ac.uk",
+                    Telephone = "022 222 2222",
+                    Website= "https://www.provider2.ac.uk",
+
+                    Locations = new List<Location>()
                 }
             };
     }

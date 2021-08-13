@@ -76,5 +76,7 @@
     <Build Include="Types\ProviderDataTableType.sql" />
     <Build Include="Stored Procedures\UpdateProviders.sql" />
     <Build Include="Stored Procedures\SearchProviders.sql" />
+    <Build Include="Types\LocationDataTableType.sql" />
+    <Build Include="Stored Procedures\UpdateLocations.sql" />
   </ItemGroup>
 </Project>

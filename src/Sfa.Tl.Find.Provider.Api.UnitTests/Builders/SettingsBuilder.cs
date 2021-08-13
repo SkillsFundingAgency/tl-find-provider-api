@@ -30,10 +30,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 
         internal ConfigurationOptions BuildConfigurationOptions(
             PostcodeApiSettings postcodeApiSettings = null,
-            string sqlConnectionString = "TestConnection") => new()
+            string sqlConnectionString = "TestConnection",
+            string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI") => new()
             {
                 PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
-                SqlConnectionString = sqlConnectionString
+                SqlConnectionString = sqlConnectionString,
+                CourseDirectoryImportSchedule = courseDirectoryImportSchedule
             };
     }
 }
