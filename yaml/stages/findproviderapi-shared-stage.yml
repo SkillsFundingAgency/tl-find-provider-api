@@ -16,6 +16,7 @@ stages:
     - '${{ each dependency in parameters.dependencies }}':
       - '${{dependency}}'
   variables:
+    - group: platform-global
     - group: platform-global-findproviderapi
     - group: platform-${{parameters.environmentName}}
     - group: platform-${{parameters.environmentName}}-findproviderapi
