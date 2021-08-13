@@ -78,8 +78,8 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
 
                 q.AddTrigger(opts => opts
                     .ForJob(jobKey)
-                    .StartNow()
-                    //.WithSchedule(new CronScheduleBuilder(cronSchedule)
+                    .StartNow() //TODO: Consider a start-up job that check s if there are any, and then runs the main job
+                    //.WithSchedule(new CronScheduleBuilder(cronSchedule) //TODO: Use configuration.CourseDirectoryImportSchedule
                     .WithSimpleSchedule(x => x
                         .WithInterval(TimeSpan.FromMinutes(5))
                         .RepeatForever())

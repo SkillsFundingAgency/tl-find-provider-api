@@ -5,6 +5,12 @@ Tlevels find-provider-api repository
 
 Data insert/update/delete is handled in stored procedures, which are passed table-valued parameters 
 to be merged into the tables. 
+
+The merge statements in the stored procedures need to use this syntax for comparing nullable columns:
+```
+    OR ISNULL(NULLIF(t.[AddressLine1], s.[AddressLine1]), NULLIF(s.[AddressLine1], t.[AddressLine1])) IS NOT NULL
+```
+
 These procedures pass back a summary of changes, with counts of inserted, updated and (soft) deleted rows.
 
 Dapper is used as the ORM layer. For more information on using table valued parameters, see [Bulk Upsert with Dapper and Sql Server](https://blog.schroederspace.com/tumbleweed-technology/bulk-upsert-with-dapper-and-sql-server)
