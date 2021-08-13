@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Sfa.Tl.Find.Provider.Api.Models
 {
@@ -16,5 +18,7 @@ namespace Sfa.Tl.Find.Provider.Api.Models
         public string Email { get; init; }
         public string Telephone { get; init; }
         public string Website { get; init; }
+
+        public ICollection<Location> Locations { get; init; }
     }
 }

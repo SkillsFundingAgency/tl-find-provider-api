@@ -93,19 +93,17 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             {
                 var tLevelId = courseElement.SafeGetString("tLevelId");
 
-                if (!courseElement.TryGetProperty("provider", out var providerProperty))
+                if (!courseElement.TryGetProperty("provider", out var providerElement))
                 {
                     _logger.LogWarning($"Could not find provider property for course record with tLevelId {tLevelId}.");
                     continue;
                 }
 
-                if (!int.TryParse(providerProperty.SafeGetString("ukprn"), out var ukPrn))
+                if (!int.TryParse(providerElement.SafeGetString("ukprn"), out var ukPrn))
                 {
-                    _logger.LogWarning($"Could not find ukprn property for course record with tLevelId {tLevelId}.");
+                    _logger.LogWarning($"Could not find ukprn property for course record with tLevelId {tLevelId}");
                     continue;
                 }
-
-                //var providerName = providerProperty.SafeGetString("providerName");
 
                 var provider = providers.FirstOrDefault(p => p.UkPrn == ukPrn);
 
@@ -114,18 +112,86 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                     provider = new Models.Provider
                     {
                         UkPrn = ukPrn,
-                        Name = providerProperty.SafeGetString("providerName"),
-                        AddressLine1 = providerProperty.SafeGetString("addressLine1"),
-                        AddressLine2 = providerProperty.SafeGetString("addressLine2"),
-                        Town = providerProperty.SafeGetString("town"),
-                        County = providerProperty.SafeGetString("county"),
-                        Postcode = providerProperty.SafeGetString("postcode"),
-                        Email = providerProperty.SafeGetString("email"),
-                        Telephone = providerProperty.SafeGetString("telephone"),
-                        Website = providerProperty.SafeGetString("website"),
-                        //Locations = new List<Location>()
+                        Name = providerElement.SafeGetString("providerName"),
+                        AddressLine1 = providerElement.SafeGetString("addressLine1"),
+                        AddressLine2 = providerElement.SafeGetString("addressLine2"),
+                        Town = providerElement.SafeGetString("town"),
+                        County = providerElement.SafeGetString("county"),
+                        Postcode = providerElement.SafeGetString("postcode"),
+                        Email = providerElement.SafeGetString("email"),
+                        Telephone = providerElement.SafeGetString("telephone"),
+                        Website = providerElement.SafeGetString("website"),
+                        Locations = new List<Location>()
                     };
                     providers.Add(provider);
+                }
+
+                if (!courseElement.TryGetProperty("locations", out var locationsProperty))
+                {
+                    _logger.LogWarning(
+                        $"Could not find locations property for course record with tLevelId {tLevelId}.");
+                    continue;
+                }
+
+                var qualificationFrameworkCode = courseElement.TryGetProperty("qualification", out var qualificationProperty)
+                    ? qualificationProperty.SafeGetInt32("frameworkCode")
+                    : 0;
+                if (qualificationFrameworkCode == 0)
+                {
+                    _logger.LogWarning($"Could not find qualification for course record with tLevelId {tLevelId}.");
+                    continue;
+                }
+
+                if (!DateTime.TryParse(courseElement.SafeGetString("startDate"), out var startDate))
+                {
+                    _logger.LogWarning($"Could not read start date for course record with tLevelId {tLevelId}.");
+                    continue;
+                }
+
+                foreach (var locationElement in locationsProperty.EnumerateArray())
+                {
+                    var postcode = locationElement.SafeGetString("postcode");
+
+                    var location = provider.Locations.FirstOrDefault(l =>
+                        l.Postcode == postcode);
+                    if (location == null)
+                    {
+                        location = new Location
+                        {
+                            Postcode = postcode,
+                            Name = locationElement.SafeGetString("venueName"),
+                            AddressLine1 = locationElement.SafeGetString("addressLine1"),
+                            AddressLine2 = locationElement.SafeGetString("addressLine2"),
+                            Town = locationElement.SafeGetString("town"),
+                            County = locationElement.SafeGetString("county"),
+                            Email = locationElement.SafeGetString("email"),
+                            Telephone = locationElement.SafeGetString("telephone"),
+                            Website = locationElement.SafeGetString("website"),
+                            Latitude = locationElement.SafeGetDouble("latitude"),
+                            Longitude = locationElement.SafeGetDouble("longitude"),
+                            DeliveryYears = new List<DeliveryYear>()
+                        };
+
+                        provider.Locations.Add(location);
+                    }
+
+                    var deliveryYear = location
+                        .DeliveryYears
+                        .FirstOrDefault(dy => dy.Year == startDate.Year);
+                    if (deliveryYear == null)
+                    {
+                        deliveryYear = new DeliveryYear
+                        {
+                            Year = (short)startDate.Year,
+                            Qualifications = new List<Qualification>()
+                        };
+                        location.DeliveryYears.Add(deliveryYear);
+                    }
+
+                    if (deliveryYear.Qualifications.All(q => q.Id != qualificationFrameworkCode))
+                    {
+                        deliveryYear.Qualifications.Add(new Qualification { Id = qualificationFrameworkCode });
+                    }
                 }
             }
 
