@@ -13,10 +13,12 @@ trigger:
   branches:
     include:
     - master
+    - develop
     - feature/*
     - bugs/*
 pr:
   - master
+  - develop
 
 variables:
   applicationName: findproviderapi

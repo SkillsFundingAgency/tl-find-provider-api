@@ -55,7 +55,7 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
   
-  - template: ../jobs/findproviderapi-publish-function-job.yml
-    parameters:
-      serviceConnection: ${{ parameters.serviceConnection }}
-      sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
+  # - template: ../jobs/findproviderapi-publish-function-job.yml
+  #   parameters:
+  #     serviceConnection: ${{ parameters.serviceConnection }}
+  #     sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}

@@ -58,12 +58,12 @@ jobs:
         projects: '**/*.UnitTests.csproj'
         arguments: '--configuration $(buildConfiguration)'
     
-    - task: DotNetCoreCLI@2
-      displayName: Integration Tests
-      inputs:
-        command: test
-        projects: '**/*.Web.IntegrationTests.csproj'
-        arguments: '--configuration $(buildConfiguration)'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Integration Tests
+    #   inputs:
+    #     command: test
+    #     projects: '**/*.Web.IntegrationTests.csproj'
+    #     arguments: '--configuration $(buildConfiguration)'
     
     - task: DotNetCoreCLI@2
       displayName: 'Publish Website'
@@ -72,27 +72,27 @@ jobs:
         publishWebProjects: true
         projects: 'src/Sfa.Tl.Find.Provider.Api.Web/Sfa.Tl.Find.Provider.Api.Web.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish Function App'
-      inputs:
-        command: publish
-        publishWebProjects: false
-        projects: 'src/Sfa.Tl.Find.Provider.Api.Functions/Sfa.Tl.Find.Provider.Api.Functions.csproj'
-        arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish Application Integration Tests'
-      inputs:
-        command: publish
-        publishWebProjects: false
-        projects: 'src/Sfa.Tl.Find.Provider.Api.Application.IntegrationTests/Sfa.Tl.Find.Provider.Api.Application.IntegrationTests.csproj'
-        arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish Web Integration Tests'
-      inputs:
-        command: publish
-        publishWebProjects: false
-        projects: 'src/Sfa.Tl.Find.Provider.Api.Web.IntegrationTests/Sfa.Tl.Find.Provider.Api.Web.IntegrationTests.csproj'
-        arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+    # - task: DotNetCoreCLI@2
+    #   displayName: 'Publish Function App'
+    #   inputs:
+    #     command: publish
+    #     publishWebProjects: false
+    #     projects: 'src/Sfa.Tl.Find.Provider.Api.Functions/Sfa.Tl.Find.Provider.Api.Functions.csproj'
+    #     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+    # - task: DotNetCoreCLI@2
+    #   displayName: 'Publish Application Integration Tests'
+    #   inputs:
+    #     command: publish
+    #     publishWebProjects: false
+    #     projects: 'src/Sfa.Tl.Find.Provider.Api.Application.IntegrationTests/Sfa.Tl.Find.Provider.Api.Application.IntegrationTests.csproj'
+    #     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+    # - task: DotNetCoreCLI@2
+    #   displayName: 'Publish Web Integration Tests'
+    #   inputs:
+    #     command: publish
+    #     publishWebProjects: false
+    #     projects: 'src/Sfa.Tl.Find.Provider.Api.Web.IntegrationTests/Sfa.Tl.Find.Provider.Api.Web.IntegrationTests.csproj'
+    #     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
     - task: CopyFiles@2
       displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
       inputs:
