@@ -27,5 +27,5 @@ jobs:
       azureSubscription: ${{ parameters.serviceConnection }}
       appType: 'functionApp'
       appName: '$(WorkerFunctionAppName)'
-      package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.findproviderapi.Functions.zip'
+      package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Functions.zip'
       deploymentMethod: 'auto'

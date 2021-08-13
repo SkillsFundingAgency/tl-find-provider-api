@@ -36,13 +36,13 @@ jobs:
     - task: Npm@1
       displayName: 'npm install'
       inputs:
-        workingDir: src/Sfa.Tl.findproviderapi.Web/
+        workingDir: src/Sfa.Tl.Find.Provider.Api.Web/
         verbose: false
     
     - task: Gulp@0
       displayName: gulp
       inputs:
-        gulpFile: src/Sfa.Tl.findproviderapi.Web/gulpfile.js
+        gulpFile: src/Sfa.Tl.Find.Provider.Api.Web/gulpfile.js
         targets: default
     
     - task: DotNetCoreCLI@2
@@ -70,28 +70,28 @@ jobs:
       inputs:
         command: publish
         publishWebProjects: true
-        projects: 'src/Sfa.Tl.findproviderapi.Web/Sfa.Tl.findproviderapi.Web.csproj'
+        projects: 'src/Sfa.Tl.Find.Provider.Api.Web/Sfa.Tl.Find.Provider.Api.Web.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
     - task: DotNetCoreCLI@2
       displayName: 'Publish Function App'
       inputs:
         command: publish
         publishWebProjects: false
-        projects: 'src/Sfa.Tl.findproviderapi.Functions/Sfa.Tl.findproviderapi.Functions.csproj'
+        projects: 'src/Sfa.Tl.Find.Provider.Api.Functions/Sfa.Tl.Find.Provider.Api.Functions.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
     - task: DotNetCoreCLI@2
       displayName: 'Publish Application Integration Tests'
       inputs:
         command: publish
         publishWebProjects: false
-        projects: 'src/Sfa.Tl.findproviderapi.Application.IntegrationTests/Sfa.Tl.findproviderapi.Application.IntegrationTests.csproj'
+        projects: 'src/Sfa.Tl.Find.Provider.Api.Application.IntegrationTests/Sfa.Tl.Find.Provider.Api.Application.IntegrationTests.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
     - task: DotNetCoreCLI@2
       displayName: 'Publish Web Integration Tests'
       inputs:
         command: publish
         publishWebProjects: false
-        projects: 'src/Sfa.Tl.findproviderapi.Web.IntegrationTests/Sfa.Tl.findproviderapi.Web.IntegrationTests.csproj'
+        projects: 'src/Sfa.Tl.Find.Provider.Api.Web.IntegrationTests/Sfa.Tl.Find.Provider.Api.Web.IntegrationTests.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
     - task: CopyFiles@2
       displayName: 'Copy Files to: $(build.artifactstagingdirectory)'

@@ -31,7 +31,7 @@ jobs:
   #     deployToSlotOrASE: true
   #     resourceGroupName: '$(ResourceGroupName)'
   #     slotName: 'staging'
-  #     package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.findproviderapi.Web.zip'
+  #     package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
   #     deploymentMethod: 'auto'
   
   - task: AzureRmWebAppDeployment@3
@@ -42,7 +42,7 @@ jobs:
       DeployToSlotFlag: true
       ResourceGroupName: '$(ResourceGroupName)'
       SlotName: 'staging'
-      Package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.findproviderapi.Web.zip'
+      Package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
       UseWebDeploy: true
       RemoveAdditionalFilesFlag: true
 

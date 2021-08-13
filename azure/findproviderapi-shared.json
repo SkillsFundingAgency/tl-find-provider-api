@@ -54,91 +54,91 @@
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
         "resourceNamePrefix": "[toLower(parameters('environmentNameAbbreviation'))]",
         "sqlServerName": "[concat(variables('resourceNamePrefix'), '-shared-sql')]",
-        // "sharedStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'sharedstr'), '-', '')]",
+        "sharedStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'sharedstr'), '-', '')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-shared-asp')]",
         "configStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'configstr'), '-', '')]",
        // "keyVaultName": "[replace(concat(variables('resourceNamePrefix'), 'sharedkv'), '-', '')]",
-        "keyVaultAccessPolicies": [
-            {
-                "objectId": "[parameters('azureWebsitesRPObjectId')]",
-                "tenantId": "[subscription().tenantId]",
-                "permissions": {
-                    "secrets": [
-                        "Get"
-                    ]
-                }
-            }
-        ],
-        "readWriteAccessPolicies": {
-            "copy": [
-                {
-                    "name": "readWriteAccessPolicies",
-                    "count": "[length(parameters('keyVaultReadWriteObjectIds'))]",
-                    "input": {
-                        "objectId": "[parameters('keyVaultReadWriteObjectIds')[copyIndex('readWriteAccessPolicies')]]",
-                        "tenantId": "[subscription().tenantId]",
-                        "permissions": {
-                            "secrets": [
-                                "Get",
-                                "List",
-                                "Set"
-                            ]
-                        }
-                    }
-                }
-            ]
-        },
-        "fullAccessPolicies": {
-            "copy": [
-                {
-                    "name": "fullAccessPolicies",
-                    "count": "[length(parameters('keyVaultFullAccessObjectIds'))]",
-                    "input": {
-                        "objectId": "[parameters('keyVaultFullAccessObjectIds')[copyIndex('fullAccessPolicies')]]",
-                        "tenantId": "[subscription().tenantId]",
-                        "permissions": {
-                            "keys": [
-                                "Get",
-                                "List",
-                                "Update",
-                                "Create",
-                                "Import",
-                                "Delete",
-                                "Recover",
-                                "Backup",
-                                "Restore"
-                            ],
-                            "secrets": [
-                                "Get",
-                                "List",
-                                "Set",
-                                "Delete",
-                                "Recover",
-                                "Backup",
-                                "Restore"
-                            ],
-                            "certificates": [
-                                "Get",
-                                "List",
-                                "Update",
-                                "Create",
-                                "Import",
-                                "Delete",
-                                "Recover",
-                                "Backup",
-                                "Restore",
-                                "ManageContacts",
-                                "ManageIssuers",
-                                "GetIssuers",
-                                "ListIssuers",
-                                "SetIssuers",
-                                "DeleteIssuers"
-                            ]
-                        }
-                    }
-                }
-            ]
-        }
+    //     "keyVaultAccessPolicies": [
+    //         {
+    //             "objectId": "[parameters('azureWebsitesRPObjectId')]",
+    //             "tenantId": "[subscription().tenantId]",
+    //             "permissions": {
+    //                 "secrets": [
+    //                     "Get"
+    //                 ]
+    //             }
+    //         }
+    //     ],
+    //     "readWriteAccessPolicies": {
+    //         "copy": [
+    //             {
+    //                 "name": "readWriteAccessPolicies",
+    //                 "count": "[length(parameters('keyVaultReadWriteObjectIds'))]",
+    //                 "input": {
+    //                     "objectId": "[parameters('keyVaultReadWriteObjectIds')[copyIndex('readWriteAccessPolicies')]]",
+    //                     "tenantId": "[subscription().tenantId]",
+    //                     "permissions": {
+    //                         "secrets": [
+    //                             "Get",
+    //                             "List",
+    //                             "Set"
+    //                         ]
+    //                     }
+    //                 }
+    //             }
+    //         ]
+    //     },
+    //     "fullAccessPolicies": {
+    //         "copy": [
+    //             {
+    //                 "name": "fullAccessPolicies",
+    //                 "count": "[length(parameters('keyVaultFullAccessObjectIds'))]",
+    //                 "input": {
+    //                     "objectId": "[parameters('keyVaultFullAccessObjectIds')[copyIndex('fullAccessPolicies')]]",
+    //                     "tenantId": "[subscription().tenantId]",
+    //                     "permissions": {
+    //                         "keys": [
+    //                             "Get",
+    //                             "List",
+    //                             "Update",
+    //                             "Create",
+    //                             "Import",
+    //                             "Delete",
+    //                             "Recover",
+    //                             "Backup",
+    //                             "Restore"
+    //                         ],
+    //                         "secrets": [
+    //                             "Get",
+    //                             "List",
+    //                             "Set",
+    //                             "Delete",
+    //                             "Recover",
+    //                             "Backup",
+    //                             "Restore"
+    //                         ],
+    //                         "certificates": [
+    //                             "Get",
+    //                             "List",
+    //                             "Update",
+    //                             "Create",
+    //                             "Import",
+    //                             "Delete",
+    //                             "Recover",
+    //                             "Backup",
+    //                             "Restore",
+    //                             "ManageContacts",
+    //                             "ManageIssuers",
+    //                             "GetIssuers",
+    //                             "ListIssuers",
+    //                             "SetIssuers",
+    //                             "DeleteIssuers"
+    //                         ]
+    //                     }
+    //                 }
+    //             }
+    //         ]
+    //     }
 
     },
     "resources": [
@@ -239,43 +239,43 @@
                     }
                 }
             }
-        },
-        {
-            "apiVersion": "2017-05-10",
-            "name": "[concat('key-vault','-', parameters('environmentNameAbbreviation'))]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'keyvault.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "keyVaultName": {
-                        "value": "[variables('keyVaultName')]"
-                    },
-                    "enabledForTemplateDeployment": {
-                        "value": true
-                    },
-                    "enableSoftDelete": {
-                        "value": true
-                    },
-                    "keyVaultAccessPolicies": {
-                        "value": "[concat(variables('keyVaultAccessPolicies'), variables('readWriteAccessPolicies').readWriteAccessPolicies, variables('fullAccessPolicies').fullAccessPolicies)]"
-                    }
-                }
-            }
         }
+        // {
+        //     "apiVersion": "2017-05-10",
+        //     "name": "[concat('key-vault','-', parameters('environmentNameAbbreviation'))]",
+        //     "type": "Microsoft.Resources/deployments",
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "templateLink": {
+        //             "uri": "[concat(variables('deploymentUrlBase'),'keyvault.json')]",
+        //             "contentVersion": "1.0.0.0"
+        //         },
+        //         "parameters": {
+        //             "keyVaultName": {
+        //                 "value": "[variables('keyVaultName')]"
+        //             },
+        //             "enabledForTemplateDeployment": {
+        //                 "value": true
+        //             },
+        //             "enableSoftDelete": {
+        //                 "value": true
+        //             },
+        //             "keyVaultAccessPolicies": {
+        //                 "value": "[concat(variables('keyVaultAccessPolicies'), variables('readWriteAccessPolicies').readWriteAccessPolicies, variables('fullAccessPolicies').fullAccessPolicies)]"
+        //             }
+        //         }
+        //     }
+        // }
     ],
     "outputs": {
         "sharedASPName": {
             "type": "string",
             "value": "[variables('appServicePlanName')]"
         },
-        "sharedKeyVaultName": {
-            "type": "string",
-            "value": "[variables('keyVaultName')]"
-        },
+        // "sharedKeyVaultName": {
+        //     "type": "string",
+        //     "value": "[variables('keyVaultName')]"
+        // },
         "sharedSQLServerName": {
             "type": "string",
             "value": "[variables('sqlServerName')]"

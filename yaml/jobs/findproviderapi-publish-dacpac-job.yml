@@ -30,7 +30,7 @@ jobs:
         DatabaseName: '$(DatabaseName)'
         SqlUsername: '$(SQLServerAdminUsername)'
         SqlPassword: '$(SQLServerAdminPassword)'
-        DacpacFile: '$(System.ArtifactsDirectory)/sqldrop/src/Sfa.Tl.findproviderapi.Database/bin/Release/Sfa.Tl.findproviderapi.Database.dacpac'
+        DacpacFile: '$(System.ArtifactsDirectory)/sqldrop/src/Sfa.Tl.Find.Provider.Api.Database/bin/Release/Sfa.Tl.Find.Provider.Api.Database.dacpac'
         AdditionalArguments: '/p:GenerateSmartDefaults=True'
 
     - pwsh: | 

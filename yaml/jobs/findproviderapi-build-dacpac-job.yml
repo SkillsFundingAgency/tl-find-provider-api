@@ -10,7 +10,7 @@
     - task: VSBuild@1
       displayName: 'Build DACPAC'
       inputs:
-        solution: 'src\Sfa.Tl.findproviderapi.Database\Sfa.Tl.findproviderapi.Database.sqlproj'
+        solution: 'src\Sfa.Tl.Find.Provider.Api.Database\Sfa.Tl.Find.Provider.Api.Database.sqlproj'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
