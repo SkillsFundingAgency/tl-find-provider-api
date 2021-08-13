@@ -12,12 +12,12 @@ resources:
 trigger:
   branches:
     include:
-    - master
+    - main
     - develop
     - feature/*
     - bugs/*
 pr:
-  - master
+  - main
   - develop
 
 variables:
