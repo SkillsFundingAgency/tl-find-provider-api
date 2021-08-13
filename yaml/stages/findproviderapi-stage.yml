@@ -54,12 +54,12 @@ stages:
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: 'uiAppName'
-      name: 'Website'
-      dependencies:
-        - DeployInfrastructure
-        - GenerateConfigs
-      package: 'Sfa.Tl.Find.Provider.Api.Web.zip'
+      # appName: 'uiAppName'
+      # name: 'Website'
+      # dependencies:
+      #   - DeployInfrastructure
+      #   - GenerateConfigs
+      # package: 'Sfa.Tl.Find.Provider.Api.Web.zip'
 
   - template: ../jobs/findproviderapi-publish-site-job.yml
     parameters:
