@@ -54,7 +54,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var postcodeLocation = await GetPostcode(postcode);
 
-            return await _providerRepository.Search(postcode, qualificationId, page, pageSize);
+            return await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
         }
 
         private async Task<PostcodeLocation> GetPostcode(string postcode)

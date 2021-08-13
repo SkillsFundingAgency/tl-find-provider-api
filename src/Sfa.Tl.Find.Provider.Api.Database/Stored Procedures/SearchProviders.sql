@@ -1,5 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[SearchProviders]
-	@postcode NVARCHAR(10),
+	@fromLatitude DECIMAL(9, 6),
+	@fromLongitude DECIMAL(9, 6),
 	@qualificationId INT,
 	@page INT,
 	@pageSize INT

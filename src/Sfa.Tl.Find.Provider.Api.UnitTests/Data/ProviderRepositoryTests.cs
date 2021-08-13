@@ -80,7 +80,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
 
             var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
 
-            var searchResults = await repository.Search(TestPostcode, null, 0, 0);
+            var fromPostcodeLocation = new PostcodeLocationBuilder().BuildValidPostcodeLocation();
+
+            var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 0);
 
             var searchResultsList = searchResults.ToList();
             searchResultsList.Count.Should().Be(providers.Count);

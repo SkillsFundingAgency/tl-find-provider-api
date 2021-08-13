@@ -4,6 +4,7 @@ using System.Data;
 using System.Threading.Tasks;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Data
 {
@@ -36,7 +37,11 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             return updateResult.ConvertToTuple();
         }
 
-        public async Task<IEnumerable<Models.Provider>> Search(string postcode, int? qualificationId, int page, int pageSize)
+        public async Task<IEnumerable<Models.Provider>> Search(
+            PostcodeLocation fromPostcodeLocation, 
+            int? qualificationId, 
+            int page, 
+            int pageSize)
         {
             using var connection = _dbContextWrapper.CreateConnection();
 
@@ -46,7 +51,8 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                     "SearchProviders",
                     new
                     {
-                        postcode,
+                        fromLatitude = fromPostcodeLocation.Latitude,
+                        fromLongitude = fromPostcodeLocation.Longitude,
                         qualificationId,
                         page,
                         pageSize
