@@ -13,8 +13,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
 {
     public class ProviderRepositoryTests
     {
-        private const string TestPostcode = "CV1 2WT";
-
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
         {

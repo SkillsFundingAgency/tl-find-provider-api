@@ -14,6 +14,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
         private const string PostcodeRetrieverApiBaseAbsoluteUri = "https://test.api.postcodes.io/";
         private static readonly Uri PostcodeRetrieverApiBaseUri = new(PostcodeRetrieverApiBaseAbsoluteUri);
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public PostcodeLookupService Build(
             HttpClient httpClient = null,
             ILogger<PostcodeLookupService> logger = null)

@@ -40,13 +40,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportProviders_Returns_Expected_Result()
         {
-            const string getTLevelCoursesFragment = "tlevels";
-
             var jsonBuilder = new CourseDirectoryJsonBuilder();
 
             var responses = new Dictionary<string, string>
             {
-                { getTLevelCoursesFragment, jsonBuilder.BuildValidTLevelsResponse() }
+                { CourseDirectoryService.CourseDetailEndpoint, jsonBuilder.BuildValidTLevelsResponse() }
             };
 
             var providerRepository = Substitute.For<IProviderRepository>();
@@ -66,13 +64,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportProviders_Creates_Expected_Providers()
         {
-            const string getTLevelCoursesFragment = "tlevels";
-
             var jsonBuilder = new CourseDirectoryJsonBuilder();
 
             var responses = new Dictionary<string, string>
             {
-                { getTLevelCoursesFragment, jsonBuilder.BuildValidTLevelsResponse() }
+                { CourseDirectoryService.CourseDetailEndpoint, jsonBuilder.BuildValidTLevelsResponse() }
             };
 
             IList<Models.Provider> receivedProviders = null;
@@ -147,13 +143,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportQualifications_Returns_Expected_Result()
         {
-            const string getTLevelDefinitionsUriFragment = "tleveldefinitions";
-
             var jsonBuilder = new CourseDirectoryJsonBuilder();
 
             var responses = new Dictionary<string, string>
             {
-                { getTLevelDefinitionsUriFragment, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
+                { CourseDirectoryService.QualificationsEndpoint, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
             };
 
             var qualificationRepository = Substitute.For<IQualificationRepository>();
@@ -173,13 +167,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportQualifications_Creates_Expected_Qualifications()
         {
-            const string getTLevelDefinitionsUriFragment = "tleveldefinitions";
-
             var jsonBuilder = new CourseDirectoryJsonBuilder();
 
             var responses = new Dictionary<string, string>
             {
-                { getTLevelDefinitionsUriFragment, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
+                { CourseDirectoryService.QualificationsEndpoint, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
             };
 
             IList<Qualification> receivedQualifications = null;

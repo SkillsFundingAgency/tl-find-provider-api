@@ -15,6 +15,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
         private const string CourseDirectoryApiBaseAbsoluteUri = "https://https://test.com/findacourse/api/";
         private static readonly Uri CourseDirectoryApiBaseUri = new(CourseDirectoryApiBaseAbsoluteUri);
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public CourseDirectoryService Build(
             HttpClient httpClient = null, 
             IProviderRepository providerRepository = null,

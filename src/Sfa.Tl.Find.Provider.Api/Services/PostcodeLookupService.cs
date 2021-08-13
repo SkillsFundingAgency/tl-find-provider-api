@@ -14,6 +14,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
     {
         private readonly HttpClient _httpClient;
 
+        // ReSharper disable once NotAccessedField.Local
         private readonly ILogger<PostcodeLookupService> _logger;
 
         public PostcodeLookupService(

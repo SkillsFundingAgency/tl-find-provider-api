@@ -2,6 +2,7 @@
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 
 // ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
