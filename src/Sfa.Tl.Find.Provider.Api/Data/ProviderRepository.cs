@@ -30,7 +30,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
 
                 connection.Open();
 
-                using var transaction = connection.BeginTransaction();
+                using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
                 var providerUpdateResult = await _dbContextWrapper
                     .QueryAsync<(string Change, int ChangeCount)>(

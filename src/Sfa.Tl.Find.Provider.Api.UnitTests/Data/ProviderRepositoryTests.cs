@@ -47,10 +47,16 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             var receivedSqlArgs = new List<string>();
 
             var dbConnection = Substitute.For<IDbConnection>();
+            var transaction = Substitute.For<IDbTransaction>();
+
             var dbContextWrapper = Substitute.For<IDbContextWrapper>();
             dbContextWrapper
                 .CreateConnection()
                 .Returns(dbConnection);
+            dbContextWrapper
+                .BeginTransaction(dbConnection)
+                .Returns(transaction);
+
             dbContextWrapper
                 .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
                     "UpdateProviders",
@@ -114,6 +120,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             receivedSqlArgs.Should().Contain("UpdateProviders");
             receivedSqlArgs.Should().Contain("UpdateLocations");
             receivedSqlArgs.Should().Contain("UpdateLocationQualifications");
+
+            dbContextWrapper
+                .Received(1)
+                .BeginTransaction(dbConnection);
+
+            transaction
+                .Received(1)
+                .Commit();
         }
 
         [Fact]

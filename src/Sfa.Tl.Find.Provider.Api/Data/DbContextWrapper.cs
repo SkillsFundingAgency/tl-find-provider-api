@@ -22,6 +22,11 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             return new SqlConnection(_connectionString);
         }
 
+        public IDbTransaction BeginTransaction(IDbConnection connection)
+        {
+            return connection.BeginTransaction();
+        }
+
         public async Task<IEnumerable<T>> QueryAsync<T>(
             IDbConnection connection,
             string sql,
