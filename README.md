@@ -5,7 +5,7 @@
 Tlevels Find a Provider API repository
 
 
-## Database notes
+## Database
 
 Data insert/update/delete is handled in stored procedures, which are passed table-valued parameters 
 to be merged into the tables. 
@@ -28,4 +28,22 @@ Deletion of rows in LocationQualification is a hard delete, since this is a mapp
 
 Updating a deleted row will set the row to undeleted; this acts to logically re-add a row that was previously soft-deleted.
 
+The search procedure can be called manually to search from a latitude/longitude:
+```
+EXEC [dbo].[SearchProviders]
+	@fromLatitude = 52.400997,
+	@fromLongitude = -1.508122,
+	@qualificationId = NULL,
+	@page = 0,
+	@pageSize = 5
+```
+`@page` is a 0-based index used for paging.
+`@pageSize` must be > 0, otherwise an error will be thrown.
+`@qualificationId` can be used to filter the results. NULL will return all qualifications.
+
+
+## External APIs
+
+Postcode details are retrieved using the postcodes.io API. Where possible,
+results are cached to avoid duplicate calls.
 

@@ -11,14 +11,15 @@ AS
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326)
 	
 	SELECT	p.[UkPrn],
-			p.[Name],
-			l.[Name],
+			p.[Name] AS [ProviderName],
+			l.[Postcode],
+			l.[Name] AS [LocationName],
 			l.[AddressLine1],
 			l.[AddressLine2],
 			l.[Town],
 			l.[County],
-			l.[Postcode],
-			l.[Email],
+			q.[Id],
+			q.[Name],
 			COALESCE(NULLIF(l.[Email],''), p.[Email]) AS [Email],
 			COALESCE(NULLIF(l.[Telephone],''), p.[Telephone]) AS [Telephone],
 			COALESCE(NULLIF(l.[Website],''), p.[Website]) AS [Website],
@@ -26,10 +27,17 @@ AS
 	FROM	[dbo].[Provider] p
 	INNER JOIN	[dbo].[Location] l
 	ON		p.[Id] = l.[ProviderId]
+	INNER JOIN	[dbo].[LocationQualification] lq
+	ON		lq.[LocationId] = l.[Id]
+	INNER JOIN	[dbo].[Qualification] q
+	ON		q.[Id] = lq.[QualificationId]
 	WHERE	p.IsDeleted = 0	
+	  AND	l.IsDeleted = 0
+	  AND	q.IsDeleted = 0
 	ORDER BY [DistanceInMiles],
 			p.[Name],
 			l.[Name]
 	OFFSET @page * @pageSize ROWS
 	FETCH NEXT @pageSize ROWS ONLY
+
 
