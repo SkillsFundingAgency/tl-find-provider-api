@@ -21,7 +21,7 @@ stages:
     - group: platform-${{parameters.environmentName}}
     - group: platform-${{parameters.environmentName}}-findproviderapi
     - name: SharedBaseName
-      value: "s126${{parameters.sharedEnvironmentId}}-findproviderapi"
+      value: "s126${{parameters.sharedEnvironmentId}}-fprapi"
     - name: SharedResourceGroup
       value: '$(SharedBaseName)-shared'
     - name: SharedSQLServerName
