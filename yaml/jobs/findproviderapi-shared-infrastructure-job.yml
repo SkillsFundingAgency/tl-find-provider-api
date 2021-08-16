@@ -32,8 +32,8 @@ jobs:
                   -threatDetectionEmailAddress "$(ThreatDetectionEmailAddress)"
                   -appServicePlanTier "$(AppServicePlanTier)"
                   -appServicePlanSize "$(AppServicePlanSize)"
-                  -appServicePlanInstances "$(AppServicePlanInstances)"
-                  -azureWebsitesRPObjectId "$(AzureWebsitesRPObjectId)"'
+                  -appServicePlanInstances "$(AppServicePlanInstances)"'
+                  # -azureWebsitesRPObjectId "$(AzureWebsitesRPObjectId)"
                 tags: $(Tags)                
                 processOutputs: true
             - pwsh: Write-Host "##vso[task.setvariable variable=SharedResourceGroup;isOutput=true]$(SharedResourceGroup)"
