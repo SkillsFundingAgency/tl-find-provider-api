@@ -18,12 +18,13 @@ AS
 			l.[AddressLine2],
 			l.[Town],
 			l.[County],
-			q.[Id],
-			q.[Name],
 			COALESCE(NULLIF(l.[Email],''), p.[Email]) AS [Email],
 			COALESCE(NULLIF(l.[Telephone],''), p.[Telephone]) AS [Telephone],
 			COALESCE(NULLIF(l.[Website],''), p.[Website]) AS [Website],
-			l.[Location].STDistance(@fromLocation) / 1609.3399999999999E0 AS [DistanceInMiles] 
+			l.[Location].STDistance(@fromLocation) / 1609.3399999999999E0 AS [Distance], --(Miles)
+			lq.[DeliveryYear] AS [Year],
+			q.[Id] AS [Id],
+			q.[Name] AS [Name]
 	FROM	[dbo].[Provider] p
 	INNER JOIN	[dbo].[Location] l
 	ON		p.[Id] = l.[ProviderId]
@@ -34,7 +35,7 @@ AS
 	WHERE	p.IsDeleted = 0	
 	  AND	l.IsDeleted = 0
 	  AND	q.IsDeleted = 0
-	ORDER BY [DistanceInMiles],
+	ORDER BY [Distance],
 			p.[Name],
 			l.[Name]
 	OFFSET @page * @pageSize ROWS

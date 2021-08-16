@@ -19,6 +19,6 @@ namespace Sfa.Tl.Find.Provider.Api.Models
         public string Telephone { get; init; }
         public string Website { get; init; }
 
-        [Write(false)] public ICollection<Location> Locations { get; init; } = new List<Location>();
+        [Write(false)] public ICollection<Location> Locations { get; init; }
     }
 }

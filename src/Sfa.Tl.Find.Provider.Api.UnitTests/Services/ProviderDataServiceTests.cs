@@ -54,7 +54,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                     Arg.Any<int?>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
-                .Returns(new ProviderBuilder().BuildList());
+                .Returns(new ProviderSearchResultBuilder().BuildList());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
             postcodeLookupService.GetPostcode(fromPostcodeLocation.Postcode)
@@ -81,7 +81,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                     Arg.Any<int?>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
-                .Returns(new ProviderBuilder().BuildList());
+                .Returns(new ProviderSearchResultBuilder().BuildList());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
@@ -122,7 +122,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                     Arg.Any<int?>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
-                .Returns(new ProviderBuilder().BuildList());
+                .Returns(new ProviderSearchResultBuilder().BuildList());
 
             var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
             postcodeLookupService.GetPostcode(fromPostcodeLocation.Postcode)

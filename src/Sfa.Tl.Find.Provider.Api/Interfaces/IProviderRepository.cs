@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
     {
         Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Models.Provider> providers);
 
-        Task<IEnumerable<Models.Provider>> Search(
+        Task<IEnumerable<ProviderSearchResult>> Search(
             PostcodeLocation fromPostcodeLocation,
             int? qualificationId,
             int page,

@@ -44,7 +44,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             return await _qualificationRepository.GetAll();
         }
         
-        public async Task<IEnumerable<Models.Provider>> FindProviders(
+        public async Task<IEnumerable<ProviderSearchResult>> FindProviders(
             string postcode,
             int? qualificationId = null,
             int page = 0,

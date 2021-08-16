@@ -75,10 +75,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task GetProviders_Returns_Expected_List()
+        public async Task GetProviders_Returns_Expected_List_Of_Search_Results()
         {
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(TestPostcode).Returns(new ProviderBuilder().BuildList());
+            dataService.FindProviders(TestPostcode).Returns(new ProviderSearchResultBuilder().BuildList());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
@@ -88,14 +88,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
             okResult.Should().NotBeNull();
             okResult!.StatusCode.Should().Be(200);
 
-            var results = okResult.Value as IEnumerable<Models.Provider>;
+            var results = okResult.Value as IEnumerable<ProviderSearchResult>;
             results.Should().NotBeNullOrEmpty();
         }
 
         [Fact]
         public async Task GetProviders_Returns_Expected_Value_For_One_Item()
         {
-            var providers = new ProviderBuilder().BuildList().Take(1).ToList();
+            var providers = new ProviderSearchResultBuilder().BuildList().Take(1).ToList();
 
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(TestPostcode).Returns(providers);
@@ -104,12 +104,16 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             var result = await controller.GetProviders(TestPostcode);
 
-            var results = ((result as OkObjectResult)?.Value as IEnumerable<Models.Provider>)?.ToList();
+            var results = ((result as OkObjectResult)?.Value 
+                as IEnumerable<ProviderSearchResult>)?.ToList();
+
             results.Should().NotBeNullOrEmpty();
             results!.Count.Should().Be(1);
 
             results.Single().UkPrn.Should().Be(providers.Single().UkPrn);
-            results.Single().Name.Should().Be(providers.Single().Name);
+            results.Single().ProviderName.Should().Be(providers.Single().ProviderName);
+            results.Single().LocationName.Should().Be(providers.Single().LocationName);
+            results.Single().Postcode.Should().Be(providers.Single().Postcode);
         }
 
         [Fact]

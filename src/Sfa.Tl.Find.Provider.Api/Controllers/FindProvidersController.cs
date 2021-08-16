@@ -35,7 +35,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// <returns>Json with providers.</returns>
         [HttpGet]
         [Route("providers/{postcode}", Name = "GetProviders")]
-        [ProducesResponseType(typeof(IEnumerable<Models.Provider>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ProviderSearchResult>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(

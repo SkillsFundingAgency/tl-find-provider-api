@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -113,7 +114,8 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         "UpdateLocationQualifications",
                         new
                         {
-                            data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType")
+                            data = locationQualificationData.AsTableValuedParameter(
+                                "dbo.LocationQualificationDataTableType")
                         },
                         transaction,
                         commandType: CommandType.StoredProcedure);
@@ -135,7 +137,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             }
         }
 
-        public async Task<IEnumerable<Models.Provider>> Search(
+        public async Task<IEnumerable<ProviderSearchResult>> Search(
             PostcodeLocation fromPostcodeLocation,
             int? qualificationId,
             int page,
@@ -143,37 +145,36 @@ namespace Sfa.Tl.Find.Provider.Api.Data
         {
             using var connection = _dbContextWrapper.CreateConnection();
 
-            //Mapping - 
-            // https://dapper-tutorial.net/knowledge-base/45505157/map-lists-of-nested-objects-with-dapper--3-level-nested-object-
-            // https://dapper-tutorial.net/knowledge-base/45505157/map-lists-of-nested-objects-with-dapper--3-level-nested-object-
-            var providerLookup = new Dictionary<long, Models.Provider>();
+            var providerSearchResults = new Dictionary<string, ProviderSearchResult>();
 
-            //Try QueryMultiple - example 5 from https://www.c-sharpcorner.com/UploadFile/e4e3f7/dapper-king-of-micro-orm-C-Sharp-net/
-            /*
-            using (var multipleResult = db.QueryMultiple(“sp_GetContact_Address”, new { id = id }, commandType: CommandType.StoredProcedure))  
-            {  
-               var contact = multipleResult.Read<Contact>().SingleOrDefault();  
-               var Addresses = multipleResult.Read<Address>().ToList();  
-               if (contact != null && Addresses != null)  
-               {  
-                  contact.Addresses.AddRange(Addresses);  
-               }  
-            }
-            */
-            var providers = await _dbContextWrapper
-                .QueryAsync<Models.Provider, Location, Models.Provider>(
+            await _dbContextWrapper
+                .QueryAsync<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>(
                     connection,
                     "SearchProviders",
-                    map: (p, l) =>
+                    map: (p, ly, q) =>
                     {
-                        if (!providerLookup.TryGetValue(p.UkPrn, out var provider))
+                        var key = $"{p.UkPrn}_{p.Postcode}";
+                        if (!providerSearchResults.TryGetValue(key, out var searchResult))
                         {
-                            providerLookup.Add(p.UkPrn, provider = p);
+                            providerSearchResults.Add(key, searchResult = p);
                         }
-                        //if (provider.Locations == null)
-                        //    provider.Locations = new List<Location>();
-                        provider!.Locations.Add(l);
-                        return provider;
+
+                        //TODO: Consider a dictionary, and lookup like above
+                        // - the year list is small so linear search would be reasonably fast
+
+                        var deliveryYear = searchResult
+                            .DeliveryYears
+                            .FirstOrDefault(y => y.Year == ly.Year);
+
+                        if (deliveryYear == null)
+                        {
+                            deliveryYear = ly;
+                            searchResult.DeliveryYears.Add(deliveryYear);
+                        }
+
+                        deliveryYear.Qualifications.Add(q);
+
+                        return searchResult;
                     },
                     new
                     {
@@ -183,10 +184,15 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         page,
                         pageSize
                     },
-                    splitOn: "UkPrn, Postcode",
+                    splitOn: "UkPrn, Postcode, Year, Id",
                     commandType: CommandType.StoredProcedure);
 
-            return providers;
+            return providerSearchResults
+                .Values
+                .OrderBy(s => s.Distance)
+                .ThenBy(s => s.ProviderName)
+                .ThenBy(s => s.LocationName)
+                .ToList();
         }
     }
 }

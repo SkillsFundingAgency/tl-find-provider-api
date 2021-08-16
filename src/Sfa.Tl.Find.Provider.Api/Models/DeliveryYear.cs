@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Api.Models
     {
         public short Year { get; init; }
 
-        public ICollection<Qualification> Qualifications { get; init; }
+        public ICollection<Qualification> Qualifications { get; init; } = new List<Qualification>();
 
         private string DebuggerDisplay()
             => $"{Year} " +

@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
     public class ProviderBuilder
     {
         public IEnumerable<Models.Provider> BuildList() =>
-            new Models.Provider[]
+            new List<Models.Provider>
             {
                 new()
                 {
