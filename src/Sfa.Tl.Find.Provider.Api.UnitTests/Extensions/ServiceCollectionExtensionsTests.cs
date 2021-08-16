@@ -61,10 +61,20 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         {
             var services = new ServiceCollection();
 
-            var servicesAfter = services.AddHostedQuartzServices();
+            var servicesAfter = services.AddHostedQuartzServices("0 0 9 ? * MON-FRI");
 
             servicesAfter.Should().NotBeEmpty();
             servicesAfter.Should().Contain(t => t.ImplementationType != null && t.ImplementationType.Name == "QuartzHostedService");
+        }
+        
+        [Fact]
+        public void AddHostedQuartzServices_Without_Schedule_Should_Not_AddService()
+        {
+            var services = new ServiceCollection();
+
+            var servicesAfter = services.AddHostedQuartzServices(null);
+
+            servicesAfter.Should().BeEmpty();
         }
     }
 }

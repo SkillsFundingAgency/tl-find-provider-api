@@ -55,8 +55,16 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         }
 
         public static IServiceCollection AddHostedQuartzServices(
-            this IServiceCollection services)
+            this IServiceCollection services,
+            string cronSchedule,
+            bool runOnStartup = false)
         {
+            if (string.IsNullOrEmpty(cronSchedule) && !runOnStartup)
+            {
+                //Can't add an empty job unless it is persisted in database
+                return services;
+            }
+
             services.AddQuartz(q =>
             {
                 // Normally would take this from appsettings.json, just show it's possible
@@ -76,14 +84,24 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
                 var jobKey = new JobKey("Import Course Data");
                 q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(jobKey));
 
-                q.AddTrigger(opts => opts
+                if (runOnStartup)
+                {
+                    //TODO: Consider a start-up job that check s if there are any, and then runs the main job
+
+                    q.AddTrigger(opts => opts
                     .ForJob(jobKey)
-                    .StartNow() //TODO: Consider a start-up job that check s if there are any, and then runs the main job
-                    //.WithSchedule(new CronScheduleBuilder(cronSchedule) //TODO: Use configuration.CourseDirectoryImportSchedule
-                    .WithSimpleSchedule(x => x
-                        .WithInterval(TimeSpan.FromMinutes(5))
-                        .RepeatForever())
+                    .StartNow()
                 );
+                }
+
+                if (!string.IsNullOrEmpty(cronSchedule))
+                {
+                    q.AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(cronSchedule)));
+                }
             });
 
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

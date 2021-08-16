@@ -59,7 +59,9 @@ namespace Sfa.Tl.Find.Provider.Api
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();
 
-            services.AddHostedQuartzServices();
+            services.AddHostedQuartzServices(
+                _configuration["CourseDirectoryImportSchedule"],
+                _configuration["SuppressStartupDataLoad"]?.ToLower() != "true");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
