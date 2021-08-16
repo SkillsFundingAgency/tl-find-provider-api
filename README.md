@@ -1,5 +1,9 @@
+[![Build Status](https://dev.azure.com/dfe-ssp/S126-Tlevelservice/_apis/build/status/tl-find-provider-api?repoName=SkillsFundingAgency%2Ftl-find-provider-api&branchName=main)](https://dev.azure.com/dfe-ssp/S126-Tlevelservice/_build/latest?definitionId=1184&repoName=SkillsFundingAgency%2Ftl-find-provider-api&branchName=main)
+
 # tl-find-provider-api
-Tlevels find-provider-api repository
+
+Tlevels Find a Provider API repository
+
 
 ## Database notes
 
