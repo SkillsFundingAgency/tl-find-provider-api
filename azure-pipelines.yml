@@ -14,11 +14,13 @@ trigger:
     include:
     - main
     - develop
+    - pipeline
     - feature/*
     - bugs/*
 pr:
   - main
   - develop
+  
 
 variables:
   applicationName: findproviderapi
