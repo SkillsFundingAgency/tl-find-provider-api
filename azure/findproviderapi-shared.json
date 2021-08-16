@@ -54,7 +54,7 @@
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
         "resourceNamePrefix": "[toLower(parameters('environmentNameAbbreviation'))]",
         "sqlServerName": "[concat(variables('resourceNamePrefix'), '-shared-sql')]",
-        "sharedStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'sharedstr'), '-', '')]",
+        "sharedStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'str'), '-', '')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-shared-asp')]",
         "configStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'configstr'), '-', '')]"
        // "keyVaultName": "[replace(concat(variables('resourceNamePrefix'), 'sharedkv'), '-', '')]",
