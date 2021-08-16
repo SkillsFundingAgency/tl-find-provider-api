@@ -39,16 +39,16 @@
         "appServicePlanInstances": {
             "type": "int",
             "minValue": 1
-        }
+        },
         // "azureWebsitesRPObjectId": {
         //     "type": "string"
         // }
-        // "keyVaultReadWriteObjectIds": {
-        //     "type": "array"
-        // },
-        // "keyVaultFullAccessObjectIds": {
-        //     "type": "array"
-        // }
+        "keyVaultReadWriteObjectIds": {
+            "type": "array"
+        },
+        "keyVaultFullAccessObjectIds": {
+            "type": "array"
+        }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
@@ -56,89 +56,89 @@
         "sqlServerName": "[concat(variables('resourceNamePrefix'), '-shared-sql')]",
         "sharedStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'str'), '-', '')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-shared-asp')]",
-        "configStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'configstr'), '-', '')]"
-       // "keyVaultName": "[replace(concat(variables('resourceNamePrefix'), 'sharedkv'), '-', '')]",
-    //     "keyVaultAccessPolicies": [
-    //         {
-    //             "objectId": "[parameters('azureWebsitesRPObjectId')]",
-    //             "tenantId": "[subscription().tenantId]",
-    //             "permissions": {
-    //                 "secrets": [
-    //                     "Get"
-    //             ]
-    //             }
-    //         }
-    //     ],
-    //     "readWriteAccessPolicies": {
-    //         "copy": [
-    //             {
-    //                 "name": "readWriteAccessPolicies",
-    //                 "count": "[length(parameters('keyVaultReadWriteObjectIds'))]",
-    //                 "input": {
-    //                     "objectId": "[parameters('keyVaultReadWriteObjectIds')[copyIndex('readWriteAccessPolicies')]]",
-    //                     "tenantId": "[subscription().tenantId]",
-    //                     "permissions": {
-    //                         "secrets": [
-    //                             "Get",
-    //                             "List",
-    //                             "Set"
-    //                         ]
-    //                     }
-    //                 }
-    //             }
-    //         ]
-    //     },
-    //     "fullAccessPolicies": {
-    //         "copy": [
-    //             {
-    //                 "name": "fullAccessPolicies",
-    //                 "count": "[length(parameters('keyVaultFullAccessObjectIds'))]",
-    //                 "input": {
-    //                     "objectId": "[parameters('keyVaultFullAccessObjectIds')[copyIndex('fullAccessPolicies')]]",
-    //                     "tenantId": "[subscription().tenantId]",
-    //                     "permissions": {
-    //                         "keys": [
-    //                             "Get",
-    //                             "List",
-    //                             "Update",
-    //                             "Create",
-    //                             "Import",
-    //                             "Delete",
-    //                             "Recover",
-    //                             "Backup",
-    //                             "Restore"
-    //                         ],
-    //                         "secrets": [
-    //                             "Get",
-    //                             "List",
-    //                             "Set",
-    //                             "Delete",
-    //                             "Recover",
-    //                             "Backup",
-    //                             "Restore"
-    //                         ],
-    //                         "certificates": [
-    //                             "Get",
-    //                             "List",
-    //                             "Update",
-    //                             "Create",
-    //                             "Import",
-    //                             "Delete",
-    //                             "Recover",
-    //                             "Backup",
-    //                             "Restore",
-    //                             "ManageContacts",
-    //                             "ManageIssuers",
-    //                             "GetIssuers",
-    //                             "ListIssuers",
-    //                             "SetIssuers",
-    //                             "DeleteIssuers"
-    //                         ]
-    //                     }
-    //                 }
-    //             }
-    //         ]
-    //     }
+        "configStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'configstr'), '-', '')]",
+        "keyVaultName": "[replace(concat(variables('resourceNamePrefix'), 'sharedkv'), '-', '')]",
+        "keyVaultAccessPolicies": [
+            {
+                "objectId": "[parameters('azureWebsitesRPObjectId')]",
+                "tenantId": "[subscription().tenantId]",
+                "permissions": {
+                    "secrets": [
+                        "Get"
+                ]
+                }
+            }
+        ],
+        "readWriteAccessPolicies": {
+            "copy": [
+                {
+                    "name": "readWriteAccessPolicies",
+                    "count": "[length(parameters('keyVaultReadWriteObjectIds'))]",
+                    "input": {
+                        "objectId": "[parameters('keyVaultReadWriteObjectIds')[copyIndex('readWriteAccessPolicies')]]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Set"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "fullAccessPolicies": {
+            "copy": [
+                {
+                    "name": "fullAccessPolicies",
+                    "count": "[length(parameters('keyVaultFullAccessObjectIds'))]",
+                    "input": {
+                        "objectId": "[parameters('keyVaultFullAccessObjectIds')[copyIndex('fullAccessPolicies')]]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "certificates": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore",
+                                "ManageContacts",
+                                "ManageIssuers",
+                                "GetIssuers",
+                                "ListIssuers",
+                                "SetIssuers",
+                                "DeleteIssuers"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
     },
     "resources": [
         {

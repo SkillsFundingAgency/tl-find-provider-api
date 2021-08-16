@@ -35,18 +35,26 @@
         "certificateName": {
             "type": "string"
         },
-        "bankHolidayGeneratorTrigger": {
-            "type": "string"
+        "ApiCustomHostname": {
+            "type": "string",
+            "defaultValue": ""
         },
-        "employerFeedbackTrigger": {
-            "type": "string"
-        },
-        "providerFeedbackTrigger": {
-            "type": "string"
-        },
-        "providerReferenceTrigger": {
-            "type": "string"
+        "ApiCertificateName": {
+            "type": "string",
+            "defaultValue": ""
         }
+        // "bankHolidayGeneratorTrigger": {
+        //     "type": "string"
+        // }
+        // "employerFeedbackTrigger": {
+        //     "type": "string"
+        // },
+        // "providerFeedbackTrigger": {
+        //     "type": "string"
+        // },
+        // "providerReferenceTrigger": {
+        //     "type": "string"
+        // }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
@@ -178,7 +186,7 @@
         {
             "condition": "[greater(length(parameters('internalApiCustomHostName')), 0)]",
             "apiVersion": "2017-05-10",
-            "name": "[concat('internal-api-app-service-certificate','-',parameters('environmentNameAbbreviation'))]",
+            "name": "[concat('api-app-service-certificate','-',parameters('environmentNameAbbreviation'))]",
             "resourceGroup": "[resourceGroup().name]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -189,7 +197,7 @@
                 },
                 "parameters": {
                     "keyVaultCertificateName": {
-                        "value": "[parameters('internalApiCertificateName')]"
+                        "value": "[parameters('ApiCertificateName')]"
                     },
                     "keyVaultName": {
                         "value": "[parameters('sharedKeyVaultName')]"
@@ -202,7 +210,7 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "[concat('internal-api-app-service','-',parameters('environmentNameAbbreviation'))]",
+            "name": "[concat('api-app-service','-',parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -249,15 +257,15 @@
                         ]
                     },
                     "customHostName": {
-                        "value": "[parameters('internalApiCustomHostname')]"
+                        "value": "[parameters('ApiCustomHostname')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[if(greater(length(parameters('internalApiCustomHostname')), 0), reference(concat('internal-api-app-service-certificate','-',parameters('environmentNameAbbreviation')), '2018-11-01').outputs.certificateThumbprint.value, '')]"
+                        "value": "[if(greater(length(parameters('ApiCustomHostname')), 0), reference(concat('internal-api-app-service-certificate','-',parameters('environmentNameAbbreviation')), '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     }
                 }
             },
             "dependsOn": [
-                "[concat('internal-api-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
+                "[concat('api-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
             ]
         },
         // {

@@ -32,7 +32,9 @@ jobs:
                   -threatDetectionEmailAddress "$(ThreatDetectionEmailAddress)"
                   -appServicePlanTier "$(AppServicePlanTier)"
                   -appServicePlanSize "$(AppServicePlanSize)"
-                  -appServicePlanInstances "$(AppServicePlanInstances)"'
+                  -appServicePlanInstances "$(AppServicePlanInstances)"
+                  -keyVaultReadWriteObjectIds "$(KeyVaultReadWriteObjectIds)"
+                  -keyVaultFullAccessObjectIds "$(keyVaultFullAccessObjectIds)"'
                   # -azureWebsitesRPObjectId "$(AzureWebsitesRPObjectId)"
                 tags: $(Tags)                
                 processOutputs: true
