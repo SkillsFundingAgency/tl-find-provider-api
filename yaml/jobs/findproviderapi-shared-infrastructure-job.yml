@@ -34,8 +34,8 @@ jobs:
                   -appServicePlanSize "$(AppServicePlanSize)"
                   -appServicePlanInstances "$(AppServicePlanInstances)"
                   -keyVaultReadWriteObjectIds "$(KeyVaultReadWriteObjectIds)"
-                  -keyVaultFullAccessObjectIds "$(keyVaultFullAccessObjectIds)"'
-                  # -azureWebsitesRPObjectId "$(AzureWebsitesRPObjectId)"
+                  -keyVaultFullAccessObjectIds "$(keyVaultFullAccessObjectIds)"
+                  -azureWebsitesRPObjectId "$(AzureWebsitesRPObjectId)"'
                 tags: $(Tags)                
                 processOutputs: true
             - pwsh: Write-Host "##vso[task.setvariable variable=SharedResourceGroup;isOutput=true]$(SharedResourceGroup)"

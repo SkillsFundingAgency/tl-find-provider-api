@@ -44,10 +44,10 @@ jobs:
             -sqlDatabaseTier "$(SQLDatabaseTier)"
             -configurationStorageConnectionString "$(ConfigurationStorageConnectionString)"
             -uiCustomHostName "$(UICustomHostName)"
-            -certificateName "$(CertificateName)"
-            -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
-            -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
-            -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
-            -providerReferenceTrigger "$(ProviderReferenceTrigger)"'
+            -certificateName "$(CertificateName)"'
+            # -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
+            # -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
+            # -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
+            # -providerReferenceTrigger "$(ProviderReferenceTrigger)"'
           tags: $(Tags)          
           processOutputs: true

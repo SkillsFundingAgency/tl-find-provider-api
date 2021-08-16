@@ -40,9 +40,9 @@
             "type": "int",
             "minValue": 1
         },
-        // "azureWebsitesRPObjectId": {
-        //     "type": "string"
-        // }
+        "azureWebsitesRPObjectId": {
+            "type": "string"
+        },
         "keyVaultReadWriteObjectIds": {
             "type": "array"
         },
@@ -238,43 +238,43 @@
                     }
                 }
             }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "[concat('key-vault','-', parameters('environmentNameAbbreviation'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'keyvault.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[variables('keyVaultName')]"
+                    },
+                    "enabledForTemplateDeployment": {
+                        "value": true
+                    },
+                    "enableSoftDelete": {
+                        "value": true
+                    },
+                    "keyVaultAccessPolicies": {
+                        "value": "[concat(variables('keyVaultAccessPolicies'), variables('readWriteAccessPolicies').readWriteAccessPolicies, variables('fullAccessPolicies').fullAccessPolicies)]"
+                    }
+                }
+            }
         }
-        // {
-        //     "apiVersion": "2017-05-10",
-        //     "name": "[concat('key-vault','-', parameters('environmentNameAbbreviation'))]",
-        //     "type": "Microsoft.Resources/deployments",
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "templateLink": {
-        //             "uri": "[concat(variables('deploymentUrlBase'),'keyvault.json')]",
-        //             "contentVersion": "1.0.0.0"
-        //         },
-        //         "parameters": {
-        //             "keyVaultName": {
-        //                 "value": "[variables('keyVaultName')]"
-        //             },
-        //             "enabledForTemplateDeployment": {
-        //                 "value": true
-        //             },
-        //             "enableSoftDelete": {
-        //                 "value": true
-        //             },
-        //             "keyVaultAccessPolicies": {
-        //                 "value": "[concat(variables('keyVaultAccessPolicies'), variables('readWriteAccessPolicies').readWriteAccessPolicies, variables('fullAccessPolicies').fullAccessPolicies)]"
-        //             }
-        //         }
-        //     }
-        // }
     ],
     "outputs": {
         "sharedASPName": {
             "type": "string",
             "value": "[variables('appServicePlanName')]"
         },
-        // "sharedKeyVaultName": {
-        //     "type": "string",
-        //     "value": "[variables('keyVaultName')]"
-        // },
+        "sharedKeyVaultName": {
+            "type": "string",
+            "value": "[variables('keyVaultName')]"
+        },
         "sharedSQLServerName": {
             "type": "string",
             "value": "[variables('sqlServerName')]"
