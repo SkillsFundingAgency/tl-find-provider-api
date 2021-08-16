@@ -9,5 +9,5 @@
 	[Postcode] NVARCHAR(10) NULL,
 	[Email] NVARCHAR(320) NULL,
 	[Telephone] NVARCHAR(150) NULL,
-	[Website] NVARCHAR(100) NULL
+	[Website] NVARCHAR(500) NULL
 )

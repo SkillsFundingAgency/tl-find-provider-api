@@ -10,7 +10,7 @@
 	[County] NVARCHAR(50) NULL,
 	[Email] NVARCHAR(320) NULL,
 	[Telephone] NVARCHAR(150) NULL,
-	[Website] NVARCHAR(100) NULL,
+	[Website] NVARCHAR(500) NULL,
 	[Latitude] DECIMAL(9, 6) NOT NULL,
 	[Longitude] DECIMAL(9, 6) NOT NULL,
 	[Location] GEOGRAPHY NULL, 
