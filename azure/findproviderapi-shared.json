@@ -40,15 +40,15 @@
             "type": "int",
             "minValue": 1
         },
-        "azureWebsitesRPObjectId": {
-            "type": "string"
-        },
-        "keyVaultReadWriteObjectIds": {
-            "type": "array"
-        },
-        "keyVaultFullAccessObjectIds": {
-            "type": "array"
-        }
+        // "azureWebsitesRPObjectId": {
+        //     "type": "string"
+        // }
+        // "keyVaultReadWriteObjectIds": {
+        //     "type": "array"
+        // },
+        // "keyVaultFullAccessObjectIds": {
+        //     "type": "array"
+        // }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
