@@ -40,9 +40,9 @@
             "type": "int",
             "minValue": 1
         }
-        "azureWebsitesRPObjectId": {
-            "type": "string"
-        }
+        // "azureWebsitesRPObjectId": {
+        //     "type": "string"
+        // }
         // "keyVaultReadWriteObjectIds": {
         //     "type": "array"
         // },
