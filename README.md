@@ -28,7 +28,10 @@ Deletion of rows in LocationQualification is a hard delete, since this is a mapp
 
 Updating a deleted row will set the row to undeleted; this acts to logically re-add a row that was previously soft-deleted.
 
-The search procedure can be called manually to search from a latitude/longitude:
+The search procedure takes the top n locations (where n = `@pageSize`) and returns them, together with 
+delivery years and qualifications, as a flat list that might have more than more than n rows.
+
+The search procedure can be called directly to search from a latitude/longitude:
 ```
 EXEC [dbo].[SearchProviders]
 	@fromLatitude = 52.400997,
