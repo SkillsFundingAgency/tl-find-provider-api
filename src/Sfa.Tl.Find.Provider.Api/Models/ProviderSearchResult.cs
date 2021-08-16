@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using Dapper.Contrib.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Models
 {

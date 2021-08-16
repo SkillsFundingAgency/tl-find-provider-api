@@ -90,8 +90,7 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
 
                     q.AddTrigger(opts => opts
                     .ForJob(jobKey)
-                    .StartNow()
-                );
+                    .StartNow());
                 }
 
                 if (!string.IsNullOrEmpty(cronSchedule))
