@@ -11,6 +11,7 @@ AS
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326)
 	
 	SELECT	p.[UkPrn],
+			p.[Name],
 			l.[Name],
 			l.[AddressLine1],
 			l.[AddressLine2],

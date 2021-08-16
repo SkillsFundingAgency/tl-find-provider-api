@@ -45,9 +45,14 @@ namespace Sfa.Tl.Find.Provider.Api.Data
 
                 var providerUpdates = providerUpdateResult.ConvertToTuple();
                 _logger.LogInformation(
-                    $"ProviderRepository Saved providers - inserted {providerUpdates.Inserted}, updated {providerUpdates.Updated}, deleted {providerUpdates.Deleted}.");
+                    "ProviderRepository Saved providers - " +
+                    $"inserted {providerUpdates.Inserted}, " +
+                    $"updated {providerUpdates.Updated}, " +
+                    $"deleted {providerUpdates.Deleted}.");
 
+                //TODO: Move to a method/mapping extension
                 var locationData = new List<LocationDto>();
+                var locationQualificationData = new List<LocationQualificationDto>();
                 foreach (var provider in providers)
                 {
                     foreach (var location in provider.Locations)
@@ -67,10 +72,22 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                             Latitude = location.Latitude,
                             Longitude = location.Longitude
                         });
+
+                        foreach (var deliveryYear in location.DeliveryYears)
+                        {
+                            foreach (var qualification in deliveryYear.Qualifications)
+                            {
+                                locationQualificationData.Add(new LocationQualificationDto
+                                {
+                                    UkPrn = provider.UkPrn,
+                                    Postcode = location.Postcode,
+                                    DeliveryYear = deliveryYear.Year,
+                                    QualificationId = qualification.Id
+                                });
+                            }
+                        }
                     }
                 }
-
-                var testData = locationData.AsTableValuedParameter("dbo.LocationDataTableType");
 
                 var locationUpdateResult = await _dbContextWrapper
                     .QueryAsync<(string Change, int ChangeCount)>(
@@ -78,14 +95,34 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         "UpdateLocations",
                         new
                         {
-                            data = testData//locationData.AsTableValuedParameter("dbo.LocationDataTableType")
+                            data = locationData.AsTableValuedParameter("dbo.LocationDataTableType")
                         },
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
                 var locationUpdates = locationUpdateResult.ConvertToTuple();
                 _logger.LogInformation(
-                    $"ProviderRepository Saved locations - inserted {locationUpdates.Inserted}, updated {locationUpdates.Updated}, deleted {locationUpdates.Deleted}.");
+                    "ProviderRepository Saved locations - " +
+                    $"inserted {locationUpdates.Inserted}, " +
+                    $"updated {locationUpdates.Updated}, " +
+                    $"deleted {locationUpdates.Deleted}.");
+
+                var locationQualificationUpdateResult = await _dbContextWrapper
+                    .QueryAsync<(string Change, int ChangeCount)>(
+                        connection,
+                        "UpdateLocationQualifications",
+                        new
+                        {
+                            data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType")
+                        },
+                        transaction,
+                        commandType: CommandType.StoredProcedure);
+
+                var locationQualificationUpdates = locationQualificationUpdateResult.ConvertToTuple();
+                _logger.LogInformation(
+                    "ProviderRepository Saved location qualifications - " +
+                    $"inserted {locationQualificationUpdates.Inserted}, " +
+                    $"deleted {locationQualificationUpdates.Deleted}.");
 
                 transaction.Commit();
 
@@ -93,7 +130,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred when saving providers");
+                _logger.LogError(ex, "An error occurred when saving providers");
                 throw;
             }
         }
@@ -106,10 +143,38 @@ namespace Sfa.Tl.Find.Provider.Api.Data
         {
             using var connection = _dbContextWrapper.CreateConnection();
 
+            //Mapping - 
+            // https://dapper-tutorial.net/knowledge-base/45505157/map-lists-of-nested-objects-with-dapper--3-level-nested-object-
+            // https://dapper-tutorial.net/knowledge-base/45505157/map-lists-of-nested-objects-with-dapper--3-level-nested-object-
+            var providerLookup = new Dictionary<long, Models.Provider>();
+
+            //Try QueryMultiple - example 5 from https://www.c-sharpcorner.com/UploadFile/e4e3f7/dapper-king-of-micro-orm-C-Sharp-net/
+            /*
+            using (var multipleResult = db.QueryMultiple(“sp_GetContact_Address”, new { id = id }, commandType: CommandType.StoredProcedure))  
+            {  
+               var contact = multipleResult.Read<Contact>().SingleOrDefault();  
+               var Addresses = multipleResult.Read<Address>().ToList();  
+               if (contact != null && Addresses != null)  
+               {  
+                  contact.Addresses.AddRange(Addresses);  
+               }  
+            }
+            */
             var providers = await _dbContextWrapper
-                .QueryAsync<Models.Provider>(
+                .QueryAsync<Models.Provider, Location, Models.Provider>(
                     connection,
                     "SearchProviders",
+                    map: (p, l) =>
+                    {
+                        if (!providerLookup.TryGetValue(p.UkPrn, out var provider))
+                        {
+                            providerLookup.Add(p.UkPrn, provider = p);
+                        }
+                        //if (provider.Locations == null)
+                        //    provider.Locations = new List<Location>();
+                        provider!.Locations.Add(l);
+                        return provider;
+                    },
                     new
                     {
                         fromLatitude = fromPostcodeLocation.Latitude,
@@ -118,6 +183,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         page,
                         pageSize
                     },
+                    splitOn: "UkPrn, Postcode",
                     commandType: CommandType.StoredProcedure);
 
             return providers;

@@ -44,7 +44,7 @@ AS
 		INSERTED.IsDeleted
 	INTO @ChangeSummary	;
 
-	WITH cte (Change) AS
+	WITH ChangesCTE (Change) AS
 	(SELECT	CASE
 				WHEN Change = 'UPDATE' AND IsDeleted = 1
 				THEN 'DELETE'
@@ -53,5 +53,5 @@ AS
 		FROM @ChangeSummary)
 		SELECT	Change, 
 				COUNT(*) AS CountPerChange	 
-		FROM cte
+		FROM ChangesCTE
 		GROUP BY Change;

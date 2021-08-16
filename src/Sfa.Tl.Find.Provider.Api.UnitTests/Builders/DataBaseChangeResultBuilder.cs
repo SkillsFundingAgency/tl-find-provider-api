@@ -9,7 +9,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
         private readonly IList<(string Change, int ChangeCount)> _changeResults
             = new List<(string Change, int ChangeCount)>();
 
-        public IEnumerable<(string Change, int ChangeCount)> Build() => _changeResults;
+        public IList<(string Change, int ChangeCount)> Build() => _changeResults;
 
         public DataBaseChangeResultBuilder WithInserts(int insertCount)
         {

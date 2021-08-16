@@ -22,7 +22,9 @@ Dapper is used as the ORM layer. For more information on using table valued para
 The qualification Id column is the T Level Framework id from the Course Directory tleveldefinitions. 
 It is used as the primary key there is no identity key in Qualifications).
 
-Deletion of data is by setting the IsDeleted flag - this is done in the stored procedure.
+Deletion of data is by setting the IsDeleted flag (soft delete) as part of the merge statements in the stored procedures. 
+Soft deletion avoids complitions with cascading deletes; all selects must check the IsDeleted flag to avoid reading deleted data.
+Deletion of rows in LocationQualification is a hard delete, since this is a mapping table.
 
 Updating a deleted row will set the row to undeleted; this acts to logically re-add a row that was previously soft-deleted.
 
