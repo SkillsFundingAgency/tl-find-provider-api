@@ -394,7 +394,7 @@
                         "value": "AZURE_IP-"
                     },
                     "ipAddresses": {
-                        "value": "[union(reference(concat('ui-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value, reference(concat('function-app','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value)]"
+                        "value": "[reference(concat('ui-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value]"
                     },
                     "serverName": {
                         "value": "[parameters('sharedSQLServerName')]"
