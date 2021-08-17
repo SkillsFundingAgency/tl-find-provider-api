@@ -2,6 +2,6 @@
 {
     public class PostcodeApiSettings
     {
-        public string BaseUri { get; init; }
+        public string BaseUri { get; set; }
     }
 }

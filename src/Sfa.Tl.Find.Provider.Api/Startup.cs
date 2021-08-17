@@ -20,12 +20,14 @@ namespace Sfa.Tl.Find.Provider.Api
     public class Startup
     {
         private readonly IConfiguration _configuration;
+        private readonly SiteConfiguration _siteConfiguration;
 
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
+            _siteConfiguration = configuration.LoadConfigurationOptions();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -48,19 +50,21 @@ namespace Sfa.Tl.Find.Provider.Api
                 "v1",
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
-            services.AddCorsPolicy(CorsPolicyName, _configuration["AllowedCorsOrigins"]);
+            services.AddCorsPolicy(CorsPolicyName, _siteConfiguration.AllowedCorsOrigins);
 
             AddHttpClients(services);
 
             services
                 .AddScoped<IDbContextWrapper>(_ =>
-                    new DbContextWrapper(_configuration.GetConnectionString("SqlConnectionString")))
+                    new DbContextWrapper(_siteConfiguration.SqlConnectionString))
                 .AddTransient<IProviderDataService, ProviderDataService>()
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();
 
+            var x = _configuration["SuppressStartupDataLoad"];
+            var y = _configuration["SuppressStartupDataLoad"]?.ToLower();
             services.AddHostedQuartzServices(
-                _configuration["CourseDirectoryImportSchedule"],
+                _siteConfiguration.CourseDirectoryImportSchedule,
                 _configuration["SuppressStartupDataLoad"]?.ToLower() != "true");
         }
 
@@ -81,7 +85,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             app.UseRouting();
 
-            if (!string.IsNullOrWhiteSpace(_configuration["AllowedCorsOrigins"]))
+            if (!string.IsNullOrWhiteSpace(_siteConfiguration.AllowedCorsOrigins))
                 app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
@@ -93,13 +97,16 @@ namespace Sfa.Tl.Find.Provider.Api
         // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddConfigurationOptions(IServiceCollection services)
         {
-            services
-                .AddOptions<PostcodeApiSettings>()
-                .Bind(_configuration.GetSection(nameof(PostcodeApiSettings)));
+            services.Configure<PostcodeApiSettings>(x =>
+            {
+                x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
+            });
 
-            services
-                .AddOptions<CourseDirectoryApiSettings>()
-                .Bind(_configuration.GetSection(nameof(CourseDirectoryApiSettings)));
+            services.Configure<CourseDirectoryApiSettings>(x =>
+            {
+                x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
+                x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+            });
 
             return services;
         }
