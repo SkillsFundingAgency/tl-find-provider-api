@@ -48,7 +48,7 @@ namespace Sfa.Tl.Find.Provider.Api
                 "v1",
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
-            services.AddCorsPolicy(CorsPolicyName, _configuration["AllowedOrigins"]);
+            services.AddCorsPolicy(CorsPolicyName, _configuration["AllowedCorsOrigins"]);
 
             AddHttpClients(services);
 
@@ -81,7 +81,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             app.UseRouting();
 
-            if (!string.IsNullOrWhiteSpace(_configuration["AllowedOrigins"]))
+            if (!string.IsNullOrWhiteSpace(_configuration["AllowedCorsOrigins"]))
                 app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
