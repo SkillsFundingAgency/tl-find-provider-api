@@ -35,13 +35,15 @@ AS
 			INNER JOIN	[dbo].[Qualification] q
 			ON		q.[Id] = lq.[QualificationId]
 			  AND	q.IsDeleted = 0
-			WHERE	lq.[LocationId] = l.[Id])
+			WHERE	lq.[LocationId] = l.[Id]
+			  AND	(q.id = @qualificationId 
+					 OR ISNULL(@qualificationid, 0) = 0))
 	ORDER BY [Distance],
-			p.[Name],
-			l.[Name]
+			 p.[Name],
+			 l.[Name]
 	OFFSET @page * @pageSize ROWS
 	FETCH NEXT @pageSize ROWS ONLY)
-	--Step 2 - add in the qualifications 
+	--Step 2 - add in the qualifications (no filter for qualifications - return all for selected locations)
 		SELECT 	[UkPrn],
 				[ProviderName],
 				[Postcode],
@@ -62,4 +64,7 @@ AS
 		ON		lq.[LocationId] = l.[LocationId]
 		INNER JOIN	[dbo].[Qualification] q
 		ON		q.[Id] = lq.[QualificationId]
-		  AND	q.IsDeleted = 0;
+		  AND	q.IsDeleted = 0
+		ORDER BY [Distance],
+				 [ProviderName],
+				 [LocationName];
