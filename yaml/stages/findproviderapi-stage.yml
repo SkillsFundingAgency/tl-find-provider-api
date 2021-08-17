@@ -23,7 +23,7 @@ stages:
     - group: platform-${{parameters.environmentName}}
     - group: platform-${{parameters.environmentName}}-findproviderapi
     - name: BaseName
-      value: "s126${{parameters.environmentId}}-fpapi-${{parameters.environmentName}}"
+      value: "s126${{parameters.environmentId}}-fprapi-${{parameters.environmentName}}"
     - name: ResourceGroupName
       value: '$(BaseName)'
     - name: EnvironmentName
