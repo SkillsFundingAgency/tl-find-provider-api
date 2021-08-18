@@ -2,7 +2,7 @@
 
 # tl-find-provider-api
 
-Tlevels Find a Provider API repository
+Tlevels Find a Provider API repository.
 
 
 ## Configuration
@@ -43,6 +43,37 @@ Add a new row to the table with:
 Course directory API values can be obtained from the NCS API portal. Ask the NCS Course Directory Team for details.
         
 CRON schedule needs to use a valid CRON string, such as `0 0 9 ? * MON-FRI`
+
+### Troubleshooting
+
+If you encounter an error starting the project:
+```
+System.InvalidOperationException: 'Configuration could not be loaded. Please check your configuration files or see the inner exception for details'
+```
+then you probably haven't started the Azure Storage Emulator, or haven't completed the configuration above.
+
+
+## Calling the API
+
+When running locally, assuming localhost with port 55961, you can either use the Swagger UI or call directly as below:
+
+> **Swagger UI**
+> - https://localhost:55961/swagger/index.html
+> 
+> **Qualifications**
+> - https://localhost:55961/findproviders/api/qualifications
+> 
+> **Provider search**
+> - https://localhost:55961/findproviders/api/providers/CV1%202WT
+> - https://localhost:55961/findproviders/api/providers/CV1%202WT?qualificationId=37
+> - https://localhost:55961/findproviders/api/providers/CV1%202WT?qualificationId=37&page=3
+> - https://localhost:55961/findproviders/api/providers/CV1%202WT?qualificationId=37&page=0&pageSize=10
+
+For provider search, the postcode at the end of the url is required. 
+The `qualificationId` filter is optional and defaults to null or 0; 
+`page` and `pageSize` are also optional and default to 0 and 5 respectively.
+
+If the postcode is not found in provider search, the API will return a 404 result with a message indicating the postcode was not found.
 
 
 ## Database

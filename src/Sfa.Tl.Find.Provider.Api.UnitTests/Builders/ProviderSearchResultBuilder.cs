@@ -86,5 +86,40 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                     }
                 }
             };
+
+        public IEnumerable<ProviderSearchResult> BuildListWithSingleItems() =>
+            new List<ProviderSearchResult>
+            {
+                new()
+                {
+                    UkPrn = 10000001,
+                    ProviderName = "Provider 1",
+                    LocationName = "Location 1",
+                    Postcode = "AA1 1AA",
+                    AddressLine1 = "Location 1 Address Line 1",
+                    AddressLine2 = "Location 1 Address Line",
+                    Town = "Location 1 Town",
+                    County = "Location 1 County",
+                    Email = "email.address@provider1.ac.uk",
+                    Telephone = "011 111 1111",
+                    Website = "https://www.provider1.ac.uk",
+                    Distance = 10.0,
+                    DeliveryYears = new List<DeliveryYear>
+                    {
+                        new()
+                        {
+                            Year = 2021,
+                            Qualifications = new List<Qualification>()
+                            {
+                                new()
+                                {
+                                    Id = 31,
+                                    Name = "Test Qualification 31"
+                                }
+                            }
+                        }
+                    }
+                }
+            };
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Sfa.Tl.Find.Provider.Api.Models
 {

@@ -23,38 +23,38 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                     Locations = new List<Location>
                     {
                         new()
+                        {
+                            Postcode = "AA1 1AA",
+                            AddressLine1 = "Provider 1 Address Line 1",
+                            AddressLine2 = "Provider 1 Address Line",
+                            Town = "Provider 1 Town",
+                            County = "Provider 1 County",
+                            Email = "email.address@provider1.ac.uk",
+                            Telephone = "011 111 1111",
+                            Website= "https://www.provider1.ac.uk",
+                            Latitude = 50.0,
+                            Longitude = 1.0,
+                            DeliveryYears = new List<DeliveryYear>
                             {
-                                Postcode = "AA1 1AA",
-                                AddressLine1 = "Provider 1 Address Line 1",
-                                AddressLine2 = "Provider 1 Address Line",
-                                Town = "Provider 1 Town",
-                                County = "Provider 1 County",
-                                Email = "email.address@provider1.ac.uk",
-                                Telephone = "011 111 1111",
-                                Website= "https://www.provider1.ac.uk",
-                                Latitude = 50.0,
-                                Longitude = 1.0,
-                                DeliveryYears = new List<DeliveryYear>
+                                new()
                                 {
-                                    new()
+                                    Year = 2021,
+                                    Qualifications = new List<Qualification>()
                                     {
-                                        Year = 2021,
-                                        Qualifications = new List<Qualification>()
+                                        new()
                                         {
-                                            new()
-                                            {
-                                                Id = 31,
-                                                Name = "Test Qualification 31"
-                                            },
-                                            new()
-                                            {
-                                                Id = 32,
-                                                Name = "Test Qualification 32"
-                                            }
+                                            Id = 31,
+                                            Name = "Test Qualification 31"
+                                        },
+                                        new()
+                                        {
+                                            Id = 32,
+                                            Name = "Test Qualification 32"
                                         }
                                     }
                                 }
                             }
+                        }
                     }
                 },
                 new()

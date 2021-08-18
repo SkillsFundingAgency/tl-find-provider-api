@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using FluentAssertions;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
@@ -20,7 +22,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             typeof(ProviderRepository)
                 .ShouldNotAcceptNullConstructorArguments();
         }
-        
+
         [Fact]
         public async Task Save_Returns_Expected_Result()
         {
@@ -133,8 +135,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         [Fact]
         public async Task Search_Returns_Expected_List()
         {
-            var providers = new ProviderBuilder()
-                .BuildList()
+            var providerSearchResults = new ProviderSearchResultBuilder()
+                .BuildListWithSingleItems()
+                .Take(1)
                 .ToList();
 
             var dbConnection = Substitute.For<IDbConnection>();
@@ -142,24 +145,62 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             dbContextWrapper
                 .CreateConnection()
                 .Returns(dbConnection);
-            dbContextWrapper
-                .QueryAsync<Models.Provider>(dbConnection,
+
+            await dbContextWrapper
+                .QueryAsync(dbConnection,
                     "SearchProviders",
+                    Arg.Do<Func<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>>(
+                        x =>
+                        {
+                            //TODO: Write a more complex test that deals with multiple results
+                            var p = providerSearchResults.Single();
+                            var d = p.DeliveryYears.Single();
+                            var q = d.Qualifications.Single();
+                            x.Invoke(p, d, q);
+                        }),
                     Arg.Any<object>(),
+                    splitOn: Arg.Any<string>(),
                     commandType: CommandType.StoredProcedure
-                )
-                .Returns(providers);
+                );
 
             var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
 
             var fromPostcodeLocation = new PostcodeLocationBuilder().BuildValidPostcodeLocation();
 
-            var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 0);
+            var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5);
 
-            var searchResultsList = searchResults.ToList();
-            //TODO: Refactor to proper search results and implement asserts
-            //searchResultsList.Count.Should().Be(providers.Count);
-            //searchResultsList.Should().BeEquivalentTo(providers);
+            var searchResultsList = searchResults?.ToList();
+            searchResultsList.Should().NotBeNull();
+            searchResultsList!.Count.Should().Be(1);
+
+            var firstResult = searchResultsList.First();
+            var expectedResult = providerSearchResults.First();
+
+            firstResult.UkPrn.Should().Be(expectedResult.UkPrn);
+            firstResult.ProviderName.Should().Be(expectedResult.ProviderName);
+            firstResult.Postcode.Should().Be(expectedResult.Postcode);
+            firstResult.LocationName.Should().Be(expectedResult.LocationName);
+            firstResult.AddressLine1.Should().Be(expectedResult.AddressLine1);
+            firstResult.AddressLine2.Should().Be(expectedResult.AddressLine2);
+            firstResult.Town.Should().Be(expectedResult.Town);
+            firstResult.County.Should().Be(expectedResult.County);
+            firstResult.Email.Should().Be(expectedResult.Email);
+            firstResult.Telephone.Should().Be(expectedResult.Telephone);
+            firstResult.Website.Should().Be(expectedResult.Website);
+            firstResult.Distance.Should().Be(expectedResult.Distance);
+
+            firstResult.DeliveryYears.Count.Should().Be(expectedResult.DeliveryYears.Count);
+            var deliveryYear = firstResult.DeliveryYears.First();
+            var expectedDeliveryYear = expectedResult.DeliveryYears.First();
+
+            deliveryYear.Year.Should().Be(expectedDeliveryYear.Year);
+            deliveryYear.Qualifications.Count.Should().Be(expectedDeliveryYear.Qualifications.Count);
+
+            var qualification = deliveryYear.Qualifications.First();
+            var expectedQualification = expectedDeliveryYear.Qualifications.First();
+
+            qualification.Id.Should().Be(expectedQualification.Id);
+            qualification.Name.Should().Be(expectedQualification.Name);
         }
     }
 }

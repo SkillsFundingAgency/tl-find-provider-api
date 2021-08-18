@@ -21,6 +21,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
     {
         private const string TestPostcode = "AB1 2XY";
         private const string InvalidPostcode = "CV99 XXX";
+        private const int TestQualificationId = 51;
+        private const int TestPage = 3;
+        private const int TestPageSize = Constants.DefaultPageSize + 10;
 
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
@@ -72,6 +75,82 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             results.Single().Id.Should().Be(qualifications.Single().Id);
             results.Single().Name.Should().Be(qualifications.Single().Name);
+        }
+
+        [Fact]
+        public async Task GetProviders_Passes_Default_Parameters()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ProviderSearchResultBuilder().BuildList());
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            await controller.GetProviders(TestPostcode);
+
+            await dataService
+                .Received()
+                .FindProviders(Arg.Is<string>(p => p == TestPostcode),
+                    Arg.Is<int?>(q => q == null),
+                    Arg.Is<int>(p => p == 0),
+                    Arg.Is<int>(s => s == Constants.DefaultPageSize));
+        }
+
+        [Fact]
+        public async Task GetProviders_Passes_QualificationId_And_Default_Parameters()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ProviderSearchResultBuilder().BuildList());
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            await controller.GetProviders(TestPostcode, TestQualificationId);
+
+            await dataService
+                .Received()
+                .FindProviders(Arg.Is<string>(p => p == TestPostcode),
+                    Arg.Is<int?>(q => q == TestQualificationId),
+                    Arg.Is<int>(p => p == 0),
+                    Arg.Is<int>(s => s == Constants.DefaultPageSize));
+        }
+
+        [Fact]
+        public async Task GetProviders_Passes_QualificationId_And_Page_And_Default_Parameters()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ProviderSearchResultBuilder().BuildList());
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            await controller.GetProviders(TestPostcode, TestQualificationId, TestPage);
+
+            await dataService
+                .Received()
+                .FindProviders(Arg.Is<string>(p => p == TestPostcode),
+                    Arg.Is<int?>(q => q == TestQualificationId),
+                    Arg.Is<int>(p => p == TestPage),
+                    Arg.Is<int>(s => s == Constants.DefaultPageSize));
+        }
+
+        [Fact]
+        public async Task GetProviders_Passes_All_Parameters()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ProviderSearchResultBuilder().BuildList());
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            await controller.GetProviders(TestPostcode, TestQualificationId, TestPage, TestPageSize);
+
+            await dataService
+                .Received()
+                .FindProviders(Arg.Is<string>(p => p == TestPostcode),
+                    Arg.Is<int?>(q => q == TestQualificationId),
+                    Arg.Is<int>(p => p == TestPage),
+                    Arg.Is<int>(s => s == TestPageSize));
         }
 
         [Fact]

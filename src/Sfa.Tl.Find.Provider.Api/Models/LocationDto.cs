@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+// ReSharper disable All
 
 namespace Sfa.Tl.Find.Provider.Api.Models
 {

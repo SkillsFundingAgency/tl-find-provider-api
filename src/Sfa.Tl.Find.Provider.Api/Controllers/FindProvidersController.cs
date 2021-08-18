@@ -49,7 +49,12 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
 
             try
             {
-                var providers = await _providerDataService.FindProviders(postcode);
+                var providers = await _providerDataService.FindProviders(
+                    postcode,
+                    qualificationId is > 0 ? qualificationId : null,
+                    page,
+                    pageSize);
+
                 return providers != null
                     ? Ok(providers)
                     : NotFound();
