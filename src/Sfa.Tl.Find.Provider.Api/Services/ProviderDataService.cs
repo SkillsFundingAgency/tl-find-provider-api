@@ -12,6 +12,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
     public class ProviderDataService : IProviderDataService
     {
         private readonly ICourseDirectoryService _courseDirectoryService;
+        private readonly IDateTimeService _dateTimeService;
         private readonly IPostcodeLookupService _postcodeLookupService;
         private readonly IProviderRepository _providerRepository;
         private readonly IQualificationRepository _qualificationRepository;
@@ -20,6 +21,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
         public ProviderDataService(
             ICourseDirectoryService courseDirectoryService,
+            IDateTimeService dateTimeService,
             IPostcodeLookupService postcodeLookupService,
             IProviderRepository providerRepository,
             IQualificationRepository qualificationRepository,
@@ -27,6 +29,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             ILogger<ProviderDataService> logger)
         {
             _courseDirectoryService = courseDirectoryService ?? throw new ArgumentNullException(nameof(courseDirectoryService));
+            _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
             _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
             _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
             _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
@@ -74,7 +77,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var cacheExpiryOptions = new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(60),
+                AbsoluteExpiration = _dateTimeService.Now.AddMinutes(60),
                 Priority = CacheItemPriority.Normal,
                 SlidingExpiration = TimeSpan.FromMinutes(10),
                 Size = 1,

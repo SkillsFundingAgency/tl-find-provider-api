@@ -57,6 +57,7 @@ namespace Sfa.Tl.Find.Provider.Api
             services
                 .AddScoped<IDbContextWrapper>(_ =>
                     new DbContextWrapper(_siteConfiguration.SqlConnectionString))
+                .AddScoped<IDateTimeService, DateTimeService>()
                 .AddTransient<IProviderDataService, ProviderDataService>()
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();
@@ -152,8 +153,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
                         client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
                         client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                    }
-                )
+                    })
                 .ConfigurePrimaryHttpMessageHandler(_ =>
                 {
                     var handler = new HttpClientHandler();

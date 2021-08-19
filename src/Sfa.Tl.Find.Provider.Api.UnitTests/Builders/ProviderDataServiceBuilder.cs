@@ -10,6 +10,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
     {
         public ProviderDataService Build(
             ICourseDirectoryService courseDirectoryService = null,
+            IDateTimeService dateTimeService = null,
             IPostcodeLookupService postcodeLookupService = null,
             IProviderRepository providerRepository = null,
             IQualificationRepository qualificationRepository = null,
@@ -17,6 +18,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
             ILogger<ProviderDataService> logger = null)
         {
             courseDirectoryService ??= Substitute.For<ICourseDirectoryService>();
+            dateTimeService ??= Substitute.For<IDateTimeService>();
             postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
             providerRepository ??= Substitute.For<IProviderRepository>();
             qualificationRepository ??= Substitute.For<IQualificationRepository>();
@@ -25,6 +27,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 
             return new ProviderDataService(
                 courseDirectoryService, 
+                dateTimeService,
                 postcodeLookupService,
                 providerRepository, 
                 qualificationRepository, 

@@ -9,12 +9,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
     {
         public ProviderRepository Build(
             IDbContextWrapper dbContextWrapper = null,
+            IDateTimeService dateTimeService = null,
             ILogger<ProviderRepository> logger = null)
         {
             dbContextWrapper ??= Substitute.For<IDbContextWrapper>();
+            dateTimeService ??= Substitute.For<IDateTimeService>();
             logger ??= Substitute.For<ILogger<ProviderRepository>>();
                 
-            return new ProviderRepository(dbContextWrapper, logger);
+            return new ProviderRepository(dbContextWrapper, dateTimeService, logger);
         }
     }
 }

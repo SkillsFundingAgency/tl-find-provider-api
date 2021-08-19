@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -13,13 +14,16 @@ namespace Sfa.Tl.Find.Provider.Api.Data
     public class ProviderRepository : IProviderRepository
     {
         private readonly IDbContextWrapper _dbContextWrapper;
+        private readonly IDateTimeService _dateTimeService;
         private readonly ILogger<ProviderRepository> _logger;
 
         public ProviderRepository(
             IDbContextWrapper dbContextWrapper,
+            IDateTimeService dateTimeService,
             ILogger<ProviderRepository> logger)
         {
             _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
+            _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -157,6 +161,11 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         if (!providerSearchResults.TryGetValue(key, out var searchResult))
                         {
                             providerSearchResults.Add(key, searchResult = p);
+                            searchResult.JourneyToLink =
+                                "https://www.google.com/maps/dir/?api=1&" +
+                                $"origin={WebUtility.UrlEncode(fromPostcodeLocation.Postcode)}" +
+                                $"&destination={WebUtility.UrlEncode(searchResult.Postcode)}" +
+                                "&travelmode=transit";
                         }
 
                         //TODO: Consider a dictionary, and lookup like above
@@ -169,10 +178,17 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         if (deliveryYear == null)
                         {
                             deliveryYear = ly;
+
+                            deliveryYear.IsAvailableNow =
+                                deliveryYear.Year < _dateTimeService.Today.Year
+                                || (deliveryYear.Year == _dateTimeService.Today.Year && _dateTimeService.Today.Month < 9);
                             searchResult.DeliveryYears.Add(deliveryYear);
                         }
 
-                        deliveryYear.Qualifications.Add(q);
+                        if (deliveryYear.Qualifications.All(z => z.Id != q.Id))
+                        {
+                            deliveryYear.Qualifications.Add(q);
+                        }
 
                         return searchResult;
                     },

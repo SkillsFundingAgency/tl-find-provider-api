@@ -136,9 +136,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         public async Task Search_Returns_Expected_List()
         {
             var providerSearchResults = new ProviderSearchResultBuilder()
-                .BuildListWithSingleItems()
+                .BuildListWithSingleItem()
                 .Take(1)
                 .ToList();
+
+            var expectedResult = new ProviderSearchResultBuilder()
+                .WithJourneyLinksFrom("CV1 2WT")
+                .BuildListWithSingleItem()
+                .First();
 
             var dbConnection = Substitute.For<IDbConnection>();
             var dbContextWrapper = Substitute.For<IDbContextWrapper>();
@@ -174,7 +179,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             searchResultsList!.Count.Should().Be(1);
 
             var firstResult = searchResultsList.First();
-            var expectedResult = providerSearchResults.First();
 
             firstResult.UkPrn.Should().Be(expectedResult.UkPrn);
             firstResult.ProviderName.Should().Be(expectedResult.ProviderName);
@@ -188,12 +192,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             firstResult.Telephone.Should().Be(expectedResult.Telephone);
             firstResult.Website.Should().Be(expectedResult.Website);
             firstResult.Distance.Should().Be(expectedResult.Distance);
+            firstResult.JourneyToLink.Should().Be(expectedResult.JourneyToLink);
 
             firstResult.DeliveryYears.Count.Should().Be(expectedResult.DeliveryYears.Count);
             var deliveryYear = firstResult.DeliveryYears.First();
             var expectedDeliveryYear = expectedResult.DeliveryYears.First();
 
             deliveryYear.Year.Should().Be(expectedDeliveryYear.Year);
+            deliveryYear.IsAvailableNow.Should().Be(expectedDeliveryYear.IsAvailableNow);
             deliveryYear.Qualifications.Count.Should().Be(expectedDeliveryYear.Qualifications.Count);
 
             var qualification = deliveryYear.Qualifications.First();

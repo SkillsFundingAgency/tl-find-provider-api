@@ -5,6 +5,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
     public class ProviderSearchResultBuilder
     {
+        private string _journeyLinkOrigin = null;
+
         public IEnumerable<ProviderSearchResult> BuildList() =>
             new List<ProviderSearchResult>
             {
@@ -22,11 +24,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                     Telephone = "011 111 1111",
                     Website= "https://www.provider1.ac.uk",
                     Distance = 10.0,
+                    JourneyToLink = CreateJourneyLink("AA1 1AA"),
                     DeliveryYears = new List<DeliveryYear>
                     {
                         new()
                         {
                             Year = 2021,
+                            IsAvailableNow = true,
                             Qualifications = new List<Qualification>()
                             {
                                 new()
@@ -57,11 +61,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                     Telephone = "022 222 2222",
                     Website= "https://www.provider2.ac.uk",
                     Distance = 12.0,
+                    JourneyToLink = CreateJourneyLink("BB2 2BB"),
                     DeliveryYears = new List<DeliveryYear>
                     {
                         new()
                         {
                             Year = 2022,
+                            IsAvailableNow = false,
                             Qualifications = new List<Qualification>()
                             {
                                 new()
@@ -74,6 +80,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                         new()
                         {
                             Year = 2023,
+                            IsAvailableNow = false,
                             Qualifications = new List<Qualification>()
                             {
                                 new()
@@ -87,7 +94,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                 }
             };
 
-        public IEnumerable<ProviderSearchResult> BuildListWithSingleItems() =>
+        public IEnumerable<ProviderSearchResult> BuildListWithSingleItem() =>
             new List<ProviderSearchResult>
             {
                 new()
@@ -104,11 +111,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                     Telephone = "011 111 1111",
                     Website = "https://www.provider1.ac.uk",
                     Distance = 10.0,
+                    JourneyToLink = CreateJourneyLink("AA1 1AA"),
                     DeliveryYears = new List<DeliveryYear>
                     {
                         new()
                         {
                             Year = 2021,
+                            IsAvailableNow = true,
                             Qualifications = new List<Qualification>()
                             {
                                 new()
@@ -121,5 +130,22 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                     }
                 }
             };
+
+        public ProviderSearchResultBuilder WithJourneyLinksFrom(string origin)
+        {
+            _journeyLinkOrigin = origin?.Trim().Replace(" ", "+");
+
+            return this;
+        }
+
+        private string CreateJourneyLink(string destination)
+        {
+            return !string.IsNullOrEmpty(_journeyLinkOrigin)
+                ? "https://www.google.com/maps/dir/?api=1" +
+                  $"&origin={_journeyLinkOrigin}" +
+                  $"&destination={(destination?.Trim().Replace(" ", "+"))}" +
+                  "&travelmode=transit"
+                : null;
+        }
     }
 }

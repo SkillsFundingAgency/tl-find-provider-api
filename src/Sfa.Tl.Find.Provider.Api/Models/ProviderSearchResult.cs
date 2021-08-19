@@ -20,6 +20,7 @@ namespace Sfa.Tl.Find.Provider.Api.Models
         public string Telephone { get; init; }
         public string Website { get; init; }
         public double Distance { get; init; }
+        public string JourneyToLink { get; set; }
 
         public ICollection<DeliveryYear> DeliveryYears { get; init; } = new List<DeliveryYear>();
     }
