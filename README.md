@@ -64,10 +64,10 @@ When running locally, assuming localhost with port 55961, you can either use the
 > - https://localhost:55961/findproviders/api/qualifications
 > 
 > **Provider search**
-> - https://localhost:55961/findproviders/api/providers/CV1%202WT
-> - https://localhost:55961/findproviders/api/providers/CV1%202WT?qualificationId=37
-> - https://localhost:55961/findproviders/api/providers/CV1%202WT?qualificationId=37&page=3
-> - https://localhost:55961/findproviders/api/providers/CV1%202WT?qualificationId=37&page=0&pageSize=10
+> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT
+> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37
+> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37&page=3
+> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
 
 For provider search, the postcode at the end of the url is required. 
 The `qualificationId` filter is optional and defaults to null or 0; 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -34,15 +35,15 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// <param name="pageSize">Number of items to return on a page.</param>
         /// <returns>Json with providers.</returns>
         [HttpGet]
-        [Route("providers/{postcode}", Name = "GetProviders")]
+        [Route("providers", Name = "GetProviders")]
         [ProducesResponseType(typeof(IEnumerable<ProviderSearchResult>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(
-            string postcode,
+            [Required, FromQuery] string postcode,
             [FromQuery] int? qualificationId = null,
-            [FromQuery] int page = 0,
-            [FromQuery] int pageSize = Constants.DefaultPageSize)
+            [FromQuery, Range(0, int.MaxValue, ErrorMessage = "Must be zero or greater.")] int page = 0,
+            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "Must be at least one.")] int pageSize = Constants.DefaultPageSize)
         {
             _logger.LogDebug($"GetProviders called with qualificationId={qualificationId}, " +
                              $"page={page}, pageSize={pageSize}");
