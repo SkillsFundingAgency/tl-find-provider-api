@@ -3,6 +3,14 @@ parameters:
     type: string
   - name: sharedEnvironmentId
     type: string
+  - name: appName
+    type: string
+  - name: name
+    type: string
+  - name: dependencies
+    type: object
+  - name: package
+    type: string
 jobs:
 - job: PublishSite
   variables:
