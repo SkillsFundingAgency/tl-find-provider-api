@@ -79,4 +79,5 @@ jobs:
       Action: 'Stop Azure App Service'
       WebAppName: '$(uiAppName)'
       ResourceGroupName: '$(ResourceGroupName)'
+      SpecifySlotOrASE: true
       Slot: 'staging'
