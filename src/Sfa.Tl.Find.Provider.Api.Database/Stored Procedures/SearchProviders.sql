@@ -67,4 +67,5 @@ AS
 		  AND	q.IsDeleted = 0
 		ORDER BY [Distance],
 				 [ProviderName],
-				 [LocationName];
+				 [LocationName],
+				 q.[Name];
