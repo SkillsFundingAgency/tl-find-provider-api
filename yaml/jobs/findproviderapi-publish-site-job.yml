@@ -42,7 +42,7 @@ jobs:
       DeployToSlotFlag: true
       ResourceGroupName: '$(ResourceGroupName)'
       SlotName: 'staging'
-      Package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
+      Package: '$(System.ArtifactsDirectory)/appdrop/${{ parameters.package }}'
       UseWebDeploy: true
       RemoveAdditionalFilesFlag: true
 

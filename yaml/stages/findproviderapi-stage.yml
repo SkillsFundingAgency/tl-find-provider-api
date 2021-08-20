@@ -51,28 +51,28 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
 
-  - template: ../jobs/findproviderapi-publish-site-job.yml
-    parameters:
-      serviceConnection: ${{ parameters.serviceConnection }}
-      sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      # appName: 'uiAppName'
-      # name: 'Website'
-      # dependencies:
-      #   - DeployInfrastructure
-      #   - GenerateConfigs
-      # package: 'Sfa.Tl.Find.Provider.Api.Web.zip'
-
   # - template: ../jobs/findproviderapi-publish-site-job.yml
   #   parameters:
   #     serviceConnection: ${{ parameters.serviceConnection }}
   #     sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-  #     appName: 'ApiAppName'
-  #     name: 'FindProviderAPI'
+  #     appName: 'uiAppName'
+  #     name: 'Website'
   #     dependencies:
-  #       - Publish_Website
   #       - DeployInfrastructure
   #       - GenerateConfigs
-  #     package: 'Sfa.Tl.Find.Provider.Api.FindProviderAPI.zip'
+  #     package: 'Sfa.Tl.Find.Provider.Api.Web.zip'
+
+  - template: ../jobs/findproviderapi-publish-site-job.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
+      appName: 'ApiAppName'
+      name: 'FindProviderAPI'
+      dependencies:
+        - Publish_Website
+        - DeployInfrastructure
+        - GenerateConfigs
+      package: 'Sfa.Tl.Find.Provider.Api.zip'
   
   # - template: ../jobs/findproviderapi-publish-function-job.yml
   #   parameters:
