@@ -11,7 +11,6 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 {
     public class ProviderDataService : IProviderDataService
     {
-        private readonly ICourseDirectoryService _courseDirectoryService;
         private readonly IDateTimeService _dateTimeService;
         private readonly IPostcodeLookupService _postcodeLookupService;
         private readonly IProviderRepository _providerRepository;
@@ -20,7 +19,6 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         private readonly ILogger<ProviderDataService> _logger;
 
         public ProviderDataService(
-            ICourseDirectoryService courseDirectoryService,
             IDateTimeService dateTimeService,
             IPostcodeLookupService postcodeLookupService,
             IProviderRepository providerRepository,
@@ -28,7 +26,6 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             IMemoryCache cache,
             ILogger<ProviderDataService> logger)
         {
-            _courseDirectoryService = courseDirectoryService ?? throw new ArgumentNullException(nameof(courseDirectoryService));
             _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
             _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
             _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
@@ -40,10 +37,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         public async Task<IEnumerable<Qualification>> GetQualifications()
         {
             _logger.LogDebug("Getting qualifications");
-
-            //Temp for testing - load qualifications from API first
-            await _courseDirectoryService.ImportQualifications();
-
+            
             return await _qualificationRepository.GetAll();
         }
         
