@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
     public class ProviderSearchResultBuilder
     {
-        private string _journeyLinkOrigin = null;
+        private string _journeyLinkOrigin;
 
         public IEnumerable<ProviderSearchResult> BuildList() =>
             new List<ProviderSearchResult>

@@ -70,8 +70,6 @@ namespace Sfa.Tl.Find.Provider.Api
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();
 
-            var x = _configuration["SuppressStartupDataLoad"];
-            var y = _configuration["SuppressStartupDataLoad"]?.ToLower();
             services.AddHostedQuartzServices(
                 _siteConfiguration.CourseDirectoryImportSchedule,
                 _configuration["SuppressStartupDataLoad"]?.ToLower() != "true");
