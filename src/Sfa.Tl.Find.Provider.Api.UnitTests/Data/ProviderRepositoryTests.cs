@@ -133,15 +133,25 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         }
 
         [Fact]
-        public async Task Search_Returns_Expected_List()
+        public async Task Search_Returns_Expected_List_For_Single_Result_Row()
         {
-            var providerSearchResults = new ProviderSearchResultBuilder()
-                .BuildListWithSingleItem()
+            var fromPostcodeLocation = new PostcodeLocationBuilder().BuildValidPostcodeLocation();
+
+            var providersPart = new ProviderSearchResultBuilder()
+                .BuildProvidersPartOfListWithSingleItem()
                 .Take(1)
                 .ToList();
-
+            var deliveryYearsPart = new ProviderSearchResultBuilder()
+                .BuildDeliveryYearsPartOfListWithSingleItem()
+                .Take(1)
+                .ToList();
+            var qualificationsPart = new ProviderSearchResultBuilder()
+                .BuildQualificationsPartOfListWithSingleItem()
+                .Take(1)
+                .ToList();
+            
             var expectedResult = new ProviderSearchResultBuilder()
-                .WithJourneyLinksFrom("CV1 2WT")
+                .WithJourneyLinksFrom(fromPostcodeLocation)
                 .BuildListWithSingleItem()
                 .First();
 
@@ -151,6 +161,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
                 .CreateConnection()
                 .Returns(dbConnection);
 
+            var callIndex = 0;
+
             await dbContextWrapper
                 .QueryAsync(dbConnection,
                     "SearchProviders",
@@ -158,19 +170,22 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
                         x =>
                         {
                             //TODO: Write a more complex test that deals with multiple results
-                            var p = providerSearchResults.Single();
-                            var d = p.DeliveryYears.Single();
-                            var q = d.Qualifications.Single();
+                            var p = providersPart[callIndex];
+                            var d = deliveryYearsPart[callIndex];
+                            var q = qualificationsPart[callIndex];
                             x.Invoke(p, d, q);
+
+                            callIndex++;
                         }),
                     Arg.Any<object>(),
                     splitOn: Arg.Any<string>(),
                     commandType: CommandType.StoredProcedure
                 );
 
-            var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
+            var dateTimeService = Substitute.For<IDateTimeService>();
+            dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
 
-            var fromPostcodeLocation = new PostcodeLocationBuilder().BuildValidPostcodeLocation();
+            var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper, dateTimeService);
 
             var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5);
 
@@ -193,7 +208,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             firstResult.Website.Should().Be(expectedResult.Website);
             firstResult.Distance.Should().Be(expectedResult.Distance);
             firstResult.JourneyToLink.Should().Be(expectedResult.JourneyToLink);
-
+            
             firstResult.DeliveryYears.Count.Should().Be(expectedResult.DeliveryYears.Count);
             var deliveryYear = firstResult.DeliveryYears.First();
             var expectedDeliveryYear = expectedResult.DeliveryYears.First();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -161,11 +160,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         if (!providerSearchResults.TryGetValue(key, out var searchResult))
                         {
                             providerSearchResults.Add(key, searchResult = p);
-                            searchResult.JourneyToLink =
-                                "https://www.google.com/maps/dir/?api=1&" +
-                                $"origin={WebUtility.UrlEncode(fromPostcodeLocation.Postcode)}" +
-                                $"&destination={WebUtility.UrlEncode(searchResult.Postcode)}" +
-                                "&travelmode=transit";
+                            searchResult.JourneyToLink = fromPostcodeLocation.CreateJourneyLink(searchResult.Postcode);
                         }
 
                         //TODO: Consider a dictionary, and lookup like above
@@ -179,9 +174,8 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         {
                             deliveryYear = ly;
 
-                            deliveryYear.IsAvailableNow =
-                                deliveryYear.Year < _dateTimeService.Today.Year
-                                || (deliveryYear.Year == _dateTimeService.Today.Year && _dateTimeService.Today.Month < 9);
+                            deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
+
                             searchResult.DeliveryYears.Add(deliveryYear);
                         }
 
