@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "CourseDirectoryApiSettings": {
+      "properties": {
+        "BaseUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "CourseDirectoryApiSettings_BaseUri"
+        },
+        "ApiKey": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "CourseDirectoryApiSettings_ApiKey"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "BaseUri",
+        "ApiKey"
+      ],
+      "type": "object"
+    },
+    "PostcodeApiSettings": {
+      "properties": {
+        "BaseUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "PostcodeApiSettings"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "BaseUri"
+      ],
+      "type": "object"
+    },
+    "SqlConnectionString": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "SqlConnectionString"
+    },
+    "CourseDirectoryImportSchedule": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "CourseDirectoryImportSchedule"
+    },
+    "AllowedCorsOrigins": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "AllowedCorsOrigins"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "CourseDirectoryApiSettings",
+    "SqlConnectionString",
+    "PostcodeApiSettings"
+  ],
+  "type": "object"
+}
