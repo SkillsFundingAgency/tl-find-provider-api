@@ -59,6 +59,7 @@
     <Folder Include="Tables" />
     <Folder Include="Indexes" />
     <Folder Include="Stored Procedures" />
+    <Folder Include="Types" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
@@ -70,5 +71,14 @@
     <Build Include="Tables\Qualification.sql" />
     <Build Include="Tables\LocationQualification.sql" />
     <Build Include="Indexes\SPATIAL_Location_Location.sql" />
+    <Build Include="Stored Procedures\UpdateQualifications.sql" />
+    <Build Include="Types\QualificationDataTableType.sql" />
+    <Build Include="Types\ProviderDataTableType.sql" />
+    <Build Include="Stored Procedures\UpdateProviders.sql" />
+    <Build Include="Stored Procedures\SearchProviders.sql" />
+    <Build Include="Types\LocationDataTableType.sql" />
+    <Build Include="Stored Procedures\UpdateLocations.sql" />
+    <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
+    <Build Include="Types\LocationQualificationDataTableType.sql" />
   </ItemGroup>
 </Project>

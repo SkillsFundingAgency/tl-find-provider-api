@@ -3,7 +3,7 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Idioms;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestEHelpers.Extensions
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions
 {
     public static class AutoFixtureExtensions
     {

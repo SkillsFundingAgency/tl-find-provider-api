@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 
@@ -7,27 +10,39 @@ namespace Sfa.Tl.Find.Provider.Api.Data
 {
     public class QualificationRepository : IQualificationRepository
     {
-        public async Task<IQueryable<Qualification>> GetAllQualifications()
+        private readonly IDbContextWrapper _dbContextWrapper;
+
+        public QualificationRepository(IDbContextWrapper dbContextWrapper)
         {
-            return new Qualification[]
-            {
-                new() { Id = 45, Name = "Building Services Engineering for Construction" },
-                new() { Id = 36, Name = "Design, Surveying and Planning for Construction" },
-                new() { Id = 39, Name = "Digital Business Services" },
-                new() { Id = 37, Name = "Digital Production, Design and Development" },
-                new() { Id = 40, Name = "Digital Support Services" },
-                new() { Id = 38, Name = "Education and Childcare" },
-                new() { Id = 41, Name = "Health" },
-                new() { Id = 42, Name = "Healthcare Science" },
-                new() { Id = 44, Name = "Onsite Construction" },
-                new() { Id = 43, Name = "Science" },
-                new() { Id = 46, Name = "Finance" },
-                new() { Id = 47, Name = "Accounting" },
-                new() { Id = 48, Name = "Design and development for engineering and manufacturing" },
-                new() { Id = 49, Name = "Maintenance, installation and repair for engineering and manufacturing" },
-                new() { Id = 50, Name = "Engineering, manufacturing, processing and control" },
-                new() { Id = 51, Name = "Management and administration" }
-            }.AsQueryable();
+            _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
+        }
+
+        public async Task<IEnumerable<Qualification>> GetAll()
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            return await _dbContextWrapper.QueryAsync<Qualification>(
+                connection,
+                "SELECT Id, Name " +
+                "FROM dbo.Qualification " +
+                "WHERE IsDeleted = 0 " +
+                "ORDER BY Name");
+        }
+
+        public async Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Qualification> qualifications)
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+            var updateResult = await _dbContextWrapper
+                .QueryAsync<(string Change, int ChangeCount)>(
+                    connection, 
+                    "UpdateQualifications",
+                    new
+                    {
+                        data = qualifications.AsTableValuedParameter("dbo.QualificationDataTableType")
+                    },
+                    commandType: CommandType.StoredProcedure);
+
+            return updateResult.ConvertToTuple();
         }
     }
 }

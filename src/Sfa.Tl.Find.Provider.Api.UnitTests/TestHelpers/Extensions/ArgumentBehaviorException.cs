@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoFixture.Idioms;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestEHelpers.Extensions
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions
 {
     public class ArgumentBehaviorException : IBehaviorExpectation
     {
