@@ -16,7 +16,7 @@ AS
 		t.[Id] = s.[Id]
 	)
 	WHEN MATCHED 
-		 AND (t.[Name] <> s.[Name]
+		 AND (t.[Name] <> s.[Name] COLLATE Latin1_General_CS_AS
 			  OR t.[IsDeleted] = 1) --To undelete
 	THEN UPDATE SET
 		t.[Name] = s.[Name],
