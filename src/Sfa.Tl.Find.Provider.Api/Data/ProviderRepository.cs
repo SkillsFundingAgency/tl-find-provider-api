@@ -62,8 +62,8 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
-                LogChangeResults(providerUpdateResult, nameof(providers));
-                
+                _logger.LogChangeResults(providerUpdateResult, nameof(ProviderRepository), nameof(providers));
+
                 var locationUpdateResult = await _dbContextWrapper
                     .QueryAsync<(string Change, int ChangeCount)>(
                         connection,
@@ -75,7 +75,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
-                LogChangeResults(locationUpdateResult, "locations");
+                _logger.LogChangeResults(locationUpdateResult, nameof(ProviderRepository), "locations");
 
                 var locationQualificationUpdateResult = await _dbContextWrapper
                     .QueryAsync<(string Change, int ChangeCount)>(
@@ -89,7 +89,8 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
-                LogChangeResults(locationQualificationUpdateResult, "location qualifications", includeUpdated: false);
+                _logger.LogChangeResults(locationQualificationUpdateResult, nameof(ProviderRepository),
+                    "location qualifications", includeUpdated: false);
 
                 transaction.Commit();
             }
@@ -163,23 +164,6 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                 .ThenBy(s => s.ProviderName)
                 .ThenBy(s => s.LocationName)
                 .ToList();
-        }
-
-        private void LogChangeResults(
-            IEnumerable<(string Change, int ChangeCount)> updateResult, 
-            string typeName,
-            bool includeInserted = true,
-            bool includeUpdated = true,
-            bool includeDeleted = true)
-        {
-            var changeResults = updateResult.ConvertToTuple();
-
-            var message = $"{nameof(ProviderRepository)} saved {typeName} data - ";
-            if (includeInserted) message += $"inserted {changeResults.Inserted}, ";
-            if (includeUpdated) message += $"updated {changeResults.Updated}, ";
-            if (includeDeleted) message += $"deleted {changeResults.Deleted}.";
-
-            _logger.LogInformation(message);
         }
     }
 }

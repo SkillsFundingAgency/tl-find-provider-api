@@ -54,7 +54,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
-                LogChangeResults(updateResult, nameof(qualifications));
+                _logger.LogChangeResults(updateResult, nameof(QualificationRepository), nameof(qualifications));
 
                 transaction.Commit();
             }
@@ -63,23 +63,6 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                 _logger.LogError(ex, "An error occurred when saving providers");
                 throw;
             }
-        }
-
-        private void LogChangeResults(
-            IEnumerable<(string Change, int ChangeCount)> updateResult,
-            string typeName,
-            bool includeInserted = true,
-            bool includeUpdated = true,
-            bool includeDeleted = true)
-        {
-            var changeResults = updateResult.ConvertToTuple();
-
-            var message = $"{nameof(QualificationRepository)} saved {typeName} data - ";
-            if (includeInserted) message += $"inserted {changeResults.Inserted}, ";
-            if (includeUpdated) message += $"updated {changeResults.Updated}, ";
-            if (includeDeleted) message += $"deleted {changeResults.Deleted}.";
-
-            _logger.LogInformation(message);
         }
     }
 }
