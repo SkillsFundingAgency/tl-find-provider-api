@@ -94,6 +94,37 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             var responses = new Dictionary<string, HttpResponseMessage>
             {
                 {
+                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildInvalidPostcodeResponse(),
+                        responseCode: HttpStatusCode.NotFound)
+                },
+                {
+                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildInvalidPostcodeResponse(),
+                        responseCode: HttpStatusCode.NotFound)
+                }
+            };
+
+            var service = new PostcodeLookupServiceBuilder()
+                .Build(responses);
+
+            var result = await service.GetPostcode(invalidPostcode.Postcode);
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetPostcode_For_NotFound_Postcode_Returns_Expected_Result()
+        {
+            var invalidPostcode = new PostcodeLocationBuilder().BuildNotFoundPostcodeLocation();
+
+            var uriFormattedPostcode = invalidPostcode.Postcode.Replace(" ", "%20");
+            var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
+            var terminatedPostcodeUriFragment = $"terminated_postcodes/{uriFormattedPostcode}";
+
+            var jsonBuilder = new PostcodeLookupJsonBuilder();
+
+            var responses = new Dictionary<string, HttpResponseMessage>
+            {
+                {
                     postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildPostcodeNotFoundResponse(),
                         responseCode: HttpStatusCode.NotFound)
                 },

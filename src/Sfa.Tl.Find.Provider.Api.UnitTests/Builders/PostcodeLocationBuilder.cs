@@ -12,6 +12,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                 Longitude = -1.508122
             };
 
+        public PostcodeLocation BuildNotFoundPostcodeLocation() =>
+            new()
+            {
+                Postcode = "CV1 9XT",
+                Latitude = double.NaN,
+                Longitude = double.NaN
+            };
+
         public PostcodeLocation BuildInvalidPostcodeLocation() =>
             new()
             {

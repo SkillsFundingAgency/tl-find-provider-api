@@ -12,12 +12,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                     "Assets.validpostcoderesponse.json");
         }
 
-        //public string BuildInvalidPostcodeResponse()
-        //{
-        //    return typeof(PostcodeLookupJsonBuilder)
-        //        .ReadManifestResourceStreamAsString(
-        //            "Assets.invalidpostcoderesponse.json");
-        //}
+        public string BuildInvalidPostcodeResponse()
+        {
+            return typeof(PostcodeLookupJsonBuilder)
+                .ReadManifestResourceStreamAsString(
+                    "Assets.invalidpostcoderesponse.json");
+        }
 
         public string BuildPostcodeNotFoundResponse()
         {
