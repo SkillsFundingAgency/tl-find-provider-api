@@ -13,12 +13,12 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
             bool includeUpdated = true,
             bool includeDeleted = true)
         {
-            var changeResults = updateResult.ConvertToTuple();
+            var (inserted, updated, deleted) = updateResult.ConvertToTuple();
 
-            var message = $"{repositoryName} saved {typeName} data - ";
-            if (includeInserted) message += $"inserted {changeResults.Inserted}, ";
-            if (includeUpdated) message += $"updated {changeResults.Updated}, ";
-            if (includeDeleted) message += $"deleted {changeResults.Deleted}.";
+            var message = $"{repositoryName} saved {typeName} data.";
+            if (includeInserted) message += $" Inserted {inserted} row{(inserted == 1 ? "" : "s")}.";
+            if (includeUpdated) message += $" Updated {updated} row{(updated == 1 ? "" : "s")}.";
+            if (includeDeleted) message += $" Deleted {deleted} row{(deleted == 1 ? "" : "s")}.";
 
             logger.LogInformation(message);
         }
