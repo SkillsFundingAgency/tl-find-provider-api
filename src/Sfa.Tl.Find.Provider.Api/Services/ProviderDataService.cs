@@ -84,7 +84,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                 {
                     new PostEvictionCallbackRegistration
                     {
-                        EvictionCallback = EvictionCallback,
+                        EvictionCallback = Extensions.CacheExtensions.EvictionLoggingCallback,
                         State = _logger
                     }
                 }
@@ -93,14 +93,6 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             _cache.Set(key, postcodeLocation, cacheExpiryOptions);
             
             return postcodeLocation;
-        }
-
-        private static void EvictionCallback(object key, object value, EvictionReason reason, object state)
-        {
-            //TODO: Could move this to a class and call it EvictionCallbackLogger
-            //var logger = (state as ProviderDataService)?._logger;
-            var logger = (state as ILogger);
-            logger?.LogInformation($"Entry {key} was evicted from the cache. Reason: {reason}.");
         }
     }
 }

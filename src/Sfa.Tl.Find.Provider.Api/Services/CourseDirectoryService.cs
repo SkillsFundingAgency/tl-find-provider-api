@@ -35,7 +35,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<(int Saved, int Updated, int Deleted)> ImportProviders()
+        public async Task ImportProviders()
         {
             var responseMessage = await _httpClient.GetAsync(CourseDetailEndpoint);
 
@@ -49,15 +49,12 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var providers = await ReadTLevelProvidersFromResponse(responseMessage);
 
-            var results = await _providerRepository.Save(providers);
+            await _providerRepository.Save(providers);
 
-            _logger.LogInformation(
-                $"Saved providers - inserted {results.Inserted}, updated {results.Updated}, deleted {results.Deleted}.");
-            
-            return results;
+            _logger.LogInformation($"{nameof(CourseDirectoryService)} saved providers.");
         }
 
-        public async Task<(int Saved, int Updated, int Deleted)> ImportQualifications()
+        public async Task ImportQualifications()
         {
             var responseMessage = await _httpClient.GetAsync(QualificationsEndpoint);
 
@@ -71,12 +68,9 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var qualifications = await ReadTLevelQualificationsFromResponse(responseMessage);
 
-            var results = await _qualificationRepository.Save(qualifications);
+            await _qualificationRepository.Save(qualifications);
 
-            _logger.LogInformation(
-                $"Saved qualifications - inserted {results.Inserted}, updated {results.Updated}, deleted {results.Deleted}.");
-
-            return results;
+            _logger.LogInformation($"{nameof(CourseDirectoryService)} saved qualifications.");
         }
 
         private async Task<IEnumerable<Models.Provider>> ReadTLevelProvidersFromResponse(

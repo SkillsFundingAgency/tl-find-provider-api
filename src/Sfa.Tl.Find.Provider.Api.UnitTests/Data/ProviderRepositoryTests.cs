@@ -24,7 +24,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         }
 
         [Fact]
-        public async Task Save_Returns_Expected_Result()
+        public async Task Save_Calls_Database_As_Expected()
         {
             var providers = new ProviderBuilder()
                 .BuildList()
@@ -101,13 +101,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
 
             var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
 
-            //TODO: Not sure this needs to return any results - log from repository
-            var results = await repository.Save(providers);
-
-            results.Should().NotBeNull();
-            results.Inserted.Should().Be(10);
-            results.Updated.Should().Be(5);
-            results.Deleted.Should().Be(2);
+            await repository.Save(providers);
 
             await dbContextWrapper
                 .Received(3)

@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
 {
     public interface IProviderRepository
     {
-        Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Models.Provider> providers);
+        Task Save(IEnumerable<Models.Provider> providers);
 
         Task<IEnumerable<ProviderSearchResult>> Search(
             PostcodeLocation fromPostcodeLocation,

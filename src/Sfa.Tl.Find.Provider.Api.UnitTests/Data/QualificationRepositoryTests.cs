@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -38,9 +39,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             var results = await repository.GetAll();
             results.Should().NotBeNullOrEmpty();
         }
-
+        
         [Fact]
-        public async Task Save_Returns_Expected_Result()
+        public async Task Save_Calls_Database_As_Expected()
         {
             var qualifications = new QualificationBuilder()
                 .BuildList()
@@ -51,28 +52,57 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
                 .WithUpdates(2)
                 .WithDeletes(1)
                 .Build();
+            
+            var receivedSqlArgs = new List<string>();
 
             var dbConnection = Substitute.For<IDbConnection>();
+            var transaction = Substitute.For<IDbTransaction>();
+
             var dbContextWrapper = Substitute.For<IDbContextWrapper>();
             dbContextWrapper
                 .CreateConnection()
                 .Returns(dbConnection);
             dbContextWrapper
-                .QueryAsync<(string Change, int ChangeCount)>(dbConnection, 
+                .BeginTransaction(dbConnection)
+                .Returns(transaction);
+
+            dbContextWrapper
+                .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
                     "UpdateQualifications",
                     Arg.Any<object>(),
+                    Arg.Any<IDbTransaction>(),
                     commandType: CommandType.StoredProcedure
-                    )
-                .Returns(changeResult);
-
+                )
+                .Returns(changeResult)
+                .AndDoes(x =>
+                {
+                    var arg = x.ArgAt<string>(1);
+                    receivedSqlArgs.Add(arg);
+                });
+            
             var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
 
-            var results = await repository.Save(qualifications);
+            await repository.Save(qualifications);
 
-            results.Should().NotBeNull();
-            results.Inserted.Should().Be(3);
-            results.Updated.Should().Be(2);
-            results.Deleted.Should().Be(1);
+            await dbContextWrapper
+                .Received(1)
+                .QueryAsync<(string Change, int ChangeCount)>(
+                    dbConnection,
+                    Arg.Any<string>(),
+                    Arg.Is<object>(o => o != null),
+                    Arg.Is<IDbTransaction>(t => t != null),
+                    commandType: CommandType.StoredProcedure
+                );
+
+            receivedSqlArgs.Should().Contain("UpdateQualifications");
+
+            dbContextWrapper
+                .Received(1)
+                .BeginTransaction(dbConnection);
+
+            transaction
+                .Received(1)
+                .Commit();
         }
     }
 }

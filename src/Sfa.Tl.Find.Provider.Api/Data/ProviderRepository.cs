@@ -26,12 +26,27 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<(int Inserted, int Updated, int Deleted)> Save(IEnumerable<Models.Provider> providers)
+        public async Task Save(IEnumerable<Models.Provider> providers)
         {
             try
             {
-                using var connection = _dbContextWrapper.CreateConnection();
+                var locationData = new List<LocationDto>();
+                var locationQualificationData = new List<LocationQualificationDto>();
 
+                foreach (var provider in providers)
+                {
+                    //locationData = provider.Locations.MapToLocationDtoCollection(provider.UkPrn);
+                    foreach (var location in provider.Locations)
+                    {
+                        locationData.Add(location.MapToLocationDto(provider.UkPrn));
+                        locationQualificationData.AddRange(
+                            location
+                                .DeliveryYears
+                                .MapToLocationQualificationDtoList(provider.UkPrn, location.Postcode));
+                    }
+                }
+
+                using var connection = _dbContextWrapper.CreateConnection();
                 connection.Open();
 
                 using var transaction = _dbContextWrapper.BeginTransaction(connection);
@@ -47,52 +62,8 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
-                var providerUpdates = providerUpdateResult.ConvertToTuple();
-                _logger.LogInformation(
-                    "ProviderRepository Saved providers - " +
-                    $"inserted {providerUpdates.Inserted}, " +
-                    $"updated {providerUpdates.Updated}, " +
-                    $"deleted {providerUpdates.Deleted}.");
-
-                //TODO: Move to a method/mapping extension
-                var locationData = new List<LocationDto>();
-                var locationQualificationData = new List<LocationQualificationDto>();
-                foreach (var provider in providers)
-                {
-                    foreach (var location in provider.Locations)
-                    {
-                        locationData.Add(new LocationDto
-                        {
-                            UkPrn = provider.UkPrn,
-                            Postcode = location.Postcode,
-                            Name = location.Name,
-                            AddressLine1 = location.AddressLine1,
-                            AddressLine2 = location.AddressLine2,
-                            Town = location.Town,
-                            County = location.County,
-                            Email = location.Email,
-                            Telephone = location.Telephone,
-                            Website = location.Website,
-                            Latitude = location.Latitude,
-                            Longitude = location.Longitude
-                        });
-
-                        foreach (var deliveryYear in location.DeliveryYears)
-                        {
-                            foreach (var qualification in deliveryYear.Qualifications)
-                            {
-                                locationQualificationData.Add(new LocationQualificationDto
-                                {
-                                    UkPrn = provider.UkPrn,
-                                    Postcode = location.Postcode,
-                                    DeliveryYear = deliveryYear.Year,
-                                    QualificationId = qualification.Id
-                                });
-                            }
-                        }
-                    }
-                }
-
+                LogChangeResults(providerUpdateResult, nameof(providers));
+                
                 var locationUpdateResult = await _dbContextWrapper
                     .QueryAsync<(string Change, int ChangeCount)>(
                         connection,
@@ -104,12 +75,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
-                var locationUpdates = locationUpdateResult.ConvertToTuple();
-                _logger.LogInformation(
-                    "ProviderRepository Saved locations - " +
-                    $"inserted {locationUpdates.Inserted}, " +
-                    $"updated {locationUpdates.Updated}, " +
-                    $"deleted {locationUpdates.Deleted}.");
+                LogChangeResults(locationUpdateResult, "locations");
 
                 var locationQualificationUpdateResult = await _dbContextWrapper
                     .QueryAsync<(string Change, int ChangeCount)>(
@@ -123,15 +89,9 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                         transaction,
                         commandType: CommandType.StoredProcedure);
 
-                var locationQualificationUpdates = locationQualificationUpdateResult.ConvertToTuple();
-                _logger.LogInformation(
-                    "ProviderRepository Saved location qualifications - " +
-                    $"inserted {locationQualificationUpdates.Inserted}, " +
-                    $"deleted {locationQualificationUpdates.Deleted}.");
+                LogChangeResults(locationQualificationUpdateResult, "location qualifications", includeUpdated: false);
 
                 transaction.Commit();
-
-                return providerUpdates;
             }
             catch (Exception ex)
             {
@@ -203,6 +163,23 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                 .ThenBy(s => s.ProviderName)
                 .ThenBy(s => s.LocationName)
                 .ToList();
+        }
+
+        private void LogChangeResults(
+            IEnumerable<(string Change, int ChangeCount)> updateResult, 
+            string typeName,
+            bool includeInserted = true,
+            bool includeUpdated = true,
+            bool includeDeleted = true)
+        {
+            var changeResults = updateResult.ConvertToTuple();
+
+            var message = $"{nameof(ProviderRepository)} saved {typeName} data - ";
+            if (includeInserted) message += $"inserted {changeResults.Inserted}, ";
+            if (includeUpdated) message += $"updated {changeResults.Updated}, ";
+            if (includeDeleted) message += $"deleted {changeResults.Deleted}.";
+
+            _logger.LogInformation(message);
         }
     }
 }
