@@ -56,11 +56,6 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
         private async Task<PostcodeLocation> GetPostcode(string postcode)
         {
-            //if (string.IsNullOrEmpty(postcode))
-            //{
-            //    throw new PostcodeNotFoundException(postcode);
-            //}
-
             var key = $"POSTCODE__{postcode.Replace(" ", "").ToUpper()}";
             if(_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
             {
