@@ -88,13 +88,13 @@ AS
 		  t.[ModifiedOn] = GETUTCDATE() --Soft delete
 
 		OUTPUT $action, 
-			INSERTED.Id, 
-			INSERTED.IsDeleted
+			INSERTED.[Id], 
+			INSERTED.[IsDeleted]
 		INTO @ChangeSummary	;
 
 	WITH ChangesCTE (Change) AS
 	(SELECT	CASE
-				WHEN Change = 'UPDATE' AND IsDeleted = 1
+				WHEN Change = 'UPDATE' AND [IsDeleted] = 1
 				THEN 'DELETE'
 				ELSE Change
 			END

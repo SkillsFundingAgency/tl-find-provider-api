@@ -114,8 +114,8 @@ AS
 			  t.[ModifiedOn] = GETUTCDATE() --Soft delete
 
 			OUTPUT $action, 
-				INSERTED.Id, 
-				INSERTED.IsDeleted
+				INSERTED.[Id], 
+				INSERTED.[IsDeleted]
 			INTO @ChangeSummary;
 
 	WITH changesCTE (Change) AS

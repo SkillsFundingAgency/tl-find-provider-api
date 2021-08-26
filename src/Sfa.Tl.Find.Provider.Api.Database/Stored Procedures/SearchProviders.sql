@@ -27,16 +27,16 @@ AS
 	FROM	[dbo].[Provider] p
 	INNER JOIN	[dbo].[Location] l
 	ON		p.[Id] = l.[ProviderId]
-	WHERE	p.IsDeleted = 0	
-	  AND	l.IsDeleted = 0
+	WHERE	p.[IsDeleted] = 0	
+	  AND	l.[IsDeleted] = 0
 	  AND	EXISTS (
 	  		SELECT	lq.[QualificationId]
 			FROM	[dbo].[LocationQualification] lq
 			INNER JOIN	[dbo].[Qualification] q
 			ON		q.[Id] = lq.[QualificationId]
-			  AND	q.IsDeleted = 0
+			  AND	q.[IsDeleted] = 0
 			WHERE	lq.[LocationId] = l.[Id]
-			  AND	(q.id = @qualificationId 
+			  AND	(q.[Id] = @qualificationId 
 					 OR ISNULL(@qualificationid, 0) = 0))
 	ORDER BY [Distance],
 			 p.[Name],
@@ -64,7 +64,7 @@ AS
 		ON		lq.[LocationId] = l.[LocationId]
 		INNER JOIN	[dbo].[Qualification] q
 		ON		q.[Id] = lq.[QualificationId]
-		  AND	q.IsDeleted = 0
+		  AND	q.[IsDeleted] = 0
 		ORDER BY [Distance],
 				 [ProviderName],
 				 [LocationName],
