@@ -68,4 +68,5 @@ AS
 		ORDER BY [Distance],
 				 [ProviderName],
 				 [LocationName],
+				 lq.[DeliveryYear],
 				 q.[Name];
