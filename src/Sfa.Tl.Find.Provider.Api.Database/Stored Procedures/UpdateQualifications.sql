@@ -34,8 +34,9 @@ AS
 		s.[Name]
 	)
 
-	WHEN NOT MATCHED BY SOURCE THEN 
-	UPDATE SET
+	WHEN NOT MATCHED BY SOURCE 
+			 AND t.[IsDeleted] <> 1 --No need to delete again
+	THEN UPDATE SET
 		t.[IsDeleted] = 1	  ,
 		t.[ModifiedOn] = GETUTCDATE() --Soft delete
 
