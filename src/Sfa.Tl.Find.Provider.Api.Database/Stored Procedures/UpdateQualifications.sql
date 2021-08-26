@@ -16,7 +16,7 @@ AS
 		t.[Id] = s.[Id]
 	)
 	WHEN MATCHED 
-		 AND (t.[Name] <> s.[Name]
+		 AND (t.[Name] <> s.[Name] COLLATE Latin1_General_CS_AS
 			  OR t.[IsDeleted] = 1) --To undelete
 	THEN UPDATE SET
 		t.[Name] = s.[Name],
@@ -34,19 +34,20 @@ AS
 		s.[Name]
 	)
 
-	WHEN NOT MATCHED BY SOURCE THEN 
-	UPDATE SET
+	WHEN NOT MATCHED BY SOURCE 
+			 AND t.[IsDeleted] <> 1 --No need to delete again
+	THEN UPDATE SET
 		t.[IsDeleted] = 1	  ,
 		t.[ModifiedOn] = GETUTCDATE() --Soft delete
 
 	OUTPUT $action, 
-		INSERTED.Id, 
-		INSERTED.IsDeleted
+		INSERTED.[Id], 
+		INSERTED.[IsDeleted]
 	INTO @ChangeSummary	;
 
 	WITH ChangesCTE (Change) AS
 	(SELECT	CASE
-				WHEN Change = 'UPDATE' AND IsDeleted = 1
+				WHEN Change = 'UPDATE' AND [IsDeleted] = 1
 				THEN 'DELETE'
 				ELSE Change
 			END

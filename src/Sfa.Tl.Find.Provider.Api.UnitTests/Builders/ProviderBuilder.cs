@@ -25,10 +25,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                         new()
                         {
                             Postcode = "AA1 1AA",
-                            AddressLine1 = "Provider 1 Address Line 1",
-                            AddressLine2 = "Provider 1 Address Line",
-                            Town = "Provider 1 Town",
-                            County = "Provider 1 County",
+                            AddressLine1 = "Location 1 Address Line 1",
+                            AddressLine2 = "Location 1 Address Line",
+                            Town = "Location 1 Town",
+                            County = "Location 1 County",
                             Email = "email.address@provider1.ac.uk",
                             Telephone = "011 111 1111",
                             Website= "https://www.provider1.ac.uk",

@@ -46,7 +46,7 @@ AS
 		WHEN NOT MATCHED BY SOURCE THEN DELETE
 
 		OUTPUT $action, 
-			INSERTED.Id
+			INSERTED.[Id]
 		INTO @ChangeSummary;
 
 	SELECT	Change, 

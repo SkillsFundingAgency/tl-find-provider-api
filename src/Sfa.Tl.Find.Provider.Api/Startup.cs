@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,6 +40,13 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddControllers();
 
+            services.Configure<RouteOptions>(options =>
+            {
+                options.AppendTrailingSlash = true;
+                options.LowercaseUrls = true;
+                options.LowercaseQueryStrings = true;
+            });
+
             services.AddMemoryCache(options =>
             {
                 //TODO: Set a bigger size limit - this is for testing
@@ -62,8 +70,6 @@ namespace Sfa.Tl.Find.Provider.Api
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();
 
-            var x = _configuration["SuppressStartupDataLoad"];
-            var y = _configuration["SuppressStartupDataLoad"]?.ToLower();
             services.AddHostedQuartzServices(
                 _siteConfiguration.CourseDirectoryImportSchedule,
                 _configuration["SuppressStartupDataLoad"]?.ToLower() != "true");

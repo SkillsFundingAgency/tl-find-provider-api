@@ -29,13 +29,10 @@ namespace Sfa.Tl.Find.Provider.Api.Jobs
 
             try
             {
-                var qualifications = await _courseDirectoryService.ImportQualifications();
-                var providers = await _courseDirectoryService.ImportProviders();
+                await _courseDirectoryService.ImportQualifications();
+                await _courseDirectoryService.ImportProviders();
 
-                if (context != null)
-                {
-                    context.Result = (qualifications, providers);
-                }
+                _logger.LogInformation($"{nameof(CourseDataImportJob)} job completed successfully.");
             }
             catch (Exception e)
             {

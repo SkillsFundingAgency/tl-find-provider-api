@@ -36,31 +36,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             typeof(CourseDirectoryService)
                 .ShouldNotAcceptNullOrBadConstructorArguments();
         }
-
-        [Fact]
-        public async Task ImportProviders_Returns_Expected_Result()
-        {
-            var jsonBuilder = new CourseDirectoryJsonBuilder();
-
-            var responses = new Dictionary<string, string>
-            {
-                { CourseDirectoryService.CourseDetailEndpoint, jsonBuilder.BuildValidTLevelsResponse() }
-            };
-
-            var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.Save(Arg.Any<IEnumerable<Models.Provider>>())
-                .Returns((20, 10, 5));
-
-            var service = new CourseDirectoryServiceBuilder()
-                .Build(responses, providerRepository);
-
-            var (saved, updated, deleted) = await service.ImportProviders();
-
-            saved.Should().Be(20);
-            updated.Should().Be(10);
-            deleted.Should().Be(5);
-        }
-
+        
         [Fact]
         public async Task ImportProviders_Creates_Expected_Providers()
         {
@@ -74,9 +50,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             IList<Models.Provider> receivedProviders = null;
 
             var providerRepository = Substitute.For<IProviderRepository>();
-            providerRepository.Save(Arg.Do<IEnumerable<Models.Provider>>(
-                    x => receivedProviders = x?.ToList()))
-                .Returns((20, 0, 0));
+            await providerRepository.Save(Arg.Do<IEnumerable<Models.Provider>>(
+                    x => receivedProviders = x?.ToList()));
 
             var service = new CourseDirectoryServiceBuilder()
                 .Build(responses, providerRepository);
@@ -139,31 +114,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 
             ValidateDeliveryYear(witneyLocation.DeliveryYears.First(), 2021, new[] { 37, 38, 41 });
         }
-
-        [Fact]
-        public async Task ImportQualifications_Returns_Expected_Result()
-        {
-            var jsonBuilder = new CourseDirectoryJsonBuilder();
-
-            var responses = new Dictionary<string, string>
-            {
-                { CourseDirectoryService.QualificationsEndpoint, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
-            };
-
-            var qualificationRepository = Substitute.For<IQualificationRepository>();
-            qualificationRepository.Save(Arg.Any<IEnumerable<Qualification>>())
-                .Returns((10, 5, 2));
-
-            var service = new CourseDirectoryServiceBuilder()
-                .Build(responses, qualificationRepository: qualificationRepository);
-
-            var (saved, updated, deleted) = await service.ImportQualifications();
-
-            saved.Should().Be(10);
-            updated.Should().Be(5);
-            deleted.Should().Be(2);
-        }
-
+        
         [Fact]
         public async Task ImportQualifications_Creates_Expected_Qualifications()
         {
@@ -177,10 +128,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             IList<Qualification> receivedQualifications = null;
 
             var qualificationRepository = Substitute.For<IQualificationRepository>();
-            qualificationRepository
+            await qualificationRepository
                 .Save(Arg.Do<IEnumerable<Qualification>>(
-                    x => receivedQualifications = x?.ToList()))
-                .Returns((16, 0, 0));
+                    x => receivedQualifications = x?.ToList()));
 
             var service = new CourseDirectoryServiceBuilder()
                 .Build(responses, qualificationRepository: qualificationRepository);

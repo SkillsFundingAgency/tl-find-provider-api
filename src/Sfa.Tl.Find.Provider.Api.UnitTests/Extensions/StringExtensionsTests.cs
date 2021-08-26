@@ -23,9 +23,15 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("T Level in Parsing ", "Parsing")]
         [InlineData("T Level In Parsing ", "Parsing")]
         [InlineData("T Level Education - Education and Childcare", "Education and Childcare")]
-        public void String_ParseTLevelDefinitionName_Data_Tests(string input, string expectedResult)
+        [InlineData("T Level Education - Education and Childcare", "Education and Childcare")]
+        [InlineData("T Level Education - Education and Childcare", "Education", 9)]
+        [InlineData("T Level Education - Education and Childcare", "Education", 10)]
+        public void String_ParseTLevelDefinitionName_Data_Tests(string input, string expectedResult, int maxLength = -1)
         {
-            var result = input.ParseTLevelDefinitionName();
+            var result = maxLength < 0 
+                ? input.ParseTLevelDefinitionName() 
+                : input.ParseTLevelDefinitionName(maxLength);
+
             result.Should().Be(expectedResult);
         }
 

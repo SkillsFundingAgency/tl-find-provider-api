@@ -83,8 +83,13 @@ to be merged into the tables.
 
 The merge statements in the stored procedures need to use this syntax for comparing nullable columns:
 ```
-    OR ISNULL(NULLIF(t.[AddressLine1], s.[AddressLine1]), NULLIF(s.[AddressLine1], t.[AddressLine1])) IS NOT NULL
+	ISNULL(NULLIF(t.[AddressLine1] COLLATE Latin1_General_CS_AS, s.[AddressLine1] COLLATE Latin1_General_CS_AS), 
+	  	   NULLIF(s.[AddressLine1] COLLATE Latin1_General_CS_AS, t.[AddressLine1] COLLATE Latin1_General_CS_AS))
+		IS NOT NULL
 ```
+- The NULLIF() function returns NULL if two expressions are equal, otherwise it returns the first expression
+- The effect is to return null if the values are the same, so the final IS NOT NULL means the values differ
+- case-sensitive comparison requres use of `COLLATE Latin1_General_CS_AS`
 
 These procedures pass back a summary of changes, with counts of inserted, updated and (soft) deleted rows.
 
