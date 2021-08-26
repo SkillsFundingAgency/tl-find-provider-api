@@ -33,7 +33,12 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
                     throw new NullReferenceException("Configuration data was null.");
                 }
 
-                return JsonSerializer.Deserialize<SiteConfiguration>(data);
+                return JsonSerializer.Deserialize<SiteConfiguration>(data, 
+                    new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true
+                    });
             }
             catch (Exception ex)
             {
