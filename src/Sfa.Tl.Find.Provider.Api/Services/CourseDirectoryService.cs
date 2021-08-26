@@ -106,15 +106,15 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                     provider = new Models.Provider
                     {
                         UkPrn = ukPrn,
-                        Name = providerElement.SafeGetString("providerName"),
-                        AddressLine1 = providerElement.SafeGetString("addressLine1"),
-                        AddressLine2 = providerElement.SafeGetString("addressLine2"),
-                        Town = providerElement.SafeGetString("town"),
-                        County = providerElement.SafeGetString("county"),
-                        Postcode = providerElement.SafeGetString("postcode"),
-                        Email = providerElement.SafeGetString("email"),
-                        Telephone = providerElement.SafeGetString("telephone"),
-                        Website = providerElement.SafeGetString("website"),
+                        Name = providerElement.SafeGetString("providerName", Constants.ProviderNameMaxLength),
+                        AddressLine1 = providerElement.SafeGetString("addressLine1", Constants.AddressLineMaxLength),
+                        AddressLine2 = providerElement.SafeGetString("addressLine2", Constants.AddressLineMaxLength),
+                        Town = providerElement.SafeGetString("town", Constants.TownMaxLength),
+                        County = providerElement.SafeGetString("county", Constants.CountyMaxLength),
+                        Postcode = providerElement.SafeGetString("postcode", Constants.PostcodeMaxLength),
+                        Email = providerElement.SafeGetString("email", Constants.EmailMaxLength),
+                        Telephone = providerElement.SafeGetString("telephone", Constants.TelephoneMaxLength),
+                        Website = providerElement.SafeGetString("website", Constants.WebsiteMaxLength),
                         Locations = new List<Location>()
                     };
                     providers.Add(provider);
@@ -144,7 +144,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
                 foreach (var locationElement in locationsProperty.EnumerateArray())
                 {
-                    var postcode = locationElement.SafeGetString("postcode");
+                    var postcode = locationElement.SafeGetString("postcode", Constants.PostcodeMaxLength);
 
                     var location = provider.Locations.FirstOrDefault(l =>
                         l.Postcode == postcode);
@@ -153,14 +153,14 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                         location = new Location
                         {
                             Postcode = postcode,
-                            Name = locationElement.SafeGetString("venueName"),
-                            AddressLine1 = locationElement.SafeGetString("addressLine1"),
-                            AddressLine2 = locationElement.SafeGetString("addressLine2"),
-                            Town = locationElement.SafeGetString("town"),
-                            County = locationElement.SafeGetString("county"),
-                            Email = locationElement.SafeGetString("email"),
-                            Telephone = locationElement.SafeGetString("telephone"),
-                            Website = locationElement.SafeGetString("website"),
+                            Name = locationElement.SafeGetString("venueName", Constants.LocationNameMaxLength),
+                            AddressLine1 = locationElement.SafeGetString("addressLine1", Constants.AddressLineMaxLength),
+                            AddressLine2 = locationElement.SafeGetString("addressLine2", Constants.AddressLineMaxLength),
+                            Town = locationElement.SafeGetString("town", Constants.TownMaxLength),
+                            County = locationElement.SafeGetString("county", Constants.CountyMaxLength),
+                            Email = locationElement.SafeGetString("email", Constants.EmailMaxLength),
+                            Telephone = locationElement.SafeGetString("telephone", Constants.TelephoneMaxLength),
+                            Website = locationElement.SafeGetString("website", Constants.WebsiteMaxLength),
                             Latitude = locationElement.SafeGetDouble("latitude"),
                             Longitude = locationElement.SafeGetDouble("longitude"),
                             DeliveryYears = new List<DeliveryYear>()
@@ -202,7 +202,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                 .Select(q => new Qualification
                 {
                     Id = q.SafeGetInt32("frameworkCode"),
-                    Name = q.SafeGetString("name").ParseTLevelDefinitionName()
+                    Name = q.SafeGetString("name").ParseTLevelDefinitionName(Constants.QualificationNameMaxLength)
                 }).ToList();
         }
     }

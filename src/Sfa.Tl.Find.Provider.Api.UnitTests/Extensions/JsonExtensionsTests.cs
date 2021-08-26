@@ -99,5 +99,23 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             result.Should().Be(expectedResult);
         }
+
+        [Theory(DisplayName = nameof(JsonExtensions.SafeGetString) + " with maxLength Data Tests")]
+        [InlineData("myString", "my value", 10)]
+        [InlineData("myString", "my value", 8)]
+        [InlineData("myString", "my val", 6)]
+        [InlineData("myInt32", null, 100)]
+        [InlineData("myInt64", null, 100)]
+        [InlineData("myDouble", null, 100)]
+        [InlineData("notAString", null, 100)]
+        [InlineData("myTrueBool", null, 100)]
+        [InlineData("myFalseBool", null, 100)]
+        public void JsonElement_SafeGetString_With_Max_Length_Data_Tests(string propertyName, string expectedResult, int maxLength)
+        {
+            var prop = _jsonDoc.RootElement.GetProperty("anElement");
+            var result = prop.SafeGetString(propertyName, maxLength);
+
+            result.Should().Be(expectedResult);
+        }
     }
 }

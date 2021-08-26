@@ -39,19 +39,16 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
                 : default;
         }
 
-        public static string SafeGetString(this JsonElement element, string propertyName)
+        public static string SafeGetString(this JsonElement element, string propertyName, int maxLength = -1)
         {
-            return element.TryGetProperty(propertyName, out var property)
-                   && property.ValueKind == JsonValueKind.String
+            var result = element.TryGetProperty(propertyName, out var property)
+                         && property.ValueKind == JsonValueKind.String
                 ? property.GetString()
                 : default;
-        }
 
-        public static string SafeGetString(this JsonElement element)
-        {
-            return element.ValueKind == JsonValueKind.String
-                ? element.GetString()
-                : default;
+            return result is not null && maxLength > 0 && result.Length > maxLength
+                ? result[..maxLength].Trim()
+                : result;
         }
     }
 }

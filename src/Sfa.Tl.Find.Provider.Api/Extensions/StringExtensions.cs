@@ -13,14 +13,18 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
             return Uri.EscapeUriString(postcode.Trim().ToUpper());
         }
 
-        public static string ParseTLevelDefinitionName(this string fullName)
+        public static string ParseTLevelDefinitionName(this string fullName, int maxLength = -1)
         {
             if (string.IsNullOrWhiteSpace(fullName)) return "";
 
             var parts = fullName.Split('-');
-            return Regex.Replace(parts[^1],
+            var name = Regex.Replace(parts[^1],
                     "^T Level in ", "", RegexOptions.IgnoreCase)
                 .ToTitleCase();
+
+            return name is not null && maxLength > 0 && name.Length > maxLength
+                ? name[..maxLength].Trim()
+                : name;
         }
 
         public static string ToTitleCase(this string value)
