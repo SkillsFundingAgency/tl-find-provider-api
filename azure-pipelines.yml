@@ -14,7 +14,6 @@ trigger:
     include:
     - main
     - develop
-    - pipeline
     - feature/*
     - bugs/*
 pr:
