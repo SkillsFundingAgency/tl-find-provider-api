@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -44,17 +43,18 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             [Required, FromQuery] string postcode,
             [FromQuery] int? qualificationId = null,
             [FromQuery, Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] int page = 0,
-            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] int pageSize = Constants.DefaultPageSize)
+            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] int pageSize = Constants.DefaultPageSize,
+            [FromHeader] string authorization = null)
         {
             _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
                              $"page={page}, pageSize={pageSize}");
 
             try
             {
-                foreach (var (key, value) in Request.Headers)
-                {
-                    Debug.WriteLine($"{key}={value}");
-                }
+                //TODO: Remove this, just here for initial testing
+                if (authorization != null)
+                    _logger.LogInformation($"Authorization header received: " +
+                                           $"{authorization[..Math.Min(10, authorization.Length)]}");
 
                 var providers = await _providerDataService.FindProviders(
                     postcode,
@@ -86,8 +86,13 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         [Route("qualifications", Name = "GetQualifications")]
         [ProducesResponseType(typeof(IEnumerable<Qualification>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetQualifications()
+        public async Task<IActionResult> GetQualifications([FromHeader] string authorization = null)
         {
+            //TODO: Remove this, just here for initial testing
+            if(authorization != null)
+                _logger.LogInformation($"Authorization header received: " +
+                    $"{authorization[..Math.Min(10, authorization.Length)]}");
+
             var qualifications = await _providerDataService.GetQualifications();
             return qualifications != null
                 ? Ok(qualifications)
