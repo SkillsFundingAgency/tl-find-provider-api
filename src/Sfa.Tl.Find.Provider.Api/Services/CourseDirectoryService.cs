@@ -49,7 +49,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var providers = await ReadTLevelProvidersFromResponse(responseMessage);
 
-            await _providerRepository.Save(providers);
+            await _providerRepository.Save(providers.ToList());
 
             _logger.LogInformation($"{nameof(CourseDirectoryService)} saved providers.");
         }

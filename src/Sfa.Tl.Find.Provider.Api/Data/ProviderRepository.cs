@@ -26,7 +26,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task Save(IEnumerable<Models.Provider> providers)
+        public async Task Save(IList<Models.Provider> providers)
         {
             try
             {
@@ -35,7 +35,6 @@ namespace Sfa.Tl.Find.Provider.Api.Data
 
                 foreach (var provider in providers)
                 {
-                    //locationData = provider.Locations.MapToLocationDtoCollection(provider.UkPrn);
                     foreach (var location in provider.Locations)
                     {
                         locationData.Add(location.MapToLocationDto(provider.UkPrn));

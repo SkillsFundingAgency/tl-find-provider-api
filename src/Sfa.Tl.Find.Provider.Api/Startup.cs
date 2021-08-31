@@ -72,7 +72,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddHostedQuartzServices(
                 _siteConfiguration.CourseDirectoryImportSchedule,
-                _configuration["SuppressStartupDataLoad"]?.ToLower() != "true");
+                _configuration?["SuppressStartupDataLoad"]?.ToLower() != "true");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

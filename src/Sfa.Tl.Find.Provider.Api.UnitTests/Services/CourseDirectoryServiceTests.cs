@@ -50,7 +50,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             IList<Models.Provider> receivedProviders = null;
 
             var providerRepository = Substitute.For<IProviderRepository>();
-            await providerRepository.Save(Arg.Do<IEnumerable<Models.Provider>>(
+            await providerRepository.Save(Arg.Do<IList<Models.Provider>>(
                     x => receivedProviders = x?.ToList()));
 
             var service = new CourseDirectoryServiceBuilder()
