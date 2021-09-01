@@ -92,12 +92,12 @@ namespace Sfa.Tl.Find.Provider.Api
                     "T Levels Find a Provider.Api v1"));
             }
 
+            if (!string.IsNullOrWhiteSpace(_siteConfiguration.AllowedCorsOrigins))
+                app.UseCors(CorsPolicyName);
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            if (!string.IsNullOrWhiteSpace(_siteConfiguration.AllowedCorsOrigins))
-                app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
             {

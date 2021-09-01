@@ -4,7 +4,7 @@ namespace Sfa.Tl.Find.Provider.Api.Security
 {
     public static class SecurityHeadersDefinitions
     {
-        public static HeaderPolicyCollection GetHeaderPolicyCollection(bool isDev = false)
+        public static HeaderPolicyCollection GetHeaderPolicyCollection(bool isDev)
         {
             var policy = new HeaderPolicyCollection()
                 .AddFrameOptionsDeny()
@@ -43,12 +43,12 @@ namespace Sfa.Tl.Find.Provider.Api.Security
                     builder.AddUsb().None();
                 });
 
-            AddCspHstsDefinitions(policy, isDev);
+            policy.AddCspHstsDefinitions(isDev);
 
             return policy;
         }
 
-        private static void AddCspHstsDefinitions(this HeaderPolicyCollection policy, bool isDev = false)
+        private static void AddCspHstsDefinitions(this HeaderPolicyCollection policy, bool isDev)
         {
             if (!isDev)
             {
