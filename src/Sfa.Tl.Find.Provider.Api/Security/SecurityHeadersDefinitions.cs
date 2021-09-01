@@ -43,12 +43,12 @@ namespace Sfa.Tl.Find.Provider.Api.Security
                     builder.AddUsb().None();
                 });
 
-            policy.AddCspHstsDefinitions(isDev);
+            AddCspHstsDefinitions(policy, isDev);
 
             return policy;
         }
 
-        private static void AddCspHstsDefinitions(this HeaderPolicyCollection policy, bool isDev)
+        private static void AddCspHstsDefinitions(HeaderPolicyCollection policy, bool isDev)
         {
             if (!isDev)
             {
