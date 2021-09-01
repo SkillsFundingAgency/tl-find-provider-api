@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
+﻿using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
@@ -36,7 +33,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 .GetAsync("/findproviders/api/providers");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            await ValidateProblemDetails(response.Content, 
+            await response.Content.ValidateProblemDetails(
                 ("postcode", "The postcode field is required."));
         }
 
@@ -48,7 +45,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 .GetAsync("/findproviders/api/providers?postcode=CV1+2WT&page=0&pageSize=0");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            await ValidateProblemDetails(response.Content, 
+            await response.Content.ValidateProblemDetails(
                 ("pageSize", "The pageSize field must be at least one."));
         }
 
@@ -60,7 +57,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 .GetAsync("/findproviders/api/providers?postcode=CV1+2WT&page=-1&pageSize=5");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            await ValidateProblemDetails(response.Content, 
+            await response.Content.ValidateProblemDetails(
                 ("page", "The page field must be zero or greater."));
         }
 
@@ -73,35 +70,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             
-            await ValidateProblemDetails(response.Content, 
+            await response.Content.ValidateProblemDetails( 
                 ("postcode", "The postcode field is required."),
                 ("pageSize", "The pageSize field must be at least one."),
                 ("page", "The page field must be zero or greater."));
 
-        }
-
-        private async Task ValidateProblemDetails(HttpContent content, params (string FieldName, string ErrorMessage)[] expectedErrors)
-        {
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(
-                await content.ReadAsStringAsync(),
-                new JsonSerializerOptions
-                {
-                    ReadCommentHandling = JsonCommentHandling.Skip,
-                    AllowTrailingCommas = true
-                });
-
-            problemDetails.Should().NotBeNull();
-            problemDetails!.Status.Should().Be((int)HttpStatusCode.BadRequest);
-            problemDetails!.Extensions.Should().NotBeNullOrEmpty();
-            problemDetails!.Extensions.Should().ContainKey("errors");
-
-            var errors = JsonDocument.Parse(problemDetails!.Extensions["errors"]!.ToString() ?? string.Empty);
-
-            foreach (var expectedError in expectedErrors)
-            {
-                var pageError = errors.RootElement.GetProperty(expectedError.FieldName);
-                pageError.EnumerateArray().First().GetString().Should().Be(expectedError.ErrorMessage);
-            }
         }
     }
 }
