@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -20,20 +21,28 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
             HttpClient httpClient = null, 
             IProviderRepository providerRepository = null,
             IQualificationRepository qualificationRepository = null,
+            IMemoryCache cache = null,
             ILogger<CourseDirectoryService> logger = null)
         {
             httpClient ??= Substitute.For<HttpClient>();
             providerRepository ??= Substitute.For<IProviderRepository>();
             qualificationRepository ??= Substitute.For<IQualificationRepository>();
+            cache ??= Substitute.For<IMemoryCache>();
             logger ??= Substitute.For<ILogger<CourseDirectoryService>>();
 
-            return new CourseDirectoryService(httpClient, providerRepository, qualificationRepository, logger);
+            return new CourseDirectoryService(
+                httpClient, 
+                providerRepository, 
+                qualificationRepository, 
+                cache, 
+                logger);
         }
         
         public CourseDirectoryService Build(
             IDictionary<string, string> responseMessages,
             IProviderRepository providerRepository = null,
             IQualificationRepository qualificationRepository = null,
+            IMemoryCache cache = null,
             ILogger<CourseDirectoryService> logger = null)
         {
             var responsesWithUri = responseMessages
@@ -44,7 +53,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
             var httpClient = new TestHttpClientFactory()
                     .CreateHttpClientWithBaseUri(CourseDirectoryApiBaseUri, responsesWithUri);
 
-            return Build(httpClient, providerRepository, qualificationRepository, logger);
+            return Build(
+                httpClient, 
+                providerRepository, 
+                qualificationRepository, 
+                cache, 
+                logger);
         }
     }
 }

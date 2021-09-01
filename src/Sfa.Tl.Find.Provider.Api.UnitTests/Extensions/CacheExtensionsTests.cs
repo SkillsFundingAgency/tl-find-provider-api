@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Xunit;
 using CacheExtensions = Sfa.Tl.Find.Provider.Api.Extensions.CacheExtensions;
 
@@ -11,6 +12,19 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 {
     public class CacheExtensionsTests
     {
+        [Fact]
+        public void CreateMemoryCacheEntryOptions_Creates_()
+        {
+            var dateTimeService = Substitute.For<IDateTimeService>();
+            var logger = Substitute.For<ILogger<object>>();
+
+            var options = CacheExtensions.CreateMemoryCacheEntryOptions(
+                dateTimeService,
+                logger);
+
+            options.Should().NotBeNull();
+        }
+
         [Fact]
         public void EvictionLoggingCallback_Ignores_Null_Logger()
         {

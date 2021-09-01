@@ -49,8 +49,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddMemoryCache(options =>
             {
-                //TODO: Set a bigger size limit - this is for testing
-                options.SizeLimit = 2;
+                options.SizeLimit = 1024;
             });
 
             services.AddSwagger("v1",

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
+using CacheExtensions = Sfa.Tl.Find.Provider.Api.Extensions.CacheExtensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Services
 {
@@ -37,10 +39,18 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         public async Task<IEnumerable<Qualification>> GetQualifications()
         {
             _logger.LogDebug("Getting qualifications");
-            
-            return await _qualificationRepository.GetAll();
+
+            const string key = CacheKeys.QualificationsKey;
+            if (!_cache.TryGetValue(key, out IList<Qualification> qualifications))
+            {
+                qualifications = (await _qualificationRepository.GetAll()).ToList();
+                _cache.Set(key, qualifications,
+                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+            }
+
+            return qualifications;
         }
-        
+
         public async Task<ProviderSearchResponse> FindProviders(
             string postcode,
             int? qualificationId = null,
@@ -61,37 +71,20 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
         private async Task<PostcodeLocation> GetPostcode(string postcode)
         {
-            var key = $"POSTCODE__{postcode.Replace(" ", "").ToUpper()}";
-            if(_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
-            {
-                return postcodeLocation;
-            }
+            var key = CacheKeys.PostcodeKey(postcode);
 
-            postcodeLocation = await _postcodeLookupService.GetPostcode(postcode);
-
-            if (postcodeLocation is null)
+            if (!_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
             {
-                throw new PostcodeNotFoundException(postcode);
-            }
-
-            var cacheExpiryOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = _dateTimeService.Now.AddMinutes(60),
-                Priority = CacheItemPriority.Normal,
-                SlidingExpiration = TimeSpan.FromMinutes(10),
-                Size = 1,
-                PostEvictionCallbacks =
+                postcodeLocation = await _postcodeLookupService.GetPostcode(postcode);
+                if (postcodeLocation is null)
                 {
-                    new PostEvictionCallbackRegistration
-                    {
-                        EvictionCallback = Extensions.CacheExtensions.EvictionLoggingCallback,
-                        State = _logger
-                    }
+                    throw new PostcodeNotFoundException(postcode);
                 }
-            };
 
-            _cache.Set(key, postcodeLocation, cacheExpiryOptions);
-            
+                _cache.Set(key, postcodeLocation, 
+                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+            }
+
             return postcodeLocation;
         }
     }

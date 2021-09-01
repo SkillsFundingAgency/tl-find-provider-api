@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
@@ -41,6 +42,40 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 
             var results = await service.GetQualifications();
             results.Should().NotBeNullOrEmpty();
+
+            await qualificationRepository
+                .Received(1)
+                .GetAll();
+        }
+
+        [Fact]
+        public async Task GetQualifications_Returns_Expected_List_From_Cache()
+        {
+            var qualificationRepository = Substitute.For<IQualificationRepository>();
+
+            var cache = Substitute.For<IMemoryCache>();
+            cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
+                .Returns(x =>
+                {
+                    if ((string)x[0] == CacheKeys.QualificationsKey)
+                    {
+                        x[1] = new QualificationBuilder().BuildList();
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(qualificationRepository: qualificationRepository,
+                    cache: cache);
+
+            var results = await service.GetQualifications();
+            results.Should().NotBeNullOrEmpty();
+
+            await qualificationRepository
+                .DidNotReceive()
+                .GetAll();
         }
 
         [Fact]
@@ -69,7 +104,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
             results.SearchResults.Should().NotBeNullOrEmpty();
 
-            await postcodeLookupService.Received(1).GetPostcode(fromPostcodeLocation.Postcode);
+            await postcodeLookupService
+                .Received(1)
+                .GetPostcode(fromPostcodeLocation.Postcode);
         }
 
         [Fact]
@@ -79,7 +116,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 
             var providerRepository = Substitute.For<IProviderRepository>();
             providerRepository.Search(
-                    Arg.Is<PostcodeLocation>(p => p.Postcode ==  fromPostcodeLocation.Postcode),
+                    Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
                     Arg.Any<int?>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
