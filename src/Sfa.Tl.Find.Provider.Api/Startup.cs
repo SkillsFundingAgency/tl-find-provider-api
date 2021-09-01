@@ -14,6 +14,7 @@ using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
+using Sfa.Tl.Find.Provider.Api.Security;
 using Sfa.Tl.Find.Provider.Api.Services;
 
 namespace Sfa.Tl.Find.Provider.Api
@@ -51,12 +52,12 @@ namespace Sfa.Tl.Find.Provider.Api
             {
                 options.SizeLimit = 1024;
             });
-
+            
             services.AddSwagger("v1",
                 "T Levels Find a Provider Api",
                 "v1",
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
-
+            
             services.AddCorsPolicy(CorsPolicyName, _siteConfiguration.AllowedCorsOrigins);
 
             AddHttpClients(services);
@@ -77,15 +78,19 @@ namespace Sfa.Tl.Find.Provider.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSecurityHeaders(
+                SecurityHeadersDefinitions
+                    .GetHeaderPolicyCollection(env.IsDevelopment()));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint(
-                "/swagger/v1/swagger.json",
-                "T Levels Find a Provider.Api v1"));
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint(
+                    "/swagger/v1/swagger.json",
+                    "T Levels Find a Provider.Api v1"));
+            }
 
             app.UseHttpsRedirection();
 
