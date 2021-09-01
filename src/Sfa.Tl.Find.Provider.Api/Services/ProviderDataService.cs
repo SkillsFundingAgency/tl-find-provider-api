@@ -41,7 +41,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             return await _qualificationRepository.GetAll();
         }
         
-        public async Task<IEnumerable<ProviderSearchResult>> FindProviders(
+        public async Task<ProviderSearchResponse> FindProviders(
             string postcode,
             int? qualificationId = null,
             int page = 0,
@@ -51,7 +51,12 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var postcodeLocation = await GetPostcode(postcode);
 
-            return await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
+            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
+            return new ProviderSearchResponse
+            {
+                Postcode = postcodeLocation.Postcode,
+                SearchResults = searchResults
+            };
         }
 
         private async Task<PostcodeLocation> GetPostcode(string postcode)

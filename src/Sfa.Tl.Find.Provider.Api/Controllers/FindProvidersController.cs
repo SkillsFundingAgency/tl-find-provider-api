@@ -53,7 +53,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             {
                 //TODO: Remove this, just here for initial testing
                 if (authorization != null)
-                    _logger.LogInformation($"Authorization header received: " +
+                    _logger.LogInformation("Authorization header received: " +
                                            $"{authorization[..Math.Min(10, authorization.Length)]}");
 
                 var providers = await _providerDataService.FindProviders(
@@ -90,7 +90,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         {
             //TODO: Remove this, just here for initial testing
             if(authorization != null)
-                _logger.LogInformation($"Authorization header received: " +
+                _logger.LogInformation("Authorization header received: " +
                     $"{authorization[..Math.Min(10, authorization.Length)]}");
 
             var qualifications = await _providerDataService.GetQualifications();

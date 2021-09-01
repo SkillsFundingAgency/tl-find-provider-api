@@ -145,7 +145,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
                 .ToList();
             
             var expectedResult = new ProviderSearchResultBuilder()
-                .WithJourneyLinksFrom(fromPostcodeLocation)
+                .WithSearchOrigin(fromPostcodeLocation)
                 .BuildListWithSingleItem()
                 .First();
 

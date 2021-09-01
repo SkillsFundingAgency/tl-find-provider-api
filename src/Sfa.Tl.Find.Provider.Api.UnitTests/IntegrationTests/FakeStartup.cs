@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
@@ -59,7 +61,21 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             services
                 .AddScoped(_ => Substitute.For<IDbContextWrapper>())
                 .AddScoped<IDateTimeService, DateTimeService>()
-                .AddTransient(_ => Substitute.For<IProviderDataService>())
+                .AddTransient(_ =>
+                {
+                    var providerDataService = Substitute.For<IProviderDataService>();
+                    providerDataService.FindProviders(
+                            Arg.Any<string>(), 
+                            Arg.Any<int?>(), 
+                            Arg.Any<int>(), 
+                            Arg.Any<int>())
+                        .Returns(x => new ProviderSearchResponse
+                        {
+                            Postcode = (string)x[0],
+                            SearchResults = new List<ProviderSearchResult>()
+                        });
+                    return providerDataService;
+                })
                 .AddTransient(_ => Substitute.For<IProviderRepository>())
                 .AddTransient(_ => Substitute.For<IQualificationRepository>());
         }

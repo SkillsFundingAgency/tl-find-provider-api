@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
     {
         Task<IEnumerable<Qualification>> GetQualifications();
 
-        Task<IEnumerable<ProviderSearchResult>> FindProviders(
+        Task<ProviderSearchResponse> FindProviders(
             string postcode,
             int? qualificationId = null,
             int page = 0,

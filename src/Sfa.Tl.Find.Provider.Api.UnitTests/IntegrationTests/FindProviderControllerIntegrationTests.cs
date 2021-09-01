@@ -14,7 +14,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         {
             _fixture = fixture;
         }
-        
+
         [Fact]
         public async Task GetProviders_Returns_OK_Result_For_Valid_Url()
         {
@@ -33,8 +33,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 .GetAsync("/findproviders/api/providers");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            await response.Content.ValidateProblemDetails(
-                ("postcode", "The postcode field is required."));
         }
 
         [Fact]
@@ -67,10 +65,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             var response = await _fixture
                 .CreateClient()
                 .GetAsync("/findproviders/api/providers?qualificationId=40&page=-1&pageSize=0");
-            
+
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            
-            await response.Content.ValidateProblemDetails( 
+
+            await response.Content.ValidateProblemDetails(
                 ("postcode", "The postcode field is required."),
                 ("pageSize", "The pageSize field must be at least one."),
                 ("page", "The page field must be zero or greater."));

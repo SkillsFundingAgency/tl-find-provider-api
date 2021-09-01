@@ -65,7 +65,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 providerRepository: providerRepository);
 
             var results = await service.FindProviders(fromPostcodeLocation.Postcode);
-            results.Should().NotBeNullOrEmpty();
+            results.Should().NotBeNull();
+            results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+            results.SearchResults.Should().NotBeNullOrEmpty();
 
             await postcodeLookupService.Received(1).GetPostcode(fromPostcodeLocation.Postcode);
         }
@@ -104,7 +106,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 cache: cache);
 
             var results = await service.FindProviders(fromPostcodeLocation.Postcode);
-            results.Should().NotBeNullOrEmpty();
+            results.Should().NotBeNull();
+            results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+            results.SearchResults.Should().NotBeNullOrEmpty();
 
             await postcodeLookupService
                 .DidNotReceive()
