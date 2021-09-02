@@ -179,5 +179,44 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 .ThrowAsync<PostcodeNotFoundException>()
                 .WithMessage($"*{fromPostcodeLocation.Postcode}*");
         }
+
+        [Fact]
+        public async Task HasQualifications_Calls_Repository()
+        {
+            var qualificationRepository = Substitute.For<IQualificationRepository>();
+            qualificationRepository.HasAny()
+                .Returns(true);
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(qualificationRepository: qualificationRepository);
+
+            var result = await service.HasQualifications();
+
+            result.Should().BeTrue();
+
+            await qualificationRepository
+                .Received(1)
+                .HasAny();
+        }
+
+        [Fact]
+        public async Task HasProviders_Calls_Repository()
+        {
+            var providerRepository = Substitute.For<IProviderRepository>();
+            providerRepository.HasAny()
+                .Returns(true);
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(providerRepository: providerRepository);
+
+            var result = await service.HasProviders();
+
+            result.Should().BeTrue();
+
+            await providerRepository
+                .Received(1)
+                .HasAny();
+        }
+
     }
 }

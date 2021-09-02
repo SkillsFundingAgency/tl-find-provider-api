@@ -22,6 +22,18 @@ namespace Sfa.Tl.Find.Provider.Api.Data
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public async Task<bool> HasAny()
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var result = await _dbContextWrapper.ExecuteScalarAsync<int>(
+                connection,
+                "SELECT COUNT(1) " +
+                "WHERE EXISTS (SELECT 1 FROM dbo.Qualification)");
+
+            return result != 0;
+        }
+
         public async Task<IEnumerable<Qualification>> GetAll()
         {
             using var connection = _dbContextWrapper.CreateConnection();

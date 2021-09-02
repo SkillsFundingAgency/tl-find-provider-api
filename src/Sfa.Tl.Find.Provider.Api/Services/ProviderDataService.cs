@@ -50,7 +50,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             return qualifications;
         }
-
+        
         public async Task<ProviderSearchResponse> FindProviders(
             string postcode,
             int? qualificationId = null,
@@ -67,6 +67,16 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                 Postcode = postcodeLocation.Postcode,
                 SearchResults = searchResults
             };
+        }
+
+        public async Task<bool> HasQualifications()
+        {
+            return await _qualificationRepository.HasAny();
+        }
+
+        public async Task<bool> HasProviders()
+        {
+            return await _providerRepository.HasAny();
         }
 
         private async Task<PostcodeLocation> GetPostcode(string postcode)

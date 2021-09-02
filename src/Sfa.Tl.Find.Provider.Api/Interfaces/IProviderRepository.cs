@@ -6,6 +6,8 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
 {
     public interface IProviderRepository
     {
+        Task<bool> HasAny();
+
         Task Save(IList<Models.Provider> providers);
 
         Task<IEnumerable<ProviderSearchResult>> Search(

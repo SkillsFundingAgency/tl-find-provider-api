@@ -20,14 +20,12 @@ namespace Sfa.Tl.Find.Provider.Api
 {
     public class Startup
     {
-        private readonly IConfiguration _configuration;
         private readonly SiteConfiguration _siteConfiguration;
 
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
             _siteConfiguration = configuration.LoadConfigurationOptions();
         }
 
@@ -69,9 +67,7 @@ namespace Sfa.Tl.Find.Provider.Api
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();
 
-            services.AddHostedQuartzServices(
-                _siteConfiguration.CourseDirectoryImportSchedule,
-                _configuration?["SuppressStartupDataLoad"]?.ToLower() != "true");
+            services.AddHostedQuartzServices(_siteConfiguration.CourseDirectoryImportSchedule);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

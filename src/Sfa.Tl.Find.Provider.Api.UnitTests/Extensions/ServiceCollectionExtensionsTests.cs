@@ -15,8 +15,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         {
             var services = new ServiceCollection();
 
-            var servicesAfter = services.AddCorsPolicy(TestPolicyName, null);
-            servicesAfter.Should().BeEmpty();
+            services.AddCorsPolicy(TestPolicyName, null);
+            services.Should().BeEmpty();
         }
 
         [Fact]
@@ -24,10 +24,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         {
             var services = new ServiceCollection();
 
-            var servicesAfter = services.AddCorsPolicy(TestPolicyName, "");
-            servicesAfter.Should().BeEmpty();
+            services.AddCorsPolicy(TestPolicyName, "");
+            services.Should().BeEmpty();
         }
-        
+
         [Fact]
         public void AddCorsPolicy_Should_Add_Policy_With_Allowed_Origins()
         {
@@ -35,10 +35,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             var services = new ServiceCollection();
 
-            var servicesAfter = services.AddCorsPolicy(TestPolicyName, allowedOrigins);
-            servicesAfter.Should().NotBeEmpty();
-           
-            servicesAfter.Should().Contain(t => t.ServiceType.Name == "ICorsService");
+            services.AddCorsPolicy(TestPolicyName, allowedOrigins);
+
+            services.Should().NotBeEmpty();
+            services.Should().Contain(t => t.ServiceType.Name == "ICorsService");
         }
 
         [Fact]
@@ -46,35 +46,38 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         {
             var services = new ServiceCollection();
 
-            var servicesAfter = services.AddSwagger(
+            services.AddSwagger(
                 "v1",
                 "T Levels Find a Provider Api",
                 "v1",
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
-            servicesAfter.Should().NotBeEmpty();
-            servicesAfter.Should().Contain(t => t.ServiceType.Name == "ISwaggerProvider");
+            services.Should().NotBeEmpty();
+            services.Should().Contain(t => t.ServiceType.Name == "ISwaggerProvider");
         }
 
         [Fact]
-        public void AddHostedQuartzServices_Should_AddService()
+        public void AddHostedQuartzServices_With_Cron_Schedule_Should_AddService()
         {
             var services = new ServiceCollection();
 
-            var servicesAfter = services.AddHostedQuartzServices("0 0 9 ? * MON-FRI");
+            services.AddHostedQuartzServices("0 0 9 ? * MON-FRI");
 
-            servicesAfter.Should().NotBeEmpty();
-            servicesAfter.Should().Contain(t => t.ImplementationType != null && t.ImplementationType.Name == "QuartzHostedService");
+            services.Should().Contain(t => 
+                t.ImplementationType != null && 
+                t.ImplementationType.Name == "QuartzHostedService");
         }
-        
+
         [Fact]
-        public void AddHostedQuartzServices_Without_Schedule_Should_Not_AddService()
+        public void AddHostedQuartzServices_Without_Cron_Schedule_Should_AddService()
         {
             var services = new ServiceCollection();
 
-            var servicesAfter = services.AddHostedQuartzServices(null);
+            services.AddHostedQuartzServices(null);
 
-            servicesAfter.Should().BeEmpty();
+            services.Should().Contain(t => 
+                t.ImplementationType != null && 
+                t.ImplementationType.Name == "QuartzHostedService");
         }
     }
 }
