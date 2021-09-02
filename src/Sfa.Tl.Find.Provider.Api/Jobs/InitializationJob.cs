@@ -35,6 +35,10 @@ namespace Sfa.Tl.Find.Provider.Api.Jobs
                     await _courseDirectoryService.ImportQualifications();
                     await _courseDirectoryService.ImportProviders();
                 }
+                else
+                {
+                    _logger.LogInformation($"{nameof(InitializationJob)} did not call import as there is data already exists.");
+                }
 
                 _logger.LogInformation($"{nameof(InitializationJob)} job completed successfully.");
             }
