@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 
-namespace Sfa.Tl.Find.Provider.Api.Security
+namespace Sfa.Tl.Find.Provider.Api.Extensions
 {
-    public static class SecurityHeadersDefinitions
+    public static class SecurityHeaderExtensions
     {
         public static HeaderPolicyCollection GetHeaderPolicyCollection(bool isDev)
         {
@@ -41,14 +41,13 @@ namespace Sfa.Tl.Find.Provider.Api.Security
                     builder.AddPictureInPicture().None();
                     builder.AddSyncXHR().None();
                     builder.AddUsb().None();
-                });
-
-            AddCspHstsDefinitions(policy, isDev);
+                })
+                .AddCspHstsDefinitions(isDev);
 
             return policy;
         }
 
-        private static void AddCspHstsDefinitions(HeaderPolicyCollection policy, bool isDev)
+        private static HeaderPolicyCollection AddCspHstsDefinitions(this HeaderPolicyCollection policy, bool isDev)
         {
             if (!isDev)
             {
@@ -65,8 +64,10 @@ namespace Sfa.Tl.Find.Provider.Api.Security
                     builder.AddFrameAncestors().None();
                     builder.AddCustomDirective("require-trusted-types-for", "'script'");
                 });
-                // maxAge = one year in seconds
-                policy.AddStrictTransportSecurityMaxAgeIncludeSubDomains(maxAgeInSeconds: 60 * 60 * 24 * 365);
+
+                policy
+                    .AddStrictTransportSecurityMaxAgeIncludeSubDomains(
+                        maxAgeInSeconds: 60 * 60 * 24 * 365); //one year in seconds
             }
             else
             {
@@ -79,11 +80,13 @@ namespace Sfa.Tl.Find.Provider.Api.Security
                     builder.AddFormAction().Self();
                     builder.AddFontSrc().Self();
                     builder.AddStyleSrc().Self().UnsafeInline();
-                    builder.AddScriptSrc().Self().UnsafeInline(); //.WithNonce();
+                    builder.AddScriptSrc().Self().UnsafeInline();//.WithNonce();
                     builder.AddBaseUri().Self();
                     builder.AddFrameAncestors().None();
                 });
             }
+
+            return policy;
         }
     }
 }

@@ -14,7 +14,6 @@ using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
-using Sfa.Tl.Find.Provider.Api.Security;
 using Sfa.Tl.Find.Provider.Api.Services;
 
 namespace Sfa.Tl.Find.Provider.Api
@@ -52,12 +51,12 @@ namespace Sfa.Tl.Find.Provider.Api
             {
                 options.SizeLimit = 1024;
             });
-            
+
             services.AddSwagger("v1",
                 "T Levels Find a Provider Api",
                 "v1",
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
-            
+
             services.AddCorsPolicy(CorsPolicyName, _siteConfiguration.AllowedCorsOrigins);
 
             AddHttpClients(services);
@@ -79,7 +78,7 @@ namespace Sfa.Tl.Find.Provider.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSecurityHeaders(
-                SecurityHeadersDefinitions
+                SecurityHeaderExtensions
                     .GetHeaderPolicyCollection(env.IsDevelopment()));
 
             if (env.IsDevelopment())
@@ -93,7 +92,9 @@ namespace Sfa.Tl.Find.Provider.Api
             }
 
             if (!string.IsNullOrWhiteSpace(_siteConfiguration.AllowedCorsOrigins))
+            {
                 app.UseCors(CorsPolicyName);
+            }
 
             app.UseHttpsRedirection();
 
