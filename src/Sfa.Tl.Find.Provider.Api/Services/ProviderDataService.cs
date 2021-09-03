@@ -53,7 +53,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         
         public async Task<ProviderSearchResponse> FindProviders(
             string postcode,
-            int? qualificationId = null,
+            IList<int> qualificationIds = null,
             int page = 0,
             int pageSize = Constants.DefaultPageSize)
         {
@@ -61,7 +61,13 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var postcodeLocation = await GetPostcode(postcode);
 
-            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
+            var searchResults = 
+                await _providerRepository.Search(
+                    postcodeLocation, 
+                    qualificationIds, 
+                    page, 
+                    pageSize);
+
             return new ProviderSearchResponse
             {
                 Postcode = postcodeLocation.Postcode,

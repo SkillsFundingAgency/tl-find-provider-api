@@ -86,7 +86,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             var providerRepository = Substitute.For<IProviderRepository>();
             providerRepository.Search(
                     Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
-                    Arg.Any<int?>(),
+                    Arg.Any<List<int>>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
                 .Returns(new ProviderSearchResultBuilder().BuildList());
@@ -117,7 +117,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             var providerRepository = Substitute.For<IProviderRepository>();
             providerRepository.Search(
                     Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
-                    Arg.Any<int?>(),
+                    Arg.Any<List<int>>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
                 .Returns(new ProviderSearchResultBuilder().BuildList());
@@ -160,7 +160,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             var providerRepository = Substitute.For<IProviderRepository>();
             providerRepository.Search(
                     Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
-                    Arg.Any<int?>(),
+                    Arg.Any<List<int>>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
                 .Returns(new ProviderSearchResultBuilder().BuildList());

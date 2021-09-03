@@ -13,7 +13,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
 
         Task<ProviderSearchResponse> FindProviders(
             string postcode,
-            int? qualificationId = null,
+            IList<int> qualificationIds = null,
             int page = 0,
             int pageSize = Constants.DefaultPageSize);
     }

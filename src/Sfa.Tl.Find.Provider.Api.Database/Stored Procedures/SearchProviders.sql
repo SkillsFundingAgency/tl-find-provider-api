@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[SearchProviders]
 	@fromLatitude DECIMAL(9, 6),
 	@fromLongitude DECIMAL(9, 6),
-	@qualificationId INT,
+	@qualificationIds [dbo].[IdListTableType] READONLY,
 	@page INT,
 	@pageSize INT
 AS
@@ -35,9 +35,11 @@ AS
 			INNER JOIN	[dbo].[Qualification] q
 			ON		q.[Id] = lq.[QualificationId]
 			  AND	q.[IsDeleted] = 0
+			--LEFT JOIN	@qualificationIds qid
+			--ON		qid.[Id] = lq.[QualificationId]			
 			WHERE	lq.[LocationId] = l.[Id]
-			  AND	(q.[Id] = @qualificationId 
-					 OR ISNULL(@qualificationid, 0) = 0))
+			  AND	(q.[Id] IN (SELECT [Id] FROM @qualificationIds)
+					 OR NOT EXISTS(SELECT [Id] FROM @qualificationIds WHERE [Id] <> 0)))
 	ORDER BY [Distance],
 			 p.[Name],
 			 l.[Name]

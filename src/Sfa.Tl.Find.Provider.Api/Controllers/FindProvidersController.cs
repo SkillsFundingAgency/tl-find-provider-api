@@ -30,7 +30,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// Search for providers.
         /// </summary>
         /// <param name="postcode">Postcode that the search should start from.</param>
-        /// <param name="qualificationId">Qualification id to filter by. Optional, defaults to null or zero.</param>
+        /// <param name="qualificationIds">Qualification ids to filter by. Null or zero will be ignored.</param>
         /// <param name="page">Page to be displayed (zero-based).</param>
         /// <param name="pageSize">Number of items to return on a page.</param>
         /// <returns>Json with providers.</returns>
@@ -41,18 +41,27 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(
             [Required, FromQuery] string postcode,
-            [FromQuery] int? qualificationId = null,
+            [FromQuery] IList<int> qualificationIds = null,
             [FromQuery, Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] int page = 0,
             [FromQuery, Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] int pageSize = Constants.DefaultPageSize)
         {
-            _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
+            _logger.LogDebug($"GetProviders called with postcode={postcode}, " +
+                             //$"qualificationId={qualificationId}, " +
                              $"page={page}, pageSize={pageSize}");
+
+            if (qualificationIds != null)
+            {
+                foreach (var q in qualificationIds)
+                {
+                    _logger.LogDebug($"  - qualificationId={q}");   
+                }
+            }
 
             try
             {
                 var providers = await _providerDataService.FindProviders(
                     postcode,
-                    qualificationId is > 0 ? qualificationId : null,
+                    qualificationIds,
                     page,
                     pageSize);
 

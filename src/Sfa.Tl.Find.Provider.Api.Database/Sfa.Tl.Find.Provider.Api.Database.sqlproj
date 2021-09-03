@@ -80,5 +80,6 @@
     <Build Include="Stored Procedures\UpdateLocations.sql" />
     <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
     <Build Include="Types\LocationQualificationDataTableType.sql" />
+    <Build Include="Types\IdListTableType.sql" />
   </ItemGroup>
 </Project>

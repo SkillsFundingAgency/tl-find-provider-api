@@ -66,7 +66,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                     var providerDataService = Substitute.For<IProviderDataService>();
                     providerDataService.FindProviders(
                             Arg.Any<string>(), 
-                            Arg.Any<int?>(), 
+                            Arg.Any<List<int>>(), 
                             Arg.Any<int>(), 
                             Arg.Any<int>())
                         .Returns(x => new ProviderSearchResponse

@@ -114,7 +114,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data
 
         public async Task<IEnumerable<ProviderSearchResult>> Search(
             PostcodeLocation fromPostcodeLocation,
-            int? qualificationId,
+            IList<int> qualificationIds,
             int page,
             int pageSize)
         {
@@ -162,7 +162,10 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                     {
                         fromLatitude = fromPostcodeLocation.Latitude,
                         fromLongitude = fromPostcodeLocation.Longitude,
-                        qualificationId,
+                        qualificationId = qualificationIds is { Count: > 0 } && 
+                                          qualificationIds[0] is > 0
+                            ? qualificationIds[0]
+                            : (int?)null,
                         page,
                         pageSize
                     },

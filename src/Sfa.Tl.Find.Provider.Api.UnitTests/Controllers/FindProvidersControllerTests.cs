@@ -21,7 +21,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
     {
         private const string TestPostcode = "AB1 2XY";
         private const string InvalidPostcode = "CV99 XXX";
-        private const int TestQualificationId = 51;
+        private readonly IList<int> TestQualificationIds =
+            new List<int> { 51 };
         private const int TestPage = 3;
         private const int TestPageSize = Constants.DefaultPageSize + 10;
 
@@ -81,7 +82,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         public async Task GetProviders_Passes_Default_Parameters()
         {
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+            dataService.FindProviders(
+                    Arg.Any<string>(),
+                    Arg.Any<List<int>>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>())
                 .Returns(new ProviderSearchResponseBuilder()
                     .BuildWithMultipleSearchResults());
 
@@ -92,7 +97,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
             await dataService
                 .Received()
                 .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                    Arg.Is<int?>(q => q == null),
+                    Arg.Is<List<int>>(q => q == null),
                     Arg.Is<int>(p => p == 0),
                     Arg.Is<int>(s => s == Constants.DefaultPageSize));
         }
@@ -101,18 +106,22 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         public async Task GetProviders_Passes_QualificationId_And_Default_Parameters()
         {
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+            dataService.FindProviders(
+                    Arg.Any<string>(),
+                    Arg.Any<List<int>>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>())
                 .Returns(new ProviderSearchResponseBuilder()
                     .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-            await controller.GetProviders(TestPostcode, TestQualificationId);
+            await controller.GetProviders(TestPostcode, TestQualificationIds);
 
             await dataService
                 .Received()
                 .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                    Arg.Is<int?>(q => q == TestQualificationId),
+                    Arg.Is<List<int>>(q => q[0] == TestQualificationIds[0]),
                     Arg.Is<int>(p => p == 0),
                     Arg.Is<int>(s => s == Constants.DefaultPageSize));
         }
@@ -121,18 +130,22 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         public async Task GetProviders_Passes_QualificationId_And_Page_And_Default_Parameters()
         {
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+            dataService.FindProviders(
+                    Arg.Any<string>(),
+                    Arg.Any<List<int>>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>())
                 .Returns(new ProviderSearchResponseBuilder()
                     .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-            await controller.GetProviders(TestPostcode, TestQualificationId, TestPage);
+            await controller.GetProviders(TestPostcode, TestQualificationIds, TestPage);
 
             await dataService
                 .Received()
                 .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                    Arg.Is<int?>(q => q == TestQualificationId),
+                    Arg.Is<List<int>>(q => q[0] == TestQualificationIds[0]),
                     Arg.Is<int>(p => p == TestPage),
                     Arg.Is<int>(s => s == Constants.DefaultPageSize));
         }
@@ -141,18 +154,22 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         public async Task GetProviders_Passes_All_Parameters()
         {
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+            dataService.FindProviders(
+                    Arg.Any<string>(),
+                    Arg.Any<List<int>>(),
+                    Arg.Any<int>(),
+                    Arg.Any<int>())
                 .Returns(new ProviderSearchResponseBuilder()
                     .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-            await controller.GetProviders(TestPostcode, TestQualificationId, TestPage, TestPageSize);
+            await controller.GetProviders(TestPostcode, TestQualificationIds, TestPage, TestPageSize);
 
             await dataService
                 .Received()
                 .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                    Arg.Is<int?>(q => q == TestQualificationId),
+                    Arg.Is<List<int>>(q => q[0] == TestQualificationIds[0]),
                     Arg.Is<int>(p => p == TestPage),
                     Arg.Is<int>(s => s == TestPageSize));
         }
@@ -199,7 +216,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             var result = await controller.GetProviders(fromPostcodeLocation.Postcode);
 
-            var results = (result as OkObjectResult)?.Value 
+            var results = (result as OkObjectResult)?.Value
                 as ProviderSearchResponse;
 
             results.Should().NotBeNull();

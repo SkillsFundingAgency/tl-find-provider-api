@@ -12,7 +12,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
 
         Task<IEnumerable<ProviderSearchResult>> Search(
             PostcodeLocation fromPostcodeLocation,
-            int? qualificationId,
+            IList<int> qualificationIds,
             int page,
             int pageSize);
     }
