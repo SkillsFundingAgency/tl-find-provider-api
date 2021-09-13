@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
@@ -9,20 +10,11 @@ using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 {
     public class CourseDirectoryServiceTests
     {
-        // ReSharper disable once NotAccessedField.Local
-        private readonly ITestOutputHelper _output;
-
-        public CourseDirectoryServiceTests(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
         [Fact]
         public void Constructor_Guards_Against_NullParameters()
         {
@@ -50,7 +42,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             IList<Models.Provider> receivedProviders = null;
 
             var providerRepository = Substitute.For<IProviderRepository>();
-            await providerRepository.Save(Arg.Do<IEnumerable<Models.Provider>>(
+            await providerRepository.Save(Arg.Do<IList<Models.Provider>>(
                     x => receivedProviders = x?.ToList()));
 
             var service = new CourseDirectoryServiceBuilder()
@@ -156,6 +148,29 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             receivedQualifications.Should().Contain(q => q.Id == 49 && q.Name == "Maintenance, Installation and Repair for Engineering and Manufacturing");
             receivedQualifications.Should().Contain(q => q.Id == 50 && q.Name == "Engineering, Manufacturing, Processing and Control");
             receivedQualifications.Should().Contain(q => q.Id == 51 && q.Name == "Management and Administration");
+        }
+
+        [Fact]
+        public async Task ImportQualifications_Removes_Qualifications_From_Cache()
+        {
+            var jsonBuilder = new CourseDirectoryJsonBuilder();
+
+            var responses = new Dictionary<string, string>
+            {
+                { CourseDirectoryService.QualificationsEndpoint, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
+            };
+
+            var cache = Substitute.For<IMemoryCache>();
+
+            var service = new CourseDirectoryServiceBuilder()
+                .Build(responses,
+                    cache: cache);
+
+            await service.ImportQualifications();
+
+            cache
+                .Received(1)
+                .Remove(CacheKeys.QualificationsKey);
         }
 
         private static void ValidateProvider(Models.Provider provider, 

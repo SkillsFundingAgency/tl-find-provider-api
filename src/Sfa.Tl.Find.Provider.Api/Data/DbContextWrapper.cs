@@ -52,5 +52,18 @@ namespace Sfa.Tl.Find.Provider.Api.Data
                 sql, map, param, transaction,
                 splitOn: splitOn, commandTimeout: commandTimeout, commandType: commandType);
         }
+
+        public async Task<T> ExecuteScalarAsync<T>(
+            IDbConnection connection, 
+            string sql,
+            object param = null,
+            IDbTransaction transaction = null,
+            int? commandTimeout = null,
+            CommandType? commandType = null)
+        {
+            return await connection.ExecuteScalarAsync<T>(
+                sql, param, transaction,
+                commandTimeout, commandType);
+        }
     }
 }

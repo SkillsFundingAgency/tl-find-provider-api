@@ -20,14 +20,12 @@ namespace Sfa.Tl.Find.Provider.Api
 {
     public class Startup
     {
-        private readonly IConfiguration _configuration;
         private readonly SiteConfiguration _siteConfiguration;
 
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
             _siteConfiguration = configuration.LoadConfigurationOptions();
         }
 
@@ -49,8 +47,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddMemoryCache(options =>
             {
-                //TODO: Set a bigger size limit - this is for testing
-                options.SizeLimit = 2;
+                options.SizeLimit = 1024;
             });
 
             services.AddSwagger("v1",
@@ -70,30 +67,34 @@ namespace Sfa.Tl.Find.Provider.Api
                 .AddTransient<IProviderRepository, ProviderRepository>()
                 .AddTransient<IQualificationRepository, QualificationRepository>();
 
-            services.AddHostedQuartzServices(
-                _siteConfiguration.CourseDirectoryImportSchedule,
-                _configuration["SuppressStartupDataLoad"]?.ToLower() != "true");
+            services.AddHostedQuartzServices(_siteConfiguration.CourseDirectoryImportSchedule);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSecurityHeaders(
+                SecurityHeaderExtensions
+                    .GetHeaderPolicyCollection(env.IsDevelopment()));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint(
+                    "/swagger/v1/swagger.json",
+                    "T Levels Find a Provider.Api v1"));
             }
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint(
-                "/swagger/v1/swagger.json",
-                "T Levels Find a Provider.Api v1"));
+            if (!string.IsNullOrWhiteSpace(_siteConfiguration.AllowedCorsOrigins))
+            {
+                app.UseCors(CorsPolicyName);
+            }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            if (!string.IsNullOrWhiteSpace(_siteConfiguration.AllowedCorsOrigins))
-                app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
             {

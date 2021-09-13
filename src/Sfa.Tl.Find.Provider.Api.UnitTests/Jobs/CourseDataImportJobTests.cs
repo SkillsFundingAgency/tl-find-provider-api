@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using NSubstitute;
 using Quartz;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
@@ -25,17 +26,22 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Jobs
         }
 
         [Fact]
-        public async Task Execute_Job_Works_As_Expected()
+        public async Task Execute_Job_Calls_Expected_Services()
         {
+            var courseDirectoryService = Substitute.For<ICourseDirectoryService>();
+
             var trigger = Substitute.For<ITrigger>();
             trigger.JobKey.Returns(new JobKey("Test"));
             var jobContext = Substitute.For<IJobExecutionContext>();
             jobContext.Trigger.Returns(trigger);
 
             var job = new CourseDataImportJobBuilder()
-                .Build();
+                .Build(courseDirectoryService);
 
             await job.Execute(jobContext);
+
+            await courseDirectoryService.Received(1).ImportQualifications();
+            await courseDirectoryService.Received(1).ImportProviders();
         }
     }
 }

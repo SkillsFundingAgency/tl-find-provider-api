@@ -42,8 +42,8 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         public async Task<IActionResult> GetProviders(
             [Required, FromQuery] string postcode,
             [FromQuery] int? qualificationId = null,
-            [FromQuery, Range(0, int.MaxValue, ErrorMessage = "'page' must be zero or greater.")] int page = 0,
-            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "'pageSize' must be at least one.")] int pageSize = Constants.DefaultPageSize)
+            [FromQuery, Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] int page = 0,
+            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] int pageSize = Constants.DefaultPageSize)
         {
             _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
                              $"page={page}, pageSize={pageSize}");

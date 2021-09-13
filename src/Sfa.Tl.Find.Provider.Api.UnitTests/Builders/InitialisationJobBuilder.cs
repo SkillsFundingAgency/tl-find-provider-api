@@ -5,17 +5,20 @@ using Sfa.Tl.Find.Provider.Api.Jobs;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
-    public class CourseDataImportJobBuilder
+    public class InitializationJobBuilder
     {
-        public CourseDataImportJob Build(
+        public InitializationJob Build(
             ICourseDirectoryService courseDirectoryService = null,
-            ILogger<CourseDataImportJob> logger = null)
+            IProviderDataService providerDataService = null,
+            ILogger<InitializationJob> logger = null)
         {
             courseDirectoryService ??= Substitute.For<ICourseDirectoryService>();
-            logger ??= Substitute.For<ILogger<CourseDataImportJob>>();
+            providerDataService ??= Substitute.For<IProviderDataService>();
+            logger ??= Substitute.For<ILogger<InitializationJob>>();
 
-            return new CourseDataImportJob(
+            return new InitializationJob(
                 courseDirectoryService,
+                providerDataService,
                 logger);
         }
     }

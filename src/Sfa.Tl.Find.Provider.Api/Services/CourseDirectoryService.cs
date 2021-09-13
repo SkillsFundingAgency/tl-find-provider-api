@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -16,6 +17,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
     {
         private readonly HttpClient _httpClient;
 
+        private readonly IMemoryCache _cache;
         private readonly IProviderRepository _providerRepository;
         private readonly IQualificationRepository _qualificationRepository;
         private readonly ILogger<CourseDirectoryService> _logger;
@@ -27,11 +29,13 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             HttpClient httpClient,
             IProviderRepository providerRepository,
             IQualificationRepository qualificationRepository,
+            IMemoryCache cache,
             ILogger<CourseDirectoryService> logger)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
             _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -49,7 +53,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             var providers = await ReadTLevelProvidersFromResponse(responseMessage);
 
-            await _providerRepository.Save(providers);
+            await _providerRepository.Save(providers.ToList());
 
             _logger.LogInformation($"{nameof(CourseDirectoryService)} saved providers.");
         }
@@ -71,6 +75,8 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             await _qualificationRepository.Save(qualifications);
 
             _logger.LogInformation($"{nameof(CourseDirectoryService)} saved qualifications.");
+
+            _cache.Remove(CacheKeys.QualificationsKey);
         }
 
         private async Task<IEnumerable<Models.Provider>> ReadTLevelProvidersFromResponse(

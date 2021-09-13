@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
@@ -41,6 +42,40 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 
             var results = await service.GetQualifications();
             results.Should().NotBeNullOrEmpty();
+
+            await qualificationRepository
+                .Received(1)
+                .GetAll();
+        }
+
+        [Fact]
+        public async Task GetQualifications_Returns_Expected_List_From_Cache()
+        {
+            var qualificationRepository = Substitute.For<IQualificationRepository>();
+
+            var cache = Substitute.For<IMemoryCache>();
+            cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
+                .Returns(x =>
+                {
+                    if ((string)x[0] == CacheKeys.QualificationsKey)
+                    {
+                        x[1] = new QualificationBuilder().BuildList();
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(qualificationRepository: qualificationRepository,
+                    cache: cache);
+
+            var results = await service.GetQualifications();
+            results.Should().NotBeNullOrEmpty();
+
+            await qualificationRepository
+                .DidNotReceive()
+                .GetAll();
         }
 
         [Fact]
@@ -65,9 +100,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 providerRepository: providerRepository);
 
             var results = await service.FindProviders(fromPostcodeLocation.Postcode);
-            results.Should().NotBeNullOrEmpty();
+            results.Should().NotBeNull();
+            results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+            results.SearchResults.Should().NotBeNullOrEmpty();
 
-            await postcodeLookupService.Received(1).GetPostcode(fromPostcodeLocation.Postcode);
+            await postcodeLookupService
+                .Received(1)
+                .GetPostcode(fromPostcodeLocation.Postcode);
         }
 
         [Fact]
@@ -77,7 +116,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
 
             var providerRepository = Substitute.For<IProviderRepository>();
             providerRepository.Search(
-                    Arg.Is<PostcodeLocation>(p => p.Postcode ==  fromPostcodeLocation.Postcode),
+                    Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
                     Arg.Any<int?>(),
                     Arg.Any<int>(),
                     Arg.Any<int>())
@@ -104,7 +143,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 cache: cache);
 
             var results = await service.FindProviders(fromPostcodeLocation.Postcode);
-            results.Should().NotBeNullOrEmpty();
+            results.Should().NotBeNull();
+            results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+            results.SearchResults.Should().NotBeNullOrEmpty();
 
             await postcodeLookupService
                 .DidNotReceive()
@@ -138,5 +179,44 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                 .ThrowAsync<PostcodeNotFoundException>()
                 .WithMessage($"*{fromPostcodeLocation.Postcode}*");
         }
+
+        [Fact]
+        public async Task HasQualifications_Calls_Repository()
+        {
+            var qualificationRepository = Substitute.For<IQualificationRepository>();
+            qualificationRepository.HasAny()
+                .Returns(true);
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(qualificationRepository: qualificationRepository);
+
+            var result = await service.HasQualifications();
+
+            result.Should().BeTrue();
+
+            await qualificationRepository
+                .Received(1)
+                .HasAny();
+        }
+
+        [Fact]
+        public async Task HasProviders_Calls_Repository()
+        {
+            var providerRepository = Substitute.For<IProviderRepository>();
+            providerRepository.HasAny()
+                .Returns(true);
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(providerRepository: providerRepository);
+
+            var result = await service.HasProviders();
+
+            result.Should().BeTrue();
+
+            await providerRepository
+                .Received(1)
+                .HasAny();
+        }
+
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
+// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions
 {
@@ -56,15 +57,8 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
 
         public static IServiceCollection AddHostedQuartzServices(
             this IServiceCollection services,
-            string cronSchedule,
-            bool runOnStartup = false)
+            string cronSchedule)
         {
-            if (string.IsNullOrEmpty(cronSchedule) && !runOnStartup)
-            {
-                //Can't add an empty job unless it is persisted in database
-                return services;
-            }
-
             services.AddQuartz(q =>
             {
                 // Normally would take this from appsettings.json, just show it's possible
@@ -73,33 +67,21 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
                 // Use a Scoped container for creating IJobs
                 q.UseMicrosoftDependencyInjectionJobFactory();
 
-                //q.UsePersistentStore(s =>
-                //{
-                //    s.UseSqlServer(connectionString);
-                //    s.UseClustering();
-                //    s.UseProperties = true;
-                //    s.UseJsonSerializer();
-                //});
-
-                var jobKey = new JobKey("Import Course Data");
-                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(jobKey));
-
-                if (runOnStartup)
-                {
-                    //TODO: Consider a start-up job that check s if there are any, and then runs the main job
-
-                    q.AddTrigger(opts => opts
-                    .ForJob(jobKey)
-                    .StartNow());
-                }
+                var startupJobKey = new JobKey("Perform Startup Tasks");
+                q.AddJob<InitializationJob>(opts => opts.WithIdentity(startupJobKey))
+                    .AddTrigger(opts => opts
+                        .ForJob(startupJobKey)
+                        .StartNow());
 
                 if (!string.IsNullOrEmpty(cronSchedule))
                 {
-                    q.AddTrigger(opts => opts
-                        .ForJob(jobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(cronSchedule)));
+                    var importJobKey = new JobKey("Import Course Data");
+                    q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(importJobKey))
+                        .AddTrigger(opts => opts
+                            .ForJob(importJobKey)
+                            .WithSchedule(
+                                CronScheduleBuilder
+                                    .CronSchedule(cronSchedule)));
                 }
             });
 

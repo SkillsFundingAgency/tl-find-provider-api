@@ -82,7 +82,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         {
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
-                .Returns(new ProviderSearchResultBuilder().BuildList());
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
@@ -101,7 +102,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         {
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
-                .Returns(new ProviderSearchResultBuilder().BuildList());
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
@@ -120,7 +122,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         {
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
-                .Returns(new ProviderSearchResultBuilder().BuildList());
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
@@ -139,7 +142,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         {
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
-                .Returns(new ProviderSearchResultBuilder().BuildList());
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
@@ -156,43 +160,54 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetProviders_Returns_Expected_List_Of_Search_Results()
         {
+            var fromPostcodeLocation = new PostcodeLocationBuilder()
+                .BuildValidPostcodeLocation();
+
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(TestPostcode).Returns(new ProviderSearchResultBuilder().BuildList());
+            dataService.FindProviders(fromPostcodeLocation.Postcode)
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildWithMultipleSearchResults());
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-            var result = await controller.GetProviders(TestPostcode);
+            var result = await controller.GetProviders(fromPostcodeLocation.Postcode);
 
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
             okResult!.StatusCode.Should().Be(200);
 
-            var results = okResult.Value as IEnumerable<ProviderSearchResult>;
-            results.Should().NotBeNullOrEmpty();
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+            results.SearchResults.Should().NotBeNullOrEmpty();
         }
 
         [Fact]
-        public async Task GetProviders_Returns_Expected_Value_For_One_Item()
+        public async Task GetProviders_Returns_Expected_Value_For_One_Search_Result()
         {
-            var providers = new ProviderSearchResultBuilder().BuildList().Take(1).ToList();
+            var fromPostcodeLocation = new PostcodeLocationBuilder()
+                .BuildValidPostcodeLocation();
+
+            var providerSearchResponse = new ProviderSearchResponseBuilder()
+                .WithSearchOrigin(fromPostcodeLocation)
+                .BuildWithSingleSearchResult();
 
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.FindProviders(TestPostcode).Returns(providers);
+            dataService.FindProviders(fromPostcodeLocation.Postcode)
+                .Returns(providerSearchResponse);
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-            var result = await controller.GetProviders(TestPostcode);
+            var result = await controller.GetProviders(fromPostcodeLocation.Postcode);
 
-            var results = ((result as OkObjectResult)?.Value 
-                as IEnumerable<ProviderSearchResult>)?.ToList();
+            var results = (result as OkObjectResult)?.Value 
+                as ProviderSearchResponse;
 
-            results.Should().NotBeNullOrEmpty();
-            results!.Count.Should().Be(1);
+            results.Should().NotBeNull();
+            results!.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+            results.SearchResults.Should().NotBeNullOrEmpty();
 
-            results.Single().UkPrn.Should().Be(providers.Single().UkPrn);
-            results.Single().ProviderName.Should().Be(providers.Single().ProviderName);
-            results.Single().LocationName.Should().Be(providers.Single().LocationName);
-            results.Single().Postcode.Should().Be(providers.Single().Postcode);
+            results.SearchResults.Count().Should().Be(1);
+            results.SearchResults.Should().BeEquivalentTo(providerSearchResponse.SearchResults);
         }
 
         [Fact]

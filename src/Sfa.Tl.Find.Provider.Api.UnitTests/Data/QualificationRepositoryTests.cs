@@ -39,7 +39,45 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
             var results = await repository.GetAll();
             results.Should().NotBeNullOrEmpty();
         }
-        
+
+        [Fact]
+        public async Task HasAny_Returns_False_When_Zero_Rows_Exist()
+        {
+            var dbConnection = Substitute.For<IDbConnection>();
+            var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+            dbContextWrapper
+                .CreateConnection()
+                .Returns(dbConnection);
+            dbContextWrapper
+                .ExecuteScalarAsync<int>(dbConnection,
+                    Arg.Is<string>(s => s.Contains("dbo.Qualification")))
+                .Returns(0);
+
+            var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
+
+            var result = await repository.HasAny();
+            result.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task HasAny_Returns_True_When_Rows_Exist()
+        {
+            var dbConnection = Substitute.For<IDbConnection>();
+            var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+            dbContextWrapper
+                .CreateConnection()
+                .Returns(dbConnection);
+            dbContextWrapper
+                .ExecuteScalarAsync<int>(dbConnection,
+                    Arg.Is<string>(s => s.Contains("dbo.Qualification")))
+                .Returns(1);
+
+            var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
+
+            var result = await repository.HasAny();
+            result.Should().BeTrue();
+        }
+
         [Fact]
         public async Task Save_Calls_Database_As_Expected()
         {

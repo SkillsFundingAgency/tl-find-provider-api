@@ -7,7 +7,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 {
     public class JsonExtensionsTests
     {
-        private readonly JsonDocument _jsonDoc = JsonDocument.Parse(
+        private readonly JsonDocument _jsonDocument = JsonDocument.Parse(
             "{ " +
                 "\"anElement\": {" +
                     "\"myInt32\": 123," +
@@ -29,7 +29,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("myFalseBool", false)]
         public void JsonElement_SafeGetBoolean_Data_Tests(string propertyName, bool expectedResult)
         {
-            var prop = _jsonDoc.RootElement.GetProperty("anElement");
+            var prop = _jsonDocument.RootElement.GetProperty("anElement");
             var result = prop.SafeGetBoolean(propertyName);
 
             result.Should().Be(expectedResult);
@@ -44,7 +44,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("myFalseBool", 0)]
         public void JsonElement_SafeGetInt32_Data_Tests(string propertyName, int expectedResult)
         {
-            var prop = _jsonDoc.RootElement.GetProperty("anElement");
+            var prop = _jsonDocument.RootElement.GetProperty("anElement");
             var result = prop.SafeGetInt32(propertyName);
 
             result.Should().BeOfType(typeof(int));
@@ -61,7 +61,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("myFalseBool", 0)]
         public void JsonElement_SafeGetInt64_Data_Tests(string propertyName, long expectedResult)
         {
-            var prop = _jsonDoc.RootElement.GetProperty("anElement");
+            var prop = _jsonDocument.RootElement.GetProperty("anElement");
             var result = prop.SafeGetInt64(propertyName);
 
             result.Should().BeOfType(typeof(long));
@@ -78,7 +78,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("myFalseBool", 0)]
         public void JsonElement_SafeGetDouble_Data_Tests(string propertyName, double expectedResult)
         {
-            var prop = _jsonDoc.RootElement.GetProperty("anElement");
+            var prop = _jsonDocument.RootElement.GetProperty("anElement");
             var result = prop.SafeGetDouble(propertyName);
 
             result.Should().Be(expectedResult);
@@ -94,7 +94,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("myFalseBool", null)]
         public void JsonElement_SafeGetString_Data_Tests(string propertyName, string expectedResult)
         {
-            var prop = _jsonDoc.RootElement.GetProperty("anElement");
+            var prop = _jsonDocument.RootElement.GetProperty("anElement");
             var result = prop.SafeGetString(propertyName);
 
             result.Should().Be(expectedResult);
@@ -112,7 +112,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
         [InlineData("myFalseBool", null, 100)]
         public void JsonElement_SafeGetString_With_Max_Length_Data_Tests(string propertyName, string expectedResult, int maxLength)
         {
-            var prop = _jsonDoc.RootElement.GetProperty("anElement");
+            var prop = _jsonDocument.RootElement.GetProperty("anElement");
             var result = prop.SafeGetString(propertyName, maxLength);
 
             result.Should().Be(expectedResult);
