@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers
 {
@@ -27,27 +29,47 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// <summary>
         /// Search for providers.
         /// </summary>
-        /// <param name="postCode">Postcode that the search should start from.</param>
+        /// <param name="postcode">Postcode that the search should start from.</param>
         /// <param name="qualificationId">Qualification id to filter by. Optional, defaults to null or zero.</param>
         /// <param name="page">Page to be displayed (zero-based).</param>
         /// <param name="pageSize">Number of items to return on a page.</param>
         /// <returns>Json with providers.</returns>
         [HttpGet]
-        //[Route("providers/{postCode}/{qualificationId:int?}", Name = "GetProviders")]
-        [Route("providers/{postCode}/{qualificationId?}", Name = "GetProviders")]
-        [ProducesResponseType(typeof(IEnumerable<Models.Provider>), StatusCodes.Status200OK)]
+        [Route("providers", Name = "GetProviders")]
+        [ProducesResponseType(typeof(IEnumerable<ProviderSearchResult>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(
-            string postCode, 
-            int? qualificationId = null, 
-            [FromQuery] int page = 0, 
-            [FromQuery] int pageSize = Constants.DefaultPageSize)
+            [Required, FromQuery] string postcode,
+            [FromQuery] int? qualificationId = null,
+            [FromQuery, Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] int page = 0,
+            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] int pageSize = Constants.DefaultPageSize)
         {
-            //TODO: Deal with exception or empty result from checking postcode - return a not found with "invalid postcode"?
-            var providers = await _providerDataService.FindProviders(postCode);
-            return providers != null
-                ? Ok(providers)
-                : NotFound();
+            _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
+                             $"page={page}, pageSize={pageSize}");
+
+            try
+            {
+                var providers = await _providerDataService.FindProviders(
+                    postcode,
+                    qualificationId is > 0 ? qualificationId : null,
+                    page,
+                    pageSize);
+
+                return providers != null
+                    ? Ok(providers)
+                    : NotFound();
+            }
+            catch (PostcodeNotFoundException pex)
+            {
+                _logger.LogError(pex, $"Postcode {pex.Postcode} was not found. Returning a Not Found result.");
+                return NotFound(pex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>

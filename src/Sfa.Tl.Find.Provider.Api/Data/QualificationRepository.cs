@@ -1,5 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 
@@ -7,27 +11,70 @@ namespace Sfa.Tl.Find.Provider.Api.Data
 {
     public class QualificationRepository : IQualificationRepository
     {
-        public async Task<IQueryable<Qualification>> GetAllQualifications()
+        private readonly IDbContextWrapper _dbContextWrapper;
+        private readonly ILogger<QualificationRepository> _logger;
+
+        public QualificationRepository(
+            IDbContextWrapper dbContextWrapper,
+            ILogger<QualificationRepository> logger)
         {
-            return new Qualification[]
+            _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public async Task<bool> HasAny()
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var result = await _dbContextWrapper.ExecuteScalarAsync<int>(
+                connection,
+                "SELECT COUNT(1) " +
+                "WHERE EXISTS (SELECT 1 FROM dbo.Qualification)");
+
+            return result != 0;
+        }
+
+        public async Task<IEnumerable<Qualification>> GetAll()
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            return await _dbContextWrapper.QueryAsync<Qualification>(
+                connection,
+                "SELECT Id, Name " +
+                "FROM dbo.Qualification " +
+                "WHERE IsDeleted = 0 " +
+                "ORDER BY Name");
+        }
+
+        public async Task Save(IEnumerable<Qualification> qualifications)
+        {
+            try
             {
-                new() { Id = 45, Name = "Building Services Engineering for Construction" },
-                new() { Id = 36, Name = "Design, Surveying and Planning for Construction" },
-                new() { Id = 39, Name = "Digital Business Services" },
-                new() { Id = 37, Name = "Digital Production, Design and Development" },
-                new() { Id = 40, Name = "Digital Support Services" },
-                new() { Id = 38, Name = "Education and Childcare" },
-                new() { Id = 41, Name = "Health" },
-                new() { Id = 42, Name = "Healthcare Science" },
-                new() { Id = 44, Name = "Onsite Construction" },
-                new() { Id = 43, Name = "Science" },
-                new() { Id = 46, Name = "Finance" },
-                new() { Id = 47, Name = "Accounting" },
-                new() { Id = 48, Name = "Design and development for engineering and manufacturing" },
-                new() { Id = 49, Name = "Maintenance, installation and repair for engineering and manufacturing" },
-                new() { Id = 50, Name = "Engineering, manufacturing, processing and control" },
-                new() { Id = 51, Name = "Management and administration" }
-            }.AsQueryable();
+                using var connection = _dbContextWrapper.CreateConnection();
+                connection.Open();
+
+                using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+                var updateResult = await _dbContextWrapper
+                    .QueryAsync<(string Change, int ChangeCount)>(
+                        connection,
+                        "UpdateQualifications",
+                        new
+                        {
+                            data = qualifications.AsTableValuedParameter("dbo.QualificationDataTableType")
+                        },
+                        transaction,
+                        commandType: CommandType.StoredProcedure);
+
+                _logger.LogChangeResults(updateResult, nameof(QualificationRepository), nameof(qualifications));
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred when saving providers");
+                throw;
+            }
         }
     }
 }

@@ -1,0 +1,27 @@
+resources:
+  repositories:
+    - repository: self
+      persistCredentials: true
+      clean: true
+
+    - repository: devopsTemplates
+      type: github
+      endpoint: DfE-Digital
+      name: DFE-Digital/operations-devops-pipeline-templates
+
+trigger:
+  branches:
+    include:
+    - main
+    - develop
+    - feature/*
+    - bugs/*
+pr:
+  - main
+  - develop
+  
+
+variables:
+  applicationName: findpvdrapi
+stages:
+  - template: ./yaml/stages/findproviderapi-master-stage.yml

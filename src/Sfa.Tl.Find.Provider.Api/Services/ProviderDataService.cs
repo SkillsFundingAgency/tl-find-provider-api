@@ -1,25 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
+using CacheExtensions = Sfa.Tl.Find.Provider.Api.Extensions.CacheExtensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Services
 {
     public class ProviderDataService : IProviderDataService
     {
-        private readonly ILogger<ProviderDataService> _logger;
+        private readonly IDateTimeService _dateTimeService;
+        private readonly IPostcodeLookupService _postcodeLookupService;
         private readonly IProviderRepository _providerRepository;
         private readonly IQualificationRepository _qualificationRepository;
+        private readonly IMemoryCache _cache;
+        private readonly ILogger<ProviderDataService> _logger;
 
         public ProviderDataService(
+            IDateTimeService dateTimeService,
+            IPostcodeLookupService postcodeLookupService,
             IProviderRepository providerRepository,
             IQualificationRepository qualificationRepository,
+            IMemoryCache cache,
             ILogger<ProviderDataService> logger)
         {
+            _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+            _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
             _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
             _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -27,18 +40,62 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         {
             _logger.LogDebug("Getting qualifications");
 
-            return await _qualificationRepository.GetAllQualifications();
+            const string key = CacheKeys.QualificationsKey;
+            if (!_cache.TryGetValue(key, out IList<Qualification> qualifications))
+            {
+                qualifications = (await _qualificationRepository.GetAll()).ToList();
+                _cache.Set(key, qualifications,
+                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+            }
+
+            return qualifications;
         }
         
-        public async Task<IEnumerable<Models.Provider>> FindProviders(
-            string postCode,
+        public async Task<ProviderSearchResponse> FindProviders(
+            string postcode,
             int? qualificationId = null,
             int page = 0,
             int pageSize = Constants.DefaultPageSize)
         {
-            _logger.LogDebug($"Searching for postcode {postCode}");
+            _logger.LogDebug($"Searching for postcode {postcode}");
 
-            return await _providerRepository.GetAllProviders();
+            var postcodeLocation = await GetPostcode(postcode);
+
+            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
+            return new ProviderSearchResponse
+            {
+                Postcode = postcodeLocation.Postcode,
+                SearchResults = searchResults
+            };
+        }
+
+        public async Task<bool> HasQualifications()
+        {
+            return await _qualificationRepository.HasAny();
+        }
+
+        public async Task<bool> HasProviders()
+        {
+            return await _providerRepository.HasAny();
+        }
+
+        private async Task<PostcodeLocation> GetPostcode(string postcode)
+        {
+            var key = CacheKeys.PostcodeKey(postcode);
+
+            if (!_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
+            {
+                postcodeLocation = await _postcodeLookupService.GetPostcode(postcode);
+                if (postcodeLocation is null)
+                {
+                    throw new PostcodeNotFoundException(postcode);
+                }
+
+                _cache.Set(key, postcodeLocation, 
+                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+            }
+
+            return postcodeLocation;
         }
     }
 }

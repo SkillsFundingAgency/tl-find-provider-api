@@ -1,16 +1,19 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Interfaces
 {
     public interface IProviderRepository
     {
-        Task<IQueryable<Models.Provider>> GetAllProviders();
+        Task<bool> HasAny();
 
-        //Task<IQueryable<Models.Provider>> FindProviders(
-        //    string postCode,
-        //    int? qualificationId,
-        //    int page,
-        //    int pageSize);
+        Task Save(IList<Models.Provider> providers);
+
+        Task<IEnumerable<ProviderSearchResult>> Search(
+            PostcodeLocation fromPostcodeLocation,
+            int? qualificationId,
+            int page,
+            int pageSize);
     }
 }

@@ -46,7 +46,7 @@ dlldata.c
 project.lock.json
 project.fragment.lock.json
 artifacts/
-**/Properties/launchSettings.json
+# **/Properties/launchSettings.json
 
 *_i.c
 *_p.c
@@ -288,6 +288,10 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 .DS_Store
+
+#Include Database publish xml file so that we can use it during the build and deploy
+!**.Database.publish.xml
+!**Database.Local.publish.xml
 
 # Local development settings files - may contain secrets
 appsettings.Development.json
