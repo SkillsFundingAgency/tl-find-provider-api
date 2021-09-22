@@ -44,7 +44,9 @@ jobs:
             -sqlDatabaseTier "$(SQLDatabaseTier)"
             -configurationStorageConnectionString "$(ConfigurationStorageConnectionString)"
             -uiCustomHostName "$(UICustomHostName)"
-            -certificateName "$(CertificateName)"'
+            -certificateName "$(CertificateName)"
+            -publisherEmail "$(PublisherEmail)"
+            -publisherName "$(PublisherName)"'
             # -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
             # -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
             # -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
