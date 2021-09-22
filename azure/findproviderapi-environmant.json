@@ -410,21 +410,24 @@
             }
         },
         {
-            "apiVersion": "2019-12-01",
+            "apiVersion": "2017-05-10",
             "name": "[concat('apim','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "[parameters('sku')]",
-                "capacity": "[parameters('skuCount')]"
-                },
+            // "location": "[parameters('location')]",
+            // "sku": {
+            //     "name": "[parameters('sku')]",
+            //     "capacity": "[parameters('skuCount')]"
+            //     },
             "properties": {
                 "mode": "Incremental", 
                 "templateLink": {
-                    "uri": "[concat(./,'apim.json')]",
+                    "uri": "[concat('./','apim.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
+                    "apiManagementServiceName": {
+                        "value": "[variables('apiManagementServiceName')]"
+                    },
                     "publisherEmail": {
                         "value": "[parameters('publisherEmail')]"
                     },
