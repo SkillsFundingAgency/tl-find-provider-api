@@ -425,9 +425,9 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "apiManagementServiceName": {
-                        "value": "[variables('apiManagementServiceName')]"
-                    },
+                    // "apiManagementServiceName": {
+                    //     "value": "[variables('apiManagementServiceName')]"
+                    // },
                     "publisherEmail": {
                         "value": "[parameters('publisherEmail')]"
                     },
