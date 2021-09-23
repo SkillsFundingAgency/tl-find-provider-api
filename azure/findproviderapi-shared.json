@@ -48,7 +48,16 @@
         },
         "keyVaultFullAccessObjectIds": {
             "type": "array"
-        }
+        },
+        "publisherEmail": {
+            "type": "string"
+        },
+        "publisherName": {
+            "type": "string"
+        },
+        "apiManagementServiceName": {
+            "type": "string"
+        } 
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
@@ -264,6 +273,34 @@
                     }
                 }
             }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "[concat('apim','-', parameters('environmentNameAbbreviation'))]",
+            "type": "Microsoft.Resources/deployments",
+            // "location": "[parameters('location')]",
+            // "sku": {
+            //     "name": "[parameters('sku')]",
+            //     "capacity": "[parameters('skuCount')]"
+            //     },
+            "properties": {
+                "mode": "Incremental", 
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'apim.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "apiManagementServiceName": {
+                        "value": "[parameters('apiManagementServiceName')]"
+                    },
+                    "publisherEmail": {
+                        "value": "[parameters('publisherEmail')]"
+                    },
+                    "publisherName": {
+                        "value": "[parameters('publisherName')]"
+                    }
+                }
+            }  
         }
     ],
     "outputs": {

@@ -34,13 +34,8 @@
         },
         "certificateName": {
             "type": "string"
-        },
-        "publisherEmail": {
-            "type": "string"
-        },
-        "publisherName": {
-            "type": "string"
-        }    
+        }
+   
         // "ApiCustomHostname": {
         //     "type": "string",
         //     "defaultValue": ""
@@ -69,8 +64,8 @@
         // "ApiAppName": "[concat(parameters('resourceNamePrefix'), '-api')]",
         // "workerFunctionAppName": "[concat(parameters('resourceNamePrefix'), '-func-worker')]",
         "sqlDatabaseName": "[concat(parameters('resourceNamePrefix'), '-sqldb')]",
-        "storageAccountName": "[replace(concat(parameters('resourceNamePrefix'), 'str'), '-', '')]",
-        "apiManagementServiceName": "[concat(parameters('resourceNamePrefix'), '-apim')]"
+        "storageAccountName": "[replace(concat(parameters('resourceNamePrefix'), 'str'), '-', '')]"
+        // "apiManagementServiceName": "[concat(parameters('resourceNamePrefix'), '-apim')]"
         // "errorLink": "[concat('https://', variables('uiAppName'), '.scm.azurewebsites.net/detectors?type=tools&name=eventviewer')]"
     },
     "resources": [
@@ -408,36 +403,7 @@
                     }
                 }
             }
-        },
-        {
-            "apiVersion": "2017-05-10",
-            "name": "[concat('apim','-', parameters('environmentNameAbbreviation'))]",
-            "type": "Microsoft.Resources/deployments",
-            // "location": "[parameters('location')]",
-            // "sku": {
-            //     "name": "[parameters('sku')]",
-            //     "capacity": "[parameters('skuCount')]"
-            //     },
-            "properties": {
-                "mode": "Incremental", 
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'apim.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    // "apiManagementServiceName": {
-                    //     "value": "[variables('apiManagementServiceName')]"
-                    // },
-                    "publisherEmail": {
-                        "value": "[parameters('publisherEmail')]"
-                    },
-                    "publisherName": {
-                        "value": "[parameters('publisherName')]"
-                    }
-                }
-            }  
         }
-
     ],
     "outputs": {
         "sqlDatabaseName": {
