@@ -37,8 +37,7 @@ jobs:
                   -keyVaultFullAccessObjectIds "$(keyVaultFullAccessObjectIds)"
                   -azureWebsitesRPObjectId "$(AzureWebsitesRPObjectId)"
                   -publisherEmail "$(PublisherEmail)"
-                  -publisherName "$(PublisherName)"
-                  -apiManagementServiceName "$(APIManagementServiceName)"'
+                  -publisherName "$(PublisherName)"'
                 tags: $(Tags)                
                 processOutputs: true
             - pwsh: Write-Host "##vso[task.setvariable variable=SharedResourceGroup;isOutput=true]$(SharedResourceGroup)"
