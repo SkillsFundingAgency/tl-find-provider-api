@@ -54,10 +54,10 @@
         },
         "publisherName": {
             "type": "string"
-        }
-        // "apiManagementServiceName": {
-        //     "type": "string"
-        // } 
+        },
+        "apiManagementServiceName": {
+            "type": "string"
+        } 
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
@@ -67,7 +67,7 @@
         "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-shared-asp')]",
         "configStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'configstr'), '-', '')]",
         "keyVaultName": "[replace(concat(variables('resourceNamePrefix'), 'sharedkv'), '-', '')]",
-        "apiManagementServiceName": "[concat(variables('resourceNamePrefix'), '-apim-svc')]",
+        // "apiManagementServiceName": "[concat(variables('resourceNamePrefix'), '-apim-svc')]",
         "keyVaultAccessPolicies": [
             {
                 "objectId": "[parameters('azureWebsitesRPObjectId')]",
@@ -292,7 +292,7 @@
                 },
                 "parameters": {
                     "apiManagementServiceName": {
-                        "value": "[variables('apiManagementServiceName')]"
+                        "value": "[parameters('apiManagementServiceName')]"
                     },
                     "publisherEmail": {
                         "value": "[parameters('publisherEmail')]"
