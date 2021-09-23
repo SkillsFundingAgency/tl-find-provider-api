@@ -421,7 +421,7 @@
             "properties": {
                 "mode": "Incremental", 
                 "templateLink": {
-                    "uri": "[concat('./','apim.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'apim.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
