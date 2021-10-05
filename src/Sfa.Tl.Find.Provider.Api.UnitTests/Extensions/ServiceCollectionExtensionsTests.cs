@@ -37,7 +37,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             services.AddCorsPolicy(TestPolicyName, allowedOrigins);
 
-            services.Should().NotBeEmpty();
             services.Should().Contain(t => t.ServiceType.Name == "ICorsService");
         }
 
@@ -52,7 +51,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
                 "v1",
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
-            services.Should().NotBeEmpty();
             services.Should().Contain(t => t.ServiceType.Name == "ISwaggerProvider");
         }
 
@@ -78,6 +76,27 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
             services.Should().Contain(t => 
                 t.ImplementationType != null && 
                 t.ImplementationType.Name == "QuartzHostedService");
+        }
+
+        [Fact]
+        public void AddRateLimitPolicy_Should_AddService()
+        {
+            var services = new ServiceCollection();
+
+            services.AddRateLimitPolicy(
+                100,
+                2000);
+
+            services.Should().Contain(t => t.ServiceType.Name == "IClientPolicyStore");
+            services.Should().Contain(t => t.ServiceType.Name == "IIpPolicyStore");
+            services.Should().Contain(t => t.ServiceType.Name == "IRateLimitCounterStore");
+            services.Should().Contain(t => t.ServiceType.Name == "IProcessingStrategy");
+            services.Should().Contain(t => t.ServiceType.Name == "IRateLimitConfiguration");
+
+            //services.Should().Contain(t =>
+            //    t.ServiceType.IsGenericType &&
+            //    t.ServiceType.GenericTypeArguments.Length > 0 &&
+            //    t.ServiceType.GenericTypeArguments[0].Name == "ClientRateLimitOptions");
         }
     }
 }

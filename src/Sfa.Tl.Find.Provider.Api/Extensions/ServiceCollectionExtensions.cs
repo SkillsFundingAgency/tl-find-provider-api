@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using AspNetCoreRateLimit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Quartz;
@@ -86,6 +87,56 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
             });
 
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+            return services;
+        }
+
+        public static IServiceCollection AddRateLimitPolicy(
+            this IServiceCollection services,
+            double requestsPerMinuteLimit = 2,
+            double requestsPerHourLimit = 10000)
+        {
+            //services.Configure(Configuration.GetSection("IpRateLimiting"));
+
+            // inject counter and rules stores
+            services.AddInMemoryRateLimiting();
+
+            // configuration (resolvers, counter key builders)
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+            /*
+            services.AddSingleton<IClientPolicyStore, MemoryCacheClientPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+
+            services.Configure<ClientRateLimitOptions>(options =>
+            {
+                options.GeneralRules = new List<RateLimitRule>
+                {
+                    new()
+                    {
+                        Endpoint = "*",
+                        Period = "1m",
+                        Limit = requestsPerMinuteLimit
+                    },
+                    new()
+                    {
+                        Endpoint = "*",
+                        Period = "1h",
+                        Limit = requestsPerHourLimit
+                    }
+                };
+            });
+
+            //https://www.cloudsavvyit.com/12306/how-to-rate-limit-requests-in-blazor-asp-net-core/
+            //services.Configure<ClientRateLimitPolicies>(options =>
+            //{
+            //    options.
+            //});
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            */
 
             return services;
         }
