@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -20,13 +21,15 @@ namespace Sfa.Tl.Find.Provider.Api
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
         private readonly SiteConfiguration _siteConfiguration;
 
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
         {
-            _siteConfiguration = configuration.LoadConfigurationOptions();
+            _configuration = configuration;
+            _siteConfiguration = _configuration.LoadConfigurationOptions();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -45,10 +48,7 @@ namespace Sfa.Tl.Find.Provider.Api
                 options.LowercaseQueryStrings = true;
             });
 
-            services.AddMemoryCache(options =>
-            {
-                options.SizeLimit = 1024;
-            });
+            services.AddMemoryCache();
 
             services.AddSwagger("v1",
                 "T Levels Find a Provider Api",
@@ -69,6 +69,8 @@ namespace Sfa.Tl.Find.Provider.Api
                 .AddTransient<IRouteRepository, RouteRepository>();
 
             services.AddHostedQuartzServices(_siteConfiguration.CourseDirectoryImportSchedule);
+
+            services.AddRateLimitPolicy(); //_siteConfiguration.MaxRequestsPerSecond);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,6 +97,9 @@ namespace Sfa.Tl.Find.Provider.Api
 
             app.UseHttpsRedirection();
 
+            //app.UseClientRateLimiting();
+            app.UseIpRateLimiting();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
@@ -106,6 +111,8 @@ namespace Sfa.Tl.Find.Provider.Api
         // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddConfigurationOptions(IServiceCollection services)
         {
+            services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimiting"));
+            
             services.Configure<ApiSettings>(x =>
             {
                 x.AppId = _siteConfiguration.ApiSettings.AppId;
