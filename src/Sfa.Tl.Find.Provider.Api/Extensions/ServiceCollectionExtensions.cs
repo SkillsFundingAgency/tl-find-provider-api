@@ -18,7 +18,8 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         {
             if (!string.IsNullOrWhiteSpace(allowedOrigins))
             {
-                var corsOrigins = allowedOrigins.Split(';', ',');
+                var splitterChars = new[] { ';', ',' };
+                var corsOrigins = allowedOrigins.Split(splitterChars);
                 services.AddCors(options => options.AddPolicy(policyName, builder =>
                     builder
                         .WithMethods(HttpMethod.Get.Method)

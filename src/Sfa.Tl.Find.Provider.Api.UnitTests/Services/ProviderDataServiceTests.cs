@@ -34,15 +34,20 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task GetQualifications_Returns_Expected_List()
         {
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .ToList();
+
             var qualificationRepository = Substitute.For<IQualificationRepository>();
             qualificationRepository.GetAll()
-                .Returns(new QualificationBuilder().BuildList());
+                .Returns(qualifications);
 
             var service = new ProviderDataServiceBuilder()
                 .Build(qualificationRepository: qualificationRepository);
 
-            var results = await service.GetQualifications();
+            var results = (await service.GetQualifications()).ToList();
             results.Should().NotBeNullOrEmpty();
+            results.Count.Should().Be(qualifications.Count);
 
             await qualificationRepository
                 .Received(1)
