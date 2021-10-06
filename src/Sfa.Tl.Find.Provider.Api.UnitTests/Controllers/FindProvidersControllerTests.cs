@@ -42,8 +42,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetQualifications_Returns_Expected_List()
         {
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .ToList();
+
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.GetQualifications().Returns(new QualificationBuilder().BuildList());
+            dataService.GetQualifications().Returns(qualifications);
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
@@ -60,7 +64,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetQualifications_Returns_Expected_Value_For_One_Item()
         {
-            var qualifications = new QualificationBuilder().BuildList().Take(1).ToList();
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .Take(1)
+                .ToList();
 
             var dataService = Substitute.For<IProviderDataService>();
             dataService.GetQualifications().Returns(qualifications);
@@ -244,6 +251,51 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             statusCodeResult!.StatusCode.Should().Be(500);
             statusCodeResult!.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_List()
+        {
+            var routes = new RouteBuilder()
+                .BuildList()
+                .ToList();
+
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.GetRoutes().Returns(routes);
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetRoutes();
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as IEnumerable<Route>;
+            results.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_Value_For_One_Item()
+        {
+            var routes = new RouteBuilder()
+                .BuildList()
+                .Take(1)
+                .ToList();
+
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.GetRoutes().Returns(routes);
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetRoutes();
+
+            var results = ((result as OkObjectResult)?.Value as IEnumerable<Route>)?.ToList();
+            results.Should().NotBeNullOrEmpty();
+            results!.Count.Should().Be(1);
+
+            results.Single().Id.Should().Be(routes.Single().Id);
+            results.Single().Name.Should().Be(routes.Single().Name);
         }
     }
 }

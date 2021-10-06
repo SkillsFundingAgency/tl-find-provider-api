@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
@@ -74,6 +75,59 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             results.Should().NotBeNullOrEmpty();
 
             await qualificationRepository
+                .DidNotReceive()
+                .GetAll();
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_List()
+        {
+            var routes = new RouteBuilder()
+                .BuildList()
+                .ToList();
+
+            var routeRepository = Substitute.For<IRouteRepository>();
+            routeRepository.GetAll()
+                .Returns(routes);
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(routeRepository: routeRepository);
+
+            var results = (await service.GetRoutes()).ToList();
+            results.Should().NotBeNullOrEmpty();
+            results.Count.Should().Be(routes.Count);
+
+            await routeRepository
+                .Received(1)
+                .GetAll();
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_List_From_Cache()
+        {
+            var routeRepository = Substitute.For<IRouteRepository>();
+
+            var cache = Substitute.For<IMemoryCache>();
+            cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Route>>())
+                .Returns(x =>
+                {
+                    if ((string)x[0] == CacheKeys.RoutesKey)
+                    {
+                        x[1] = new RouteBuilder().BuildList();
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(routeRepository: routeRepository,
+                    cache: cache);
+
+            var results = await service.GetRoutes();
+            results.Should().NotBeNullOrEmpty();
+
+            await routeRepository
                 .DidNotReceive()
                 .GetAll();
         }

@@ -65,7 +65,8 @@ namespace Sfa.Tl.Find.Provider.Api
                 .AddScoped<IDateTimeService, DateTimeService>()
                 .AddTransient<IProviderDataService, ProviderDataService>()
                 .AddTransient<IProviderRepository, ProviderRepository>()
-                .AddTransient<IQualificationRepository, QualificationRepository>();
+                .AddTransient<IQualificationRepository, QualificationRepository>()
+                .AddTransient<IRouteRepository, RouteRepository>();
 
             services.AddHostedQuartzServices(_siteConfiguration.CourseDirectoryImportSchedule);
         }

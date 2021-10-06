@@ -87,5 +87,22 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
                 ? Ok(qualifications)
                 : NotFound();
         }
+
+        /// <summary>
+        /// Returns a list of all routes.
+        /// </summary>
+        /// <returns>Json with routes.</returns>
+        [HttpGet]
+        [Route("routes", Name = "GetRoutes")]
+        [ProducesResponseType(typeof(IEnumerable<Route>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRoutes()
+        {
+            var routes = await _providerDataService.GetRoutes();
+            return routes != null
+                ? Ok(routes)
+                : NotFound();
+        }
+
     }
 }
