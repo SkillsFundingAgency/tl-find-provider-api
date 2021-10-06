@@ -29,6 +29,10 @@ Add a new row to the table with:
     {
         "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;",
         "AllowedCorsOrigins": "*",
+        "ApiSettings": {
+            "AppId": "<Application ID>",
+            "ApiKey": "<API Key>"
+        },
         "CourseDirectoryApiSettings": {
             "BaseUri": "<Course Directory API>",
             "ApiKey": "<API Key>"
@@ -39,9 +43,10 @@ Add a new row to the table with:
         }
     }
 ```
+The API Settings are maintained by the T Levels DevOps team, and contain the Application ID and API Key used for HMAC. 
 
 Course directory API values can be obtained from the NCS API portal. Ask the NCS Course Directory Team for details.
-        
+
 CRON schedule needs to use a valid CRON string, such as `0 0 9 ? * MON-FRI`
 
 ### Troubleshooting

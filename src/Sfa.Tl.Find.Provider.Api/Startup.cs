@@ -106,15 +106,21 @@ namespace Sfa.Tl.Find.Provider.Api
         // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddConfigurationOptions(IServiceCollection services)
         {
-            services.Configure<PostcodeApiSettings>(x =>
+            services.Configure<ApiSettings>(x =>
             {
-                x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
+                x.AppId = _siteConfiguration.ApiSettings.AppId;
+                x.ApiKey = _siteConfiguration.ApiSettings.ApiKey;
             });
 
             services.Configure<CourseDirectoryApiSettings>(x =>
             {
                 x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
                 x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+            });
+
+            services.Configure<PostcodeApiSettings>(x =>
+            {
+                x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
             });
 
             return services;
