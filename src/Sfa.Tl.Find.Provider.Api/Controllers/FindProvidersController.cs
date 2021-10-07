@@ -94,6 +94,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// </summary>
         /// <returns>Json with routes.</returns>
         [HttpGet]
+        [NonAction] //Hidden method - remove this attribute to expose routes
         [Route("routes", Name = "GetRoutes")]
         [ProducesResponseType(typeof(IEnumerable<Route>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -104,6 +105,5 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
                 ? Ok(routes)
                 : NotFound();
         }
-
     }
 }
