@@ -20,7 +20,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         {
             var response = await _fixture
                 .CreateClient()
-                .GetAsync("/findproviders/api/providers?postcode=CV1+2WT&qualificationId=40&page=0&pageSize=5");
+                .GetAsync("/api/v1/findproviders/providers?postcode=CV1+2WT&qualificationId=40&page=0&pageSize=5");
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -30,7 +30,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         {
             var response = await _fixture
                 .CreateClient()
-                .GetAsync("/findproviders/api/providers");
+                .GetAsync("/api/v1/findproviders/providers");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
@@ -40,7 +40,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         {
             var response = await _fixture
                 .CreateClient()
-                .GetAsync("/findproviders/api/providers?postcode=CV1+2WT&page=0&pageSize=0");
+                .GetAsync("/api/v1/findproviders/providers?postcode=CV1+2WT&page=0&pageSize=0");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             await response.Content.ValidateProblemDetails(
@@ -52,7 +52,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         {
             var response = await _fixture
                 .CreateClient()
-                .GetAsync("/findproviders/api/providers?postcode=CV1+2WT&page=-1&pageSize=5");
+                .GetAsync("/api/v1/findproviders/providers?postcode=CV1+2WT&page=-1&pageSize=5");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             await response.Content.ValidateProblemDetails(
@@ -64,7 +64,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         {
             var response = await _fixture
                 .CreateClient()
-                .GetAsync("/findproviders/api/providers?qualificationId=40&page=-1&pageSize=0");
+                .GetAsync("/api/v1/findproviders/providers?qualificationId=40&page=-1&pageSize=0");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 

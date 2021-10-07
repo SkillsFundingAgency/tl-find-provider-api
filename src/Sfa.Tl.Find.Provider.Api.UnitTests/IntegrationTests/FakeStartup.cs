@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -39,6 +40,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             {
                 x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
                 x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+            });
+
+            services.AddApiVersioning(config =>
+            {
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.ReportApiVersions = true;
             });
 
             services

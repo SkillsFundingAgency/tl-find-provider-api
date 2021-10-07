@@ -91,5 +91,15 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
             services.Should().Contain(t => t.ServiceType.Name == "IProcessingStrategy");
             services.Should().Contain(t => t.ServiceType.Name == "IRateLimitConfiguration");
         }
+
+        [Fact]
+        public void AddApiVersioningPolicy_Should_AddService()
+        {
+            var services = new ServiceCollection();
+
+            services.AddApiVersioningPolicy();
+
+            services.Should().Contain(t => t.ServiceType.Name == "IApiVersionRoutePolicy");
+        }
     }
 }

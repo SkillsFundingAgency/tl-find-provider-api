@@ -12,7 +12,8 @@ using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 namespace Sfa.Tl.Find.Provider.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]/api")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class FindProvidersController : ControllerBase
     {
         private readonly IProviderDataService _providerDataService;

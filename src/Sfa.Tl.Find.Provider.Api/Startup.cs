@@ -6,6 +6,7 @@ using System.Reflection;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,7 @@ namespace Sfa.Tl.Find.Provider.Api
     {
         private readonly IConfiguration _configuration;
         private readonly SiteConfiguration _siteConfiguration;
-
+        
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
@@ -38,6 +39,8 @@ namespace Sfa.Tl.Find.Provider.Api
             services.AddApplicationInsightsTelemetry();
 
             AddConfigurationOptions(services);
+
+            services.AddApiVersioningPolicy();
 
             services.AddControllers();
 

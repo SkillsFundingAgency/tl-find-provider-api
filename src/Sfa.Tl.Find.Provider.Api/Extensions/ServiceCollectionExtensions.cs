@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Quartz;
@@ -98,6 +99,19 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
             services.AddInMemoryRateLimiting();
 
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddApiVersioningPolicy(
+            this IServiceCollection services)
+        {
+            services.AddApiVersioning(config =>
+            {
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.ReportApiVersions = true;
+            });
 
             return services;
         }
