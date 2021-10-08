@@ -83,11 +83,17 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetQualifications()
         {
+            var cond = __rand.Next();
+            if (cond % 2 == 0) return Unauthorized();
+            if (cond % 3 == 0) throw new InvalidOperationException();    
+
             var qualifications = await _providerDataService.GetQualifications();
             return qualifications != null
                 ? Ok(qualifications)
                 : NotFound();
         }
+
+        private static Random __rand = new Random();
 
         /// <summary>
         /// Returns a list of all routes.
