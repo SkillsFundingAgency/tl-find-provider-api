@@ -53,6 +53,7 @@ jobs:
     
     - task: DotNetCoreCLI@2
       displayName: Test
+      enabled: false
       inputs:
         command: test
         projects: '**/*.UnitTests.csproj'
