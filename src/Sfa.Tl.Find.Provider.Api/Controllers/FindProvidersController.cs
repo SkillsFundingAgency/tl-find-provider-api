@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
@@ -14,6 +15,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [TypeFilter(typeof(HmacAuthorizationFilter))]
     public class FindProvidersController : ControllerBase
     {
         private readonly IProviderDataService _providerDataService;
@@ -83,17 +85,11 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetQualifications()
         {
-            var cond = __rand.Next();
-            if (cond % 2 == 0) return Unauthorized();
-            if (cond % 3 == 0) throw new InvalidOperationException();    
-
             var qualifications = await _providerDataService.GetQualifications();
             return qualifications != null
                 ? Ok(qualifications)
                 : NotFound();
         }
-
-        private static Random __rand = new Random();
 
         /// <summary>
         /// Returns a list of all routes.
