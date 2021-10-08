@@ -74,7 +74,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 ("page", "The page field must be zero or greater."));
 
         }
-        
+
         [Fact]
         public async Task GetQualifications_Returns_OK_Result_For_Valid_Url()
         {

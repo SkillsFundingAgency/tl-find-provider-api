@@ -7,7 +7,7 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
 {
     public static class CacheExtensions
     {
-        public static MemoryCacheEntryOptions CreateMemoryCacheEntryOptions(
+        public static MemoryCacheEntryOptions DefaultMemoryCacheEntryOptions(
             IDateTimeService dateTimeService,
             ILogger logger,
             double absoluteExpirationInMinutes = 60,

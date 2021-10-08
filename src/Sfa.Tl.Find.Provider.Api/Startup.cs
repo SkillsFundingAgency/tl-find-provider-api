@@ -39,9 +39,9 @@ namespace Sfa.Tl.Find.Provider.Api
 
             AddConfigurationOptions(services);
 
-            services.AddApiVersioningPolicy();
+            services.AddMemoryCache();
 
-            services.AddControllers();
+            services.AddApiVersioningPolicy();
 
             services.Configure<RouteOptions>(options =>
             {
@@ -50,7 +50,7 @@ namespace Sfa.Tl.Find.Provider.Api
                 options.LowercaseQueryStrings = true;
             });
 
-            services.AddMemoryCache();
+            services.AddControllers();
 
             services.AddSwagger("v1",
                 "T Levels Find a Provider Api",
@@ -72,7 +72,7 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddHostedQuartzServices(_siteConfiguration.CourseDirectoryImportSchedule);
 
-            services.AddRateLimitPolicy(); //_siteConfiguration.MaxRequestsPerSecond);
+            services.AddRateLimitPolicy();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -113,24 +113,22 @@ namespace Sfa.Tl.Find.Provider.Api
         // ReSharper disable once UnusedMethodReturnValue.Local
         private IServiceCollection AddConfigurationOptions(IServiceCollection services)
         {
-            services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimiting"));
-            
-            services.Configure<ApiSettings>(x =>
-            {
-                x.AppId = _siteConfiguration.ApiSettings.AppId;
-                x.ApiKey = _siteConfiguration.ApiSettings.ApiKey;
-            });
-
-            services.Configure<CourseDirectoryApiSettings>(x =>
-            {
-                x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
-                x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
-            });
-
-            services.Configure<PostcodeApiSettings>(x =>
-            {
-                x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
-            });
+            services
+                .Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimiting"))
+                .Configure<ApiSettings>(x =>
+                {
+                    x.AppId = _siteConfiguration.ApiSettings.AppId;
+                    x.ApiKey = _siteConfiguration.ApiSettings.ApiKey;
+                })
+                .Configure<CourseDirectoryApiSettings>(x =>
+                {
+                    x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
+                    x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+                })
+                .Configure<PostcodeApiSettings>(x =>
+                {
+                    x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
+                });
 
             return services;
         }

@@ -48,7 +48,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             {
                 qualifications = (await _qualificationRepository.GetAll()).ToList();
                 _cache.Set(key, qualifications,
-                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
             }
 
             return qualifications;
@@ -63,7 +63,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             {
                 routes = (await _routeRepository.GetAll()).ToList();
                 _cache.Set(key, routes,
-                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
             }
 
             return routes;
@@ -110,7 +110,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                 }
 
                 _cache.Set(key, postcodeLocation, 
-                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
             }
 
             return postcodeLocation;

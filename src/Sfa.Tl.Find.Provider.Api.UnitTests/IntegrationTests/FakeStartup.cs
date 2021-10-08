@@ -31,16 +31,21 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<PostcodeApiSettings>(x =>
-            {
-                x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
-            });
-
-            services.Configure<CourseDirectoryApiSettings>(x =>
-            {
-                x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
-                x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
-            });
+            services
+                .Configure<ApiSettings>(x =>
+                {
+                    x.AppId = _siteConfiguration.ApiSettings.AppId;
+                    x.ApiKey = _siteConfiguration.ApiSettings.ApiKey;
+                })
+                .Configure<CourseDirectoryApiSettings>(x =>
+                {
+                    x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
+                    x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+                })
+                .Configure<PostcodeApiSettings>(x =>
+                {
+                    x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
+                });
 
             services.AddApiVersioning(config =>
             {
