@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Sfa.Tl.Find.Provider.Api.Filters;
+using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
@@ -15,7 +15,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [TypeFilter(typeof(HmacAuthorizationFilter))]
+    [HmacAuthorization]
     public class FindProvidersController : ControllerBase
     {
         private readonly IProviderDataService _providerDataService;
