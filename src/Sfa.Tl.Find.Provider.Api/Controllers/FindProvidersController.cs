@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers
 {
@@ -39,34 +38,35 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// <returns>Json with providers.</returns>
         [HttpGet]
         [Route("providers", Name = "GetProviders")]
-        [ProducesResponseType(typeof(IEnumerable<ProviderSearchResult>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(
-            [Required, FromQuery] string postcode,
-            [FromQuery] int? qualificationId = null,
-            [FromQuery, Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] int page = 0,
-            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] int pageSize = Constants.DefaultPageSize)
+            [FromQuery, 
+             Required, 
+             MinLength(5), 
+             MaxLength(8)] 
+            string postcode,
+            [FromQuery] 
+            int? qualificationId = null,
+            [FromQuery, 
+             Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] 
+            int page = 0,
+            [FromQuery, 
+             Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] 
+            int pageSize = Constants.DefaultPageSize)
         {
             _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
                              $"page={page}, pageSize={pageSize}");
 
             try
             {
-                var providers = await _providerDataService.FindProviders(
+                var providersSearchResponse = await _providerDataService.FindProviders(
                     postcode,
                     qualificationId is > 0 ? qualificationId : null,
                     page,
                     pageSize);
 
-                return providers != null
-                    ? Ok(providers)
-                    : NotFound();
-            }
-            catch (PostcodeNotFoundException pex)
-            {
-                _logger.LogError(pex, $"Postcode {pex.Postcode} was not found. Returning a Not Found result.");
-                return NotFound(pex.Message);
+                return Ok(providersSearchResponse);
             }
             catch (Exception ex)
             {

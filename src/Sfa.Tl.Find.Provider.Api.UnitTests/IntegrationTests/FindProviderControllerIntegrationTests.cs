@@ -33,6 +33,32 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 .GetAsync("/api/v1/findproviders/providers");
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            await response.Content.ValidateProblemDetails(
+                ("postcode", "The postcode field is required."));
+        }
+
+        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        public async Task GetProviders_Returns_Bad_Request_Result_For_Postcode_Too_Short()
+        {
+            var response = await _fixture
+                .CreateClient()
+                .GetAsync("/api/v1/findproviders/providers?postcode=CV1");
+
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            await response.Content.ValidateProblemDetails(
+                ("postcode", "The postcode field must be at least 3 characters."));
+        }
+
+        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        public async Task GetProviders_Returns_Bad_Request_Result_For_Postcode_Too_Long()
+        {
+            var response = await _fixture
+                .CreateClient()
+                .GetAsync("/api/v1/findproviders/providers?postcode=ABC+DEF+GHI");
+
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            await response.Content.ValidateProblemDetails(
+                ("postcode", "The postcode field must be at no more than 8 characters."));
         }
 
         [Fact(Skip = "TODO: Make this test set HMAC header")]

@@ -10,7 +10,6 @@ using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
@@ -220,19 +219,23 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetProviders_Returns_Not_Found_Result_For_Invalid_Postcode()
         {
+            var errorMessage = $"Postcode {InvalidPostcode} was not found";
+
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(InvalidPostcode)
-                .Throws(new PostcodeNotFoundException(InvalidPostcode));
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildErrorResponse(errorMessage));
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
             var result = await controller.GetProviders(InvalidPostcode);
 
-            result.Should().BeOfType(typeof(NotFoundObjectResult));
-            var notFoundObjectResult = result as NotFoundObjectResult;
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
 
-            var message = notFoundObjectResult!.Value as string;
-            message.Should().Be($"Postcode {InvalidPostcode} was not found");
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be(errorMessage);
         }
 
         [Fact]

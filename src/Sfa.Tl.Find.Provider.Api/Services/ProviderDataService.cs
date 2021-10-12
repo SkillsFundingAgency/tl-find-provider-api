@@ -75,16 +75,27 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             int page = 0,
             int pageSize = Constants.DefaultPageSize)
         {
-            _logger.LogDebug($"Searching for postcode {postcode}");
-
-            var postcodeLocation = await GetPostcode(postcode);
-
-            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
-            return new ProviderSearchResponse
+            try
             {
-                Postcode = postcodeLocation.Postcode,
-                SearchResults = searchResults
-            };
+                _logger.LogDebug($"Searching for postcode {postcode}");
+
+                var postcodeLocation = await GetPostcode(postcode);
+
+                var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
+                return new ProviderSearchResponse
+                {
+                    Postcode = postcodeLocation.Postcode,
+                    SearchResults = searchResults
+                };
+            }
+            catch (PostcodeNotFoundException pex)
+            {
+                _logger.LogError(pex, $"Postcode {pex.Postcode} was not found. Returning an error result.");
+                return new ProviderSearchResponse
+                {
+                    Error = "The postcode was not found"
+                };
+            }
         }
 
         public async Task<bool> HasQualifications()
@@ -109,8 +120,12 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                     throw new PostcodeNotFoundException(postcode);
                 }
 
-                _cache.Set(key, postcodeLocation, 
-                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+                _cache.Set(key, postcodeLocation,
+                    CacheExtensions.DefaultMemoryCacheEntryOptions(
+                        _dateTimeService, 
+                        _logger,
+                        absoluteExpirationInMinutes: 90,
+                        slidingExpirationInMinutes: 10));
             }
 
             return postcodeLocation;

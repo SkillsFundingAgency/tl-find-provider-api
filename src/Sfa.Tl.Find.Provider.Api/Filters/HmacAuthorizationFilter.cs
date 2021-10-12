@@ -35,7 +35,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            if (AllowedApps.Count == 0)
+            if (AllowedApps.IsEmpty)
             {
                 AllowedApps.TryAdd(apiSettings.Value.AppId, apiSettings.Value.ApiKey);
             }
@@ -47,19 +47,12 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             {
                 if (context.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
                     && AuthenticationHeaderValue.TryParse(authHeader, out var auth)
-                    //&& authHeader[0].StartsWith(AuthenticationScheme))
                     && auth.Scheme == AuthenticationScheme)
                 {
-                    _logger.LogInformation($"Checking auth header {auth.Scheme} {auth.Parameter}");
                     var credentials = GetAuthorizationHeaderValues(auth.Parameter);
 
                     if (credentials != null)
                     {
-                        _logger.LogInformation($"Found auth header credentials. " +
-                                               $"{credentials.Value.appId}, " +
-                                               $"{credentials.Value.incomingBase64Signature}, " +
-                                               $"{credentials.Value.nonce}, " +
-                                               $"{credentials.Value.requestTimestamp}");
                         var isValid = await IsValidRequest(context.HttpContext.Request,
                             credentials.Value.appId,
                             credentials.Value.incomingBase64Signature,
@@ -73,22 +66,14 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
                         context.Result = new UnauthorizedObjectResult("Incorrect 'Authorization' header.");
                     }
-                    else
-                    {
-                        _logger.LogInformation($"Credentials were null");
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation($"Failed to get header? - {authHeader}");
                 }
 
                 context.Result = new UnauthorizedObjectResult("Missing or malformed 'Authorization' header.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in {nameof(HmacAuthorizationFilter)}", ex);
-                throw;
+                _logger.LogError($"Error in {nameof(HmacAuthorizationFilter)}.", ex);
+                context.Result = new StatusCodeResult(500);
             }
         }
 
@@ -102,20 +87,14 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
             if (!AllowedApps.ContainsKey(appId))
             {
-                _logger.LogInformation($"Failed validation - app id not allowed");
+                _logger.LogWarning("Failed authentication - application id is not allowed.");
                 return false;
             }
 
-            _logger.LogInformation($"Validation - method '{requestHttpMethod}'");
-            _logger.LogInformation($"Validation - uri '{requestUri}'");
-
             var sharedKey = AllowedApps[appId];
-
-            _logger.LogInformation($"Validation - shared key '{sharedKey}'");
 
             if (IsReplayRequest(nonce, requestTimeStamp))
             {
-                _logger.LogInformation($"Failed validation - replay request");
                 return false;
             }
 
@@ -126,16 +105,12 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             }
 
             var data = $"{appId}{requestHttpMethod}{requestUri}{requestTimeStamp}{nonce}{requestContentBase64String}";
-            _logger.LogInformation($"Validation - data '{data}'");
 
             var secretKeyBytes = Encoding.ASCII.GetBytes(sharedKey);
             var signature = Encoding.ASCII.GetBytes(data);
             using var hmac = new HMACSHA256(secretKeyBytes);
             var signatureBytes = hmac.ComputeHash(signature);
             var base64Signature = Convert.ToBase64String(signatureBytes);
-
-            _logger.LogInformation($"Signature in - '{incomingBase64Signature}'");
-            _logger.LogInformation($"Signature out - '{base64Signature}'");
 
             return incomingBase64Signature.Equals(base64Signature, StringComparison.Ordinal);
         }
@@ -144,7 +119,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
         {
             if (_cache.TryGetValue(nonce, out _))
             {
-                _logger.LogInformation($"Replay request - found in cache");
+                _logger.LogWarning("Replay request detected - nonce found in cache.");
                 return true;
             }
 
@@ -158,11 +133,12 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
                 ? serverTotalSeconds - requestTotalSeconds
                 : requestTotalSeconds - serverTotalSeconds;
 
-            _logger.LogInformation($"Replay check - server time {serverTotalSeconds} request time {requestTotalSeconds} difference {difference}");
-
             if (difference > RequestMaxAgeInSeconds)
             {
-                _logger.LogInformation($"Replay check - timeout");
+                _logger.LogWarning("Replay request detected - timeout. " +
+                                   $"Server time {serverTotalSeconds}. " +
+                                   $"Request time {requestTotalSeconds}. " +
+                                   $"Difference {difference}");
                 return true;
             }
 

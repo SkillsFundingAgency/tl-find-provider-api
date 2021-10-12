@@ -27,10 +27,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions
 
             var errors = JsonDocument.Parse(problemDetails!.Extensions["errors"]!.ToString() ?? string.Empty);
 
-            foreach (var expectedError in expectedErrors)
+            foreach (var (fieldName, errorMessage) in expectedErrors)
             {
-                var pageError = errors.RootElement.GetProperty(expectedError.FieldName);
-                pageError.EnumerateArray().First().GetString().Should().Be(expectedError.ErrorMessage);
+                var pageError = errors.RootElement.GetProperty(fieldName);
+                pageError.EnumerateArray().First().GetString().Should().Be(errorMessage);
             }
         }
     }
