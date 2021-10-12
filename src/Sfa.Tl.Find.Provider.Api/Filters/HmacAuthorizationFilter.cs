@@ -153,10 +153,16 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
             var serverTotalSeconds = Convert.ToUInt64(currentTs.TotalSeconds);
             var requestTotalSeconds = Convert.ToUInt64(requestTimeStamp);
+            
+            var difference = serverTotalSeconds > requestTotalSeconds
+                ? serverTotalSeconds - requestTotalSeconds
+                : requestTotalSeconds - serverTotalSeconds;
 
-            if (serverTotalSeconds - requestTotalSeconds > RequestMaxAgeInSeconds)
+            _logger.LogInformation($"Replay check - server time {serverTotalSeconds} request time {requestTotalSeconds} difference {difference}");
+
+            if (difference > RequestMaxAgeInSeconds)
             {
-                _logger.LogInformation($"Replay check - timeout {serverTotalSeconds} - {requestTotalSeconds} = {(serverTotalSeconds - requestTotalSeconds)}");
+                _logger.LogInformation($"Replay check - timeout");
                 return true;
             }
 
