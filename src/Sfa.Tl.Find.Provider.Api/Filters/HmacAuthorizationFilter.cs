@@ -50,9 +50,16 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
                     //&& authHeader[0].StartsWith(AuthenticationScheme))
                     && auth.Scheme == AuthenticationScheme)
                 {
+                    _logger.LogInformation($"Checking auth header {auth.Scheme} {auth.Parameter}");
                     var credentials = GetAuthorizationHeaderValues(auth.Parameter);
+
                     if (credentials != null)
                     {
+                        _logger.LogInformation($"Found auth header credentials. " +
+                                               $"{credentials.Value.appId}, " +
+                                               $"{credentials.Value.incomingBase64Signature}, " +
+                                               $"{credentials.Value.nonce}, " +
+                                               $"{credentials.Value.requestTimestamp}");
                         var isValid = await IsValidRequest(context.HttpContext.Request,
                             credentials.Value.appId,
                             credentials.Value.incomingBase64Signature,
@@ -66,6 +73,14 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
                         context.Result = new UnauthorizedObjectResult("Incorrect 'Authorization' header.");
                     }
+                    else
+                    {
+                        _logger.LogInformation($"Credentials were null");
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation($"Failed to get header? - {authHeader}");
                 }
 
                 context.Result = new UnauthorizedObjectResult("Missing or malformed 'Authorization' header.");
@@ -87,13 +102,20 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
             if (!AllowedApps.ContainsKey(appId))
             {
+                _logger.LogInformation($"Failed validation - app id not allowed");
                 return false;
             }
 
+            _logger.LogInformation($"Validation - method '{requestHttpMethod}'");
+            _logger.LogInformation($"Validation - uri '{requestUri}'");
+
             var sharedKey = AllowedApps[appId];
+
+            _logger.LogInformation($"Validation - shared key '{sharedKey}'");
 
             if (IsReplayRequest(nonce, requestTimeStamp))
             {
+                _logger.LogInformation($"Failed validation - replay request");
                 return false;
             }
 
@@ -104,6 +126,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             }
 
             var data = $"{appId}{requestHttpMethod}{requestUri}{requestTimeStamp}{nonce}{requestContentBase64String}";
+            _logger.LogInformation($"Validation - data '{data}'");
 
             var secretKeyBytes = Encoding.ASCII.GetBytes(sharedKey);
             var signature = Encoding.ASCII.GetBytes(data);
@@ -111,13 +134,17 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             var signatureBytes = hmac.ComputeHash(signature);
             var base64Signature = Convert.ToBase64String(signatureBytes);
 
-            return (incomingBase64Signature.Equals(base64Signature, StringComparison.Ordinal));
+            _logger.LogInformation($"Signature in - '{incomingBase64Signature}'");
+            _logger.LogInformation($"Signature out - '{base64Signature}'");
+
+            return incomingBase64Signature.Equals(base64Signature, StringComparison.Ordinal);
         }
 
         private bool IsReplayRequest(string nonce, string requestTimeStamp)
         {
             if (_cache.TryGetValue(nonce, out _))
             {
+                _logger.LogInformation($"Replay request - found in cache");
                 return true;
             }
 
@@ -129,6 +156,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
             if (serverTotalSeconds - requestTotalSeconds > RequestMaxAgeInSeconds)
             {
+                _logger.LogInformation($"Replay check - timeout {serverTotalSeconds} - {requestTotalSeconds} = {(serverTotalSeconds - requestTotalSeconds)}");
                 return true;
             }
 
@@ -149,7 +177,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
         private (string appId,
                  string incomingBase64Signature,
                  string nonce,
-                 string requestTimestamp)? 
+                 string requestTimestamp)?
                  GetAuthorizationHeaderValues(string authorizationHeaderParameter)
         {
             var credentialsArray = authorizationHeaderParameter.Split(':');
@@ -160,6 +188,8 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
                 credentialsArray[2],
                 credentialsArray[3]);
             }
+
+            _logger.LogWarning($"Credentials array had unexpected length {credentialsArray.Length}");
 
             return null;
         }
