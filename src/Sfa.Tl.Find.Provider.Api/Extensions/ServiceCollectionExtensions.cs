@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Quartz;
@@ -18,7 +20,8 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         {
             if (!string.IsNullOrWhiteSpace(allowedOrigins))
             {
-                var corsOrigins = allowedOrigins.Split(';', ',');
+                var splitterChars = new[] { ';', ',' };
+                var corsOrigins = allowedOrigins.Split(splitterChars);
                 services.AddCors(options => options.AddPolicy(policyName, builder =>
                     builder
                         .WithMethods(HttpMethod.Get.Method)
@@ -86,6 +89,29 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
             });
 
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+            return services;
+        }
+
+        public static IServiceCollection AddRateLimitPolicy(
+            this IServiceCollection services)
+        {
+            services.AddInMemoryRateLimiting();
+
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddApiVersioningPolicy(
+            this IServiceCollection services)
+        {
+            services.AddApiVersioning(config =>
+            {
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.ReportApiVersions = true;
+            });
 
             return services;
         }

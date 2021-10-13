@@ -13,12 +13,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
     public class CacheExtensionsTests
     {
         [Fact]
-        public void CreateMemoryCacheEntryOptions_Creates_()
+        public void DefaultMemoryCacheEntryOptions_Returns_Expected_Value()
         {
             var dateTimeService = Substitute.For<IDateTimeService>();
             var logger = Substitute.For<ILogger<object>>();
 
-            var options = CacheExtensions.CreateMemoryCacheEntryOptions(
+            var options = CacheExtensions.DefaultMemoryCacheEntryOptions(
                 dateTimeService,
                 logger);
 

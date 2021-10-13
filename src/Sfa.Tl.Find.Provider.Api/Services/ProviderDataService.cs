@@ -17,6 +17,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         private readonly IPostcodeLookupService _postcodeLookupService;
         private readonly IProviderRepository _providerRepository;
         private readonly IQualificationRepository _qualificationRepository;
+        private readonly IRouteRepository _routeRepository;
         private readonly IMemoryCache _cache;
         private readonly ILogger<ProviderDataService> _logger;
 
@@ -25,6 +26,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             IPostcodeLookupService postcodeLookupService,
             IProviderRepository providerRepository,
             IQualificationRepository qualificationRepository,
+            IRouteRepository routeRepository,
             IMemoryCache cache,
             ILogger<ProviderDataService> logger)
         {
@@ -32,6 +34,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
             _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
             _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
+            _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -45,28 +48,54 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             {
                 qualifications = (await _qualificationRepository.GetAll()).ToList();
                 _cache.Set(key, qualifications,
-                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
             }
 
             return qualifications;
         }
-        
+
+        public async Task<IEnumerable<Route>> GetRoutes()
+        {
+            _logger.LogDebug("Getting routes");
+
+            const string key = CacheKeys.RoutesKey;
+            if (!_cache.TryGetValue(key, out IList<Route> routes))
+            {
+                routes = (await _routeRepository.GetAll()).ToList();
+                _cache.Set(key, routes,
+                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+            }
+
+            return routes;
+        }
+
         public async Task<ProviderSearchResponse> FindProviders(
             string postcode,
             int? qualificationId = null,
             int page = 0,
             int pageSize = Constants.DefaultPageSize)
         {
-            _logger.LogDebug($"Searching for postcode {postcode}");
-
-            var postcodeLocation = await GetPostcode(postcode);
-
-            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
-            return new ProviderSearchResponse
+            try
             {
-                Postcode = postcodeLocation.Postcode,
-                SearchResults = searchResults
-            };
+                _logger.LogDebug($"Searching for postcode {postcode}");
+
+                var postcodeLocation = await GetPostcode(postcode);
+
+                var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
+                return new ProviderSearchResponse
+                {
+                    Postcode = postcodeLocation.Postcode,
+                    SearchResults = searchResults
+                };
+            }
+            catch (PostcodeNotFoundException pex)
+            {
+                _logger.LogError(pex, $"Postcode {pex.Postcode} was not found. Returning an error result.");
+                return new ProviderSearchResponse
+                {
+                    Error = "The postcode was not found"
+                };
+            }
         }
 
         public async Task<bool> HasQualifications()
@@ -91,8 +120,12 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                     throw new PostcodeNotFoundException(postcode);
                 }
 
-                _cache.Set(key, postcodeLocation, 
-                    CacheExtensions.CreateMemoryCacheEntryOptions(_dateTimeService, _logger));
+                _cache.Set(key, postcodeLocation,
+                    CacheExtensions.DefaultMemoryCacheEntryOptions(
+                        _dateTimeService, 
+                        _logger,
+                        absoluteExpirationInMinutes: 90,
+                        slidingExpirationInMinutes: 10));
             }
 
             return postcodeLocation;

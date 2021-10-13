@@ -37,7 +37,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             services.AddCorsPolicy(TestPolicyName, allowedOrigins);
 
-            services.Should().NotBeEmpty();
             services.Should().Contain(t => t.ServiceType.Name == "ICorsService");
         }
 
@@ -52,7 +51,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
                 "v1",
                 $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
-            services.Should().NotBeEmpty();
             services.Should().Contain(t => t.ServiceType.Name == "ISwaggerProvider");
         }
 
@@ -63,8 +61,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             services.AddHostedQuartzServices("0 0 9 ? * MON-FRI");
 
-            services.Should().Contain(t => 
-                t.ImplementationType != null && 
+            services.Should().Contain(t =>
+                t.ImplementationType != null &&
                 t.ImplementationType.Name == "QuartzHostedService");
         }
 
@@ -75,9 +73,33 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             services.AddHostedQuartzServices(null);
 
-            services.Should().Contain(t => 
-                t.ImplementationType != null && 
+            services.Should().Contain(t =>
+                t.ImplementationType != null &&
                 t.ImplementationType.Name == "QuartzHostedService");
+        }
+
+        [Fact]
+        public void AddRateLimitPolicy_Should_AddService()
+        {
+            var services = new ServiceCollection();
+
+            services.AddRateLimitPolicy();
+
+            services.Should().Contain(t => t.ServiceType.Name == "IClientPolicyStore");
+            services.Should().Contain(t => t.ServiceType.Name == "IIpPolicyStore");
+            services.Should().Contain(t => t.ServiceType.Name == "IRateLimitCounterStore");
+            services.Should().Contain(t => t.ServiceType.Name == "IProcessingStrategy");
+            services.Should().Contain(t => t.ServiceType.Name == "IRateLimitConfiguration");
+        }
+
+        [Fact]
+        public void AddApiVersioningPolicy_Should_AddService()
+        {
+            var services = new ServiceCollection();
+
+            services.AddApiVersioningPolicy();
+
+            services.Should().Contain(t => t.ServiceType.Name == "IApiVersionRoutePolicy");
         }
     }
 }

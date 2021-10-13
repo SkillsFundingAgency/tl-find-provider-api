@@ -18,9 +18,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         [Fact]
         public void GetQualifications_Returns_Expected_List()
         {
-            var repository = new DbContextWrapperBuilder().Build();
+            var dbContextWrapper = new DbContextWrapperBuilder().Build();
 
-            var connection = repository.CreateConnection();
+            var connection = dbContextWrapper.CreateConnection();
             connection.Should().NotBeNull();
         }
     }

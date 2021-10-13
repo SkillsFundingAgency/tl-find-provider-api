@@ -7,11 +7,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
     public class ProviderSearchResponseBuilder
     {
         private PostcodeLocation _searchOrigin;
-
+        
+        private const string DefaultPostcode = "CV1 2WT";
+        
         public ProviderSearchResponse BuildWithMultipleSearchResults() =>
             new()
             {
-                Postcode = _searchOrigin != null ? _searchOrigin.Postcode : "CV1 2WT",
+                Postcode = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
                 SearchResults = new List<ProviderSearchResult>
                 {
                     new()
@@ -26,9 +28,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                         County = "Location 1 County",
                         Email = "email.address@provider1.ac.uk",
                         Telephone = "011 111 1111",
-                        Website= "https://www.provider1.ac.uk",
+                        Website = "https://www.provider1.ac.uk",
                         Distance = 10.0,
-                        JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation{ Postcode = "AA1 1AA" }),
+                        JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation { Postcode = "AA1 1AA" }),
                         DeliveryYears = new List<DeliveryYear>
                         {
                             new()
@@ -63,9 +65,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                         County = "Location 2 County",
                         Email = "email.address@provider2.ac.uk",
                         Telephone = "022 222 2222",
-                        Website= "https://www.provider2.ac.uk",
+                        Website = "https://www.provider2.ac.uk",
                         Distance = 12.0,
-                        JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation{ Postcode = "BB2 2BB" }),
+                        JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation { Postcode = "BB2 2BB" }),
                         DeliveryYears = new List<DeliveryYear>
                         {
                             new()
@@ -102,7 +104,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
         public ProviderSearchResponse BuildWithSingleSearchResult() =>
             new()
             {
-                Postcode = _searchOrigin != null ? _searchOrigin.Postcode : "CV1 2WT",
+                Postcode = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
                 SearchResults = new List<ProviderSearchResult>
                 {
                     new()
@@ -119,7 +121,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                         Telephone = "011 111 1111",
                         Website = "https://www.provider1.ac.uk",
                         Distance = 10.0,
-                        JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation{ Postcode = "AA1 1AA" }),
+                        JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation { Postcode = "AA1 1AA" }),
                         DeliveryYears = new List<DeliveryYear>
                         {
                             new()
@@ -138,6 +140,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                         }
                     }
                 }
+            };
+
+        public ProviderSearchResponse BuildErrorResponse(string errorMessage) =>
+            new()
+            {
+                Error = errorMessage
             };
 
         public ProviderSearchResponseBuilder WithSearchOrigin(PostcodeLocation origin)

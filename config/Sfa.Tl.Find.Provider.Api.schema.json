@@ -3,6 +3,26 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
+    "ApiSettings": {
+      "properties": {
+        "AppId": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ApiSettings_AppId"
+        },
+        "ApiKey": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ApiSettings_ApiKey"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "AppId",
+        "ApiKey"
+      ],
+      "type": "object"
+    },
     "CourseDirectoryApiSettings": {
       "properties": {
         "BaseUri": {
@@ -55,6 +75,7 @@
   },
   "additionalProperties": false,
   "required": [
+    "ApiSettings",
     "CourseDirectoryApiSettings",
     "SqlConnectionString",
     "PostcodeApiSettings"
