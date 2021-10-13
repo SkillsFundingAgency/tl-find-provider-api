@@ -72,7 +72,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in {nameof(HmacAuthorizationFilter)}.", ex);
+                _logger.LogError(ex, $"Error in {nameof(HmacAuthorizationFilter)}.");
                 context.Result = new StatusCodeResult(500);
             }
         }
