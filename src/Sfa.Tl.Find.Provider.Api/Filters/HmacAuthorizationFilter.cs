@@ -68,7 +68,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
                     }
                 }
 
-                context.Result = new UnauthorizedObjectResult("Missing or malformed 'Authorization' header.");
+                context.Result ??= new UnauthorizedObjectResult("Missing or malformed 'Authorization' header.");
             }
             catch (Exception ex)
             {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Api.Attributes;
@@ -41,18 +42,15 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(
-            [FromQuery, 
-             Required, 
-             MinLength(5), 
-             MaxLength(8)] 
+            [FromQuery]
             string postcode,
-            [FromQuery] 
+            [FromQuery]
             int? qualificationId = null,
-            [FromQuery, 
-             Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] 
+            [FromQuery,
+             Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")]
             int page = 0,
-            [FromQuery, 
-             Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] 
+            [FromQuery,
+             Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")]
             int pageSize = Constants.DefaultPageSize)
         {
             _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
@@ -60,6 +58,14 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
 
             try
             {
+                if (!TryValidatePostcode(postcode, out var validationMessage))
+                {
+                    return Ok(new ProviderSearchResponse
+                    {
+                        Error = validationMessage
+                    });
+                }
+
                 var providersSearchResponse = await _providerDataService.FindProviders(
                     postcode,
                     qualificationId is > 0 ? qualificationId : null,
@@ -106,6 +112,34 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             return routes != null
                 ? Ok(routes)
                 : NotFound();
+        }
+
+        private bool TryValidatePostcode(string postcode, out string errorMessage)
+        {
+            errorMessage = null;
+
+            if (string.IsNullOrWhiteSpace(postcode))
+            {
+                errorMessage = "The postcode field is required.";
+            }
+            else
+            {
+                switch (postcode.Length)
+                {
+                    case < 5:
+                        errorMessage = "The postcode field must be at least 5 characters.";
+                        break;
+                    case > 8:
+                        errorMessage = "The postcode field must be no more than 8 characters.";
+                        break;
+                }
+
+                var regex = new Regex(@"^[0-9a-zA-Z\s]+$");
+                if (!regex.IsMatch(postcode))
+                    errorMessage = "The postcode field must contain only letters, numbers, and an optional space.";
+            }
+
+            return errorMessage is null;
         }
     }
 }

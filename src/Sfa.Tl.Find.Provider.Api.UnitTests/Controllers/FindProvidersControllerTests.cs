@@ -20,6 +20,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
     {
         private const string TestPostcode = "AB1 2XY";
         private const string InvalidPostcode = "CV99 XXX";
+        private const string PostcodeWithIllegalCharacters = "CV99 XX$";
+        private const string PostcodeWithTooManyCharacters = "CV99 XG2 Z15";
+        private const string PostcodeWithTooFewCharacters = "CV19";
         private const int TestQualificationId = 51;
         private const int TestPage = 3;
         private const int TestPageSize = Constants.DefaultPageSize + 10;
@@ -236,6 +239,91 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             var results = okResult.Value as ProviderSearchResponse;
             results!.Error.Should().Be(errorMessage);
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Null_Postcode()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(null);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field is required.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Empty_Postcode()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders("");
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field is required.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Illegal_Postcode_Characters()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithIllegalCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field must contain only letters, numbers, and an optional space.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Postcode_Maximum_Length()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithTooManyCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field must be no more than 8 characters.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Postcode_Minimum_Length()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithTooFewCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field must be at least 5 characters.");
         }
 
         [Fact]

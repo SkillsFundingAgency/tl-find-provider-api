@@ -18,7 +18,8 @@ namespace Sfa.Tl.Find.Provider.Api.Models
         public IEnumerable<ProviderSearchResult> SearchResults { get; init; }
 
         private string DebuggerDisplay()
-            => $"{Postcode} " +
-               $"{(SearchResults != null ? SearchResults.Count() : "null")} SearchResults";
+            => $"{Postcode ?? "No postcode"}, " +
+               $"{(SearchResults != null ? SearchResults.Count() : "null")} SearchResults " +
+               $"{Error ?? ""}";
     }
 }
