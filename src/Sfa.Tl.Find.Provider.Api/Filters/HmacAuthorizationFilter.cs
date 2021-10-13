@@ -61,6 +61,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
                         if (isValid)
                         {
+                            LogHeaders(context.HttpContext.Request.Headers);
                             return;
                         }
 
@@ -72,8 +73,27 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in {nameof(HmacAuthorizationFilter)}.", ex);
+                _logger.LogError(ex, $"Error in {nameof(HmacAuthorizationFilter)}.");
                 context.Result = new StatusCodeResult(500);
+            }
+        }
+
+        //TODO: Remove this method
+        private void LogHeaders(IHeaderDictionary requestHeaders)
+        {
+            try
+            {
+                var headerInfo = new StringBuilder("Headers: \n");
+                foreach (var header in requestHeaders)
+                {
+                    headerInfo.AppendLine($"{header.Key} = {header.Value}");
+                }
+
+                _logger.LogDebug(headerInfo.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to log headers");
             }
         }
 
