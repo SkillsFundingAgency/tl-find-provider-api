@@ -29,6 +29,10 @@ Add a new row to the table with:
     {
         "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;",
         "AllowedCorsOrigins": "*",
+        "ApiSettings": {
+            "AppId": "<Application ID>",
+            "ApiKey": "<API Key>"
+        },
         "CourseDirectoryApiSettings": {
             "BaseUri": "<Course Directory API>",
             "ApiKey": "<API Key>"
@@ -39,9 +43,10 @@ Add a new row to the table with:
         }
     }
 ```
+The API Settings are maintained by the T Levels DevOps team, and contain the Application ID and API Key used for HMAC. 
 
 Course directory API values can be obtained from the NCS API portal. Ask the NCS Course Directory Team for details.
-        
+
 CRON schedule needs to use a valid CRON string, such as `0 0 9 ? * MON-FRI`
 
 ### Troubleshooting
@@ -78,6 +83,15 @@ If the postcode is not found in provider search, the API will return a 404 resul
 
 ## Database
 
+##### Route mapping
+
+Routes are hard-coded and initialised from the database post-deployment scripts. If any routes are addied they will need to be added to the script `Sfa.Tl.Find.Provider.Api.Database\PostDeployment\Seed Routes.sql`.
+
+Route mapping is also done in the script. This will need to be modified after new qualifications have been imported, and the project redeployed.
+This is done in the script `Sfa.Tl.Find.Provider.Api.Database\PostDeployment\Seed RouteQualification.sql`.
+
+##### Data import
+
 Data insert/update/delete is handled in stored procedures, which are passed table-valued parameters 
 to be merged into the tables. 
 
@@ -104,6 +118,7 @@ Deletion of rows in LocationQualification is a hard delete, since this is a mapp
 
 Updating a deleted row will set the row to undeleted; this acts to logically re-add a row that was previously soft-deleted.
 
+##### Search
 The search procedure takes the top n locations (where n = `@pageSize`) and returns them, together with 
 delivery years and qualifications, as a flat list that might have more than more than n rows.
 

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
@@ -33,15 +32,20 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task GetQualifications_Returns_Expected_List()
         {
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .ToList();
+
             var qualificationRepository = Substitute.For<IQualificationRepository>();
             qualificationRepository.GetAll()
-                .Returns(new QualificationBuilder().BuildList());
+                .Returns(qualifications);
 
             var service = new ProviderDataServiceBuilder()
                 .Build(qualificationRepository: qualificationRepository);
 
-            var results = await service.GetQualifications();
+            var results = (await service.GetQualifications()).ToList();
             results.Should().NotBeNullOrEmpty();
+            results.Count.Should().Be(qualifications.Count);
 
             await qualificationRepository
                 .Received(1)
@@ -74,6 +78,59 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
             results.Should().NotBeNullOrEmpty();
 
             await qualificationRepository
+                .DidNotReceive()
+                .GetAll();
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_List()
+        {
+            var routes = new RouteBuilder()
+                .BuildList()
+                .ToList();
+
+            var routeRepository = Substitute.For<IRouteRepository>();
+            routeRepository.GetAll()
+                .Returns(routes);
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(routeRepository: routeRepository);
+
+            var results = (await service.GetRoutes()).ToList();
+            results.Should().NotBeNullOrEmpty();
+            results.Count.Should().Be(routes.Count);
+
+            await routeRepository
+                .Received(1)
+                .GetAll();
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_List_From_Cache()
+        {
+            var routeRepository = Substitute.For<IRouteRepository>();
+
+            var cache = Substitute.For<IMemoryCache>();
+            cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Route>>())
+                .Returns(x =>
+                {
+                    if ((string)x[0] == CacheKeys.RoutesKey)
+                    {
+                        x[1] = new RouteBuilder().BuildList();
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            var service = new ProviderDataServiceBuilder()
+                .Build(routeRepository: routeRepository,
+                    cache: cache);
+
+            var results = await service.GetRoutes();
+            results.Should().NotBeNullOrEmpty();
+
+            await routeRepository
                 .DidNotReceive()
                 .GetAll();
         }
@@ -153,7 +210,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         }
 
         [Fact]
-        public async Task FindProviders_Throws_Exception_For_Bad_Postcode()
+        public async Task FindProviders_Returns_Expected_Error_Details_For_Bad_Postcode()
         {
             var fromPostcodeLocation = new PostcodeLocationBuilder().BuildInvalidPostcodeLocation();
 
@@ -173,11 +230,15 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
                  postcodeLookupService: postcodeLookupService,
                  providerRepository: providerRepository);
 
-            Func<Task> target = async () => await service.FindProviders(fromPostcodeLocation.Postcode);
+            var results = await service.FindProviders(fromPostcodeLocation.Postcode);
+            results.Should().NotBeNull();
+            results.Error.Should().Be("The postcode was not found");
+            results.Postcode.Should().BeNull();
+            results.SearchResults.Should().BeNull();
 
-            await target.Should()
-                .ThrowAsync<PostcodeNotFoundException>()
-                .WithMessage($"*{fromPostcodeLocation.Postcode}*");
+            await postcodeLookupService
+                .Received(1)
+                .GetPostcode(fromPostcodeLocation.Postcode);
         }
 
         [Fact]

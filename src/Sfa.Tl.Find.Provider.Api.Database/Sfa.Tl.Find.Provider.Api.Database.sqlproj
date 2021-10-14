@@ -60,10 +60,12 @@
     <Folder Include="Indexes" />
     <Folder Include="Stored Procedures" />
     <Folder Include="Types" />
+    <Folder Include="PostDeployment" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
+    <None Include="PostDeployment\Seed Routes.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
@@ -80,5 +82,11 @@
     <Build Include="Stored Procedures\UpdateLocations.sql" />
     <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
     <Build Include="Types\LocationQualificationDataTableType.sql" />
+    <Build Include="Tables\Route.sql" />
+    <Build Include="Tables\RouteQualification.sql" />
+    <None Include="PostDeployment\Seed RouteQualification.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
   </ItemGroup>
 </Project>

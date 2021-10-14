@@ -3,16 +3,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]/api")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [HmacAuthorization]
     public class FindProvidersController : ControllerBase
     {
         private readonly IProviderDataService _providerDataService;
@@ -36,34 +39,40 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// <returns>Json with providers.</returns>
         [HttpGet]
         [Route("providers", Name = "GetProviders")]
-        [ProducesResponseType(typeof(IEnumerable<ProviderSearchResult>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProviders(
-            [Required, FromQuery] string postcode,
-            [FromQuery] int? qualificationId = null,
-            [FromQuery, Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")] int page = 0,
-            [FromQuery, Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")] int pageSize = Constants.DefaultPageSize)
+            [FromQuery]
+            string postcode,
+            [FromQuery]
+            int? qualificationId = null,
+            [FromQuery,
+             Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")]
+            int page = 0,
+            [FromQuery,
+             Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")]
+            int pageSize = Constants.DefaultPageSize)
         {
             _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
                              $"page={page}, pageSize={pageSize}");
 
             try
             {
-                var providers = await _providerDataService.FindProviders(
+                if (!TryValidatePostcode(postcode, out var validationMessage))
+                {
+                    return Ok(new ProviderSearchResponse
+                    {
+                        Error = validationMessage
+                    });
+                }
+
+                var providersSearchResponse = await _providerDataService.FindProviders(
                     postcode,
                     qualificationId is > 0 ? qualificationId : null,
                     page,
                     pageSize);
 
-                return providers != null
-                    ? Ok(providers)
-                    : NotFound();
-            }
-            catch (PostcodeNotFoundException pex)
-            {
-                _logger.LogError(pex, $"Postcode {pex.Postcode} was not found. Returning a Not Found result.");
-                return NotFound(pex.Message);
+                return Ok(providersSearchResponse);
             }
             catch (Exception ex)
             {
@@ -86,6 +95,51 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             return qualifications != null
                 ? Ok(qualifications)
                 : NotFound();
+        }
+
+        /// <summary>
+        /// Returns a list of all routes.
+        /// </summary>
+        /// <returns>Json with routes.</returns>
+        [HttpGet]
+        [NonAction] //Hidden method - remove this attribute to expose routes
+        [Route("routes", Name = "GetRoutes")]
+        [ProducesResponseType(typeof(IEnumerable<Route>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRoutes()
+        {
+            var routes = await _providerDataService.GetRoutes();
+            return routes != null
+                ? Ok(routes)
+                : NotFound();
+        }
+
+        private bool TryValidatePostcode(string postcode, out string errorMessage)
+        {
+            errorMessage = null;
+
+            if (string.IsNullOrWhiteSpace(postcode))
+            {
+                errorMessage = "The postcode field is required.";
+            }
+            else
+            {
+                switch (postcode.Length)
+                {
+                    case < 5:
+                        errorMessage = "The postcode field must be at least 5 characters.";
+                        break;
+                    case > 8:
+                        errorMessage = "The postcode field must be no more than 8 characters.";
+                        break;
+                }
+
+                var regex = new Regex(@"^[0-9a-zA-Z\s]+$");
+                if (!regex.IsMatch(postcode))
+                    errorMessage = "The postcode field must contain only letters, numbers, and an optional space.";
+            }
+
+            return errorMessage is null;
         }
     }
 }

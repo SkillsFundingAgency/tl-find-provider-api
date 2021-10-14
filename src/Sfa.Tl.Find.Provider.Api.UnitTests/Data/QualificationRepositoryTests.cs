@@ -25,6 +25,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         [Fact]
         public async Task GetAll_Returns_Expected_List()
         {
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .ToList();
+
             var dbConnection = Substitute.For<IDbConnection>();
             var dbContextWrapper = Substitute.For<IDbContextWrapper>();
             dbContextWrapper
@@ -32,12 +36,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
                 .Returns(dbConnection);
             dbContextWrapper
                 .QueryAsync<Qualification>(dbConnection, Arg.Any<string>())
-                .Returns(new QualificationBuilder().BuildList());
+                .Returns(qualifications);
 
             var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
 
-            var results = await repository.GetAll();
+            var results = (await repository.GetAll()).ToList();
             results.Should().NotBeNullOrEmpty();
+            results.Count.Should().Be(qualifications.Count);
         }
 
         [Fact]

@@ -8,6 +8,8 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
     {
         Task<IEnumerable<Qualification>> GetQualifications();
 
+        Task<IEnumerable<Route>> GetRoutes();
+
         Task<bool> HasQualifications();
         Task<bool> HasProviders();
 

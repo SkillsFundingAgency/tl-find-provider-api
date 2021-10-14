@@ -10,7 +10,6 @@ using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
@@ -21,6 +20,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
     {
         private const string TestPostcode = "AB1 2XY";
         private const string InvalidPostcode = "CV99 XXX";
+        private const string PostcodeWithIllegalCharacters = "CV99 XX$";
+        private const string PostcodeWithTooManyCharacters = "CV99 XG2 Z15";
+        private const string PostcodeWithTooFewCharacters = "CV19";
         private const int TestQualificationId = 51;
         private const int TestPage = 3;
         private const int TestPageSize = Constants.DefaultPageSize + 10;
@@ -42,8 +44,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetQualifications_Returns_Expected_List()
         {
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .ToList();
+
             var dataService = Substitute.For<IProviderDataService>();
-            dataService.GetQualifications().Returns(new QualificationBuilder().BuildList());
+            dataService.GetQualifications().Returns(qualifications);
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
@@ -60,7 +66,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetQualifications_Returns_Expected_Value_For_One_Item()
         {
-            var qualifications = new QualificationBuilder().BuildList().Take(1).ToList();
+            var qualifications = new QualificationBuilder()
+                .BuildList()
+                .Take(1)
+                .ToList();
 
             var dataService = Substitute.For<IProviderDataService>();
             dataService.GetQualifications().Returns(qualifications);
@@ -213,19 +222,108 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetProviders_Returns_Not_Found_Result_For_Invalid_Postcode()
         {
+            var errorMessage = $"Postcode {InvalidPostcode} was not found";
+
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(InvalidPostcode)
-                .Throws(new PostcodeNotFoundException(InvalidPostcode));
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildErrorResponse(errorMessage));
 
             var controller = new FindProvidersControllerBuilder().Build(dataService);
 
             var result = await controller.GetProviders(InvalidPostcode);
 
-            result.Should().BeOfType(typeof(NotFoundObjectResult));
-            var notFoundObjectResult = result as NotFoundObjectResult;
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
 
-            var message = notFoundObjectResult!.Value as string;
-            message.Should().Be($"Postcode {InvalidPostcode} was not found");
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be(errorMessage);
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Null_Postcode()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(null);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field is required.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Empty_Postcode()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders("");
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field is required.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Illegal_Postcode_Characters()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithIllegalCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field must contain only letters, numbers, and an optional space.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Postcode_Maximum_Length()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithTooManyCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field must be no more than 8 characters.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Postcode_Minimum_Length()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithTooFewCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field must be at least 5 characters.");
         }
 
         [Fact]
@@ -244,6 +342,51 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             statusCodeResult!.StatusCode.Should().Be(500);
             statusCodeResult!.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_List()
+        {
+            var routes = new RouteBuilder()
+                .BuildList()
+                .ToList();
+
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.GetRoutes().Returns(routes);
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetRoutes();
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as IEnumerable<Route>;
+            results.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task GetRoutes_Returns_Expected_Value_For_One_Item()
+        {
+            var routes = new RouteBuilder()
+                .BuildList()
+                .Take(1)
+                .ToList();
+
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.GetRoutes().Returns(routes);
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetRoutes();
+
+            var results = ((result as OkObjectResult)?.Value as IEnumerable<Route>)?.ToList();
+            results.Should().NotBeNullOrEmpty();
+            results!.Count.Should().Be(1);
+
+            results.Single().Id.Should().Be(routes.Single().Id);
+            results.Single().Name.Should().Be(routes.Single().Name);
         }
     }
 }
