@@ -52,41 +52,14 @@ USING (VALUES
   (11, 47) -- Accounting
   --(11, ) -- Legal Services
   )
-/*
-1	Agriculture, environment and animal care
-2	Business and administration
-3	Catering
-4	Construction
-5	Creative and design
-6	Digital and IT
-7	Education and childcare
-8	Engineering and manufacturing
-9	Hair and beauty
-10	Health and science
-11	Legal, finance and accounting
-*/
-/*
-36	Design, Surveying and Planning for Construction
-37	Digital Production, Design and Development
-38	Education and Childcare
-39	Digital Business Services
-40	Digital Support Services
-41	Health
-42	Healthcare Science
-43	Science
-44	Onsite Construction
-45	Building Services Engineering for Construction
-46	Finance
-47	Accounting
-48	Design and Development for Engineering and Manufacturing
-49	Maintenance, Installation and Repair for Engineering and Manufacturing
-50	Engineering, Manufacturing, Processing and Control
-51	Management and Administration
-*/
-  AS Source ([RouteId], [QualificationId] ) 
+  AS Source ([RouteId], [QualificationId])
 ON Target.[RouteId] = Source.[RouteId] 
   AND Target.[QualificationId] = Source.[QualificationId] 
-WHEN NOT MATCHED BY TARGET THEN 
+WHEN NOT MATCHED BY TARGET 
+  AND EXISTS(SELECT * 
+			 FROM [Qualification] 
+			 WHERE [Id] = [QualificationId]) 
+  THEN 
 	INSERT ([RouteId], [QualificationId]) 
 	VALUES ([RouteId], [QualificationId]) 
 WHEN NOT MATCHED BY SOURCE THEN 
