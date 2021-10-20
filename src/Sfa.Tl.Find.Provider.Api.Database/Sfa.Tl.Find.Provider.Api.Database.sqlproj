@@ -65,28 +65,29 @@
   <ItemGroup>
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
-    <None Include="PostDeployment\Seed Routes.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
     <Build Include="Tables\Location.sql" />
     <Build Include="Tables\Qualification.sql" />
     <Build Include="Tables\LocationQualification.sql" />
-    <Build Include="Indexes\SPATIAL_Location_Location.sql" />
-    <Build Include="Stored Procedures\UpdateQualifications.sql" />
-    <Build Include="Types\QualificationDataTableType.sql" />
-    <Build Include="Types\ProviderDataTableType.sql" />
-    <Build Include="Stored Procedures\UpdateProviders.sql" />
-    <Build Include="Stored Procedures\SearchProviders.sql" />
-    <Build Include="Types\LocationDataTableType.sql" />
-    <Build Include="Stored Procedures\UpdateLocations.sql" />
-    <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
-    <Build Include="Types\LocationQualificationDataTableType.sql" />
     <Build Include="Tables\Route.sql" />
     <Build Include="Tables\RouteQualification.sql" />
-    <None Include="PostDeployment\Seed RouteQualification.sql" />
+    <Build Include="Indexes\SPATIAL_Location_Location.sql" />
+    <Build Include="Types\QualificationDataTableType.sql" />
+    <Build Include="Types\ProviderDataTableType.sql" />
+    <Build Include="Types\LocationDataTableType.sql" />
+    <Build Include="Types\LocationQualificationDataTableType.sql" />
+    <Build Include="Stored Procedures\SearchProviders.sql" />
+    <Build Include="Stored Procedures\UpdateLocations.sql" />
+    <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
+    <Build Include="Stored Procedures\UpdateProviders.sql" />
+    <Build Include="Stored Procedures\UpdateQualifications.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
+    <None Include="PostDeployment\Seed Qualifications.sql" />
+    <None Include="PostDeployment\Seed Routes.sql" />
+    <None Include="PostDeployment\Seed RouteQualification.sql" />
   </ItemGroup>
 </Project>

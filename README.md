@@ -83,7 +83,18 @@ If the postcode is not found in provider search, the API will return a 404 resul
 
 ## Database
 
-##### Route mapping
+##### Initialization and post-deployment
+
+Some data is seeded into the database during deployment:
+
+- **Qualifications** - an initial list of qualifications, which will be overwriten by the nightly import
+- **Routes** - a hard-coded list of routes
+- **RouteQualification** - a hard-coded list of mappings ([below](#route_mapping))
+
+Note that qualifications will be imported from the Course Directory; however the route qualification mapping needs the qualification ids so they have been added in the post-deployment script.
+
+
+##### <a name="route_mapping"></a> Route mapping
 
 Routes are hard-coded and initialised from the database post-deployment scripts. If any routes are addied they will need to be added to the script `Sfa.Tl.Find.Provider.Api.Database\PostDeployment\Seed Routes.sql`.
 
