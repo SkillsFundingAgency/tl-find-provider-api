@@ -20,8 +20,8 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
     {
         private static readonly ConcurrentDictionary<string, string> AllowedApps = new();
 
-        private const ulong RequestMaxAgeInSeconds = 300;
         private const string AuthenticationScheme = "amx";
+        private const ulong RequestMaxAgeInSeconds = 300;
 
         private readonly IMemoryCache _cache;
         private readonly ILogger<HmacAuthorizationFilter> _logger;
@@ -79,39 +79,36 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
         
         private async Task<bool> IsValidRequest(HttpRequest request, string appId, string incomingBase64Signature, string nonce, string requestTimeStamp)
         {
-            var requestContentBase64String = "";
-
-            var requestUri = request.GetDisplayUrl().ToLower();
-
-            var requestHttpMethod = request.Method;
-
             if (!AllowedApps.ContainsKey(appId))
             {
                 _logger.LogWarning("Failed authentication - application id is not allowed.");
                 return false;
             }
 
-            var sharedKey = AllowedApps[appId];
-
             if (IsReplayRequest(nonce, requestTimeStamp))
             {
                 return false;
             }
 
+            var requestContentBase64String = "";
+            
             var hash = await ComputeHash(request.Body);
             if (hash != null)
             {
                 requestContentBase64String = Convert.ToBase64String(hash);
             }
 
-            var data = $"{appId}{requestHttpMethod}{requestUri}{requestTimeStamp}{nonce}{requestContentBase64String}";
+            var requestUri = request.GetDisplayUrl().ToLower();
+            var sharedKey = AllowedApps[appId];
+
+            var data = $"{appId}{request.Method.ToUpper()}{requestUri}{requestTimeStamp}{nonce}{requestContentBase64String}";
 
             var secretKeyBytes = Encoding.ASCII.GetBytes(sharedKey);
             var signature = Encoding.ASCII.GetBytes(data);
             using var hmac = new HMACSHA256(secretKeyBytes);
             var signatureBytes = hmac.ComputeHash(signature);
             var base64Signature = Convert.ToBase64String(signatureBytes);
-
+            
             return incomingBase64Signature.Equals(base64Signature, StringComparison.Ordinal);
         }
 
