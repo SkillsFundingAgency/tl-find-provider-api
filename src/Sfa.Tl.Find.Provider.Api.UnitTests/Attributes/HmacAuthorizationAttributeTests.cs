@@ -1,6 +1,12 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Filters;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -22,6 +28,28 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Attributes
             attribute.ImplementationType.Should().Be(typeof(HmacAuthorizationFilter));
         }
 
-        //TODO: Add a test for CreateInstance - needs a ServiceProvider passed in
+        [Fact]
+        public void Implementation_Create_Instance_Returns_Expected_Object()
+        {
+            var apiSettingOptions = Options.Create(
+                new SettingsBuilder()
+                    .BuildApiSettings());
+
+            var memoryCache = Substitute.For<IMemoryCache>();
+            var logger = Substitute.For<ILogger<HmacAuthorizationFilter>>();
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => apiSettingOptions)
+                .AddScoped(_ => memoryCache)
+                .AddScoped(_ => logger)
+                .BuildServiceProvider();
+
+            var attribute = new HmacAuthorizationAttribute();
+            attribute.ImplementationType.Should().Be(typeof(HmacAuthorizationFilter));
+
+            var filter = attribute.CreateInstance(serviceProvider);
+            filter.Should().NotBeNull();
+            filter.Should().BeOfType(typeof(HmacAuthorizationFilter));
+        }
     }
 }
