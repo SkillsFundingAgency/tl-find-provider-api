@@ -61,7 +61,6 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
 
                         if (isValid)
                         {
-                            LogHeaders(context.HttpContext.Request.Headers);
                             return;
                         }
 
@@ -77,26 +76,7 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
                 context.Result = new StatusCodeResult(500);
             }
         }
-
-        //TODO: Remove this method after testing
-        private void LogHeaders(IHeaderDictionary requestHeaders)
-        {
-            try
-            {
-                var headerInfo = new StringBuilder("Headers: \n");
-                foreach (var header in requestHeaders)
-                {
-                    headerInfo.AppendLine($"{header.Key} = {header.Value}");
-                }
-
-                _logger.LogDebug(headerInfo.ToString());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to log headers");
-            }
-        }
-
+        
         private async Task<bool> IsValidRequest(HttpRequest request, string appId, string incomingBase64Signature, string nonce, string requestTimeStamp)
         {
             var requestContentBase64String = "";
