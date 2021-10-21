@@ -65,20 +65,27 @@ When running locally, assuming localhost with port 55961, you can either use the
 > **Swagger UI**
 > - https://localhost:55961/swagger/index.html
 > 
+> **Generate API definition file**
+> - https://localhost:55961/swagger/v1/swagger.json
+>   - This can be saved into `\api-definitions\findaproviderapi.json`
+> 
 > **Qualifications**
-> - https://localhost:55961/findproviders/api/qualifications
+> - https://localhost:55961/api/v1/findproviders/qualifications
 > 
 > **Provider search**
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37&page=3
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=3
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
 
 For provider search, the postcode at the end of the url is required. 
 The `qualificationId` filter is optional and defaults to null or 0; 
 `page` and `pageSize` are also optional and default to 0 and 5 respectively.
 
 If the postcode is not found in provider search, the API will return a 404 result with a message indicating the postcode was not found.
+
+API calls need to include an `Authorization` header with an HMAC signature.
+
 
 
 ## Database
