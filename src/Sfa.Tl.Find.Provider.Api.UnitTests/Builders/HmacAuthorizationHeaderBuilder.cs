@@ -1,11 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
@@ -80,34 +77,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                 return _headers;
             }
 
-            var epochStart = new DateTime(1970, 01, 01, 0, 0, 0, 0, DateTimeKind.Utc);
-            var timeSpan = DateTime.UtcNow - epochStart;
-            var requestTimeStamp = Convert.ToUInt64(timeSpan.TotalSeconds).ToString();
-
-            var nonce = Guid.NewGuid().ToString("N");
-
-            string requestContentBase64String = null;
-            if (_body != null)
-            {
-                using var md5 = MD5.Create();
-                var requestContentHash = md5.ComputeHash(_body);
-                requestContentBase64String = Convert.ToBase64String(requestContentHash);
-            }
-
-            var signatureRawData =
-                $"{_appId}{_method}{_uri?.ToLower()}{requestTimeStamp}{nonce}{requestContentBase64String}";
-
-            var secretKeyBytes = Encoding.ASCII.GetBytes(_apiKey);
-            var signature = Encoding.ASCII.GetBytes(signatureRawData);
-
-            using var hmac = new HMACSHA256(secretKeyBytes);
-            var signatureBytes = hmac.ComputeHash(signature);
-            var requestSignatureBase64String = Convert.ToBase64String(signatureBytes);
-
-            _headers[AuthorizationHeaderName] =
-                new StringValues($"amx {_appId}:{requestSignatureBase64String}:{nonce}:{requestTimeStamp}");
-
-            return _headers;
+            return _uri.GetHmacHeader(_method.Method, null, _appId, _apiKey)
+                .GetAwaiter()
+                .GetResult()
+                .ConvertToDictionary();
         }
     }
 }
