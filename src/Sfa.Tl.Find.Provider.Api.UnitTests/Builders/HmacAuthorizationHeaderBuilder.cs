@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -25,15 +26,17 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
             _headers = new HeaderDictionary();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public HmacAuthorizationHeaderBuilder RemoveHeader()
         {
             if (_headers.ContainsKey(AuthorizationHeaderName))
             {
                 _headers.Remove(AuthorizationHeaderName);
             }
+
             return this;
         }
-        
+
         public HmacAuthorizationHeaderBuilder WithInvalidHeader()
         {
             _headers[AuthorizationHeaderName] = new StringValues("amx invalid");
@@ -91,7 +94,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                 requestContentBase64String = Convert.ToBase64String(requestContentHash);
             }
 
-            var signatureRawData = $"{_appId}{_method}{_uri?.ToLower()}{requestTimeStamp}{nonce}{requestContentBase64String}";
+            var signatureRawData =
+                $"{_appId}{_method}{_uri?.ToLower()}{requestTimeStamp}{nonce}{requestContentBase64String}";
 
             var secretKeyBytes = Encoding.ASCII.GetBytes(_apiKey);
             var signature = Encoding.ASCII.GetBytes(signatureRawData);
@@ -102,7 +106,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 
             _headers[AuthorizationHeaderName] =
                 new StringValues($"amx {_appId}:{requestSignatureBase64String}:{nonce}:{requestTimeStamp}");
-            
+
             return _headers;
         }
     }
