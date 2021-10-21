@@ -16,7 +16,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
             string requestUri,
             IHeaderDictionary requestHeaders = null)
         {
-            if (requestUri == null) throw new ArgumentNullException("requestUri");
+            if (requestUri == null) throw new ArgumentNullException(nameof(requestUri));
             
             var uri = new Uri(requestUri);
             
