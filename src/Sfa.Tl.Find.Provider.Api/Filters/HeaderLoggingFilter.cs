@@ -26,6 +26,8 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
                 }
 
                 _logger.LogInformation(headerInfo.ToString());
+
+                _logger.LogInformation($"RemoteIpAddress: {context.HttpContext.Connection.RemoteIpAddress}");
             }
             catch (Exception e)
             {
