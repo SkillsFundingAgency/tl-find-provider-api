@@ -6,6 +6,7 @@ using System.Reflection;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,8 +100,13 @@ namespace Sfa.Tl.Find.Provider.Api
 
             app.UseHttpsRedirection();
 
-            //app.UseClientRateLimiting();
             app.UseIpRateLimiting();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+                //RequireHeaderSymmetry = true
+                //ForwardLimit = 2
+            });
 
             app.UseRouting();
 
