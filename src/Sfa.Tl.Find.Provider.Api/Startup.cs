@@ -25,7 +25,7 @@ namespace Sfa.Tl.Find.Provider.Api
     {
         private readonly IConfiguration _configuration;
         private readonly SiteConfiguration _siteConfiguration;
-        
+
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
@@ -93,6 +93,14 @@ namespace Sfa.Tl.Find.Provider.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders();
+            //app.UseForwardedHeaders(new ForwardedHeadersOptions
+            //{
+            //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            //    RequireHeaderSymmetry = true,
+            //    ForwardLimit = 3,
+            //});
+
             app.UseSecurityHeaders(
                 SecurityHeaderExtensions
                     .GetHeaderPolicyCollection(env.IsDevelopment()));
@@ -115,12 +123,6 @@ namespace Sfa.Tl.Find.Provider.Api
             app.UseHttpsRedirection();
 
             app.UseIpRateLimiting();
-            //app.UseForwardedHeaders(new ForwardedHeadersOptions
-            //{
-            //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-            //    RequireHeaderSymmetry = true,
-            //    ForwardLimit = 3,
-            //});
 
             app.UseRouting();
 
