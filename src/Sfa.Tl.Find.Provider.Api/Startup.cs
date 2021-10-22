@@ -6,6 +6,7 @@ using System.Reflection;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -73,7 +74,9 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddHostedQuartzServices(_siteConfiguration.CourseDirectoryImportSchedule);
 
-            services.AddRateLimitPolicy();
+            services
+                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+                .AddRateLimitPolicy();
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
