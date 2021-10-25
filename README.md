@@ -154,6 +154,12 @@ EXEC [dbo].[SearchProviders]
 `@qualificationId` can be used to filter the results. NULL will return all qualifications.
 
 
+## Rate Limiting
+
+The API uses the `AspNetCoreRateLimit` to limit the number of incoming requests, with configuration in `appSettings.json`.
+To make sure the IP address of the original requster is passed to the rate limiting code, where it is used to limit requests from indivudual IP addresses, `UseForwardedHeaders` from the `Microsoft.AspNetCore.HttpOverrides` package has been used. 
+
+
 ## External APIs
 
 Postcode details are retrieved using the postcodes.io API. Where possible,
