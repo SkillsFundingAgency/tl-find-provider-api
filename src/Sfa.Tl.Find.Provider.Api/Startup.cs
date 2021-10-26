@@ -76,31 +76,23 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services
                 .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-                .AddRateLimitPolicy();
-
-            //services.Configure<ForwardedHeadersOptions>(options =>
-            //{
-            //    options.ForwardedHeaders =
-            //        ForwardedHeaders.XForwardedHost |
-            //        ForwardedHeaders.XForwardedFor |
-            //        ForwardedHeaders.XForwardedProto;
-            //    options.ForwardLimit = 2;
-            //    options.KnownNetworks.Clear(); //In a real scenario we would add the real proxy network(s) here based on a config parameter
-            //    options.KnownProxies.Clear();  //In a real scenario add the real proxy here based on a config parameter
-            //});
+                .AddRateLimitPolicy()
+                .Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardedHeaders =
+                        ForwardedHeaders.XForwardedFor |
+                        ForwardedHeaders.XForwardedProto;
+                    options.ForwardLimit = 2;
+                    options.RequireHeaderSymmetry = false;
+                    options.KnownNetworks.Clear();
+                    options.KnownProxies.Clear();
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedHost |
-                                   ForwardedHeaders.XForwardedFor |
-                                   ForwardedHeaders.XForwardedProto,
-                RequireHeaderSymmetry = true,
-                ForwardLimit = 2
-            });
+            app.UseForwardedHeaders();
 
             app.UseSecurityHeaders(
                 SecurityHeaderExtensions
