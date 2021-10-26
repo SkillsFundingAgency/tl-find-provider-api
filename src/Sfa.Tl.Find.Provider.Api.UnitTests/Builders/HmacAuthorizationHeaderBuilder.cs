@@ -77,7 +77,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
                 return _headers;
             }
 
-            return _uri.GetHmacHeader(_method.Method, null, _appId, _apiKey)
+            return _uri.GetHmacHeader(_method.Method, _body, _appId, _apiKey)
                 .GetAwaiter()
                 .GetResult()
                 .ConvertToDictionary();

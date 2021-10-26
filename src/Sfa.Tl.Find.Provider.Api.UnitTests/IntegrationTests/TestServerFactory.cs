@@ -22,13 +22,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                     .UseStartup<TEntryPoint>());
         }
 
-        public HttpClient CreateClient_Old()
-        {
-            var client = _server.CreateClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            return client;
-        }
-
         public HttpClient CreateClient()
         {
             var apiSettings = _server.Services.GetRequiredService<IOptions<ApiSettings>>();
