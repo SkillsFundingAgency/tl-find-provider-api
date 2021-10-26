@@ -95,8 +95,10 @@ namespace Sfa.Tl.Find.Provider.Api
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-                //RequireHeaderSymmetry = true,
+                ForwardedHeaders = ForwardedHeaders.XForwardedHost |
+                                   ForwardedHeaders.XForwardedFor |
+                                   ForwardedHeaders.XForwardedProto,
+                RequireHeaderSymmetry = true,
                 ForwardLimit = 2
             });
 
