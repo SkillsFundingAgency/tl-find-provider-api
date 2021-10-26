@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
-using CacheExtensions = Sfa.Tl.Find.Provider.Api.Extensions.CacheExtensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Services
 {
@@ -48,7 +48,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             {
                 qualifications = (await _qualificationRepository.GetAll()).ToList();
                 _cache.Set(key, qualifications,
-                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+                    CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
             }
 
             return qualifications;
@@ -63,7 +63,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             {
                 routes = (await _routeRepository.GetAll()).ToList();
                 _cache.Set(key, routes,
-                    CacheExtensions.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+                    CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
             }
 
             return routes;
@@ -121,11 +121,9 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                 }
 
                 _cache.Set(key, postcodeLocation,
-                    CacheExtensions.DefaultMemoryCacheEntryOptions(
+                    CacheUtilities.DefaultMemoryCacheEntryOptions(
                         _dateTimeService, 
-                        _logger,
-                        absoluteExpirationInMinutes: 90,
-                        slidingExpirationInMinutes: 10));
+                        _logger));
             }
 
             return postcodeLocation;
