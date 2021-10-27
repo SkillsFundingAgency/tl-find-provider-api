@@ -48,7 +48,7 @@
         "BaseUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "PostcodeApiSettings"
+          "environmentVariable": "PostcodeApiSettings_BaseUri"
         }
       },
       "additionalProperties": false,
