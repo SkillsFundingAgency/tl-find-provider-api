@@ -13,7 +13,8 @@ The configuration values will be read from an Azure table. To make this work on 
 
 [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator) 
 and [Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) 
-need to be installed on local development machines. Alternatively, Azurite could be used with Docker.
+need to be installed on local development machines. 
+> Azure Storage Emulator is now depracated. Use [Azurite](https://skillsfundingagency.atlassian.net/wiki/spaces/NDL/pages/edit-v2/3349184600) instead.
 
 To set up local configuration, make sure Azure Storage Emulator is running, 
 open Storage Explorer and navigate to the local storage account emulator.
@@ -164,4 +165,6 @@ To make sure the IP address of the original requster is passed to the rate limit
 
 Postcode details are retrieved using the postcodes.io API. Where possible,
 results are cached to avoid duplicate calls.
+
+Provider and course details are read from the NCS Course directory API. This is called from a scheduled Quartz job.
 
