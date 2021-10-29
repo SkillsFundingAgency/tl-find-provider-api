@@ -16,6 +16,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [HmacAuthorization]
+    [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
     public class FindProvidersController : ControllerBase
     {
         private readonly IProviderDataService _providerDataService;
@@ -114,7 +115,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
                 : NotFound();
         }
 
-        private bool TryValidatePostcode(string postcode, out string errorMessage)
+        private static bool TryValidatePostcode(string postcode, out string errorMessage)
         {
             errorMessage = null;
 

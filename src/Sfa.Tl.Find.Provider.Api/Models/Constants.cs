@@ -5,6 +5,9 @@ namespace Sfa.Tl.Find.Provider.Api.Models
     {
         public const int DefaultPageSize = 5;
 
+        public const int DefaultAbsoluteExpirationInMinutes = 60;
+        public const int DefaultSlidingExpirationInMinutes = 10;
+
         public const string EnvironmentNameConfigKey = "EnvironmentName";
         public const string ConfigurationStorageConnectionStringConfigKey = "ConfigurationStorageConnectionString";
         public const string VersionConfigKey = "Version";

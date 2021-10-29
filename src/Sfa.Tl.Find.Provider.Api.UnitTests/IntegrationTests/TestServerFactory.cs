@@ -2,6 +2,10 @@
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Api.Models.Configuration;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.DelegatingHandlers;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
 {
@@ -20,9 +24,24 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
 
         public HttpClient CreateClient()
         {
-            var client = _server.CreateClient();
+            var apiSettings = _server.Services.GetRequiredService<IOptions<ApiSettings>>();
+
+            var baseHandler = _server.CreateHandler();
+            var hmacAuthorizationHandler = new HmacAuthorizationHeaderDelegatingHandler(apiSettings)
+            {
+                InnerHandler = baseHandler
+            };
+
+            var client = new HttpClient(hmacAuthorizationHandler)
+            {
+                BaseAddress = _server.BaseAddress
+            };
+
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
             return client;
         }
     }
+
+
 }

@@ -2,16 +2,17 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions
 {
-    public static class CacheExtensions
+    public static class CacheUtilities
     {
         public static MemoryCacheEntryOptions DefaultMemoryCacheEntryOptions(
             IDateTimeService dateTimeService,
             ILogger logger,
-            double absoluteExpirationInMinutes = 60,
-            double slidingExpirationInMinutes = 5,
+            int absoluteExpirationInMinutes = Constants.DefaultAbsoluteExpirationInMinutes,
+            int slidingExpirationInMinutes = Constants.DefaultSlidingExpirationInMinutes,
             int size = 1) =>
             new()
             {

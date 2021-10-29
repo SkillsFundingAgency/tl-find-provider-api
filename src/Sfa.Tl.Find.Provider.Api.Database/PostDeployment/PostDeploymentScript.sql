@@ -10,6 +10,6 @@ Post-Deployment Script
 --------------------------------------------------------------------------------------
 */
 
+:r ".\Seed Qualifications.sql"
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
-

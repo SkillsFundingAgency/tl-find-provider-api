@@ -1,10 +1,6 @@
-﻿using System;
-using System.Net;
-using System.Text.Json;
+﻿using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -19,7 +15,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             _fixture = fixture;
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_OK_Result_For_Valid_Url()
         {
             var response = await _fixture
@@ -29,7 +25,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_Error_Message_Result_For_Missing_Postcode()
         {
             var response = await _fixture
@@ -42,7 +38,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             searchResponse!.Error.Should().Be("The postcode field is required.");
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_Error_Message_Result_For_Postcode_Too_Long()
         {
             var response = await _fixture
@@ -55,7 +51,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             searchResponse!.Error.Should().Be("The postcode field must be no more than 8 characters.");
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_Error_Message_Result_For_Postcode_Too_Short()
         {
             var response = await _fixture
@@ -68,7 +64,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             searchResponse!.Error.Should().Be("The postcode field must be at least 5 characters.");
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_Bad_Request_Result_For_Zero_PageSize()
         {
             var response = await _fixture
@@ -80,7 +76,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 ("pageSize", "The pageSize field must be at least one."));
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_Error_Message_Result_For_Postcode_With_Illegal_Characters()
         {
             var response = await _fixture
@@ -93,7 +89,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             searchResponse!.Error.Should().Be("The postcode field must contain only letters, numbers, and an optional space.");
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_Bad_Request_Result_For_Negative_Page()
         {
             var response = await _fixture
@@ -105,7 +101,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 ("page", "The page field must be zero or greater."));
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetProviders_Returns_Bad_Request_Result_With_All_Errors()
         {
             var response = await _fixture
@@ -115,12 +111,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
             await response.Content.ValidateProblemDetails(
-                //("postcode", "The postcode field is required."),
                 ("pageSize", "The pageSize field must be at least one."),
                 ("page", "The page field must be zero or greater."));
         }
 
-        [Fact(Skip = "TODO: Make this test set HMAC header")]
+        [Fact]
         public async Task GetQualifications_Returns_OK_Result_For_Valid_Url()
         {
             var response = await _fixture

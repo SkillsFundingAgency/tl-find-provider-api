@@ -6,6 +6,8 @@ using System.Reflection;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +25,7 @@ namespace Sfa.Tl.Find.Provider.Api
     {
         private readonly IConfiguration _configuration;
         private readonly SiteConfiguration _siteConfiguration;
-        
+
         private const string CorsPolicyName = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
@@ -72,12 +74,26 @@ namespace Sfa.Tl.Find.Provider.Api
 
             services.AddHostedQuartzServices(_siteConfiguration.CourseDirectoryImportSchedule);
 
-            services.AddRateLimitPolicy();
+            services
+                .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+                .AddRateLimitPolicy()
+                .Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardedHeaders =
+                        ForwardedHeaders.XForwardedFor |
+                        ForwardedHeaders.XForwardedProto;
+                    options.ForwardLimit = 2;
+                    options.RequireHeaderSymmetry = false;
+                    options.KnownNetworks.Clear();
+                    options.KnownProxies.Clear();
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders();
+
             app.UseSecurityHeaders(
                 SecurityHeaderExtensions
                     .GetHeaderPolicyCollection(env.IsDevelopment()));
@@ -99,7 +115,6 @@ namespace Sfa.Tl.Find.Provider.Api
 
             app.UseHttpsRedirection();
 
-            //app.UseClientRateLimiting();
             app.UseIpRateLimiting();
 
             app.UseRouting();
