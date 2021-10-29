@@ -16,6 +16,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [HmacAuthorization]
+    [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
     public class FindProvidersController : ControllerBase
     {
         private readonly IProviderDataService _providerDataService;
