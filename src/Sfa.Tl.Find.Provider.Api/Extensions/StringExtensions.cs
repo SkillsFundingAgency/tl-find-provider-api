@@ -10,7 +10,7 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
     {
         public static string FormatPostcodeForUri(this string postcode)
         {
-            return Uri.EscapeUriString(postcode.Trim().ToUpper());
+            return Uri.EscapeDataString(postcode.Trim().ToUpper());
         }
 
         public static string ParseTLevelDefinitionName(this string fullName, int maxLength = -1)
