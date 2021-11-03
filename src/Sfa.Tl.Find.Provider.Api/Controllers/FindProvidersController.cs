@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -113,6 +115,40 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             return routes != null
                 ? Ok(routes)
                 : NotFound();
+        }
+
+        [HttpGet]
+        [Route("statusresult", Name = "GetStatusResult")]
+        public IActionResult ReturnStatusResult(int statusCode)
+        {
+            return StatusCode(statusCode);
+        }
+        
+        [HttpGet]
+        [Route("version", Name = "GetVersion")]
+        public async Task<IActionResult> GetVersion()
+        {
+            var framework = Assembly
+                .GetEntryAssembly()?
+                .GetCustomAttribute<TargetFrameworkAttribute>()?
+                .FrameworkName;
+
+            var stats = new
+            {
+                OsPlatform = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+                AspDotnetVersion = framework
+            };
+
+            return Ok(stats);;
+        }
+
+        [HttpGet]
+        [Route("runtimeversion", Name = "GetRuntimeVersion")]
+        public async Task<IActionResult> GetRuntimeVersion()
+        {
+            var runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+
+            return Ok(runtime); ;
         }
 
         private static bool TryValidatePostcode(string postcode, out string errorMessage)
