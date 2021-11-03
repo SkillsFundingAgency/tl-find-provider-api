@@ -126,7 +126,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         
         [HttpGet]
         [Route("version", Name = "GetVersion")]
-        public async Task<IActionResult> GetVersion()
+        public IActionResult GetVersion()
         {
             var framework = Assembly
                 .GetEntryAssembly()?
@@ -136,19 +136,11 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             var stats = new
             {
                 OsPlatform = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
-                AspDotnetVersion = framework
+                AspDotnetVersion = framework,
+                RuntimeVersion = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
             };
 
-            return Ok(stats);;
-        }
-
-        [HttpGet]
-        [Route("runtimeversion", Name = "GetRuntimeVersion")]
-        public async Task<IActionResult> GetRuntimeVersion()
-        {
-            var runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
-
-            return Ok(runtime); ;
+            return Ok(stats);
         }
 
         private static bool TryValidatePostcode(string postcode, out string errorMessage)
