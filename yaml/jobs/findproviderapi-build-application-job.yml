@@ -65,7 +65,7 @@ jobs:
         command: publish
         publishWebProjects: true
         projects: 'src/Sfa.Tl.Find.Provider.Api/Sfa.Tl.Find.Provider.Api.csproj'
-        arguments: '--configuration $(buildConfiguration) --framework $(dotNetFramework) --self-contained --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+        arguments: '--configuration $(buildConfiguration) --runtime $(targetRuntime) --framework $(dotNetFramework) --self-contained -v diag --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
         
     # - task: DotNetCoreCLI@2
     #   displayName: 'Publish Function App'
