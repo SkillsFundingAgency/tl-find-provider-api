@@ -14,12 +14,11 @@ using Sfa.Tl.Find.Provider.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var configuration = builder.Configuration;
-var siteConfiguration = configuration.LoadConfigurationOptions();
+var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
 
 builder.Services.AddApplicationInsightsTelemetry();
 
-builder.Services.AddConfigurationOptions(configuration, siteConfiguration);
+builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
 
 builder.Services.AddMemoryCache();
 
@@ -52,7 +51,7 @@ builder.Services
     .AddTransient<IQualificationRepository, QualificationRepository>()
     .AddTransient<IRouteRepository, RouteRepository>();
 
-builder.Services.AddHostedQuartzServices(siteConfiguration.CourseDirectoryImportSchedule);
+builder.Services.AddQuartzServices(siteConfiguration.CourseDirectoryImportSchedule);
 
 builder.Services
     .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
