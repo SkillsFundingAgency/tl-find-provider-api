@@ -1,12 +1,20 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Quartz;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Jobs;
+using Sfa.Tl.Find.Provider.Api.Models.Configuration;
+using Sfa.Tl.Find.Provider.Api.Services;
+
 // ReSharper disable UnusedMethodReturnValue.Global
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions
@@ -112,6 +120,83 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
                 config.AssumeDefaultVersionWhenUnspecified = true;
                 config.ReportApiVersions = true;
             });
+
+            return services;
+        }
+        
+        public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration, SiteConfiguration siteConfiguration)
+        {
+            services
+                .Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"))
+                .Configure<ApiSettings>(x =>
+                {
+                    x.AppId = siteConfiguration.ApiSettings.AppId;
+                    x.ApiKey = siteConfiguration.ApiSettings.ApiKey;
+                })
+                .Configure<CourseDirectoryApiSettings>(x =>
+                {
+                    x.BaseUri = siteConfiguration.CourseDirectoryApiSettings.BaseUri;
+                    x.ApiKey = siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+                })
+                .Configure<PostcodeApiSettings>(x =>
+                {
+                    x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+                });
+
+            return services;
+        }
+
+        public static IServiceCollection AddHttpClients(this IServiceCollection services)
+        {
+            services
+                .AddHttpClient<IPostcodeLookupService, PostcodeLookupService>(
+                    (serviceProvider, client) =>
+                    {
+                        var postcodeApiSettings = serviceProvider
+                            .GetRequiredService<IOptions<PostcodeApiSettings>>()
+                            .Value;
+
+                        client.BaseAddress =
+                            postcodeApiSettings.BaseUri.EndsWith("/")
+                                ? new Uri(postcodeApiSettings.BaseUri)
+                                : new Uri(postcodeApiSettings.BaseUri + "/");
+
+                        client.DefaultRequestHeaders.Accept.Add(
+                            new MediaTypeWithQualityHeaderValue("application/json"));
+                    }
+                )
+                .AddRetryPolicyHandler<PostcodeLookupService>();
+
+            services
+                .AddHttpClient<ICourseDirectoryService, CourseDirectoryService>(
+                    (serviceProvider, client) =>
+                    {
+                        var courseDirectoryApiSettings = serviceProvider
+                            .GetRequiredService<IOptions<CourseDirectoryApiSettings>>()
+                            .Value;
+
+                        client.BaseAddress =
+                            courseDirectoryApiSettings.BaseUri.EndsWith("/")
+                                ? new Uri(courseDirectoryApiSettings.BaseUri)
+                                : new Uri(courseDirectoryApiSettings.BaseUri + "/");
+
+                        client.DefaultRequestHeaders.Accept.Add(
+                            new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", courseDirectoryApiSettings.ApiKey);
+
+                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                    })
+                .ConfigurePrimaryHttpMessageHandler(_ =>
+                {
+                    var handler = new HttpClientHandler();
+                    if (handler.SupportsAutomaticDecompression)
+                    {
+                        handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+                    }
+                    return handler;
+                })
+                .AddRetryPolicyHandler<CourseDirectoryService>();
 
             return services;
         }
