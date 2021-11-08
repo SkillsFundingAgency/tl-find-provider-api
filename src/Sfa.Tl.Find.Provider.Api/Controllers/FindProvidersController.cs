@@ -56,9 +56,6 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
              Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")]
             int pageSize = Constants.DefaultPageSize)
         {
-            _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
-                             $"page={page}, pageSize={pageSize}");
-
             try
             {
                 if (!TryValidatePostcode(postcode, out var validationMessage))
