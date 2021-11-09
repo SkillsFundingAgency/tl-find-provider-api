@@ -8,8 +8,7 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         {
             return element.TryGetProperty(propertyName, out var property)
                    && (property.ValueKind is JsonValueKind.True or JsonValueKind.False)
-                ? property.GetBoolean()
-                : default;
+                   && property.GetBoolean();
         }
 
         public static int SafeGetInt32(this JsonElement element, string propertyName)
