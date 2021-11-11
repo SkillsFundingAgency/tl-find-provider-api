@@ -142,10 +142,8 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         {
             services.AddQuartz(q =>
             {
-                // Normally would take this from appsettings.json, just show it's possible
-                q.SchedulerName = "Example Quartz Scheduler";
+                q.SchedulerName = "Find a Provider Quartz Scheduler";
 
-                // Use a Scoped container for creating IJobs
                 q.UseMicrosoftDependencyInjectionJobFactory();
 
                 var startupJobKey = new JobKey("Perform Startup Tasks");
