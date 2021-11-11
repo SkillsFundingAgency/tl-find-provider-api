@@ -14,9 +14,21 @@ The configuration values will be read from an Azure table. To make this work on 
 [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator) 
 and [Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) 
 need to be installed on local development machines. 
-> Azure Storage Emulator is now depracated. Use [Azurite](https://skillsfundingagency.atlassian.net/wiki/spaces/NDL/pages/edit-v2/3349184600) instead.
 
-To set up local configuration, make sure Azure Storage Emulator is running, 
+> Azure Storage Emulator is now deprecated. Use [Azurite](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite) instead.
+> To install Azurite, run
+> ```
+> npm install -g azurite
+> ```
+> To run Azurite, open a terminal and run
+> ```
+> azurite
+> ```
+> #### Notes
+> - Unless you add a different path as an option when starting Azurite it will save the tables in a local file `__azurite_db_table__.json` so make sure you run it in the same directory each time.
+> - If you have a configuration table saved in Azure Storage Emulator, you will need to recreate it in azurite.
+
+To set up local configuration, make sure Azure Storage Emulator or Azurite is running, 
 open Storage Explorer and navigate to the local storage account emulator.
 
 Add a table `Configuration` if it doesn't already exist.

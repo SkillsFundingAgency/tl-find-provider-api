@@ -133,9 +133,10 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
             if (difference > RequestMaxAgeInSeconds)
             {
                 _logger.LogWarning("Replay request detected - timeout. " +
-                                   $"Server time {serverTotalSeconds}. " +
-                                   $"Request time {requestTotalSeconds}. " +
-                                   $"Difference {difference}");
+                                   "Server time {serverTotalSeconds}. " +
+                                   "Request time {requestTotalSeconds}. " +
+                                   "Difference {difference}",
+                    serverTotalSeconds, requestTotalSeconds, difference);
                 return true;
             }
 
@@ -168,7 +169,8 @@ namespace Sfa.Tl.Find.Provider.Api.Filters
                 credentialsArray[3]);
             }
 
-            _logger.LogWarning($"Credentials array had unexpected length {credentialsArray.Length}");
+            _logger.LogWarning("Credentials array had unexpected length {credentialsArray.Length}", 
+                credentialsArray.Length);
 
             return null;
         }

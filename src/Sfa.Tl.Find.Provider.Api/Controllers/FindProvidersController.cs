@@ -54,9 +54,6 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
              Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")]
             int pageSize = Constants.DefaultPageSize)
         {
-            _logger.LogDebug($"GetProviders called with postcode={postcode}, qualificationId={qualificationId}, " +
-                             $"page={page}, pageSize={pageSize}");
-
             try
             {
                 if (!TryValidatePostcode(postcode, out var validationMessage))
@@ -103,7 +100,6 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
         /// </summary>
         /// <returns>Json with routes.</returns>
         [HttpGet]
-        [NonAction] //Hidden method - remove this attribute to expose routes
         [Route("routes", Name = "GetRoutes")]
         [ProducesResponseType(typeof(IEnumerable<Route>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -42,6 +42,4 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             return client;
         }
     }
-
-
 }

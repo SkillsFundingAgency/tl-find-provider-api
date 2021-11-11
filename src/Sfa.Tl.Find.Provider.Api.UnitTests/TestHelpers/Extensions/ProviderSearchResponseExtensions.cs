@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Sfa.Tl.Find.Provider.Api.Models;
 
@@ -13,7 +14,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions
                 await content.ReadAsStringAsync(),
                 new JsonSerializerOptions
                 {
-                    IgnoreNullValues = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
         }

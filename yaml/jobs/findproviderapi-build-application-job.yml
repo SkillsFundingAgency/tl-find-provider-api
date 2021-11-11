@@ -5,14 +5,7 @@ jobs:
       vmImage: 'windows-2019'
   workspace:
     clean: all
-  steps:        
-    # - task: UseDotNet@2
-    #   displayName: 'Use .NET Core SDK 5.x LTS'
-    #   inputs:
-    #     packageType: sdk
-    #     version: 5.x
-    #     installationPath: $(Agent.ToolsDirectory)/dotnet
-
+  steps:
     - task: GitVersion@5
       displayName: GitVersion
       inputs:
@@ -20,7 +13,7 @@ jobs:
         updateAssemblyInfo: true
     
     - task: UseDotNet@2
-      displayName: 'Use .NET Core SDK $(dotnetVersion)'
+      displayName: 'Use .NET SDK $(dotnetVersion)'
       inputs:
         packageType: sdk
         version: $(dotnetVersion)
@@ -49,7 +42,7 @@ jobs:
       displayName: Build
       inputs:
         projects: 'src/**/*.csproj'
-        arguments: '--configuration $(buildConfiguration)  --no-restore'        
+        arguments: '--configuration $(buildConfiguration) --no-restore'
     
     - task: DotNetCoreCLI@2
       displayName: Test
@@ -72,7 +65,7 @@ jobs:
         publishWebProjects: true
         projects: 'src/Sfa.Tl.Find.Provider.Api/Sfa.Tl.Find.Provider.Api.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
-    
+        
     # - task: DotNetCoreCLI@2
     #   displayName: 'Publish Function App'
     #   inputs:

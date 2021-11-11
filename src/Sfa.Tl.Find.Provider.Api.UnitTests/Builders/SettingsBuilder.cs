@@ -40,11 +40,13 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 
         internal SiteConfiguration BuildConfigurationOptions(
             ApiSettings apiSettings = null,
+            CourseDirectoryApiSettings courseDirectoryApiSettings = null,
             PostcodeApiSettings postcodeApiSettings = null,
             string sqlConnectionString = "TestConnection",
             string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI") => new()
         {
             ApiSettings = apiSettings ?? BuildApiSettings(),
+            CourseDirectoryApiSettings = courseDirectoryApiSettings ?? BuildCourseDirectoryApiSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             SqlConnectionString = sqlConnectionString,
             CourseDirectoryImportSchedule = courseDirectoryImportSchedule
