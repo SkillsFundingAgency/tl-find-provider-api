@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
@@ -14,15 +13,10 @@ namespace Sfa.Tl.Find.Provider.Api.Services
     {
         private readonly HttpClient _httpClient;
 
-        // ReSharper disable once NotAccessedField.Local
-        private readonly ILogger<PostcodeLookupService> _logger;
-
         public PostcodeLookupService(
-            HttpClient httpClient,
-            ILogger<PostcodeLookupService> logger)
+            HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<PostcodeLocation> GetPostcode(string postcode)
@@ -43,7 +37,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             return await ReadPostcodeLocationFromResponse(responseMessage);
         }
 
-        private async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(HttpResponseMessage responseMessage)
+        private static async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(HttpResponseMessage responseMessage)
         {
             var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
 

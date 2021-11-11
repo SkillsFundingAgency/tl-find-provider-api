@@ -4,13 +4,13 @@ using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Xunit;
-using CacheExtensions = Sfa.Tl.Find.Provider.Api.Extensions.CacheExtensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 {
-    public class CacheExtensionsTests
+    public class CacheUtilitiesTests
     {
         [Fact]
         public void DefaultMemoryCacheEntryOptions_Returns_Expected_Value()
@@ -18,7 +18,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
             var dateTimeService = Substitute.For<IDateTimeService>();
             var logger = Substitute.For<ILogger<object>>();
 
-            var options = CacheExtensions.DefaultMemoryCacheEntryOptions(
+            var options = CacheUtilities.DefaultMemoryCacheEntryOptions(
                 dateTimeService,
                 logger);
 
@@ -32,7 +32,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
             const EvictionReason reason = EvictionReason.Removed;
             var value = new { x = "test " };
 
-            Action act = () => CacheExtensions.EvictionLoggingCallback(key, value, reason, null);
+            Action act = () => CacheUtilities.EvictionLoggingCallback(key, value, reason, null);
             act
                 .Should().NotThrow<ArgumentNullException>();
         }
@@ -45,7 +45,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
             var value = new { x = "test " };
             var logger = Substitute.For<ILogger<object>>();
 
-            CacheExtensions.EvictionLoggingCallback(key, value, reason, logger);
+            CacheUtilities.EvictionLoggingCallback(key, value, reason, logger);
             
             logger.ReceivedCalls()
                 .Select(call => call.GetArguments())

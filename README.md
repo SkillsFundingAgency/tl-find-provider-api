@@ -13,9 +13,22 @@ The configuration values will be read from an Azure table. To make this work on 
 
 [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator) 
 and [Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) 
-need to be installed on local development machines. Alternatively, Azurite could be used with Docker.
+need to be installed on local development machines. 
 
-To set up local configuration, make sure Azure Storage Emulator is running, 
+> Azure Storage Emulator is now deprecated. Use [Azurite](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite) instead.
+> To install Azurite, run
+> ```
+> npm install -g azurite
+> ```
+> To run Azurite, open a terminal and run
+> ```
+> azurite
+> ```
+> #### Notes
+> - Unless you add a different path as an option when starting Azurite it will save the tables in a local file `__azurite_db_table__.json` so make sure you run it in the same directory each time.
+> - If you have a configuration table saved in Azure Storage Emulator, you will need to recreate it in azurite.
+
+To set up local configuration, make sure Azure Storage Emulator or Azurite is running, 
 open Storage Explorer and navigate to the local storage account emulator.
 
 Add a table `Configuration` if it doesn't already exist.
@@ -65,14 +78,18 @@ When running locally, assuming localhost with port 55961, you can either use the
 > **Swagger UI**
 > - https://localhost:55961/swagger/index.html
 > 
+> **Generate API definition file**
+> - https://localhost:55961/swagger/v1/swagger.json
+>   - This can be saved into `\api-definitions\findaproviderapi.json`
+> 
 > **Qualifications**
-> - https://localhost:55961/findproviders/api/qualifications
+> - https://localhost:55961/api/v1/findproviders/qualifications
 > 
 > **Provider search**
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37&page=3
-> - https://localhost:55961/findproviders/api/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=3
+> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
 
 For provider search, the postcode at the end of the url is required. 
 The `qualificationId` filter is optional and defaults to null or 0; 
@@ -80,10 +97,24 @@ The `qualificationId` filter is optional and defaults to null or 0;
 
 If the postcode is not found in provider search, the API will return a 404 result with a message indicating the postcode was not found.
 
+API calls need to include an `Authorization` header with an HMAC signature.
+
+
 
 ## Database
 
-##### Route mapping
+##### Initialization and post-deployment
+
+Some data is seeded into the database during deployment:
+
+- **Qualifications** - an initial list of qualifications, which will be overwriten by the nightly import
+- **Routes** - a hard-coded list of routes
+- **RouteQualification** - a hard-coded list of mappings ([below](#route_mapping))
+
+Note that qualifications will be imported from the Course Directory; however the route qualification mapping needs the qualification ids so they have been added in the post-deployment script.
+
+
+##### <a name="route_mapping"></a> Route mapping
 
 Routes are hard-coded and initialised from the database post-deployment scripts. If any routes are addied they will need to be added to the script `Sfa.Tl.Find.Provider.Api.Database\PostDeployment\Seed Routes.sql`.
 
@@ -136,8 +167,16 @@ EXEC [dbo].[SearchProviders]
 `@qualificationId` can be used to filter the results. NULL will return all qualifications.
 
 
+## Rate Limiting
+
+The API uses the `AspNetCoreRateLimit` to limit the number of incoming requests, with configuration in `appSettings.json`.
+To make sure the IP address of the original requster is passed to the rate limiting code, where it is used to limit requests from indivudual IP addresses, `UseForwardedHeaders` from the `Microsoft.AspNetCore.HttpOverrides` package has been used. 
+
+
 ## External APIs
 
 Postcode details are retrieved using the postcodes.io API. Where possible,
 results are cached to avoid duplicate calls.
+
+Provider and course details are read from the NCS Course directory API. This is called from a scheduled Quartz job.
 

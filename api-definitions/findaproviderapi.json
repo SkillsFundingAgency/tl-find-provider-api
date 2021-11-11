@@ -5,7 +5,7 @@
     "version": "v1"
   },
   "paths": {
-    "/findproviders/api/providers": {
+    "/api/v{version}/findproviders/providers": {
       "get": {
         "tags": [
           "FindProviders"
@@ -17,7 +17,6 @@
             "name": "postcode",
             "in": "query",
             "description": "Postcode that the search should start from.",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -54,6 +53,14 @@
               "format": "int32",
               "default": 5
             }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -62,46 +69,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProviderSearchResult"
-                  }
+                  "$ref": "#/components/schemas/ProviderSearchResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProviderSearchResult"
-                  }
+                  "$ref": "#/components/schemas/ProviderSearchResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProviderSearchResult"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProviderSearchResponse"
                 }
               }
             }
@@ -112,13 +90,23 @@
         }
       }
     },
-    "/findproviders/api/qualifications": {
+    "/api/v{version}/findproviders/qualifications": {
       "get": {
         "tags": [
           "FindProviders"
         ],
         "summary": "Returns a list of all qualifications.",
         "operationId": "GetQualifications",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -220,20 +208,12 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
-      "ProviderSearchResult": {
+      "ProviderSearchResponse": {
         "type": "object",
         "properties": {
-          "ukPrn": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "providerName": {
-            "type": "string",
-            "nullable": true
-          },
-          "locationName": {
+          "error": {
             "type": "string",
             "nullable": true
           },
@@ -241,19 +221,28 @@
             "type": "string",
             "nullable": true
           },
-          "addressLine1": {
+          "searchResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProviderSearchResult"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderSearchResult": {
+        "type": "object",
+        "properties": {
+          "providerName": {
             "type": "string",
             "nullable": true
           },
-          "addressLine2": {
+          "postcode": {
             "type": "string",
             "nullable": true
           },
           "town": {
-            "type": "string",
-            "nullable": true
-          },
-          "county": {
             "type": "string",
             "nullable": true
           },
@@ -272,10 +261,6 @@
           "distance": {
             "type": "number",
             "format": "double"
-          },
-          "journeyToLink": {
-            "type": "string",
-            "nullable": true
           },
           "deliveryYears": {
             "type": "array",

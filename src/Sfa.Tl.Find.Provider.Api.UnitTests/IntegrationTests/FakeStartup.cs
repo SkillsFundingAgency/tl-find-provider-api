@@ -25,8 +25,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseRouting();
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app
+                .UseRouting()
+                .UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -66,10 +67,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 options.LowercaseQueryStrings = true;
             });
 
-            services.AddMemoryCache(options =>
-            {
-                options.SizeLimit = 2;
-            });
+            services.AddMemoryCache();
 
             services
                 .AddScoped(_ => Substitute.For<IDbContextWrapper>())
