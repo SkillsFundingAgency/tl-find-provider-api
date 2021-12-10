@@ -56,12 +56,12 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         {
             var response = await _fixture
                 .CreateClient()
-                .GetAsync("/api/v1/findproviders/providers?postcode=AB1");
+                .GetAsync("/api/v1/findproviders/providers?postcode=A");
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             var searchResponse = await response.Content.DeserializeFromHttpContent();
             searchResponse.Should().NotBeNull();
-            searchResponse!.Error.Should().Be("The postcode field must be at least 5 characters.");
+            searchResponse!.Error.Should().Be("The postcode field must be at least 2 characters.");
         }
 
         [Fact]
@@ -86,7 +86,21 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             var searchResponse = await response.Content.DeserializeFromHttpContent();
             searchResponse.Should().NotBeNull();
-            searchResponse!.Error.Should().Be("The postcode field must contain only letters, numbers, and an optional space.");
+            searchResponse!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        }
+
+
+        [Fact]
+        public async Task GetProviders_Returns_Error_Message_Result_For_Postcode_Starting_With_Number()
+        {
+            var response = await _fixture
+                .CreateClient()
+                .GetAsync("/api/v1/findproviders/providers?postcode=2V1+2WT");
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var searchResponse = await response.Content.DeserializeFromHttpContent();
+            searchResponse.Should().NotBeNull();
+            searchResponse!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
         }
 
         [Fact]

@@ -31,44 +31,60 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task GetPostcode_For_Valid_Postcode_Returns_Expected_Result()
         {
-            var validPostcode = new PostcodeLocationBuilder().BuildValidPostcodeLocation();
+            var validPostcode = PostcodeLocationBuilder.BuildValidPostcodeLocation();
 
-            var postcodeUriFragment = $"postcodes/{validPostcode.Postcode.Replace(" ", "%20")}";
-
-            var jsonBuilder = new PostcodeLookupJsonBuilder();
+            var postcodeUriFragment = $"postcodes/{validPostcode.GetUriFormattedPostcode()}";
 
             var responses = new Dictionary<string, string>
             {
-                { postcodeUriFragment, jsonBuilder.BuildValidPostcodeResponse() }
+                { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildValidPostcodeResponse() }
             };
 
             var service = new PostcodeLookupServiceBuilder()
                 .Build(responses);
 
             var result = await service.GetPostcode(validPostcode.Postcode);
-            
+
+            Verify(result, validPostcode);
+        }
+
+        [Fact]
+        public async Task GetPostcode_For_Valid_Postcode_Outward_Code_Returns_Expected_Result()
+        {
+            var validPostcode = PostcodeLocationBuilder.BuildValidOutwardPostcodeLocation();
+
+            var postcodeUriFragment = $"outcodes/{validPostcode.Postcode}";
+
+            var responses = new Dictionary<string, string>
+            {
+                { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildValidOutcodeResponse() }
+            };
+
+            var service = new PostcodeLookupServiceBuilder()
+                .Build(responses);
+
+            var result = await service.GetOutcode(validPostcode.Postcode);
+
             Verify(result, validPostcode);
         }
 
         [Fact]
         public async Task GetPostcode_For_Terminated_Postcode_Returns_Expected_Result()
         {
-            var terminatedPostcode = new PostcodeLocationBuilder().BuildTerminatedPostcodeLocation();
+            var terminatedPostcode = PostcodeLocationBuilder.BuildTerminatedPostcodeLocation();
 
-            var uriFormattedPostcode = terminatedPostcode.Postcode.Replace(" ", "%20");
+            var uriFormattedPostcode = terminatedPostcode.GetUriFormattedPostcode();
             var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
             var terminatedPostcodeUriFragment = $"terminated_postcodes/{uriFormattedPostcode}";
 
-            var jsonBuilder = new PostcodeLookupJsonBuilder();
-            
             var responses = new Dictionary<string, HttpResponseMessage>
             {
                 {
-                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildPostcodeNotFoundResponse(),
+                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildPostcodeNotFoundResponse(),
                         responseCode: HttpStatusCode.NotFound)
                 },
                 {
-                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildTerminatedPostcodeResponse())
+                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildTerminatedPostcodeResponse())
                 }
             };
 
@@ -81,24 +97,91 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         }
 
         [Fact]
-        public async Task GetPostcode_For_Invalid_Postcode_Returns_Expected_Result()
+        public async Task GetPostcode_For_Valid_Postcode_With_No_Lat_Long_Returns_Expected_Result()
         {
-            var invalidPostcode = new PostcodeLocationBuilder().BuildInvalidPostcodeLocation();
+            var noLocationPostcode = PostcodeLocationBuilder.BuildPostcodeLocationWithDefaultLatLong();
 
-            var uriFormattedPostcode = invalidPostcode.Postcode.Replace(" ", "%20");
+            var postcodeUriFragment = $"postcodes/{noLocationPostcode.GetUriFormattedPostcode()}";
+
+            var responses = new Dictionary<string, string>
+            {
+                { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildValidPostcodeResponseWithNullLatLong() }
+            };
+
+            var service = new PostcodeLookupServiceBuilder()
+                .Build(responses);
+
+            var result = await service.GetPostcode(noLocationPostcode.Postcode);
+
+            Verify(result, noLocationPostcode);
+        }
+
+        [Fact]
+        public async Task GetPostcode_For_Terminated_Postcode_With_No_Lat_Long_Returns_Expected_Result()
+        {
+            var noLocationTerminatedPostcode = PostcodeLocationBuilder.BuildTerminatedPostcodeLocationWithDefaultLatLong();
+
+            var uriFormattedPostcode = noLocationTerminatedPostcode.GetUriFormattedPostcode();
             var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
             var terminatedPostcodeUriFragment = $"terminated_postcodes/{uriFormattedPostcode}";
-
-            var jsonBuilder = new PostcodeLookupJsonBuilder();
 
             var responses = new Dictionary<string, HttpResponseMessage>
             {
                 {
-                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildInvalidPostcodeResponse(),
+                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildPostcodeNotFoundResponse(),
                         responseCode: HttpStatusCode.NotFound)
                 },
                 {
-                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildInvalidPostcodeResponse(),
+                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildValidTerminatedPostcodeResponseWithNullLatLong())
+                }
+            };
+
+            var service = new PostcodeLookupServiceBuilder()
+                .Build(responses);
+
+            var result = await service.GetPostcode(noLocationTerminatedPostcode.Postcode);
+
+            Verify(result, noLocationTerminatedPostcode);
+
+        }
+
+        [Fact]
+        public async Task GetPostcode_For_Valid_Postcode_Outward_Code_With_No_Lat_Long_Returns_Expected_Result()
+        {
+            var noLocationOutcode = PostcodeLocationBuilder.BuildOutwardPostcodeLocationWithDefaultLatLong();
+
+            var postcodeUriFragment = $"outcodes/{noLocationOutcode.Postcode}";
+
+            var responses = new Dictionary<string, string>
+            {
+                { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildValidOutcodeResponseWithNullLatLong() }
+            };
+
+            var service = new PostcodeLookupServiceBuilder()
+                .Build(responses);
+
+            var result = await service.GetOutcode(noLocationOutcode.Postcode);
+
+            Verify(result, noLocationOutcode);
+        }
+
+        [Fact]
+        public async Task GetPostcode_For_Invalid_Postcode_Returns_Expected_Result()
+        {
+            var invalidPostcode = PostcodeLocationBuilder.BuildInvalidPostcodeLocation();
+
+            var uriFormattedPostcode = invalidPostcode.GetUriFormattedPostcode();
+            var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
+            var terminatedPostcodeUriFragment = $"terminated_postcodes/{uriFormattedPostcode}";
+
+            var responses = new Dictionary<string, HttpResponseMessage>
+            {
+                {
+                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildInvalidPostcodeResponse(),
+                        responseCode: HttpStatusCode.NotFound)
+                },
+                {
+                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildInvalidPostcodeResponse(),
                         responseCode: HttpStatusCode.NotFound)
                 }
             };
@@ -114,22 +197,20 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task GetPostcode_For_NotFound_Postcode_Returns_Expected_Result()
         {
-            var invalidPostcode = new PostcodeLocationBuilder().BuildNotFoundPostcodeLocation();
+            var invalidPostcode = PostcodeLocationBuilder.BuildNotFoundPostcodeLocation();
 
-            var uriFormattedPostcode = invalidPostcode.Postcode.Replace(" ", "%20");
+            var uriFormattedPostcode = invalidPostcode.GetUriFormattedPostcode();
             var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
             var terminatedPostcodeUriFragment = $"terminated_postcodes/{uriFormattedPostcode}";
-
-            var jsonBuilder = new PostcodeLookupJsonBuilder();
 
             var responses = new Dictionary<string, HttpResponseMessage>
             {
                 {
-                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildPostcodeNotFoundResponse(),
+                    postcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildPostcodeNotFoundResponse(),
                         responseCode: HttpStatusCode.NotFound)
                 },
                 {
-                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(jsonBuilder.BuildPostcodeNotFoundResponse(),
+                    terminatedPostcodeUriFragment, FakeResponseFactory.CreateFakeResponse(PostcodeLookupJsonBuilder.BuildPostcodeNotFoundResponse(),
                         responseCode: HttpStatusCode.NotFound)
                 }
             };

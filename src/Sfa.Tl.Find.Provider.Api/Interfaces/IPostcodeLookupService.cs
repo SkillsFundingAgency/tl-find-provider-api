@@ -6,5 +6,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces
     public interface IPostcodeLookupService
     {
         Task<PostcodeLocation> GetPostcode(string postcode);
+
+        Task<PostcodeLocation> GetOutcode(string outcode);
     }
 }
