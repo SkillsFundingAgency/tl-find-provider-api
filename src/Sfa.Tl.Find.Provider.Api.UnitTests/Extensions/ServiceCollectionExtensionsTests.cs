@@ -46,6 +46,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
 
             var postcodeApiOptions = serviceProvider.GetRequiredService<IOptions<PostcodeApiSettings>>();
             postcodeApiOptions.Value.Should().BeEquivalentTo(siteConfiguration.PostcodeApiSettings);
+
+            var connectionStringOptions = serviceProvider.GetRequiredService<IOptions<ConnectionStringSettings>>();
+            //connectionStringOptions.Value.Should().BeEquivalentTo(siteConfiguration.ConnectionStringSettings);
+            connectionStringOptions.Value.Should().NotBeNull();
+            connectionStringOptions.Value.SqlConnectionString.Should().BeEquivalentTo(siteConfiguration.SqlConnectionString);
         }
 
         [Fact]

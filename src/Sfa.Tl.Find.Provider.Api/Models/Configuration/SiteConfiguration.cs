@@ -1,4 +1,5 @@
-﻿namespace Sfa.Tl.Find.Provider.Api.Models.Configuration
+﻿
+namespace Sfa.Tl.Find.Provider.Api.Models.Configuration
 {
     public class SiteConfiguration
     {

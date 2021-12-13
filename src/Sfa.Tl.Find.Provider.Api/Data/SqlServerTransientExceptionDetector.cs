@@ -7,6 +7,7 @@
 
 using System.ComponentModel;
 using Microsoft.Data.SqlClient;
+// ReSharper disable CommentTypo
 
 namespace Sfa.Tl.Find.Provider.Api.Data;
 
@@ -15,7 +16,7 @@ namespace Sfa.Tl.Find.Provider.Api.Data;
 /// </summary>
 public static class SqlServerTransientExceptionDetector
 {
-    public static bool ShouldRetryOn(SqlException ex)
+    public static bool CouldNotOpenConnection(SqlException ex)
     {
         foreach (SqlError err in ex.Errors)
         {
@@ -23,6 +24,19 @@ public static class SqlServerTransientExceptionDetector
             {
                 //Could not open connection
                 case 4060:
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static bool ShouldRetryOn(SqlException ex)
+    {
+        foreach (SqlError err in ex.Errors)
+        {
+            switch (err.Number)
+            {
                 // SQL Error Code: 49920
                 // Cannot process request. Too many operations in progress for subscription "%ld".
                 // The service is busy processing multiple requests for this subscription.

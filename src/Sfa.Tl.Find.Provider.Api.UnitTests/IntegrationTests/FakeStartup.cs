@@ -46,6 +46,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
                 .Configure<PostcodeApiSettings>(x =>
                 {
                     x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
+                })
+                .Configure<ConnectionStringSettings>(x =>
+                {
+                    x.SqlConnectionString = _siteConfiguration.SqlConnectionString;
                 });
 
             services.AddApiVersioning(config =>

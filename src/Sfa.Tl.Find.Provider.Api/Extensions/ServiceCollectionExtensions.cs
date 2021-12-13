@@ -57,6 +57,10 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
                 .Configure<PostcodeApiSettings>(x =>
                 {
                     x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+                })
+                .Configure<ConnectionStringSettings>(x =>
+                {
+                    x.SqlConnectionString = siteConfiguration.SqlConnectionString;
                 });
 
             return services;
