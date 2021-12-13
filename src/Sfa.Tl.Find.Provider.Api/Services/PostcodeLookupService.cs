@@ -37,7 +37,19 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             return await ReadPostcodeLocationFromResponse(responseMessage);
         }
 
-        private static async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(HttpResponseMessage responseMessage)
+        public async Task<PostcodeLocation> GetOutcode(string outcode)
+        {
+            var responseMessage = await _httpClient.GetAsync($"outcodes/{outcode}");
+
+            return responseMessage.StatusCode != HttpStatusCode.OK
+                ? null
+                : await ReadPostcodeLocationFromResponse(responseMessage,
+                    "outcode");
+        }
+
+        private static async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(
+            HttpResponseMessage responseMessage,
+            string postcodeFieldName = "postcode")
         {
             var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
 
@@ -47,8 +59,8 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             return new PostcodeLocation
             {
-                Postcode = resultElement.SafeGetString("postcode"),
-                Latitude = resultElement.SafeGetDouble("latitude"),
+                Postcode = resultElement.SafeGetString(postcodeFieldName),
+                Latitude = resultElement.SafeGetDouble("latitude", Constants.DefaultLatitude),
                 Longitude = resultElement.SafeGetDouble("longitude")
             };
         }

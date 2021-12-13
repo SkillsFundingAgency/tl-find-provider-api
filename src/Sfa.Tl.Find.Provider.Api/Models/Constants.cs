@@ -9,6 +9,9 @@ public static class Constants
     public const int DefaultAbsoluteExpirationInMinutes = 60;
     public const int DefaultSlidingExpirationInMinutes = 10;
 
+    public const double DefaultLatitude = 51.477928;
+    public const double DefaultLongitude = 0;
+
     public const string EnvironmentNameConfigKey = "EnvironmentName";
     public const string ConfigurationStorageConnectionStringConfigKey = "ConfigurationStorageConnectionString";
     public const string VersionConfigKey = "Version";

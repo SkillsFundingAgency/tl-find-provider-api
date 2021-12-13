@@ -1,25 +1,24 @@
 ﻿using System;
 using FluentAssertions;
-using Sfa.Tl.Find.Provider.Api.Models;
 using Xunit;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.Caching
 {
     public class CacheKeysTests
     {
-        [Theory(DisplayName = nameof(CacheKeys.PostcodeKey) + " Data Tests")]
+        [Theory(DisplayName = nameof(Models.CacheKeys.PostcodeKey) + " Data Tests")]
         [InlineData("cv12wt", "POSTCODE__CV12WT")]
         [InlineData("CV1 2WT", "POSTCODE__CV12WT")]
         public void Postcode_Key_Returns_Expected_Value(string postcode, string expectedKey)
         {
-            var key = CacheKeys.PostcodeKey(postcode);
+            var key = Models.CacheKeys.PostcodeKey(postcode);
             key.Should().Be(expectedKey);
         }
 
         [Fact]
         public void PostcodeKey_Throws_Exception_For_Null_Postcode()
         {
-            Action act = () => CacheKeys.PostcodeKey(null);
+            Action act = () => Models.CacheKeys.PostcodeKey(null);
 
             act.Should().Throw<ArgumentNullException>();
 
@@ -30,7 +29,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests
         [Fact]
         public void PostcodeKey_Throws_Exception_For_Empty_Postcode()
         {
-            Action act = () => CacheKeys.PostcodeKey("");
+            Action act = () => Models.CacheKeys.PostcodeKey("");
 
             act.Should().Throw<ArgumentException>();
 

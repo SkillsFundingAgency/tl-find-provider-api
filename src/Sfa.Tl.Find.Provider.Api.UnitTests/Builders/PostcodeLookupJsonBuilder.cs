@@ -3,34 +3,35 @@
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
 {
     // ReSharper disable StringLiteralTypo
-    public class PostcodeLookupJsonBuilder
+    public static class PostcodeLookupJsonBuilder
     {
-        public string BuildValidPostcodeResponse()
-        {
-            return typeof(PostcodeLookupJsonBuilder)
-                .ReadManifestResourceStreamAsString(
-                    "Assets.validpostcoderesponse.json");
-        }
+        public static string BuildValidPostcodeResponse() => 
+            BuildResponse("validpostcoderesponse");
 
-        public string BuildInvalidPostcodeResponse()
-        {
-            return typeof(PostcodeLookupJsonBuilder)
-                .ReadManifestResourceStreamAsString(
-                    "Assets.invalidpostcoderesponse.json");
-        }
+        public static string BuildValidPostcodeResponseWithNullLatLong() => 
+            BuildResponse("validpostcodewithnulllatlongresponse");
 
-        public string BuildPostcodeNotFoundResponse()
-        {
-            return typeof(PostcodeLookupJsonBuilder)
-                .ReadManifestResourceStreamAsString(
-                    "Assets.postcodenotfoundresponse.json");
-        }
+        public static string BuildValidOutcodeResponse() => 
+            BuildResponse("validoutcoderesponse");
 
-        public string BuildTerminatedPostcodeResponse()
-        {
-            return typeof(PostcodeLookupJsonBuilder)
+        public static string BuildValidOutcodeResponseWithNullLatLong() => 
+            BuildResponse("validoutcodewithnulllatlongresponse");
+
+        public static string BuildTerminatedPostcodeResponse() => 
+            BuildResponse("terminatedpostcoderesponse");
+
+        public static string BuildValidTerminatedPostcodeResponseWithNullLatLong() => 
+            BuildResponse("terminatedpostcodewithnulllatlongresponse");
+
+        public static string BuildInvalidPostcodeResponse() => 
+            BuildResponse("invalidpostcoderesponse");
+
+        public static string BuildPostcodeNotFoundResponse() => 
+            BuildResponse("postcodenotfoundresponse");
+        
+        private static string BuildResponse(string assetName) =>
+            typeof(PostcodeLookupJsonBuilder)
                 .ReadManifestResourceStreamAsString(
-                    "Assets.terminatedpostcoderesponse.json");
-        }
+                    $"Assets.{assetName}.json");
     }
 }

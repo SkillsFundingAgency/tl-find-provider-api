@@ -114,7 +114,10 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             if (!_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
             {
-                postcodeLocation = await _postcodeLookupService.GetPostcode(postcode);
+                postcodeLocation = postcode.Length <= 4
+                    ? await _postcodeLookupService.GetOutcode(postcode)
+                    : await _postcodeLookupService.GetPostcode(postcode);
+
                 if (postcodeLocation is null)
                 {
                     throw new PostcodeNotFoundException(postcode);
@@ -122,7 +125,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
                 _cache.Set(key, postcodeLocation,
                     CacheUtilities.DefaultMemoryCacheEntryOptions(
-                        _dateTimeService, 
+                        _dateTimeService,
                         _logger));
             }
 

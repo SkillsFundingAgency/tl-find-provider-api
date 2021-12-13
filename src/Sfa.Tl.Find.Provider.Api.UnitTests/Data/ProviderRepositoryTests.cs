@@ -167,7 +167,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data
         [Fact]
         public async Task Search_Returns_Expected_List_For_Single_Result_Row()
         {
-            var fromPostcodeLocation = new PostcodeLocationBuilder().BuildValidPostcodeLocation();
+            var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
 
             var providersPart = new ProviderSearchResultBuilder()
                 .BuildProvidersPartOfListWithSingleItem()
