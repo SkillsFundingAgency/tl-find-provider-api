@@ -24,6 +24,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         private const string PostcodeWithIllegalCharacters = "CV99 XX$";
         private const string PostcodeWithTooManyCharacters = "CV99 XG2 Z15";
         private const string PostcodeWithTooFewCharacters = "C";
+        private const string PostcodeWithMinimumCharacters = "L1";
         private const int TestQualificationId = 51;
         private const int TestPage = 3;
         private const int TestPageSize = Constants.DefaultPageSize + 10;
@@ -340,6 +341,26 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
 
             var results = okResult.Value as ProviderSearchResponse;
             results!.Error.Should().Be("The postcode field must be at least 2 characters.");
+        }
+        
+        [Fact]
+        public async Task GetProviders_Allows_Postcode_With_Minimum_Length()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(PostcodeWithMinimumCharacters, Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildWithSingleSearchResult());
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithMinimumCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().BeNull();
         }
 
         [Fact]

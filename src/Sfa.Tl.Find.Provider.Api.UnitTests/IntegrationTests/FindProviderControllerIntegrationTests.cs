@@ -26,6 +26,19 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests
         }
 
         [Fact]
+        public async Task GetProviders_Returns_OK_Result_For_Short_Postcode_Url()
+        {
+            var response = await _fixture
+                .CreateClient()
+                .GetAsync("/api/v1/findproviders/providers?postcode=L1");
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var searchResponse = await response.Content.DeserializeFromHttpContent();
+            searchResponse.Should().NotBeNull();
+            searchResponse!.Error.Should().BeNull();
+        }
+
+        [Fact]
         public async Task GetProviders_Returns_Error_Message_Result_For_Missing_Postcode()
         {
             var response = await _fixture
