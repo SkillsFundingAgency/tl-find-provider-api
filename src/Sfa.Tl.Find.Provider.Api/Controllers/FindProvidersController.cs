@@ -123,7 +123,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             {
                 switch (postcode.Length)
                 {
-                    case <= 2:
+                    case < 2:
                         errorMessage = "The postcode field must be at least 2 characters.";
                         break;
                     case > 8:
