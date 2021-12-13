@@ -1,0 +1,29 @@
+{
+  "status": 200,
+  "result": {
+    "outcode": "CV1",
+    "longitude": -1.50652551178011,
+    "latitude": 52.4093942342931,
+    "northings": 279157,
+    "eastings": 433665,
+    "admin_district": [
+      "Coventry"
+    ],
+    "parish": [
+      "Coventry, unparished area"
+    ],
+    "admin_county": [],
+    "admin_ward": [
+      "Radford",
+      "Lower Stoke",
+      "Sherbourne",
+      "Foleshill",
+      "Binley and Willenhall",
+      "St Michael's",
+      "Whoberley"
+    ],
+    "country": [
+      "England"
+    ]
+  }
+}

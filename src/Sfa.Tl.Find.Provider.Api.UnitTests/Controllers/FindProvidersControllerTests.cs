@@ -20,9 +20,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
     {
         private const string TestPostcode = "AB1 2XY";
         private const string InvalidPostcode = "CV99 XXX";
+        private const string PostcodeWithInitialNonLetter = "1V1 2WT";
         private const string PostcodeWithIllegalCharacters = "CV99 XX$";
         private const string PostcodeWithTooManyCharacters = "CV99 XG2 Z15";
-        private const string PostcodeWithTooFewCharacters = "CV19";
+        private const string PostcodeWithTooFewCharacters = "C";
+        private const string PostcodeWithMinimumCharacters = "L1";
         private const int TestQualificationId = 51;
         private const int TestPage = 3;
         private const int TestPageSize = Constants.DefaultPageSize + 10;
@@ -169,8 +171,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetProviders_Returns_Expected_List_Of_Search_Results()
         {
-            var fromPostcodeLocation = new PostcodeLocationBuilder()
-                .BuildValidPostcodeLocation();
+            var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
 
             var dataService = Substitute.For<IProviderDataService>();
             dataService.FindProviders(fromPostcodeLocation.Postcode)
@@ -193,8 +194,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
         [Fact]
         public async Task GetProviders_Returns_Expected_Value_For_One_Search_Result()
         {
-            var fromPostcodeLocation = new PostcodeLocationBuilder()
-                .BuildValidPostcodeLocation();
+            var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
 
             var providerSearchResponse = new ProviderSearchResponseBuilder()
                 .WithSearchOrigin(fromPostcodeLocation)
@@ -289,7 +289,24 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
             okResult!.StatusCode.Should().Be(200);
 
             var results = okResult.Value as ProviderSearchResponse;
-            results!.Error.Should().Be("The postcode field must contain only letters, numbers, and an optional space.");
+            results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        }
+
+        [Fact]
+        public async Task GetProviders_Validates_Postcode_Does_Not_Start_With_Letter()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithInitialNonLetter);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
         }
 
         [Fact]
@@ -323,7 +340,27 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers
             okResult!.StatusCode.Should().Be(200);
 
             var results = okResult.Value as ProviderSearchResponse;
-            results!.Error.Should().Be("The postcode field must be at least 5 characters.");
+            results!.Error.Should().Be("The postcode field must be at least 2 characters.");
+        }
+        
+        [Fact]
+        public async Task GetProviders_Allows_Postcode_With_Minimum_Length()
+        {
+            var dataService = Substitute.For<IProviderDataService>();
+            dataService.FindProviders(PostcodeWithMinimumCharacters, Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+                .Returns(new ProviderSearchResponseBuilder()
+                    .BuildWithSingleSearchResult());
+
+            var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+            var result = await controller.GetProviders(PostcodeWithMinimumCharacters);
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var results = okResult.Value as ProviderSearchResponse;
+            results!.Error.Should().BeNull();
         }
 
         [Fact]

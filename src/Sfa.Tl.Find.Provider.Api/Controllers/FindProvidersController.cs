@@ -123,17 +123,17 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers
             {
                 switch (postcode.Length)
                 {
-                    case < 5:
-                        errorMessage = "The postcode field must be at least 5 characters.";
+                    case < 2:
+                        errorMessage = "The postcode field must be at least 2 characters.";
                         break;
                     case > 8:
                         errorMessage = "The postcode field must be no more than 8 characters.";
                         break;
                 }
 
-                var regex = new Regex(@"^[0-9a-zA-Z\s]+$");
+                var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z\s]*$");
                 if (!regex.IsMatch(postcode))
-                    errorMessage = "The postcode field must contain only letters, numbers, and an optional space.";
+                    errorMessage = "The postcode field must start with a letter and contain only letters, numbers, and an optional space.";
             }
 
             return errorMessage is null;

@@ -32,11 +32,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportProviders_Creates_Expected_Providers()
         {
-            var jsonBuilder = new CourseDirectoryJsonBuilder();
-
             var responses = new Dictionary<string, string>
             {
-                { CourseDirectoryService.CourseDetailEndpoint, jsonBuilder.BuildValidTLevelsResponse() }
+                { CourseDirectoryService.CourseDetailEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelsResponse() }
             };
 
             IList<Models.Provider> receivedProviders = null;
@@ -110,11 +108,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportQualifications_Creates_Expected_Qualifications()
         {
-            var jsonBuilder = new CourseDirectoryJsonBuilder();
-
             var responses = new Dictionary<string, string>
             {
-                { CourseDirectoryService.QualificationsEndpoint, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
+                { CourseDirectoryService.QualificationsEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelDefinitionsResponse() }
             };
 
             IList<Qualification> receivedQualifications = null;
@@ -153,11 +149,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services
         [Fact]
         public async Task ImportQualifications_Removes_Qualifications_From_Cache()
         {
-            var jsonBuilder = new CourseDirectoryJsonBuilder();
-
             var responses = new Dictionary<string, string>
             {
-                { CourseDirectoryService.QualificationsEndpoint, jsonBuilder.BuildValidTLevelDefinitionsResponse() }
+                { CourseDirectoryService.QualificationsEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelDefinitionsResponse() }
             };
 
             var cache = Substitute.For<IMemoryCache>();

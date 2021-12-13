@@ -1,0 +1,17 @@
+{
+  "status": 200,
+  "result": {
+    "outcode": "IM4",
+    "longitude": null,
+    "latitude": null,
+    "northings": 0,
+    "eastings": 0,
+    "admin_district": [],
+    "parish": [],
+    "admin_county": [],
+    "admin_ward": [],
+    "country": [
+      "Isle of Man"
+    ]
+  }
+}
