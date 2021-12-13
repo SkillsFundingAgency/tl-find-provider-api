@@ -43,8 +43,9 @@ builder.Services.AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.Allow
 builder.Services.AddHttpClients();
 
 builder.Services
-    .AddScoped<IDbContextWrapper>(_ =>
-        new DbContextWrapper(siteConfiguration.SqlConnectionString))
+    //.AddScoped<IDbContextWrapper>(_ =>
+    //    new DbContextWrapper(siteConfiguration.SqlConnectionString))
+    .AddScoped<IDbContextWrapper, DbContextWrapper>()
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
     .AddTransient<IProviderRepository, ProviderRepository>()
