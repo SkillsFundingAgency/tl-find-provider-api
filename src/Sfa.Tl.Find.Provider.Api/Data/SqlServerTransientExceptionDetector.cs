@@ -139,15 +139,13 @@ public static class SqlServerTransientExceptionDetector
 
     public static bool ShouldRetryOn(Win32Exception ex)
     {
-        switch (ex.NativeErrorCode)
+        return ex.NativeErrorCode switch
         {
             // Timeout expired
-            case 0x102:
+            0x102 => true,
             // Semaphore timeout expired
-            case 0x121:
-                return true;
-            default:
-                return false;
-        }
+            0x121 => true,
+            _ => false
+        };
     }
 }
