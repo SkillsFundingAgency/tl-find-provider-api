@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 

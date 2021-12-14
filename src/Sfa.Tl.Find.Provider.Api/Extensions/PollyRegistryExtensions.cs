@@ -7,6 +7,8 @@ using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Models;
 
+// ReSharper disable UnusedMethodReturnValue.Global
+
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
 public static class PollyRegistryExtensions
