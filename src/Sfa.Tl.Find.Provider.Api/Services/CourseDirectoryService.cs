@@ -45,8 +45,9 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
-                _logger.LogError($"Course Directory API call to '{CourseDetailEndpoint}' failed with " +
-                                 $"{responseMessage.StatusCode} - {responseMessage.ReasonPhrase}");
+                _logger.LogError("Course Directory API call to '{CourseDetailEndpoint}' failed with " +
+                                 "{StatusCode} - {ReasonPhrase}",
+                    CourseDetailEndpoint, responseMessage.StatusCode, responseMessage.ReasonPhrase);
             }
 
             responseMessage.EnsureSuccessStatusCode();
@@ -64,8 +65,9 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
-                _logger.LogError($"Course Directory API call to '{QualificationsEndpoint}' failed with " +
-                                 $"{responseMessage.StatusCode} - {responseMessage.ReasonPhrase}");
+                _logger.LogError("Course Directory API call to '{QualificationsEndpoint}' failed with " +
+                                 "{StatusCode} - {ReasonPhrase}",
+                    QualificationsEndpoint, responseMessage.StatusCode, responseMessage.ReasonPhrase);
             }
 
             responseMessage.EnsureSuccessStatusCode();
@@ -95,13 +97,15 @@ namespace Sfa.Tl.Find.Provider.Api.Services
 
                 if (!courseElement.TryGetProperty("provider", out var providerElement))
                 {
-                    _logger.LogWarning($"Could not find provider property for course record with tLevelId {tLevelId}.");
+                    _logger.LogWarning("Could not find provider property for course record with tLevelId {tLevelId}.",
+                        tLevelId);
                     continue;
                 }
 
                 if (!int.TryParse(providerElement.SafeGetString("ukprn"), out var ukPrn))
                 {
-                    _logger.LogWarning($"Could not find ukprn property for course record with tLevelId {tLevelId}");
+                    _logger.LogWarning("Could not find ukprn property for course record with tLevelId {tLevelId}",
+                        tLevelId);
                     continue;
                 }
 
@@ -129,7 +133,8 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                 if (!courseElement.TryGetProperty("locations", out var locationsProperty))
                 {
                     _logger.LogWarning(
-                        $"Could not find locations property for course record with tLevelId {tLevelId}.");
+                        "Could not find locations property for course record with tLevelId {tLevelId}.", 
+                        tLevelId);
                     continue;
                 }
 
@@ -138,13 +143,15 @@ namespace Sfa.Tl.Find.Provider.Api.Services
                     : 0;
                 if (qualificationFrameworkCode == 0)
                 {
-                    _logger.LogWarning($"Could not find qualification for course record with tLevelId {tLevelId}.");
+                    _logger.LogWarning("Could not find qualification for course record with tLevelId {tLevelId}",
+                        tLevelId);
                     continue;
                 }
 
                 if (!DateTime.TryParse(courseElement.SafeGetString("startDate"), out var startDate))
                 {
-                    _logger.LogWarning($"Could not read start date for course record with tLevelId {tLevelId}.");
+                    _logger.LogWarning("Could not read start date for course record with tLevelId {tLevelId}.",
+                        tLevelId);
                     continue;
                 }
 

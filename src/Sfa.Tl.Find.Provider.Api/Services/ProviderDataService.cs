@@ -77,7 +77,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services
         {
             try
             {
-                _logger.LogDebug($"Searching for postcode {postcode}");
+                _logger.LogDebug("Searching for postcode {postcode}", postcode);
 
                 var postcodeLocation = await GetPostcode(postcode);
 
@@ -90,7 +90,8 @@ namespace Sfa.Tl.Find.Provider.Api.Services
             }
             catch (PostcodeNotFoundException pex)
             {
-                _logger.LogError(pex, $"Postcode {pex.Postcode} was not found. Returning an error result.");
+                _logger.LogError(pex, "Postcode {Postcode} was not found. Returning an error result.",
+                    pex.Postcode);
                 return new ProviderSearchResponse
                 {
                     Error = "The postcode was not found"

@@ -15,12 +15,12 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
         {
             var (inserted, updated, deleted) = updateResult.ConvertToTuple();
 
-            var message = $"{repositoryName} saved {typeName} data.";
-            if (includeInserted) message += $" Inserted {inserted} row{(inserted == 1 ? "" : "s")}.";
-            if (includeUpdated) message += $" Updated {updated} row{(updated == 1 ? "" : "s")}.";
-            if (includeDeleted) message += $" Deleted {deleted} row{(deleted == 1 ? "" : "s")}.";
+            logger.LogInformation("{repositoryName} saved {typeName} data.",
+                repositoryName, typeName);
 
-            logger.LogInformation(message);
+            if (includeInserted) logger.LogInformation(" Inserted {inserted} row(s).", inserted);
+            if (includeUpdated) logger.LogInformation(" Updated {updated} row(s).", updated);
+            if (includeDeleted) logger.LogInformation(" Deleted {deleted} row(s).", deleted);
         }
     }
 }

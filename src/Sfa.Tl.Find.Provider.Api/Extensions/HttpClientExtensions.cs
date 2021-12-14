@@ -24,8 +24,9 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions
                             {
                                 serviceProvider
                                     .GetService<ILogger<T>>()?
-                                    .LogWarning($"Transient HTTP error in {typeof(T).Name}. " +
-                                                $"Delaying for {timespan.TotalMilliseconds}ms, then making retry {retryAttempt}.");
+                                    .LogWarning("Transient HTTP error in {Name}. " +
+                                                "Delaying for {delayTime}ms, then making retry {retryAttempt}.",
+                                        typeof(T).Name, timespan.TotalMilliseconds, retryAttempt);
                             }
                         ));
         }
