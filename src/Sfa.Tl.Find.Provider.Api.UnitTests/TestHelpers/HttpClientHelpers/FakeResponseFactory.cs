@@ -2,20 +2,19 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
+
+public static class FakeResponseFactory
 {
-    public static class FakeResponseFactory
+    public static HttpResponseMessage CreateFakeResponse(string response, string responseContentType = "application/json", HttpStatusCode responseCode = HttpStatusCode.OK)
     {
-        public static HttpResponseMessage CreateFakeResponse(string response, string responseContentType = "application/json", HttpStatusCode responseCode = HttpStatusCode.OK)
+        var httpResponseMessage = new HttpResponseMessage(responseCode)
         {
-            var httpResponseMessage = new HttpResponseMessage(responseCode)
-            {
-                Content = new StringContent(response)
-            };
+            Content = new StringContent(response)
+        };
 
-            httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue(responseContentType);
+        httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue(responseContentType);
 
-            return httpResponseMessage;
-        }
+        return httpResponseMessage;
     }
 }

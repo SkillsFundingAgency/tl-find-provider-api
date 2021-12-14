@@ -10,46 +10,45 @@ using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Attributes
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.Attributes;
+
+public class HmacAuthorizationAttributeTests
 {
-    public class HmacAuthorizationAttributeTests
+    [Fact]
+    public void Constructor_Guards_Against_NullParameters()
     {
-        [Fact]
-        public void Constructor_Guards_Against_NullParameters()
-        {
-            typeof(HmacAuthorizationAttribute)
-                .ShouldNotAcceptNullConstructorArguments();
-        }
+        typeof(HmacAuthorizationAttribute)
+            .ShouldNotAcceptNullConstructorArguments();
+    }
 
-        [Fact]
-        public void Implementation_Type_Is_Expected_Type()
-        {
-            var attribute = new HmacAuthorizationAttribute();
-            attribute.ImplementationType.Should().Be(typeof(HmacAuthorizationFilter));
-        }
+    [Fact]
+    public void Implementation_Type_Is_Expected_Type()
+    {
+        var attribute = new HmacAuthorizationAttribute();
+        attribute.ImplementationType.Should().Be(typeof(HmacAuthorizationFilter));
+    }
 
-        [Fact]
-        public void Implementation_Create_Instance_Returns_Expected_Object()
-        {
-            var apiSettingOptions = Options.Create(
-                new SettingsBuilder()
-                    .BuildApiSettings());
+    [Fact]
+    public void Implementation_Create_Instance_Returns_Expected_Object()
+    {
+        var apiSettingOptions = Options.Create(
+            new SettingsBuilder()
+                .BuildApiSettings());
 
-            var memoryCache = Substitute.For<IMemoryCache>();
-            var logger = Substitute.For<ILogger<HmacAuthorizationFilter>>();
+        var memoryCache = Substitute.For<IMemoryCache>();
+        var logger = Substitute.For<ILogger<HmacAuthorizationFilter>>();
 
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => apiSettingOptions)
-                .AddScoped(_ => memoryCache)
-                .AddScoped(_ => logger)
-                .BuildServiceProvider();
+        var serviceProvider = new ServiceCollection()
+            .AddScoped(_ => apiSettingOptions)
+            .AddScoped(_ => memoryCache)
+            .AddScoped(_ => logger)
+            .BuildServiceProvider();
 
-            var attribute = new HmacAuthorizationAttribute();
-            attribute.ImplementationType.Should().Be(typeof(HmacAuthorizationFilter));
+        var attribute = new HmacAuthorizationAttribute();
+        attribute.ImplementationType.Should().Be(typeof(HmacAuthorizationFilter));
 
-            var filter = attribute.CreateInstance(serviceProvider);
-            filter.Should().NotBeNull();
-            filter.Should().BeOfType(typeof(HmacAuthorizationFilter));
-        }
+        var filter = attribute.CreateInstance(serviceProvider);
+        filter.Should().NotBeNull();
+        filter.Should().BeOfType(typeof(HmacAuthorizationFilter));
     }
 }

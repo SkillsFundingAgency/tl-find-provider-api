@@ -4,21 +4,20 @@ using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Xunit;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
+
+public class HttpClientBuilderExtensionsTests
 {
-    public class HttpClientBuilderExtensionsTests
+    [Fact]
+    public void AddSwagger_Should_AddService()
     {
-        [Fact]
-        public void AddSwagger_Should_AddService()
-        {
-            var services = new ServiceCollection();
-            var builder = Substitute.For<IHttpClientBuilder>();
-            builder.Services.Returns(services);
+        var services = new ServiceCollection();
+        var builder = Substitute.For<IHttpClientBuilder>();
+        builder.Services.Returns(services);
 
-            var builderAfter = builder.AddRetryPolicyHandler<HttpClientBuilderExtensionsTests>();
+        var builderAfter = builder.AddRetryPolicyHandler<HttpClientBuilderExtensionsTests>();
 
-            builderAfter.Should().NotBeNull();
-            builderAfter.Services.Should().NotBeNullOrEmpty();
-        }
+        builderAfter.Should().NotBeNull();
+        builderAfter.Services.Should().NotBeNullOrEmpty();
     }
 }
