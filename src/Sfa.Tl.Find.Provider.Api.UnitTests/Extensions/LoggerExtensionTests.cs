@@ -23,15 +23,35 @@ public class LoggerExtensionTests
 
         logger.LogChangeResults(changeResult, "TestRepository", "TestData");
 
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information);
+        logger.ReceivedCalls().Count().Should().Be(4);
 
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
-            .Contain(args => args[2] != null && args[2].ToString() == "TestRepository saved TestData data. Inserted 3 rows. Updated 2 rows. Deleted 1 row.");
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
+
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args => 
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Inserted 3 row(s).");
+
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args => 
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Updated 2 row(s).");
+
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args => 
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Deleted 1 row(s).");
     }
 
     [Fact]
@@ -51,10 +71,28 @@ public class LoggerExtensionTests
             .Should()
             .Contain(args => args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information);
 
+        logger.ReceivedCalls().Count().Should().Be(3);
+        
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
-            .Contain(args => args[2] != null && args[2].ToString() == "TestRepository saved TestData data. Updated 2 rows. Deleted 1 row.");
+            .Contain(args => 
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
+        
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args => 
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Updated 2 row(s).");
+        
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information && 
+                args[2] != null && args[2].ToString() == " Deleted 1 row(s).");
     }
 
     [Fact]
@@ -69,15 +107,28 @@ public class LoggerExtensionTests
 
         logger.LogChangeResults(changeResult, "TestRepository", "TestData", includeUpdated: false);
 
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information);
+        logger.ReceivedCalls().Count().Should().Be(3);
 
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
-            .Contain(args => args[2] != null && args[2].ToString() == "TestRepository saved TestData data. Inserted 3 rows. Deleted 1 row.");
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
+
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Inserted 3 row(s).");
+        
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Deleted 1 row(s).");
     }
 
     [Fact]
@@ -92,14 +143,27 @@ public class LoggerExtensionTests
 
         logger.LogChangeResults(changeResult, "TestRepository", "TestData", includeDeleted: false);
 
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information);
+        logger.ReceivedCalls().Count().Should().Be(3);
 
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
-            .Contain(args => args[2] != null && args[2].ToString() == "TestRepository saved TestData data. Inserted 1 row. Updated 1 row.");
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
+
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Inserted 1 row(s).");
+
+        logger.ReceivedCalls()
+            .Select(call => call.GetArguments())
+            .Should()
+            .Contain(args =>
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == " Updated 1 row(s).");
     }
 }
