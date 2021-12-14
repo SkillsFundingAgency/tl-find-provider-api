@@ -1,7 +1,6 @@
-﻿namespace Sfa.Tl.Find.Provider.Api.Models.Configuration
+﻿namespace Sfa.Tl.Find.Provider.Api.Models.Configuration;
+
+public class ConnectionStringSettings
 {
-    public class ConnectionStringSettings
-    {
-        public string SqlConnectionString { get; set; }
-    }
+    public string SqlConnectionString { get; set; }
 }

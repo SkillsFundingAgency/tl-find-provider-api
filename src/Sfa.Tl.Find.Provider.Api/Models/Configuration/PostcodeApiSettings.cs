@@ -1,7 +1,6 @@
-﻿namespace Sfa.Tl.Find.Provider.Api.Models.Configuration
+﻿namespace Sfa.Tl.Find.Provider.Api.Models.Configuration;
+
+public class PostcodeApiSettings
 {
-    public class PostcodeApiSettings
-    {
-        public string BaseUri { get; set; }
-    }
+    public string BaseUri { get; set; }
 }
