@@ -49,7 +49,6 @@ public class DbContextWrapper : IDbContextWrapper
         CommandType? commandType = null)
     {
         var (retryPolicy, context) = GetRetryPolicy();
-
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection
@@ -73,7 +72,6 @@ public class DbContextWrapper : IDbContextWrapper
         CommandType? commandType = null)
     {
         var (retryPolicy, context) = GetRetryPolicy();
-
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection
@@ -94,10 +92,16 @@ public class DbContextWrapper : IDbContextWrapper
         object param = null,
         IDbTransaction transaction = null,
         int? commandTimeout = null,
-        CommandType? commandType = null) =>
-        await connection.ExecuteScalarAsync<T>(
-            sql, param, transaction,
-            commandTimeout, commandType);
+        CommandType? commandType = null)
+    {
+        var (retryPolicy, context) = GetRetryPolicy();
+        return await retryPolicy
+            .ExecuteAsync(async _ =>
+                    await connection.ExecuteScalarAsync<T>(
+                        sql, param, transaction,
+                        commandTimeout, commandType),
+                context);
+    }
 
     private (IAsyncPolicy, Context) GetRetryPolicy()
     {
