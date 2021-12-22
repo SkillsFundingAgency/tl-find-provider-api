@@ -48,7 +48,6 @@ public class ServiceCollectionExtensionsTests
         postcodeApiOptions.Value.Should().BeEquivalentTo(siteConfiguration.PostcodeApiSettings);
 
         var connectionStringOptions = serviceProvider.GetRequiredService<IOptions<ConnectionStringSettings>>();
-        //connectionStringOptions.Value.Should().BeEquivalentTo(siteConfiguration.ConnectionStringSettings);
         connectionStringOptions.Value.Should().NotBeNull();
         connectionStringOptions.Value.SqlConnectionString.Should().BeEquivalentTo(siteConfiguration.SqlConnectionString);
     }

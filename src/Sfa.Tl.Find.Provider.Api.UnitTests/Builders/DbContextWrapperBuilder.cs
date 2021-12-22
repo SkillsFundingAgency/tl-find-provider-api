@@ -17,7 +17,7 @@ public class DbContextWrapperBuilder
     {
         connectionString ??= "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
 
-        var connectionStringOptions = new Func<IOptions<ConnectionStringSettings>>(() => 
+        var connectionStringOptions = new Func<IOptions<ConnectionStringSettings>>(() =>
         {
             var config = Substitute.For<IOptions<ConnectionStringSettings>>();
             config.Value.Returns(new ConnectionStringSettings
@@ -28,9 +28,9 @@ public class DbContextWrapperBuilder
         }).Invoke();
 
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
-            
+
         logger ??= Substitute.For<ILogger<DbContextWrapper>>();
-            
+
         return new DbContextWrapper(connectionStringOptions, policyRegistry, logger);
     }
 }

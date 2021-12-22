@@ -1,12 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
-
-public static class PolicyContextItems
-{
-    public const string Logger = "logger";
-}
 
 public static class PollyContextExtensions
 {
