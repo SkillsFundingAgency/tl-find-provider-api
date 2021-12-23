@@ -140,12 +140,12 @@ public class ProviderRepository : IProviderRepository
                                 a => a.FullName!.ToLowerInvariant().StartsWith("xunit.runner"));
                         if (!isRunningFromTest)
                         {
-                            var r = __random.Next(100);
+                            var r = __random.Next(10);
                             switch (r)
                             {
                                 case 1:
                                     throw SqlExceptionFactory.Create(49920);
-                                case 99:
+                                case 9:
                                     throw SqlExceptionFactory.Create(40613);
                             }
                         }
