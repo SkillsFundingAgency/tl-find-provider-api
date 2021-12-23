@@ -1,8 +1,11 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -131,6 +134,15 @@ public class ProviderRepository : IProviderRepository
                     var key = $"{p.UkPrn}_{p.Postcode}";
                     if (!providerSearchResults.TryGetValue(key, out var searchResult))
                     {
+                        var r = __random.Next(100);
+                        switch (r)
+                        {
+                            case 1:
+                                throw SqlExceptionFactory.Create(49920);
+                            case 99:
+                                throw SqlExceptionFactory.Create(40613);
+                        }
+
                         providerSearchResults.Add(key, searchResult = p);
                         searchResult.JourneyToLink = fromPostcodeLocation.CreateJourneyLink(searchResult.Postcode);
                     }
@@ -175,5 +187,25 @@ public class ProviderRepository : IProviderRepository
             .ThenBy(s => s.ProviderName)
             .ThenBy(s => s.LocationName)
             .ToList();
+    }
+
+    private static readonly Random __random = new();
+
+    private static class SqlExceptionFactory
+    {
+        public static SqlException Create(int number)
+        {
+            Exception? innerEx = null;
+            var c = typeof(SqlErrorCollection).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance);
+            var errors = (c[0].Invoke(null) as SqlErrorCollection)!;
+            var errorList = (errors.GetType().GetField("_errors", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(errors) as List<object>)!;
+            c = typeof(SqlError).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance);
+            var nineC = c.FirstOrDefault(f => f.GetParameters().Length == 9)!;
+            var sqlError = (nineC.Invoke(new object?[] { number, (byte)0, (byte)0, "", "", "", 0, (uint)0, innerEx }) as SqlError)!;
+            errorList.Add(sqlError);
+
+            return (Activator.CreateInstance(typeof(SqlException), BindingFlags.NonPublic | BindingFlags.Instance, null, new object?[] { "test", errors,
+                innerEx, Guid.NewGuid() }, null) as SqlException)!;
+        }
     }
 }
