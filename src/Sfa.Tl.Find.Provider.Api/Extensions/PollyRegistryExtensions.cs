@@ -36,12 +36,12 @@ public static class PollyRegistryExtensions
 
                     if (exception != null)
                     {
-                        logger.LogWarning(exception, "An error occurred when calling the database. Retrying after {sleepDuration}. Retry {retryAttempt} for {policyKey}",
-                            sleepDuration, context.Count, context.PolicyKey);
+                        logger.LogWarning(exception, "A database error occurred on attempt {retryAttempt}. Retrying after {sleepDuration:F2}s. Policy key {policyKey}",
+                            context.Count, sleepDuration.TotalSeconds, context.PolicyKey);
                     }
                     else
                     {
-                        logger.LogWarning("A non success code was received on retry {RetryAttempt} for {PolicyKey}",
+                        logger.LogWarning("Attempt {retryAttempt} for {policyKey} failed, but no exception was seen.",
                             context.Count, context.PolicyKey);
                     }
                 })
