@@ -30,6 +30,7 @@ public static class PollyRegistryExtensions
                 backoff,
                 (exception,
                     sleepDuration,
+                    retryAttempt,
                     context) =>
                 {
                     if (!context.TryGetLogger(out var logger)) return;
@@ -37,12 +38,12 @@ public static class PollyRegistryExtensions
                     if (exception != null)
                     {
                         logger.LogWarning(exception, "A database error occurred on attempt {retryAttempt}. Retrying after {sleepDuration:F2}s. Policy key {policyKey}",
-                            context.Count, sleepDuration.TotalSeconds, context.PolicyKey);
+                            retryAttempt, sleepDuration.TotalSeconds, context.PolicyKey);
                     }
                     else
                     {
                         logger.LogWarning("Attempt {retryAttempt} for {policyKey} failed, but no exception was seen.",
-                            context.Count, context.PolicyKey);
+                            retryAttempt, context.PolicyKey);
                     }
                 })
             .WithPolicyKey(Constants.DapperRetryPolicyName);
