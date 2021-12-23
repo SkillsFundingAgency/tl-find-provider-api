@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -136,8 +135,10 @@ public class ProviderRepository : IProviderRepository
                     if (!providerSearchResults.TryGetValue(key, out var searchResult))
                     {
                         //TODO: Remove code here
+                        /*
                         var isRunningFromTest = AppDomain.CurrentDomain.GetAssemblies().Any(
-                                a => a.FullName!.ToLowerInvariant().StartsWith("xunit.runner"));
+                            // ReSharper disable once StringLiteralTypo
+                            a => a.FullName!.ToLowerInvariant().StartsWith("xunit.runner"));
                         if (!isRunningFromTest)
                         {
                             var r = __random.Next(6);
@@ -149,6 +150,7 @@ public class ProviderRepository : IProviderRepository
                                     throw SqlExceptionFactory.Create(40613);
                             }
                         }
+                        */
                         //End of temp code block
 
                         providerSearchResults.Add(key, searchResult = p);
