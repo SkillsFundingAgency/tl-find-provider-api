@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -134,14 +135,21 @@ public class ProviderRepository : IProviderRepository
                     var key = $"{p.UkPrn}_{p.Postcode}";
                     if (!providerSearchResults.TryGetValue(key, out var searchResult))
                     {
-                        var r = __random.Next(100);
-                        switch (r)
+                        //TODO: Remove code here
+                        var isRunningFromTest = AppDomain.CurrentDomain.GetAssemblies().Any(
+                                a => a.FullName!.ToLowerInvariant().StartsWith("xunit.runner"));
+                        if (!isRunningFromTest)
                         {
-                            case 1:
-                                throw SqlExceptionFactory.Create(49920);
-                            case 99:
-                                throw SqlExceptionFactory.Create(40613);
+                            var r = __random.Next(100);
+                            switch (r)
+                            {
+                                case 1:
+                                    throw SqlExceptionFactory.Create(49920);
+                                case 99:
+                                    throw SqlExceptionFactory.Create(40613);
+                            }
                         }
+                        //End of temp code block
 
                         providerSearchResults.Add(key, searchResult = p);
                         searchResult.JourneyToLink = fromPostcodeLocation.CreateJourneyLink(searchResult.Postcode);
