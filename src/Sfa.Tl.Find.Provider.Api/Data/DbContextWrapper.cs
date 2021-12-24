@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Registry;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
@@ -47,7 +48,7 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = GetRetryPolicy();
+        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection
@@ -70,7 +71,8 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = GetRetryPolicy();
+        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+        
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection
@@ -93,31 +95,12 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = GetRetryPolicy();
+        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection.ExecuteScalarAsync<T>(
                         sql, param, transaction,
                         commandTimeout, commandType),
                 context);
-    }
-
-    private (IAsyncPolicy, Context) GetRetryPolicy()
-    {
-        var retryPolicy =
-            _policyRegistry
-                .Get<IAsyncPolicy>(Constants.DapperRetryPolicyName)
-            ?? Policy.NoOpAsync();
-
-        //https://www.stevejgordon.co.uk/passing-an-ilogger-to-polly-policies
-        var context = new Context($"{Guid.NewGuid()}",
-            new Dictionary<string, object>
-            {
-                {
-                    PolicyContextItems.Logger, _logger
-                }
-            });
-
-        return (retryPolicy, context);
     }
 }

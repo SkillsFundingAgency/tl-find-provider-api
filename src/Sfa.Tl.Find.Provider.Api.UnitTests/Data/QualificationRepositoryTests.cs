@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Polly;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
@@ -122,8 +125,14 @@ public class QualificationRepositoryTests
                 var arg = x.ArgAt<string>(1);
                 receivedSqlArgs.Add(arg);
             });
-            
-        var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
+
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var logger = Substitute.For<ILogger<QualificationRepository>>();
+
+        var repository = new QualificationRepositoryBuilder()
+            .Build(dbContextWrapper, pollyPolicyRegistry, logger);
 
         await repository.Save(qualifications);
 
@@ -146,5 +155,27 @@ public class QualificationRepositoryTests
         transaction
             .Received(1)
             .Commit();
+    }
+
+    [Fact]
+    public async Task Save_Calls_Retry_Policy()
+    {
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var logger = Substitute.For<ILogger<QualificationRepository>>();
+
+        var repository = new QualificationRepositoryBuilder()
+            .Build(policyRegistry: pollyPolicyRegistry, 
+                logger: logger);
+
+        await repository.Save(new List<Qualification>());
+        
+        await pollyPolicy.Received(1).ExecuteAsync(
+            Arg.Any<Func<Context, Task>>(),
+            Arg.Is<Context>(ctx =>
+                ctx.ContainsKey(PolicyContextItems.Logger) &&
+                ctx[PolicyContextItems.Logger] == logger
+            ));
     }
 }

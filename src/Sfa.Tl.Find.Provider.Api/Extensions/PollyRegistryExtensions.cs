@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -16,10 +17,9 @@ public static class PollyRegistryExtensions
 {
     public static IPolicyRegistry<string> AddDapperRetryPolicy(this IPolicyRegistry<string> policyRegistry)
     {
-        var backoff = Backoff.DecorrelatedJitterBackoffV2(
-            TimeSpan.FromSeconds(1),
-            7,
-            seed: 100);
+        var backoff = Backoff.ExponentialBackoff(
+            TimeSpan.FromSeconds(1.2),
+            7);
 
         var retryPolicy = Policy
             .Handle<SqlException>(SqlServerTransientExceptionDetector.ShouldRetryOn)
@@ -51,5 +51,26 @@ public static class PollyRegistryExtensions
         policyRegistry.Add(Constants.DapperRetryPolicyName, retryPolicy);
 
         return policyRegistry;
+    }
+
+    public static (IAsyncPolicy, Context) GetRetryPolicy(
+        this IReadOnlyPolicyRegistry<string> policyRegistry, 
+        ILogger logger)
+    {
+        var retryPolicy =
+            policyRegistry
+                .Get<IAsyncPolicy>(Constants.DapperRetryPolicyName)
+            ?? Policy.NoOpAsync();
+
+        //https://www.stevejgordon.co.uk/passing-an-ilogger-to-polly-policies
+        var context = new Context($"{Guid.NewGuid()}",
+            new Dictionary<string, object>
+            {
+                {
+                    PolicyContextItems.Logger, logger
+                }
+            });
+
+        return (retryPolicy, context);
     }
 }

@@ -1,12 +1,10 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
@@ -18,14 +16,17 @@ public class ProviderRepository : IProviderRepository
     private readonly IDbContextWrapper _dbContextWrapper;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<ProviderRepository> _logger;
+    private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
     public ProviderRepository(
         IDbContextWrapper dbContextWrapper,
         IDateTimeService dateTimeService,
+        IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<ProviderRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
         _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -60,59 +61,72 @@ public class ProviderRepository : IProviderRepository
                 }
             }
 
-            using var connection = _dbContextWrapper.CreateConnection();
-            connection.Open();
+            var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
 
-            using var transaction = _dbContextWrapper.BeginTransaction(connection);
-
-            var providerUpdateResult = await _dbContextWrapper
-                .QueryAsync<(string Change, int ChangeCount)>(
-                    connection,
-                    "UpdateProviders",
-                    new
-                    {
-                        data = providers.AsTableValuedParameter("dbo.ProviderDataTableType")
-                    },
-                    transaction,
-                    commandType: CommandType.StoredProcedure);
-
-            _logger.LogChangeResults(providerUpdateResult, nameof(ProviderRepository), nameof(providers));
-
-            var locationUpdateResult = await _dbContextWrapper
-                .QueryAsync<(string Change, int ChangeCount)>(
-                    connection,
-                    "UpdateLocations",
-                    new
-                    {
-                        data = locationData.AsTableValuedParameter("dbo.LocationDataTableType")
-                    },
-                    transaction,
-                    commandType: CommandType.StoredProcedure);
-
-            _logger.LogChangeResults(locationUpdateResult, nameof(ProviderRepository), "locations");
-
-            var locationQualificationUpdateResult = await _dbContextWrapper
-                .QueryAsync<(string Change, int ChangeCount)>(
-                    connection,
-                    "UpdateLocationQualifications",
-                    new
-                    {
-                        data = locationQualificationData.AsTableValuedParameter(
-                            "dbo.LocationQualificationDataTableType")
-                    },
-                    transaction,
-                    commandType: CommandType.StoredProcedure);
-
-            _logger.LogChangeResults(locationQualificationUpdateResult, nameof(ProviderRepository),
-                "location qualifications", includeUpdated: false);
-
-            transaction.Commit();
+            await retryPolicy
+                .ExecuteAsync(async _ => 
+                    await PerformSave(providers, locationData, locationQualificationData),
+                    context);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred when saving providers");
             throw;
         }
+    }
+
+    private async Task PerformSave(
+        IEnumerable<Models.Provider> providers,
+        IEnumerable<LocationDto> locationData,
+        IEnumerable<LocationQualificationDto> locationQualificationData)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+        connection.Open();
+
+        using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+        var providerUpdateResult = await _dbContextWrapper
+            .QueryAsync<(string Change, int ChangeCount)>(
+                connection,
+                "UpdateProviders",
+                new
+                {
+                    data = providers.AsTableValuedParameter("dbo.ProviderDataTableType")
+                },
+                transaction,
+                commandType: CommandType.StoredProcedure);
+
+        _logger.LogChangeResults(providerUpdateResult, nameof(ProviderRepository), nameof(providers));
+
+        var locationUpdateResult = await _dbContextWrapper
+            .QueryAsync<(string Change, int ChangeCount)>(
+                connection,
+                "UpdateLocations",
+                new
+                {
+                    data = locationData.AsTableValuedParameter("dbo.LocationDataTableType")
+                },
+                transaction,
+                commandType: CommandType.StoredProcedure);
+
+        _logger.LogChangeResults(locationUpdateResult, nameof(ProviderRepository), "locations");
+
+        var locationQualificationUpdateResult = await _dbContextWrapper
+            .QueryAsync<(string Change, int ChangeCount)>(
+                connection,
+                "UpdateLocationQualifications",
+                new
+                {
+                    data = locationQualificationData.AsTableValuedParameter(
+                        "dbo.LocationQualificationDataTableType")
+                },
+                transaction,
+                commandType: CommandType.StoredProcedure);
+
+        _logger.LogChangeResults(locationQualificationUpdateResult, nameof(ProviderRepository),
+            "location qualifications", includeUpdated: false);
+
+        transaction.Commit();
     }
 
     public async Task<IEnumerable<ProviderSearchResult>> Search(
@@ -134,31 +148,10 @@ public class ProviderRepository : IProviderRepository
                     var key = $"{p.UkPrn}_{p.Postcode}";
                     if (!providerSearchResults.TryGetValue(key, out var searchResult))
                     {
-                        //TODO: Remove code here
-                        /*
-                        var isRunningFromTest = AppDomain.CurrentDomain.GetAssemblies().Any(
-                            // ReSharper disable once StringLiteralTypo
-                            a => a.FullName!.ToLowerInvariant().StartsWith("xunit.runner"));
-                        if (!isRunningFromTest)
-                        {
-                            var r = __random.Next(6);
-                            switch (r)
-                            {
-                                case 1:
-                                    throw SqlExceptionFactory.Create(49920);
-                                case 2:
-                                    throw SqlExceptionFactory.Create(40613);
-                            }
-                        }
-                        */
-                        //End of temp code block
-
+                        ChaosMaker.MakeChaos(0);
                         providerSearchResults.Add(key, searchResult = p);
                         searchResult.JourneyToLink = fromPostcodeLocation.CreateJourneyLink(searchResult.Postcode);
                     }
-
-                    //TODO: Consider a dictionary, and lookup like above
-                    // - the year list is small so linear search would be reasonably fast
 
                     var deliveryYear = searchResult
                         .DeliveryYears
@@ -197,25 +190,5 @@ public class ProviderRepository : IProviderRepository
             .ThenBy(s => s.ProviderName)
             .ThenBy(s => s.LocationName)
             .ToList();
-    }
-
-    private static readonly Random __random = new();
-
-    private static class SqlExceptionFactory
-    {
-        public static SqlException Create(int number)
-        {
-            Exception? innerEx = null;
-            var c = typeof(SqlErrorCollection).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance);
-            var errors = (c[0].Invoke(null) as SqlErrorCollection)!;
-            var errorList = (errors.GetType().GetField("_errors", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(errors) as List<object>)!;
-            c = typeof(SqlError).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance);
-            var nineC = c.FirstOrDefault(f => f.GetParameters().Length == 9)!;
-            var sqlError = (nineC.Invoke(new object?[] { number, (byte)0, (byte)0, "", "", "", 0, (uint)0, innerEx }) as SqlError)!;
-            errorList.Add(sqlError);
-
-            return (Activator.CreateInstance(typeof(SqlException), BindingFlags.NonPublic | BindingFlags.Instance, null, new object?[] { "test", errors,
-                innerEx, Guid.NewGuid() }, null) as SqlException)!;
-        }
     }
 }
