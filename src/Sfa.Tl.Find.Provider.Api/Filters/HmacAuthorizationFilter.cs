@@ -27,17 +27,17 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
     private readonly ILogger<HmacAuthorizationFilter> _logger;
 
     public HmacAuthorizationFilter(
-        IOptions<ApiSettings> apiSettings,
+        IOptions<ApiSettings> apiOptions,
         IMemoryCache cache,
         ILogger<HmacAuthorizationFilter> logger)
     {
-        if (apiSettings is null) throw new ArgumentNullException(nameof(apiSettings));
+        if (apiOptions is null) throw new ArgumentNullException(nameof(apiOptions));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         if (AllowedApps.IsEmpty)
         {
-            AllowedApps.TryAdd(apiSettings.Value.AppId, apiSettings.Value.ApiKey);
+            AllowedApps.TryAdd(apiOptions.Value.AppId, apiOptions.Value.ApiKey);
         }
     }
 

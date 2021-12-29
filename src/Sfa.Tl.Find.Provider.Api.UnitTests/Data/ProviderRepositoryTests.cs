@@ -253,7 +253,7 @@ public class ProviderRepositoryTests
 
         var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper, dateTimeService);
 
-        var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5);
+        var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5, false);
 
         var searchResultsList = searchResults?.ToList();
         searchResultsList.Should().NotBeNull();

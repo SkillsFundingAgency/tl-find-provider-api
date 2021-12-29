@@ -51,6 +51,15 @@
           "environmentVariable": "PostcodeApiSettings_BaseUri"
         }
       },
+      "SearchSettings": {
+        "properties": {
+          "MergeAdditionalProviderData": {
+            "minLength": 1,
+            "type": "boolean",
+            "environmentVariable": "SearchSettings_MergeAdditionalProviderData",
+            "default": false
+          }
+        },
       "additionalProperties": false,
       "required": [
         "BaseUri"

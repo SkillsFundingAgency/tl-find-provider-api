@@ -19,12 +19,12 @@ public class DbContextWrapperBuilder
 
         var connectionStringOptions = new Func<IOptions<ConnectionStringSettings>>(() =>
         {
-            var config = Substitute.For<IOptions<ConnectionStringSettings>>();
-            config.Value.Returns(new ConnectionStringSettings
+            var options = Substitute.For<IOptions<ConnectionStringSettings>>();
+            options.Value.Returns(new ConnectionStringSettings
             {
                 SqlConnectionString = connectionString
             });
-            return config;
+            return options;
         }).Invoke();
 
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();

@@ -3,7 +3,8 @@
 	@fromLongitude DECIMAL(9, 6),
 	@qualificationId INT,
 	@page INT,
-	@pageSize INT
+	@pageSize INT,
+	@mergeAdditionalProviderData BIT
 AS
 
 	SET NOCOUNT ON;
@@ -27,8 +28,11 @@ AS
 	FROM	[dbo].[Provider] p
 	INNER JOIN	[dbo].[Location] l
 	ON		p.[Id] = l.[ProviderId]
-	WHERE	p.[IsDeleted] = 0	
+	WHERE	p.[IsDeleted] = 0
 	  AND	l.[IsDeleted] = 0
+	  --Only include addidtional data if @mergeAdditionalProviderData is 1
+	  AND	(@mergeAdditionalProviderData = 1 OR p.[IsAdditionalProviderData] = 0)
+	  AND	(@mergeAdditionalProviderData = 1 OR l.[IsAdditionalProviderData] = 0)
 	  AND	EXISTS (
 	  		SELECT	lq.[QualificationId]
 			FROM	[dbo].[LocationQualification] lq

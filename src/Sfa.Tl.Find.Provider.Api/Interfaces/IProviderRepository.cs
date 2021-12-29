@@ -14,5 +14,6 @@ public interface IProviderRepository
         PostcodeLocation fromPostcodeLocation,
         int? qualificationId,
         int page,
-        int pageSize);
+        int pageSize,
+        bool mergeAdditionalProviderData);
 }

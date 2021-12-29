@@ -145,7 +145,8 @@ public class ProviderDataServiceTests
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
                 Arg.Any<int?>(),
                 Arg.Any<int>(),
-                Arg.Any<int>())
+                Arg.Any<int>(),
+                Arg.Any<bool>())
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -176,7 +177,8 @@ public class ProviderDataServiceTests
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
                 Arg.Any<int?>(),
                 Arg.Any<int>(),
-                Arg.Any<int>())
+                Arg.Any<int>(),
+                Arg.Any<bool>())
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -219,7 +221,8 @@ public class ProviderDataServiceTests
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
                 Arg.Any<int?>(),
                 Arg.Any<int>(),
-                Arg.Any<int>())
+                Arg.Any<int>(),
+                Arg.Any<bool>())
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -253,7 +256,8 @@ public class ProviderDataServiceTests
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
                 Arg.Any<int?>(),
                 Arg.Any<int>(),
-                Arg.Any<int>())
+                Arg.Any<int>(),
+                Arg.Any<bool>())
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();

@@ -133,7 +133,8 @@ public class ProviderRepository : IProviderRepository
         PostcodeLocation fromPostcodeLocation,
         int? qualificationId,
         int page,
-        int pageSize)
+        int pageSize,
+        bool mergeAdditionalProviderData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -179,7 +180,8 @@ public class ProviderRepository : IProviderRepository
                     fromLongitude = fromPostcodeLocation.Longitude,
                     qualificationId,
                     page,
-                    pageSize
+                    pageSize,
+                    mergeAdditionalProviderData
                 },
                 splitOn: "UkPrn, Postcode, Year, Id",
                 commandType: CommandType.StoredProcedure);

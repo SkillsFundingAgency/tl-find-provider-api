@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -57,6 +58,10 @@ public static class ServiceCollectionExtensions
             .Configure<PostcodeApiSettings>(x =>
             {
                 x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+            })
+            .Configure<SearchSettings>(x =>
+            {
+                x.MergeAdditionalProviderData = siteConfiguration.SearchSettings.MergeAdditionalProviderData;
             })
             .Configure<ConnectionStringSettings>(x =>
             {

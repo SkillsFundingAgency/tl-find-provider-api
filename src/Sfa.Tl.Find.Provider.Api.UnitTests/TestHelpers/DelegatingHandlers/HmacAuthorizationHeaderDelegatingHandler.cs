@@ -13,9 +13,9 @@ public class HmacAuthorizationHeaderDelegatingHandler : DelegatingHandler
     private readonly ApiSettings _apiSettings;
 
     public HmacAuthorizationHeaderDelegatingHandler(
-        IOptions<ApiSettings> settings)
+        IOptions<ApiSettings> apiOptions)
     {
-        _apiSettings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+        _apiSettings = apiOptions?.Value ?? throw new ArgumentNullException(nameof(apiOptions));
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

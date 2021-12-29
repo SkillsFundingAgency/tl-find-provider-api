@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Services;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
@@ -15,6 +18,7 @@ public class ProviderDataServiceBuilder
         IQualificationRepository qualificationRepository = null,
         IRouteRepository routeRepository = null,
         IMemoryCache cache = null,
+        SearchSettings searchSettings = null,
         ILogger<ProviderDataService> logger = null)
     {
         dateTimeService ??= Substitute.For<IDateTimeService>();
@@ -25,6 +29,14 @@ public class ProviderDataServiceBuilder
         cache ??= Substitute.For<IMemoryCache>();
         logger ??= Substitute.For<ILogger<ProviderDataService>>();
 
+        searchSettings ??= new SettingsBuilder().BuildSearchSettings();
+        var searchOptions = new Func<IOptions<SearchSettings>>(() =>
+        {
+            var options = Substitute.For<IOptions<SearchSettings>>();
+            options.Value.Returns(searchSettings);
+            return options;
+        }).Invoke();
+
         return new ProviderDataService(
             dateTimeService,
             postcodeLookupService,
@@ -32,6 +44,7 @@ public class ProviderDataServiceBuilder
             qualificationRepository,
             routeRepository,
             cache,
+            searchOptions,
             logger);
     }
 }

@@ -8,5 +8,6 @@ public class SiteConfiguration
     public CourseDirectoryApiSettings CourseDirectoryApiSettings { get; init; }
     public string CourseDirectoryImportSchedule { get; init; }
     public PostcodeApiSettings PostcodeApiSettings { get; init; }
+    public SearchSettings SearchSettings { get; init; }
     public string SqlConnectionString { get; init; }
 }

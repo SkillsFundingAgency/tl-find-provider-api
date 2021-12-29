@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
 
 namespace Sfa.Tl.Find.Provider.Api.Services;
@@ -20,6 +22,7 @@ public class ProviderDataService : IProviderDataService
     private readonly IRouteRepository _routeRepository;
     private readonly IMemoryCache _cache;
     private readonly ILogger<ProviderDataService> _logger;
+    private readonly bool _mergeAdditionalProviderData;
 
     public ProviderDataService(
         IDateTimeService dateTimeService,
@@ -28,6 +31,7 @@ public class ProviderDataService : IProviderDataService
         IQualificationRepository qualificationRepository,
         IRouteRepository routeRepository,
         IMemoryCache cache,
+        IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
     {
         _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
@@ -37,6 +41,9 @@ public class ProviderDataService : IProviderDataService
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
+                                       ?? throw new ArgumentNullException(nameof(searchOptions));
     }
 
     public async Task<IEnumerable<Qualification>> GetQualifications()
@@ -81,7 +88,7 @@ public class ProviderDataService : IProviderDataService
 
             var postcodeLocation = await GetPostcode(postcode);
 
-            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize);
+            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize, _mergeAdditionalProviderData);
             return new ProviderSearchResponse
             {
                 Postcode = postcodeLocation.Postcode,
