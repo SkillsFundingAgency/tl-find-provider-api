@@ -149,7 +149,6 @@ public class ProviderRepository : IProviderRepository
                     var key = $"{p.UkPrn}_{p.Postcode}";
                     if (!providerSearchResults.TryGetValue(key, out var searchResult))
                     {
-                        ChaosMaker.MakeChaos(0);
                         providerSearchResults.Add(key, searchResult = p);
                         searchResult.JourneyToLink = fromPostcodeLocation.CreateJourneyLink(searchResult.Postcode);
                     }

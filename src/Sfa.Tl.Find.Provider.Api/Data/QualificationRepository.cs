@@ -71,11 +71,9 @@ public class QualificationRepository : IQualificationRepository
     private async Task PerformSave(IEnumerable<Qualification> qualifications)
     {
         using var connection = _dbContextWrapper.CreateConnection();
-        ChaosMaker.MakeChaos(0);
         connection.Open();
 
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
-        ChaosMaker.MakeChaos(0);
         var updateResult = await _dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(
                 connection,
