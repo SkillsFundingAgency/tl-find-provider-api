@@ -6,11 +6,9 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.Data;

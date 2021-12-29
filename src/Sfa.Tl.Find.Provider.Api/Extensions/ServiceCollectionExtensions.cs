@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
