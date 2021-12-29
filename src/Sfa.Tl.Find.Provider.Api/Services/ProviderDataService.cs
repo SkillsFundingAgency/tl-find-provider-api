@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -138,5 +139,69 @@ public class ProviderDataService : IProviderDataService
         }
 
         return postcodeLocation;
+    }
+
+    public async Task LoadAdditionalProviderData()
+    {
+        //if (!_mergeAdditionalProviderData) return;
+
+        try
+        {
+            const string jsonFile = "Assets.ProviderData.json";
+
+            var providers = JsonDocument
+                    .Parse(jsonFile.ReadManifestResourceStreamAsString())
+                    .RootElement
+                    .GetProperty("providers")
+                    .EnumerateArray()
+                    .Select(p =>
+                        new Models.Provider
+                        {
+                            UkPrn = p.GetProperty("ukPrn").GetInt64(),
+                            Name = p.GetProperty("name").GetString(),
+                            IsAdditionalData = true,
+                            Locations = p.GetProperty("locations")
+                                .EnumerateArray()
+                                .Select(l =>
+                                    new Location
+                                    {
+                                        Postcode = l.GetProperty("postcode").GetString(),
+                                        Name = l.SafeGetString("name", defaultValue: p.SafeGetString("name")),
+                                        Town = l.SafeGetString("town"),
+                                        Latitude = l.SafeGetDouble("latitude"),
+                                        Longitude = l.SafeGetDouble("longitude"),
+                                        Email = l.SafeGetString("email"),
+                                        Telephone = l.SafeGetString("telephone"),
+                                        Website = l.SafeGetString("website"),
+                                        IsAdditionalData = true,
+                                        DeliveryYears = l.TryGetProperty("deliveryYears", out var deliveryYears)
+                                            ? deliveryYears.EnumerateArray()
+                                                .Select(d =>
+                                                    new DeliveryYear
+                                                    {
+                                                        Year = d.GetProperty("year").GetInt16(),
+                                                        Qualifications = d.GetProperty("qualifications")
+                                                            .EnumerateArray()
+                                                            .Select(q => new Qualification
+                                                            {
+                                                                Id = q.GetInt32()
+                                                            })
+                                                            .ToList()
+                                                    })
+                                                .ToList()
+                                            : new List<DeliveryYear>()
+                                    }).ToList()
+                        })
+                    .ToList();
+
+            await _providerRepository.Save(providers, true);
+
+            _logger.LogInformation("Saved {providerCount} providers from ", providers.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"{nameof(LoadAdditionalProviderData)} failed.");
+            throw;
+        }
     }
 }

@@ -316,5 +316,49 @@ public class ProviderDataServiceTests
             .Received(1)
             .HasAny();
     }
+    
+    [Fact]
+    public async Task LoadAdditionalProviderData_Calls_Repository_To_Save_Data()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
 
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await service.LoadAdditionalProviderData();
+
+        await providerRepository
+            .Received(1)
+            .Save(Arg.Any<IList<Models.Provider>>(),
+                Arg.Is<bool>(b => b));
+    }
+
+    [Fact]
+    public async Task LoadAdditionalProviderData_Calls_Repository_To_Save_Data_With_Additional_Data_Flag_Set()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
+
+        IList<Models.Provider> receivedProviders = null;
+
+        await providerRepository
+            .Save(Arg.Do<IList<Models.Provider>>(
+                x => receivedProviders = x),
+                Arg.Any<bool>());
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await service.LoadAdditionalProviderData();
+
+        receivedProviders.Should().NotBeNullOrEmpty();
+
+        foreach (var provider in receivedProviders)
+        {
+            provider.IsAdditionalData.Should().BeTrue();
+            foreach (var location in provider.Locations)
+            {
+                location.IsAdditionalData.Should().BeTrue();
+            }
+        }
+    }
 }

@@ -8,12 +8,12 @@ public interface IProviderRepository
 {
     Task<bool> HasAny();
 
-    Task Save(IList<Models.Provider> providers);
+    Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);
 
     Task<IEnumerable<ProviderSearchResult>> Search(
         PostcodeLocation fromPostcodeLocation,
         int? qualificationId,
         int page,
         int pageSize,
-        bool mergeAdditionalProviderData);
+        bool mergeAdditionalData);
 }

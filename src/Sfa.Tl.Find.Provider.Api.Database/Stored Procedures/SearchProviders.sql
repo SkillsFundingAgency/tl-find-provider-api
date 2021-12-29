@@ -4,7 +4,7 @@
 	@qualificationId INT,
 	@page INT,
 	@pageSize INT,
-	@mergeAdditionalProviderData BIT
+	@mergeAdditionalData BIT
 AS
 
 	SET NOCOUNT ON;
@@ -30,9 +30,9 @@ AS
 	ON		p.[Id] = l.[ProviderId]
 	WHERE	p.[IsDeleted] = 0
 	  AND	l.[IsDeleted] = 0
-	  --Only include addidtional data if @mergeAdditionalProviderData is 1
-	  AND	(@mergeAdditionalProviderData = 1 OR p.[IsAdditionalProviderData] = 0)
-	  AND	(@mergeAdditionalProviderData = 1 OR l.[IsAdditionalProviderData] = 0)
+	  --Only include additional data if @mergeAdditionalData is 1
+	  AND	(@mergeAdditionalData = 1 OR (@mergeAdditionalData = 0 AND p.[IsAdditionalData] = 0))
+	  AND	(@mergeAdditionalData = 1 OR (@mergeAdditionalData = 0 AND l.[IsAdditionalData] = 0))
 	  AND	EXISTS (
 	  		SELECT	lq.[QualificationId]
 			FROM	[dbo].[LocationQualification] lq

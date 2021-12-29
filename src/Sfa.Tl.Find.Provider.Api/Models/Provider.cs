@@ -18,6 +18,7 @@ public class Provider
     public string Email { get; init; }
     public string Telephone { get; init; }
     public string Website { get; init; }
+    public bool IsAdditionalData { get; init; }
 
     [Write(false)] public ICollection<Location> Locations { get; init; }
 }
