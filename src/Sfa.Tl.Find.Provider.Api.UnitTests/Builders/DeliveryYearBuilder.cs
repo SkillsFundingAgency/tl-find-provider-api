@@ -1,47 +1,46 @@
 ﻿using System.Collections.Generic;
 using Sfa.Tl.Find.Provider.Api.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+
+public class DeliveryYearBuilder
 {
-    public class DeliveryYearBuilder
-    {
-        public IEnumerable<DeliveryYear> BuildList() =>
-            new List<DeliveryYear>
+    public IEnumerable<DeliveryYear> BuildList() =>
+        new List<DeliveryYear>
+        {
+            new()
             {
-                new()
+                Year = 2021,
+                Qualifications = new List<Qualification>
                 {
-                    Year = 2021,
-                    Qualifications = new List<Qualification>
+                    new()
                     {
-                        new()
-                        {
-                            Id = 31,
-                            Name = "Test Qualification 31"
-                        },
-                        new()
-                        {
-                            Id = 32,
-                            Name = "Test Qualification 32"
-                        }
-                    }
-                },
-                new()
-                {
-                    Year = 2022,
-                    Qualifications = new List<Qualification>
+                        Id = 31,
+                        Name = "Test Qualification 31"
+                    },
+                    new()
                     {
-                        new()
-                        {
-                            Id = 41,
-                            Name = "Test Qualification 41"
-                        },
-                        new()
-                        {
-                            Id = 42,
-                            Name = "Test Qualification 42"
-                        }
+                        Id = 32,
+                        Name = "Test Qualification 32"
                     }
                 }
-            };
-    }
+            },
+            new()
+            {
+                Year = 2022,
+                Qualifications = new List<Qualification>
+                {
+                    new()
+                    {
+                        Id = 41,
+                        Name = "Test Qualification 41"
+                    },
+                    new()
+                    {
+                        Id = 42,
+                        Name = "Test Qualification 42"
+                    }
+                }
+            }
+        };
 }
