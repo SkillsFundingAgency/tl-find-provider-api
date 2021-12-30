@@ -30,14 +30,16 @@ public class ProviderRepository : IProviderRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<bool> HasAny()
+    public async Task<bool> HasAny(bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         var result = await _dbContextWrapper.ExecuteScalarAsync<int>(
             connection,
             "SELECT COUNT(1) " +
-            "WHERE EXISTS (SELECT 1 FROM dbo.Provider WHERE IsAdditionalData = 0)");
+            "WHERE EXISTS (SELECT 1 FROM dbo.Provider WHERE IsAdditionalData = @isAdditionalData)",
+            new { isAdditionalData = isAdditionalData ? 1 : 0 }
+            );
 
         return result != 0;
     }

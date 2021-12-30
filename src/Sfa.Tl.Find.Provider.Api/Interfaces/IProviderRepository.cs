@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces;
 
 public interface IProviderRepository
 {
-    Task<bool> HasAny();
+    Task<bool> HasAny(bool isAdditionalData = false);
 
     Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);
 

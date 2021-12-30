@@ -53,14 +53,47 @@ public class ProviderRepositoryTests
             .CreateConnection()
             .Returns(dbConnection);
         dbContextWrapper
-            .ExecuteScalarAsync<int>(dbConnection, 
-                Arg.Is<string>(s => s.Contains("dbo.Provider")))
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Any<string>(),
+                Arg.Any<object>())
             .Returns(1);
 
         var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
 
         var result = await repository.HasAny();
         result.Should().BeTrue();
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Is<string>(s => s.Contains("dbo.Provider")),
+                Arg.Is<object>(o => o.GetIsAdditionalDataValueFromAnonymousType() == 0));
+    }
+
+    [Fact]
+    public async Task HasAny_Returns_True_When_Rows_Exist_For_Additional_Data()
+    {
+        var dbConnection = Substitute.For<IDbConnection>();
+        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+        dbContextWrapper
+            .CreateConnection()
+            .Returns(dbConnection);
+        dbContextWrapper
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Any<string>(),
+                Arg.Any<object>())
+            .Returns(1);
+
+        var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
+
+        var result = await repository.HasAny(true);
+        result.Should().BeTrue();
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Is<string>(s => s.Contains("dbo.Provider")),
+                Arg.Is<object>(o => o.GetIsAdditionalDataValueFromAnonymousType() == 1));
     }
 
     [Fact]
@@ -146,8 +179,8 @@ public class ProviderRepositoryTests
 
         var repository = new ProviderRepositoryBuilder()
             .Build(
-                dbContextWrapper, 
-                policyRegistry: pollyPolicyRegistry, 
+                dbContextWrapper,
+                policyRegistry: pollyPolicyRegistry,
                 logger: logger);
 
         await repository.Save(providers);
@@ -215,7 +248,7 @@ public class ProviderRepositoryTests
             .BuildQualificationsPartOfListWithSingleItem()
             .Take(1)
             .ToList();
-            
+
         var expectedResult = new ProviderSearchResultBuilder()
             .WithSearchOrigin(fromPostcodeLocation)
             .BuildListWithSingleItem()
@@ -259,34 +292,64 @@ public class ProviderRepositoryTests
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
 
-        var firstResult = searchResultsList.First();
+        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
+    }
 
-        firstResult.UkPrn.Should().Be(expectedResult.UkPrn);
-        firstResult.ProviderName.Should().Be(expectedResult.ProviderName);
-        firstResult.Postcode.Should().Be(expectedResult.Postcode);
-        firstResult.LocationName.Should().Be(expectedResult.LocationName);
-        firstResult.AddressLine1.Should().Be(expectedResult.AddressLine1);
-        firstResult.AddressLine2.Should().Be(expectedResult.AddressLine2);
-        firstResult.Town.Should().Be(expectedResult.Town);
-        firstResult.County.Should().Be(expectedResult.County);
-        firstResult.Email.Should().Be(expectedResult.Email);
-        firstResult.Telephone.Should().Be(expectedResult.Telephone);
-        firstResult.Website.Should().Be(expectedResult.Website);
-        firstResult.Distance.Should().Be(expectedResult.Distance);
-        firstResult.JourneyToLink.Should().Be(expectedResult.JourneyToLink);
-            
-        firstResult.DeliveryYears.Count.Should().Be(expectedResult.DeliveryYears.Count);
-        var deliveryYear = firstResult.DeliveryYears.First();
-        var expectedDeliveryYear = expectedResult.DeliveryYears.First();
+    [Fact]
+    public async Task Search_Merges_Additional_Data()
+    {
+        //TODO: Implement test
+    }
 
-        deliveryYear.Year.Should().Be(expectedDeliveryYear.Year);
-        deliveryYear.IsAvailableNow.Should().Be(expectedDeliveryYear.IsAvailableNow);
-        deliveryYear.Qualifications.Count.Should().Be(expectedDeliveryYear.Qualifications.Count);
+    [Fact]
+    public async Task Search_Merges_Additional_Data_When_Merge_Additional_Data_Is_False()
+    {
+        //TODO: Implement test
+    }
 
-        var qualification = deliveryYear.Qualifications.First();
-        var expectedQualification = expectedDeliveryYear.Qualifications.First();
+    private static void ValidateProviderSearchResult(ProviderSearchResult result, ProviderSearchResult expected)
+    {
+        result.UkPrn.Should().Be(expected.UkPrn);
+        result.ProviderName.Should().Be(expected.ProviderName);
+        result.Postcode.Should().Be(expected.Postcode);
+        result.LocationName.Should().Be(expected.LocationName);
+        result.AddressLine1.Should().Be(expected.AddressLine1);
+        result.AddressLine2.Should().Be(expected.AddressLine2);
+        result.Town.Should().Be(expected.Town);
+        result.County.Should().Be(expected.County);
+        result.Email.Should().Be(expected.Email);
+        result.Telephone.Should().Be(expected.Telephone);
+        result.Website.Should().Be(expected.Website);
+        result.Distance.Should().Be(expected.Distance);
+        result.JourneyToLink.Should().Be(expected.JourneyToLink);
 
-        qualification.Id.Should().Be(expectedQualification.Id);
-        qualification.Name.Should().Be(expectedQualification.Name);
+        result.DeliveryYears.Should().NotBeNull();
+        result.DeliveryYears.Count.Should().Be(expected.DeliveryYears.Count);
+
+        foreach (var deliveryYear in result.DeliveryYears)
+        {
+            var expectedDeliveryYear = expected.DeliveryYears.Single(dy => dy.Year == deliveryYear.Year);
+            ValidateDeliveryYear(deliveryYear, expectedDeliveryYear);
+        }
+    }
+    
+    private static void ValidateDeliveryYear(DeliveryYear deliveryYear, DeliveryYear expected)
+    {
+        deliveryYear.Year.Should().Be(expected.Year);
+        deliveryYear.IsAvailableNow.Should().Be(expected.IsAvailableNow);
+        deliveryYear.Qualifications.Should().NotBeNull();
+        deliveryYear.Qualifications.Count.Should().Be(expected.Qualifications.Count);
+        
+        foreach (var qualification in deliveryYear.Qualifications)
+        {
+            var expectedQualification = expected.Qualifications.Single(q => q.Id == qualification.Id);
+            ValidateQualification(qualification, expectedQualification);
+        }
+    }
+
+    private static void ValidateQualification(Qualification qualification, Qualification expected)
+    {
+        qualification.Id.Should().Be(expected.Id);
+        qualification.Name.Should().Be(expected.Name);
     }
 }
