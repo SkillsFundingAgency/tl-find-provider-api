@@ -148,7 +148,6 @@ public class ProviderDataService : IProviderDataService
         try
         {
             const string jsonFile = "Assets.ProviderData.json";
-
             var providers = JsonDocument
                     .Parse(jsonFile.ReadManifestResourceStreamAsString())
                     .RootElement
@@ -159,6 +158,11 @@ public class ProviderDataService : IProviderDataService
                         {
                             UkPrn = p.GetProperty("ukPrn").GetInt64(),
                             Name = p.GetProperty("name").GetString(),
+                            Postcode = p.SafeGetString("postcode"),
+                            Town = p.SafeGetString("town"),
+                            Email = p.SafeGetString("email"),
+                            Telephone = p.SafeGetString("telephone"),
+                            Website = p.SafeGetString("website"),
                             IsAdditionalData = true,
                             Locations = p.GetProperty("locations")
                                 .EnumerateArray()

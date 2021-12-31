@@ -60,7 +60,9 @@ public static class ServiceCollectionExtensions
             })
             .Configure<SearchSettings>(x =>
             {
-                x.MergeAdditionalProviderData = siteConfiguration.SearchSettings.MergeAdditionalProviderData;
+                x.MergeAdditionalProviderData = siteConfiguration.SearchSettings != null 
+                    ? siteConfiguration.SearchSettings.MergeAdditionalProviderData 
+                    : false;
             })
             .Configure<ConnectionStringSettings>(x =>
             {

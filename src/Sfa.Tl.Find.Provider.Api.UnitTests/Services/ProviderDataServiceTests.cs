@@ -316,7 +316,7 @@ public class ProviderDataServiceTests
             .Received(1)
             .HasAny();
     }
-    
+
     [Fact]
     public async Task LoadAdditionalProviderData_Calls_Repository_To_Save_Data()
     {
@@ -360,5 +360,64 @@ public class ProviderDataServiceTests
                 location.IsAdditionalData.Should().BeTrue();
             }
         }
+    }
+
+    [Fact]
+    public async Task LoadAdditionalProviderData_Loads_Expected_Provider()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
+
+        IList<Models.Provider> receivedProviders = null;
+
+        await providerRepository
+            .Save(Arg.Do<IList<Models.Provider>>(
+                x => receivedProviders = x),
+                Arg.Any<bool>());
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await service.LoadAdditionalProviderData();
+
+        receivedProviders.Should().NotBeNullOrEmpty();
+
+        var provider = receivedProviders.SingleOrDefault(p => p.UkPrn == 10035123);
+        provider.Should().NotBeNull();
+
+        provider.Name.Should().Be("BIDDULPH HIGH SCHOOL");
+        //provider.Postcode.Should().Be("ST8 7AR");
+        //provider.Website.Should().Be("https://biddulphhigh.co.uk/");
+        //provider.Email.Should().Be("office@biddulphhigh.co.uk");
+        //provider.Telephone.Should().Be("01782 523977");
+        //provider.Town.Should().Be("STOKE-ON-TRENT");
+
+        //TODO: Validate the rest of the fields
+        //TODO: Load in town, postcode etc in providerdata
+
+        provider.IsAdditionalData.Should().BeTrue();
+
+        provider.Locations.Should().NotBeNull();
+        provider.Locations.Count.Should().Be(1);
+
+        var location = provider.Locations.First();
+
+        location.Postcode.Should().Be("ST8 7AR");
+        location.Town.Should().Be("STOKE-ON-TRENT");
+        location.Latitude.Should().Be(53.105857);
+        location.Longitude.Should().Be(-2.171092);
+        location.Website.Should().Be("https://biddulphhigh.co.uk/");
+        location.Email.Should().Be("office@biddulphhigh.co.uk");
+        location.Telephone.Should().Be("01782 523977");
+        location.DeliveryYears.Should().NotBeNull();
+        location.DeliveryYears.Count.Should().Be(1);
+
+        var deliveryYear = location.DeliveryYears.First();
+
+        deliveryYear.Year.Should().Be(2022);
+        deliveryYear.Qualifications.Should().NotBeNull();
+        deliveryYear.Qualifications.Count.Should().Be(1);
+
+        var qualification = deliveryYear.Qualifications.First();
+        qualification.Id.Should().Be(41);
     }
 }
