@@ -16,5 +16,5 @@
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
 	[ModifiedOn] DATETIME2(7) NULL
     CONSTRAINT [PK_Provider] PRIMARY KEY ([Id])
-	CONSTRAINT UQ_UkPrn UNIQUE(UkPrn) 
+	CONSTRAINT [UQ_UkPrn] UNIQUE([UkPrn], [IsAdditionalData]) 
 )
