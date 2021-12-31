@@ -11,7 +11,18 @@ AS
 
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326);
 	
-	WITH NearestLocationsCTE AS (
+	WITH ProvidersCTE AS (
+		SELECT	p.[Id],
+				p.[UkPrn],
+				p.[Name], 
+				p.[Email],
+				p.[Telephone],
+				p.[Website],
+				--Need to filter so providers in the additional data set are overidden by ones in the main data set
+				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
+		FROM	[Provider] p
+		WHERE	p.[IsDeleted] = 0),
+	NearestLocationsCTE AS (
 	SELECT	p.[UkPrn],
 			p.[Name] AS [ProviderName],
 			l.[Id] AS [LocationId],
@@ -25,14 +36,12 @@ AS
 			COALESCE(NULLIF(l.[Telephone],''), p.[Telephone]) AS [Telephone],
 			COALESCE(NULLIF(l.[Website],''), p.[Website]) AS [Website],
 			l.[Location].STDistance(@fromLocation) / 1609.3399999999999E0 AS [Distance] --(Miles)
-	FROM	[dbo].[Provider] p
+	FROM	[ProvidersCTE] p
 	INNER JOIN	[dbo].[Location] l
 	ON		p.[Id] = l.[ProviderId]
-	WHERE	p.[IsDeleted] = 0
-	  AND	l.[IsDeleted] = 0
-	  --Only include additional data if @mergeAdditionalData is 1
-	  AND	(@mergeAdditionalData = 1 OR (@mergeAdditionalData = 0 AND p.[IsAdditionalData] = 0))
-	  AND	(@mergeAdditionalData = 1 OR (@mergeAdditionalData = 0 AND l.[IsAdditionalData] = 0))
+	WHERE	l.[IsDeleted] = 0
+	  --Only include the first row to make sure main data set takes priority
+	  AND	p.[ProviderRowNum] = 1
 	  AND	EXISTS (
 	  		SELECT	lq.[QualificationId]
 			FROM	[dbo].[LocationQualification] lq
