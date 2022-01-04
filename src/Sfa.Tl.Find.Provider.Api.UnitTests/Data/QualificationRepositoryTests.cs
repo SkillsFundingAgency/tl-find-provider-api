@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
 using Sfa.Tl.Find.Provider.Api.Data;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
@@ -32,11 +31,9 @@ public class QualificationRepositoryTests
             .BuildList()
             .ToList();
 
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .QueryAsync<Qualification>(dbConnection, Arg.Any<string>())
             .Returns(qualifications);
@@ -51,11 +48,9 @@ public class QualificationRepositoryTests
     [Fact]
     public async Task HasAny_Returns_False_When_Zero_Rows_Exist()
     {
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .ExecuteScalarAsync<int>(dbConnection,
                 Arg.Is<string>(s => s.Contains("dbo.Qualification")))
@@ -70,11 +65,9 @@ public class QualificationRepositoryTests
     [Fact]
     public async Task HasAny_Returns_True_When_Rows_Exist()
     {
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .ExecuteScalarAsync<int>(dbConnection,
                 Arg.Is<string>(s => s.Contains("dbo.Qualification")))
@@ -101,16 +94,8 @@ public class QualificationRepositoryTests
             
         var receivedSqlArgs = new List<string>();
 
-        var dbConnection = Substitute.For<IDbConnection>();
-        var transaction = Substitute.For<IDbTransaction>();
-
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
-        dbContextWrapper
-            .BeginTransaction(dbConnection)
-            .Returns(transaction);
+        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithTransaction();
 
         dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
@@ -142,7 +127,7 @@ public class QualificationRepositoryTests
                 dbConnection,
                 Arg.Any<string>(),
                 Arg.Is<object>(o => o != null),
-                Arg.Is<IDbTransaction>(t => t != null),
+                Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
 

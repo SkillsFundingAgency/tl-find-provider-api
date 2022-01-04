@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Data;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
@@ -32,5 +34,27 @@ public class DbContextWrapperBuilder
         logger ??= Substitute.For<ILogger<DbContextWrapper>>();
 
         return new DbContextWrapper(connectionStringOptions, policyRegistry, logger);
+    }
+
+    public (IDbContextWrapper, IDbConnection) BuildSubstituteWrapperAndConnection()
+    {
+        var dbConnection = Substitute.For<IDbConnection>();
+        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+        dbContextWrapper
+            .CreateConnection()
+            .Returns(dbConnection);
+
+        return (dbContextWrapper, dbConnection);
+    }
+
+    public (IDbContextWrapper, IDbConnection, IDbTransaction) BuildSubstituteWrapperAndConnectionWithTransaction()
+    {
+        var (dbContextWrapper, dbConnection) = BuildSubstituteWrapperAndConnection();
+        var transaction = Substitute.For<IDbTransaction>();
+        dbContextWrapper
+            .BeginTransaction(dbConnection)
+            .Returns(transaction);
+
+        return (dbContextWrapper, dbConnection, transaction);
     }
 }

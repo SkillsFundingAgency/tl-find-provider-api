@@ -28,11 +28,9 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task HasAny_Returns_False_When_Zero_Rows_Exist()
     {
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .ExecuteScalarAsync<int>(dbConnection,
                 Arg.Is<string>(s => s.Contains("dbo.Provider")))
@@ -47,11 +45,9 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task HasAny_Returns_True_When_Rows_Exist()
     {
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .ExecuteScalarAsync<int>(dbConnection,
                 Arg.Any<string>(),
@@ -73,11 +69,9 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task HasAny_Returns_True_When_Rows_Exist_For_Additional_Data()
     {
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .ExecuteScalarAsync<int>(dbConnection,
                 Arg.Any<string>(),
@@ -120,17 +114,9 @@ public class ProviderRepositoryTests
             .Build();
 
         var receivedSqlArgs = new List<string>();
-
-        var dbConnection = Substitute.For<IDbConnection>();
-        var transaction = Substitute.For<IDbTransaction>();
-
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
-        dbContextWrapper
-            .BeginTransaction(dbConnection)
-            .Returns(transaction);
+        
+        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithTransaction();
 
         dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
@@ -191,7 +177,7 @@ public class ProviderRepositoryTests
                 dbConnection,
                 Arg.Any<string>(),
                 Arg.Is<object>(o => o != null),
-                Arg.Is<IDbTransaction>(t => t != null),
+                Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
 
@@ -236,6 +222,42 @@ public class ProviderRepositoryTests
     {
         var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
 
+        var expectedResult = new ProviderSearchResultBuilder()
+            .BuildSingleSearchResultWithSearchOrigin(fromPostcodeLocation);
+
+        var repository = await BuildRepositoryWithDataToSearchProviders();
+
+        var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5, false);
+
+        var searchResultsList = searchResults?.ToList();
+        searchResultsList.Should().NotBeNull();
+        searchResultsList!.Count.Should().Be(1);
+
+        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
+    }
+
+    [Fact]
+    public async Task Search_Merges_Additional_Data()
+    {
+        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+
+        var expectedResult = new ProviderSearchResultBuilder()
+             .BuildSingleSearchResultWithSearchOrigin(fromPostcodeLocation);
+
+        var repository = await BuildRepositoryWithDataToSearchProviders();
+
+        var searchResults = await repository
+            .Search(fromPostcodeLocation, null, 0, 5, true);
+
+        var searchResultsList = searchResults?.ToList();
+        searchResultsList.Should().NotBeNull();
+        searchResultsList!.Count.Should().Be(1);
+
+        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
+    }
+
+    private static async Task<IProviderRepository> BuildRepositoryWithDataToSearchProviders()
+    {
         var providersPart = new ProviderSearchResultBuilder()
             .BuildProvidersPartOfListWithSingleItem()
             .Take(1)
@@ -249,16 +271,8 @@ public class ProviderRepositoryTests
             .Take(1)
             .ToList();
 
-        var expectedResult = new ProviderSearchResultBuilder()
-            .WithSearchOrigin(fromPostcodeLocation)
-            .BuildListWithSingleItem()
-            .First();
-
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
 
         var callIndex = 0;
 
@@ -268,7 +282,6 @@ public class ProviderRepositoryTests
                 Arg.Do<Func<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>>(
                     x =>
                     {
-                        //TODO: Write a more complex test that deals with multiple results
                         var p = providersPart[callIndex];
                         var d = deliveryYearsPart[callIndex];
                         var q = qualificationsPart[callIndex];
@@ -284,27 +297,7 @@ public class ProviderRepositoryTests
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
 
-        var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper, dateTimeService);
-
-        var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5, false);
-
-        var searchResultsList = searchResults?.ToList();
-        searchResultsList.Should().NotBeNull();
-        searchResultsList!.Count.Should().Be(1);
-
-        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
-    }
-
-    [Fact]
-    public async Task Search_Merges_Additional_Data()
-    {
-        //TODO: Implement test
-    }
-
-    [Fact]
-    public async Task Search_Merges_Additional_Data_When_Merge_Additional_Data_Is_False()
-    {
-        //TODO: Implement test
+        return new ProviderRepositoryBuilder().Build(dbContextWrapper, dateTimeService);
     }
 
     private static void ValidateProviderSearchResult(ProviderSearchResult result, ProviderSearchResult expected)
@@ -332,14 +325,14 @@ public class ProviderRepositoryTests
             ValidateDeliveryYear(deliveryYear, expectedDeliveryYear);
         }
     }
-    
+
     private static void ValidateDeliveryYear(DeliveryYear deliveryYear, DeliveryYear expected)
     {
         deliveryYear.Year.Should().Be(expected.Year);
         deliveryYear.IsAvailableNow.Should().Be(expected.IsAvailableNow);
         deliveryYear.Qualifications.Should().NotBeNull();
         deliveryYear.Qualifications.Count.Should().Be(expected.Qualifications.Count);
-        
+
         foreach (var qualification in deliveryYear.Qualifications)
         {
             var expectedQualification = expected.Qualifications.Single(q => q.Id == qualification.Id);
