@@ -384,15 +384,12 @@ public class ProviderDataServiceTests
         var provider = receivedProviders.SingleOrDefault(p => p.UkPrn == 10035123);
         provider.Should().NotBeNull();
 
-        provider.Name.Should().Be("BIDDULPH HIGH SCHOOL");
-        //provider.Postcode.Should().Be("ST8 7AR");
-        //provider.Website.Should().Be("https://biddulphhigh.co.uk/");
-        //provider.Email.Should().Be("office@biddulphhigh.co.uk");
-        //provider.Telephone.Should().Be("01782 523977");
-        //provider.Town.Should().Be("STOKE-ON-TRENT");
-
-        //TODO: Validate the rest of the fields
-        //TODO: Load in town, postcode etc in providerdata
+        provider!.Name.Should().Be("BIDDULPH HIGH SCHOOL");
+        provider.Postcode.Should().Be("ST8 7AR");
+        provider.Website.Should().Be("https://biddulphhigh.co.uk/");
+        provider.Email.Should().Be("office@biddulphhigh.co.uk");
+        provider.Telephone.Should().Be("01782 523977");
+        provider.Town.Should().Be("STOKE-ON-TRENT");
 
         provider.IsAdditionalData.Should().BeTrue();
 
