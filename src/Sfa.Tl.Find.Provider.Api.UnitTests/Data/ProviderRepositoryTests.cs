@@ -114,7 +114,7 @@ public class ProviderRepositoryTests
             .Build();
 
         var receivedSqlArgs = new List<string>();
-        
+
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
 

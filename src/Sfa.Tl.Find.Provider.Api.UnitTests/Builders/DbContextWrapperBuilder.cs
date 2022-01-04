@@ -39,6 +39,7 @@ public class DbContextWrapperBuilder
     public (IDbContextWrapper, IDbConnection) BuildSubstituteWrapperAndConnection()
     {
         var dbConnection = Substitute.For<IDbConnection>();
+
         var dbContextWrapper = Substitute.For<IDbContextWrapper>();
         dbContextWrapper
             .CreateConnection()
@@ -49,8 +50,10 @@ public class DbContextWrapperBuilder
 
     public (IDbContextWrapper, IDbConnection, IDbTransaction) BuildSubstituteWrapperAndConnectionWithTransaction()
     {
-        var (dbContextWrapper, dbConnection) = BuildSubstituteWrapperAndConnection();
         var transaction = Substitute.For<IDbTransaction>();
+
+        var (dbContextWrapper, dbConnection) = BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .BeginTransaction(dbConnection)
             .Returns(transaction);
