@@ -33,6 +33,7 @@ AS
 		  t.[LocationId] = s.[LocationId]
 		  AND t.[DeliveryYear] = s.[DeliveryYear]
 		  AND t.[QualificationId] = s.[QualificationId]
+		  AND t.[IsAdditionalData] = s.[IsAdditionalData]
 		)
 
 		WHEN NOT MATCHED BY TARGET THEN INSERT

@@ -39,6 +39,7 @@ AS
 		  AND t.[Postcode] = s.[Postcode]
 		  AND t.[IsAdditionalData] = s.[IsAdditionalData]
 		)
+
 		WHEN MATCHED 
 			 AND (t.[Name] <> s.[Name] COLLATE Latin1_General_CS_AS
 				  OR ISNULL(NULLIF(t.[AddressLine1] COLLATE Latin1_General_CS_AS, s.[AddressLine1] COLLATE Latin1_General_CS_AS), 
