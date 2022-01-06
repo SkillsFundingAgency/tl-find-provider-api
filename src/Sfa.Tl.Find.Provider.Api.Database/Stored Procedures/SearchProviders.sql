@@ -21,7 +21,9 @@ AS
 				--Need to filter so providers in the additional data set are overidden by ones in the main data set
 				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
 		FROM	[Provider] p
-		WHERE	p.[IsDeleted] = 0),
+		WHERE	p.[IsDeleted] = 0
+		  --If not merging additional data, have to make sure we only include non-additional data
+		  AND	(@mergeAdditionalData = 1 OR (@mergeAdditionalData = 0 AND p.[IsAdditionalData] = 0))),
 	NearestLocationsCTE AS (
 	SELECT	p.[UkPrn],
 			p.[Name] AS [ProviderName],
