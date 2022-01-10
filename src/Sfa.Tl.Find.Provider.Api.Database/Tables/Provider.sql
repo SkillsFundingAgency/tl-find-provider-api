@@ -12,8 +12,9 @@
 	[Telephone] NVARCHAR(150) NULL,
 	[Website] NVARCHAR(500) NULL,
 	[IsDeleted] BIT NOT NULL DEFAULT (0),
+	[IsAdditionalData] BIT NOT NULL DEFAULT (0),
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
 	[ModifiedOn] DATETIME2(7) NULL
     CONSTRAINT [PK_Provider] PRIMARY KEY ([Id])
-	CONSTRAINT UQ_UkPrn UNIQUE(UkPrn) 
+	CONSTRAINT [UQ_UkPrn] UNIQUE([UkPrn], [IsAdditionalData]) 
 )

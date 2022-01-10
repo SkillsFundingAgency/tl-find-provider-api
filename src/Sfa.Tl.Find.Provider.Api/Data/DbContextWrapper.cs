@@ -6,11 +6,9 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.Data;
@@ -22,7 +20,7 @@ public class DbContextWrapper : IDbContextWrapper
     private readonly ILogger<DbContextWrapper> _logger;
 
     public DbContextWrapper(
-        IOptions<ConnectionStringSettings> connectionStringSettings,
+        IOptions<ConnectionStringSettings> connectionStringOptions,
         IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<DbContextWrapper> logger)
     {
@@ -30,8 +28,8 @@ public class DbContextWrapper : IDbContextWrapper
 
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _connectionString = connectionStringSettings?.Value?.SqlConnectionString
-                            ?? throw new ArgumentNullException(nameof(connectionStringSettings));
+        _connectionString = connectionStringOptions?.Value?.SqlConnectionString
+                            ?? throw new ArgumentNullException(nameof(connectionStringOptions));
     }
 
     public IDbConnection CreateConnection() =>

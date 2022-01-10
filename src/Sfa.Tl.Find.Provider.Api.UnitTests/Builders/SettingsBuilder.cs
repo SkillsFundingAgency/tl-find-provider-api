@@ -15,40 +15,49 @@ internal class SettingsBuilder
     private const string FindCourseApiBaseAbsoluteUri = "https://test.com/findacourse/api";
     public static readonly Uri FindCourseApiBaseUri = new(FindCourseApiBaseAbsoluteUri);
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
+    private const bool MergeAdditionalProviderData = true;
 
     internal ApiSettings BuildApiSettings(
         string appId = AppId,
         string apiKey = ApiKey) => new()
-    {
-        AppId = appId,
-        ApiKey = apiKey
-    };
-        
+        {
+            AppId = appId,
+            ApiKey = apiKey
+        };
+
     internal CourseDirectoryApiSettings BuildCourseDirectoryApiSettings(
         string findCourseApiBaseUri = FindCourseApiBaseAbsoluteUri,
         string findCourseApiKey = FindCourseApiKey) => new()
-    {
-        BaseUri = findCourseApiBaseUri,
-        ApiKey = findCourseApiKey
-    };
+        {
+            BaseUri = findCourseApiBaseUri,
+            ApiKey = findCourseApiKey
+        };
 
     internal PostcodeApiSettings BuildPostcodeApiSettings(
         string postcodeRetrieverUri = PostcodeRetrieverUri) => new()
-    {
-        BaseUri = postcodeRetrieverUri
-    };
+        {
+            BaseUri = postcodeRetrieverUri
+        };
+
+    internal SearchSettings BuildSearchSettings(
+        bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
+        {
+            MergeAdditionalProviderData = mergeAdditionalProviderData
+        };
 
     internal SiteConfiguration BuildConfigurationOptions(
         ApiSettings apiSettings = null,
         CourseDirectoryApiSettings courseDirectoryApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
+        SearchSettings searchSettings = null,
         string sqlConnectionString = "TestConnection",
         string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI") => new()
-    {
-        ApiSettings = apiSettings ?? BuildApiSettings(),
-        CourseDirectoryApiSettings = courseDirectoryApiSettings ?? BuildCourseDirectoryApiSettings(),
-        PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
-        SqlConnectionString = sqlConnectionString,
-        CourseDirectoryImportSchedule = courseDirectoryImportSchedule
-    };
+        {
+            ApiSettings = apiSettings ?? BuildApiSettings(),
+            CourseDirectoryApiSettings = courseDirectoryApiSettings ?? BuildCourseDirectoryApiSettings(),
+            PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
+            SearchSettings = searchSettings ?? BuildSearchSettings(),
+            SqlConnectionString = sqlConnectionString,
+            CourseDirectoryImportSchedule = courseDirectoryImportSchedule
+        };
 }

@@ -1,5 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[UpdateLocations]
-	@data [dbo].[LocationDataTableType] READONLY
+	@data [dbo].[LocationDataTableType] READONLY,
+	@isAdditionalData BIT
 AS
 	SET NOCOUNT ON;
 
@@ -22,10 +23,13 @@ AS
 		d.[Telephone],
 		d.[Website],
 		d.[Latitude],
-		d.[Longitude]
+		d.[Longitude],
+		d.[IsAdditionalData]
 	FROM @data d
 	INNER JOIN [dbo].[Provider] p
-	ON p.[UkPrn] = d.[UkPrn])
+	ON p.[UkPrn] = d.[UkPrn]
+	--Make sure "normal" and additional data are kept separate
+	AND p.[IsAdditionalData] = d.[IsAdditionalData]) 
 	
 		MERGE INTO [dbo].[Location] AS t
 		USING ProviderLocationsCTE AS s
@@ -33,7 +37,9 @@ AS
 		(
 		  t.[ProviderId] = s.[ProviderId] 
 		  AND t.[Postcode] = s.[Postcode]
+		  AND t.[IsAdditionalData] = s.[IsAdditionalData]
 		)
+
 		WHEN MATCHED 
 			 AND (t.[Name] <> s.[Name] COLLATE Latin1_General_CS_AS
 				  OR ISNULL(NULLIF(t.[AddressLine1] COLLATE Latin1_General_CS_AS, s.[AddressLine1] COLLATE Latin1_General_CS_AS), 
@@ -72,11 +78,12 @@ AS
 				t.[Latitude] = s.[Latitude],
 				t.[Longitude] = s.[Longitude],
 				t.[Location] = geography::Point(s.[Latitude], s.[Longitude], 4326),
+				t.[IsAdditionalData] = s.[IsAdditionalData],
 				t.[IsDeleted] = 0,
 				t.[ModifiedOn] = GETUTCDATE()
 
 			WHEN NOT MATCHED BY TARGET THEN INSERT
-				(
+			(
 				[ProviderId],
 				[Postcode],
 				[Name],
@@ -89,7 +96,8 @@ AS
 				[Website],
 				[Latitude],
 				[Longitude],
-				[Location] 
+				[Location],
+				[IsAdditionalData]
 			)
 			VALUES
 			(
@@ -105,13 +113,15 @@ AS
 				s.[Website],
 				s.[Latitude],
 				s.[Longitude],
-				geography::Point(s.[Latitude], s.[Longitude], 4326)
+				geography::Point(s.[Latitude], s.[Longitude], 4326),
+				s.[IsAdditionalData]
 			)
 
 			WHEN NOT MATCHED BY SOURCE 
 			 AND t.[IsDeleted] <> 1 --No need to delete again
+			 AND t.[IsAdditionalData] = @isAdditionalData
 			THEN UPDATE SET
-			  t.[IsDeleted] = 1	  ,
+			  t.[IsDeleted] = 1,
 			  t.[ModifiedOn] = GETUTCDATE() --Soft delete
 
 			OUTPUT $action, 

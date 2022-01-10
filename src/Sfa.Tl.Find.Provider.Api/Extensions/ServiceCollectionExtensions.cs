@@ -58,6 +58,10 @@ public static class ServiceCollectionExtensions
             {
                 x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
             })
+            .Configure<SearchSettings>(x =>
+            {
+                x.MergeAdditionalProviderData = siteConfiguration.SearchSettings?.MergeAdditionalProviderData ?? false;
+            })
             .Configure<ConnectionStringSettings>(x =>
             {
                 x.SqlConnectionString = siteConfiguration.SqlConnectionString;

@@ -6,10 +6,10 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 
 public class LocationBuilder
 {
-    public Location Build() =>
-        BuildList().First();
+    public Location Build(bool isAdditionalData = false) =>
+        BuildList(isAdditionalData).First();
 
-    public IEnumerable<Location> BuildList() =>
+    public IEnumerable<Location> BuildList(bool isAdditionalData = false) =>
         new List<Location>
         {
             new()
@@ -24,6 +24,7 @@ public class LocationBuilder
                 Website= "https://www.provider1.ac.uk",
                 Latitude = 50.0,
                 Longitude = 1.0,
+                IsAdditionalData = isAdditionalData,
                 DeliveryYears = new List<DeliveryYear>
                 {
                     new()
@@ -57,6 +58,7 @@ public class LocationBuilder
                 Website= "https://www.provider2.ac.uk",
                 Latitude = 51.0,
                 Longitude = -1.0,
+                IsAdditionalData = isAdditionalData,
                 DeliveryYears = new List<DeliveryYear>
                 {
                     new()

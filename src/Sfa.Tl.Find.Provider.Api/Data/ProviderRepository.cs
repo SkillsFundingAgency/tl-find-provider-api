@@ -30,19 +30,21 @@ public class ProviderRepository : IProviderRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<bool> HasAny()
+    public async Task<bool> HasAny(bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         var result = await _dbContextWrapper.ExecuteScalarAsync<int>(
             connection,
             "SELECT COUNT(1) " +
-            "WHERE EXISTS (SELECT 1 FROM dbo.Provider)");
+            "WHERE EXISTS (SELECT 1 FROM dbo.Provider WHERE IsAdditionalData = @isAdditionalData)",
+            new { isAdditionalData = isAdditionalData ? 1 : 0 }
+            );
 
         return result != 0;
     }
 
-    public async Task Save(IList<Models.Provider> providers)
+    public async Task Save(IList<Models.Provider> providers, bool isAdditionalData = false)
     {
         try
         {
@@ -57,7 +59,7 @@ public class ProviderRepository : IProviderRepository
                     locationQualificationData.AddRange(
                         location
                             .DeliveryYears
-                            .MapToLocationQualificationDtoList(provider.UkPrn, location.Postcode));
+                            .MapToLocationQualificationDtoList(provider.UkPrn, location.Postcode, isAdditionalData));
                 }
             }
 
@@ -65,7 +67,7 @@ public class ProviderRepository : IProviderRepository
 
             await retryPolicy
                 .ExecuteAsync(async _ => 
-                    await PerformSave(providers, locationData, locationQualificationData),
+                    await PerformSave(providers, locationData, locationQualificationData, isAdditionalData),
                     context);
         }
         catch (Exception ex)
@@ -78,7 +80,8 @@ public class ProviderRepository : IProviderRepository
     private async Task PerformSave(
         IEnumerable<Models.Provider> providers,
         IEnumerable<LocationDto> locationData,
-        IEnumerable<LocationQualificationDto> locationQualificationData)
+        IEnumerable<LocationQualificationDto> locationQualificationData,
+        bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
@@ -91,7 +94,8 @@ public class ProviderRepository : IProviderRepository
                 "UpdateProviders",
                 new
                 {
-                    data = providers.AsTableValuedParameter("dbo.ProviderDataTableType")
+                    data = providers.AsTableValuedParameter("dbo.ProviderDataTableType"),
+                    isAdditionalData
                 },
                 transaction,
                 commandType: CommandType.StoredProcedure);
@@ -104,7 +108,8 @@ public class ProviderRepository : IProviderRepository
                 "UpdateLocations",
                 new
                 {
-                    data = locationData.AsTableValuedParameter("dbo.LocationDataTableType")
+                    data = locationData.AsTableValuedParameter("dbo.LocationDataTableType"),
+                    isAdditionalData 
                 },
                 transaction,
                 commandType: CommandType.StoredProcedure);
@@ -118,7 +123,8 @@ public class ProviderRepository : IProviderRepository
                 new
                 {
                     data = locationQualificationData.AsTableValuedParameter(
-                        "dbo.LocationQualificationDataTableType")
+                        "dbo.LocationQualificationDataTableType"),
+                    isAdditionalData
                 },
                 transaction,
                 commandType: CommandType.StoredProcedure);
@@ -133,7 +139,8 @@ public class ProviderRepository : IProviderRepository
         PostcodeLocation fromPostcodeLocation,
         int? qualificationId,
         int page,
-        int pageSize)
+        int pageSize,
+        bool mergeAdditionalData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -148,7 +155,6 @@ public class ProviderRepository : IProviderRepository
                     var key = $"{p.UkPrn}_{p.Postcode}";
                     if (!providerSearchResults.TryGetValue(key, out var searchResult))
                     {
-                        ChaosMaker.MakeChaos(0);
                         providerSearchResults.Add(key, searchResult = p);
                         searchResult.JourneyToLink = fromPostcodeLocation.CreateJourneyLink(searchResult.Postcode);
                     }
@@ -179,7 +185,8 @@ public class ProviderRepository : IProviderRepository
                     fromLongitude = fromPostcodeLocation.Longitude,
                     qualificationId,
                     page,
-                    pageSize
+                    pageSize,
+                    mergeAdditionalData
                 },
                 splitOn: "UkPrn, Postcode, Year, Id",
                 commandType: CommandType.StoredProcedure);

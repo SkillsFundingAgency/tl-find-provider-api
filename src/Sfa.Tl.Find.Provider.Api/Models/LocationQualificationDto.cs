@@ -12,4 +12,5 @@ public class LocationQualificationDto
     public string Postcode { get; init; }
     public  short DeliveryYear { get; init; }
     public  int QualificationId { get; init; }
+    public bool IsAdditionalData { get; init; }
 }

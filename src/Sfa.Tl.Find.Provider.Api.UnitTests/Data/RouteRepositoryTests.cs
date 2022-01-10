@@ -1,10 +1,8 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Data;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
@@ -28,11 +26,9 @@ public class RouteRepositoryTests
             .BuildList()
             .ToList();
 
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .QueryAsync<Route>(dbConnection, Arg.Any<string>())
             .Returns(routes);

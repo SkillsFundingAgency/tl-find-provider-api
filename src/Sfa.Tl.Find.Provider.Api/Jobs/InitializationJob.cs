@@ -40,6 +40,8 @@ public class InitializationJob : IJob
                 _logger.LogInformation($"{nameof(InitializationJob)} did not call import because data already exists.");
             }
 
+            await _providerDataService.LoadAdditionalProviderData();
+
             _logger.LogInformation($"{nameof(InitializationJob)} job completed successfully.");
         }
         catch (Exception e)

@@ -18,4 +18,6 @@ public interface IProviderDataService
         int? qualificationId = null,
         int page = 0,
         int pageSize = Constants.DefaultPageSize);
+
+    Task LoadAdditionalProviderData();
 }

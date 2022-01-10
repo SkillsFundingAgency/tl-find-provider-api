@@ -28,11 +28,9 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task HasAny_Returns_False_When_Zero_Rows_Exist()
     {
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
             .ExecuteScalarAsync<int>(dbConnection,
                 Arg.Is<string>(s => s.Contains("dbo.Provider")))
@@ -47,20 +45,49 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task HasAny_Returns_True_When_Rows_Exist()
     {
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
         dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
-        dbContextWrapper
-            .ExecuteScalarAsync<int>(dbConnection, 
-                Arg.Is<string>(s => s.Contains("dbo.Provider")))
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Any<string>(),
+                Arg.Any<object>())
             .Returns(1);
 
         var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
 
         var result = await repository.HasAny();
         result.Should().BeTrue();
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Is<string>(s => s.Contains("dbo.Provider")),
+                Arg.Is<object>(o => o.GetIsAdditionalDataValueFromAnonymousType() == 0));
+    }
+
+    [Fact]
+    public async Task HasAny_Returns_True_When_Rows_Exist_For_Additional_Data()
+    {
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Any<string>(),
+                Arg.Any<object>())
+            .Returns(1);
+
+        var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
+
+        var result = await repository.HasAny(true);
+        result.Should().BeTrue();
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteScalarAsync<int>(dbConnection,
+                Arg.Is<string>(s => s.Contains("dbo.Provider")),
+                Arg.Is<object>(o => o.GetIsAdditionalDataValueFromAnonymousType() == 1));
     }
 
     [Fact]
@@ -88,16 +115,8 @@ public class ProviderRepositoryTests
 
         var receivedSqlArgs = new List<string>();
 
-        var dbConnection = Substitute.For<IDbConnection>();
-        var transaction = Substitute.For<IDbTransaction>();
-
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
-        dbContextWrapper
-            .BeginTransaction(dbConnection)
-            .Returns(transaction);
+        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithTransaction();
 
         dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
@@ -146,8 +165,8 @@ public class ProviderRepositoryTests
 
         var repository = new ProviderRepositoryBuilder()
             .Build(
-                dbContextWrapper, 
-                policyRegistry: pollyPolicyRegistry, 
+                dbContextWrapper,
+                policyRegistry: pollyPolicyRegistry,
                 logger: logger);
 
         await repository.Save(providers);
@@ -158,7 +177,7 @@ public class ProviderRepositoryTests
                 dbConnection,
                 Arg.Any<string>(),
                 Arg.Is<object>(o => o != null),
-                Arg.Is<IDbTransaction>(t => t != null),
+                Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
 
@@ -203,6 +222,42 @@ public class ProviderRepositoryTests
     {
         var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
 
+        var expectedResult = new ProviderSearchResultBuilder()
+            .BuildSingleSearchResultWithSearchOrigin(fromPostcodeLocation);
+
+        var repository = await BuildRepositoryWithDataToSearchProviders();
+
+        var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5, false);
+
+        var searchResultsList = searchResults?.ToList();
+        searchResultsList.Should().NotBeNull();
+        searchResultsList!.Count.Should().Be(1);
+
+        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
+    }
+
+    [Fact]
+    public async Task Search_Merges_Additional_Data()
+    {
+        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+
+        var expectedResult = new ProviderSearchResultBuilder()
+             .BuildSingleSearchResultWithSearchOrigin(fromPostcodeLocation);
+
+        var repository = await BuildRepositoryWithDataToSearchProviders();
+
+        var searchResults = await repository
+            .Search(fromPostcodeLocation, null, 0, 5, true);
+
+        var searchResultsList = searchResults?.ToList();
+        searchResultsList.Should().NotBeNull();
+        searchResultsList!.Count.Should().Be(1);
+
+        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
+    }
+
+    private static async Task<IProviderRepository> BuildRepositoryWithDataToSearchProviders()
+    {
         var providersPart = new ProviderSearchResultBuilder()
             .BuildProvidersPartOfListWithSingleItem()
             .Take(1)
@@ -215,17 +270,9 @@ public class ProviderRepositoryTests
             .BuildQualificationsPartOfListWithSingleItem()
             .Take(1)
             .ToList();
-            
-        var expectedResult = new ProviderSearchResultBuilder()
-            .WithSearchOrigin(fromPostcodeLocation)
-            .BuildListWithSingleItem()
-            .First();
 
-        var dbConnection = Substitute.For<IDbConnection>();
-        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
-        dbContextWrapper
-            .CreateConnection()
-            .Returns(dbConnection);
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
 
         var callIndex = 0;
 
@@ -235,7 +282,6 @@ public class ProviderRepositoryTests
                 Arg.Do<Func<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>>(
                     x =>
                     {
-                        //TODO: Write a more complex test that deals with multiple results
                         var p = providersPart[callIndex];
                         var d = deliveryYearsPart[callIndex];
                         var q = qualificationsPart[callIndex];
@@ -251,42 +297,52 @@ public class ProviderRepositoryTests
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
 
-        var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper, dateTimeService);
+        return new ProviderRepositoryBuilder().Build(dbContextWrapper, dateTimeService);
+    }
 
-        var searchResults = await repository.Search(fromPostcodeLocation, null, 0, 5);
+    private static void ValidateProviderSearchResult(ProviderSearchResult result, ProviderSearchResult expected)
+    {
+        result.UkPrn.Should().Be(expected.UkPrn);
+        result.ProviderName.Should().Be(expected.ProviderName);
+        result.Postcode.Should().Be(expected.Postcode);
+        result.LocationName.Should().Be(expected.LocationName);
+        result.AddressLine1.Should().Be(expected.AddressLine1);
+        result.AddressLine2.Should().Be(expected.AddressLine2);
+        result.Town.Should().Be(expected.Town);
+        result.County.Should().Be(expected.County);
+        result.Email.Should().Be(expected.Email);
+        result.Telephone.Should().Be(expected.Telephone);
+        result.Website.Should().Be(expected.Website);
+        result.Distance.Should().Be(expected.Distance);
+        result.JourneyToLink.Should().Be(expected.JourneyToLink);
 
-        var searchResultsList = searchResults?.ToList();
-        searchResultsList.Should().NotBeNull();
-        searchResultsList!.Count.Should().Be(1);
+        result.DeliveryYears.Should().NotBeNull();
+        result.DeliveryYears.Count.Should().Be(expected.DeliveryYears.Count);
 
-        var firstResult = searchResultsList.First();
+        foreach (var deliveryYear in result.DeliveryYears)
+        {
+            var expectedDeliveryYear = expected.DeliveryYears.Single(dy => dy.Year == deliveryYear.Year);
+            ValidateDeliveryYear(deliveryYear, expectedDeliveryYear);
+        }
+    }
 
-        firstResult.UkPrn.Should().Be(expectedResult.UkPrn);
-        firstResult.ProviderName.Should().Be(expectedResult.ProviderName);
-        firstResult.Postcode.Should().Be(expectedResult.Postcode);
-        firstResult.LocationName.Should().Be(expectedResult.LocationName);
-        firstResult.AddressLine1.Should().Be(expectedResult.AddressLine1);
-        firstResult.AddressLine2.Should().Be(expectedResult.AddressLine2);
-        firstResult.Town.Should().Be(expectedResult.Town);
-        firstResult.County.Should().Be(expectedResult.County);
-        firstResult.Email.Should().Be(expectedResult.Email);
-        firstResult.Telephone.Should().Be(expectedResult.Telephone);
-        firstResult.Website.Should().Be(expectedResult.Website);
-        firstResult.Distance.Should().Be(expectedResult.Distance);
-        firstResult.JourneyToLink.Should().Be(expectedResult.JourneyToLink);
-            
-        firstResult.DeliveryYears.Count.Should().Be(expectedResult.DeliveryYears.Count);
-        var deliveryYear = firstResult.DeliveryYears.First();
-        var expectedDeliveryYear = expectedResult.DeliveryYears.First();
+    private static void ValidateDeliveryYear(DeliveryYear deliveryYear, DeliveryYear expected)
+    {
+        deliveryYear.Year.Should().Be(expected.Year);
+        deliveryYear.IsAvailableNow.Should().Be(expected.IsAvailableNow);
+        deliveryYear.Qualifications.Should().NotBeNull();
+        deliveryYear.Qualifications.Count.Should().Be(expected.Qualifications.Count);
 
-        deliveryYear.Year.Should().Be(expectedDeliveryYear.Year);
-        deliveryYear.IsAvailableNow.Should().Be(expectedDeliveryYear.IsAvailableNow);
-        deliveryYear.Qualifications.Count.Should().Be(expectedDeliveryYear.Qualifications.Count);
+        foreach (var qualification in deliveryYear.Qualifications)
+        {
+            var expectedQualification = expected.Qualifications.Single(q => q.Id == qualification.Id);
+            ValidateQualification(qualification, expectedQualification);
+        }
+    }
 
-        var qualification = deliveryYear.Qualifications.First();
-        var expectedQualification = expectedDeliveryYear.Qualifications.First();
-
-        qualification.Id.Should().Be(expectedQualification.Id);
-        qualification.Name.Should().Be(expectedQualification.Name);
+    private static void ValidateQualification(Qualification qualification, Qualification expected)
+    {
+        qualification.Id.Should().Be(expected.Id);
+        qualification.Name.Should().Be(expected.Name);
     }
 }

@@ -28,7 +28,8 @@ public static class MappingExtensions
                     Telephone = location.Telephone,
                     Website = location.Website,
                     Latitude = location.Latitude,
-                    Longitude = location.Longitude
+                    Longitude = location.Longitude,
+                    IsAdditionalData = location.IsAdditionalData
                 });
             }
         }
@@ -56,14 +57,16 @@ public static class MappingExtensions
             Telephone = location.Telephone,
             Website = location.Website,
             Latitude = location.Latitude,
-            Longitude = location.Longitude
+            Longitude = location.Longitude,
+            IsAdditionalData = location.IsAdditionalData
         };
     }
 
     public static IEnumerable<LocationQualificationDto> MapToLocationQualificationDtoList(
         this IEnumerable<DeliveryYear> deliveryYears,
         long ukPrn, 
-        string postcode)
+        string postcode,
+        bool isAdditionalData = false)
     {
         var results = new List<LocationQualificationDto>();
 
@@ -78,7 +81,8 @@ public static class MappingExtensions
                         UkPrn = ukPrn,
                         Postcode = postcode,
                         DeliveryYear = deliveryYear.Year,
-                        QualificationId = qualification.Id
+                        QualificationId = qualification.Id,
+                        IsAdditionalData = isAdditionalData
                     });
                 }
             }
@@ -86,5 +90,4 @@ public static class MappingExtensions
 
         return results;
     }
-
 }
