@@ -17,192 +17,199 @@ using Sfa.Tl.Find.Provider.Api.Services;
 
 // ReSharper disable UnusedMethodReturnValue.Global
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions
-{
-    public static class ServiceCollectionExtensions
-    {
-        public static IServiceCollection AddApiVersioningPolicy(
-            this IServiceCollection services)
-        {
-            services.AddApiVersioning(config =>
-            {
-                config.DefaultApiVersion = new ApiVersion(1, 0);
-                config.AssumeDefaultVersionWhenUnspecified = true;
-                config.ReportApiVersions = true;
-            });
+namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
-            return services;
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddApiVersioningPolicy(
+        this IServiceCollection services)
+    {
+        services.AddApiVersioning(config =>
+        {
+            config.DefaultApiVersion = new ApiVersion(1, 0);
+            config.AssumeDefaultVersionWhenUnspecified = true;
+            config.ReportApiVersions = true;
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration, SiteConfiguration siteConfiguration)
+    {
+        var rateLimiting = configuration?.GetSection("IpRateLimiting");
+        if (rateLimiting != null)
+        {
+            services
+                .Configure<IpRateLimitOptions>(rateLimiting);
         }
 
-        public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration, SiteConfiguration siteConfiguration)
-        {
-            var rateLimiting = configuration?.GetSection("IpRateLimiting");
-            if (rateLimiting != null)
+        services
+            .Configure<ApiSettings>(x =>
             {
-                services
-                    .Configure<IpRateLimitOptions>(rateLimiting);
-            }
+                x.AppId = siteConfiguration.ApiSettings.AppId;
+                x.ApiKey = siteConfiguration.ApiSettings.ApiKey;
+            })
+            .Configure<CourseDirectoryApiSettings>(x =>
+            {
+                x.BaseUri = siteConfiguration.CourseDirectoryApiSettings.BaseUri;
+                x.ApiKey = siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+            })
+            .Configure<PostcodeApiSettings>(x =>
+            {
+                x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+            })
+            .Configure<SearchSettings>(x =>
+            {
+                x.MergeAdditionalProviderData = siteConfiguration.SearchSettings?.MergeAdditionalProviderData ?? false;
+            })
+            .Configure<ConnectionStringSettings>(x =>
+            {
+                x.SqlConnectionString = siteConfiguration.SqlConnectionString;
+            });
 
-            services
-                .Configure<ApiSettings>(x =>
+        return services;
+    }
+
+    public static IServiceCollection AddCorsPolicy(
+        this IServiceCollection services,
+        string policyName,
+        string allowedOrigins)
+    {
+        if (!string.IsNullOrWhiteSpace(allowedOrigins))
+        {
+            var splitterChars = new[] { ';', ',' };
+            var corsOrigins = allowedOrigins.Split(splitterChars);
+            services.AddCors(options => options.AddPolicy(policyName, builder =>
+                builder
+                    .WithMethods(HttpMethod.Get.Method)
+                    .AllowAnyHeader()
+                    .WithOrigins(corsOrigins)));
+        }
+
+        return services;
+    }
+
+    public static IServiceCollection AddHttpClients(this IServiceCollection services)
+    {
+        services
+            .AddHttpClient<IPostcodeLookupService, PostcodeLookupService>(
+                (serviceProvider, client) =>
                 {
-                    x.AppId = siteConfiguration.ApiSettings.AppId;
-                    x.ApiKey = siteConfiguration.ApiSettings.ApiKey;
+                    var postcodeApiSettings = serviceProvider
+                        .GetRequiredService<IOptions<PostcodeApiSettings>>()
+                        .Value;
+
+                    client.BaseAddress =
+                        postcodeApiSettings.BaseUri.EndsWith("/")
+                            ? new Uri(postcodeApiSettings.BaseUri)
+                            : new Uri(postcodeApiSettings.BaseUri + "/");
+
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+            )
+            .AddRetryPolicyHandler<PostcodeLookupService>();
+
+        services
+            .AddHttpClient<ICourseDirectoryService, CourseDirectoryService>(
+                (serviceProvider, client) =>
+                {
+                    var courseDirectoryApiSettings = serviceProvider
+                        .GetRequiredService<IOptions<CourseDirectoryApiSettings>>()
+                        .Value;
+
+                    client.BaseAddress =
+                        courseDirectoryApiSettings.BaseUri.EndsWith("/")
+                            ? new Uri(courseDirectoryApiSettings.BaseUri)
+                            : new Uri(courseDirectoryApiSettings.BaseUri + "/");
+
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", courseDirectoryApiSettings.ApiKey);
+
+                    client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                    client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
                 })
-                .Configure<CourseDirectoryApiSettings>(x =>
+            .ConfigurePrimaryHttpMessageHandler(_ =>
+            {
+                var handler = new HttpClientHandler();
+                if (handler.SupportsAutomaticDecompression)
                 {
-                    x.BaseUri = siteConfiguration.CourseDirectoryApiSettings.BaseUri;
-                    x.ApiKey = siteConfiguration.CourseDirectoryApiSettings.ApiKey;
-                })
-                .Configure<PostcodeApiSettings>(x =>
+                    handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+                }
+                return handler;
+            })
+            .AddRetryPolicyHandler<CourseDirectoryService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddQuartzServices(
+        this IServiceCollection services,
+        string cronSchedule)
+    {
+        services.AddQuartz(q =>
+        {
+            q.SchedulerName = "Find a Provider Quartz Scheduler";
+
+            q.UseMicrosoftDependencyInjectionJobFactory();
+
+            var startupJobKey = new JobKey("Perform Startup Tasks");
+            q.AddJob<InitializationJob>(opts => opts.WithIdentity(startupJobKey))
+                .AddTrigger(opts => opts
+                    .ForJob(startupJobKey)
+                    .StartNow());
+
+            if (!string.IsNullOrEmpty(cronSchedule))
+            {
+                var importJobKey = new JobKey("Import Course Data");
+                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(importJobKey))
+                    .AddTrigger(opts => opts
+                        .ForJob(importJobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(cronSchedule)));
+            }
+        });
+
+        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+        return services;
+    }
+
+    public static IServiceCollection AddRateLimitPolicy(
+        this IServiceCollection services)
+    {
+        services.AddInMemoryRateLimiting();
+
+        services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSwagger(
+        this IServiceCollection services,
+        string name,
+        string title,
+        string version,
+        string xmlFile = null)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc(name,
+                new OpenApiInfo
                 {
-                    x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+                    Title = title,
+                    Version = version
                 });
 
-            return services;
-        }
-
-        public static IServiceCollection AddCorsPolicy(
-            this IServiceCollection services,
-            string policyName,
-            string allowedOrigins)
-        {
-            if (!string.IsNullOrWhiteSpace(allowedOrigins))
+            if (xmlFile != null)
             {
-                var splitterChars = new[] { ';', ',' };
-                var corsOrigins = allowedOrigins.Split(splitterChars);
-                services.AddCors(options => options.AddPolicy(policyName, builder =>
-                    builder
-                        .WithMethods(HttpMethod.Get.Method)
-                        .AllowAnyHeader()
-                        .WithOrigins(corsOrigins)));
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             }
+        });
 
-            return services;
-        }
-
-        public static IServiceCollection AddHttpClients(this IServiceCollection services)
-        {
-            services
-                .AddHttpClient<IPostcodeLookupService, PostcodeLookupService>(
-                    (serviceProvider, client) =>
-                    {
-                        var postcodeApiSettings = serviceProvider
-                            .GetRequiredService<IOptions<PostcodeApiSettings>>()
-                            .Value;
-
-                        client.BaseAddress =
-                            postcodeApiSettings.BaseUri.EndsWith("/")
-                                ? new Uri(postcodeApiSettings.BaseUri)
-                                : new Uri(postcodeApiSettings.BaseUri + "/");
-
-                        client.DefaultRequestHeaders.Accept.Add(
-                            new MediaTypeWithQualityHeaderValue("application/json"));
-                    }
-                )
-                .AddRetryPolicyHandler<PostcodeLookupService>();
-
-            services
-                .AddHttpClient<ICourseDirectoryService, CourseDirectoryService>(
-                    (serviceProvider, client) =>
-                    {
-                        var courseDirectoryApiSettings = serviceProvider
-                            .GetRequiredService<IOptions<CourseDirectoryApiSettings>>()
-                            .Value;
-
-                        client.BaseAddress =
-                            courseDirectoryApiSettings.BaseUri.EndsWith("/")
-                                ? new Uri(courseDirectoryApiSettings.BaseUri)
-                                : new Uri(courseDirectoryApiSettings.BaseUri + "/");
-
-                        client.DefaultRequestHeaders.Accept.Add(
-                            new MediaTypeWithQualityHeaderValue("application/json"));
-                        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", courseDirectoryApiSettings.ApiKey);
-
-                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                        client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                    })
-                .ConfigurePrimaryHttpMessageHandler(_ =>
-                {
-                    var handler = new HttpClientHandler();
-                    if (handler.SupportsAutomaticDecompression)
-                    {
-                        handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-                    }
-                    return handler;
-                })
-                .AddRetryPolicyHandler<CourseDirectoryService>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddQuartzServices(
-            this IServiceCollection services,
-            string cronSchedule)
-        {
-            services.AddQuartz(q =>
-            {
-                q.SchedulerName = "Find a Provider Quartz Scheduler";
-
-                q.UseMicrosoftDependencyInjectionJobFactory();
-
-                var startupJobKey = new JobKey("Perform Startup Tasks");
-                q.AddJob<InitializationJob>(opts => opts.WithIdentity(startupJobKey))
-                    .AddTrigger(opts => opts
-                        .ForJob(startupJobKey)
-                        .StartNow());
-
-                if (!string.IsNullOrEmpty(cronSchedule))
-                {
-                    var importJobKey = new JobKey("Import Course Data");
-                    q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(importJobKey))
-                        .AddTrigger(opts => opts
-                            .ForJob(importJobKey)
-                            .WithSchedule(
-                                CronScheduleBuilder
-                                    .CronSchedule(cronSchedule)));
-                }
-            });
-
-            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
-            return services;
-        }
-
-        public static IServiceCollection AddRateLimitPolicy(
-            this IServiceCollection services)
-        {
-            services.AddInMemoryRateLimiting();
-
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddSwagger(
-            this IServiceCollection services,
-            string name,
-            string title,
-            string version,
-            string xmlFile = null)
-        {
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc(name,
-                    new OpenApiInfo
-                    {
-                        Title = title,
-                        Version = version
-                    });
-
-                if (xmlFile != null)
-                {
-                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                    c.IncludeXmlComments(xmlPath);
-                }
-            });
-
-            return services;
-        }
+        return services;
     }
 }

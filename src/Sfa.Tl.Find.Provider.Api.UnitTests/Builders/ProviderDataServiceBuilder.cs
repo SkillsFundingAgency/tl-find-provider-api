@@ -1,38 +1,50 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Services;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
-{
-    public class ProviderDataServiceBuilder
-    {
-        public ProviderDataService Build(
-            IDateTimeService dateTimeService = null,
-            IPostcodeLookupService postcodeLookupService = null,
-            IProviderRepository providerRepository = null,
-            IQualificationRepository qualificationRepository = null,
-            IRouteRepository routeRepository = null,
-            IMemoryCache cache = null,
-            ILogger<ProviderDataService> logger = null)
-        {
-            dateTimeService ??= Substitute.For<IDateTimeService>();
-            postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
-            providerRepository ??= Substitute.For<IProviderRepository>();
-            qualificationRepository ??= Substitute.For<IQualificationRepository>();
-            routeRepository ??= Substitute.For<IRouteRepository>();
-            cache ??= Substitute.For<IMemoryCache>();
-            logger ??= Substitute.For<ILogger<ProviderDataService>>();
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 
-            return new ProviderDataService(
-                dateTimeService,
-                postcodeLookupService,
-                providerRepository,
-                qualificationRepository,
-                routeRepository,
-                cache,
-                logger);
-        }
+public class ProviderDataServiceBuilder
+{
+    public ProviderDataService Build(
+        IDateTimeService dateTimeService = null,
+        IPostcodeLookupService postcodeLookupService = null,
+        IProviderRepository providerRepository = null,
+        IQualificationRepository qualificationRepository = null,
+        IRouteRepository routeRepository = null,
+        IMemoryCache cache = null,
+        SearchSettings searchSettings = null,
+        ILogger<ProviderDataService> logger = null)
+    {
+        dateTimeService ??= Substitute.For<IDateTimeService>();
+        postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
+        providerRepository ??= Substitute.For<IProviderRepository>();
+        qualificationRepository ??= Substitute.For<IQualificationRepository>();
+        routeRepository ??= Substitute.For<IRouteRepository>();
+        cache ??= Substitute.For<IMemoryCache>();
+        logger ??= Substitute.For<ILogger<ProviderDataService>>();
+
+        searchSettings ??= new SettingsBuilder().BuildSearchSettings();
+        var searchOptions = new Func<IOptions<SearchSettings>>(() =>
+        {
+            var options = Substitute.For<IOptions<SearchSettings>>();
+            options.Value.Returns(searchSettings);
+            return options;
+        }).Invoke();
+
+        return new ProviderDataService(
+            dateTimeService,
+            postcodeLookupService,
+            providerRepository,
+            qualificationRepository,
+            routeRepository,
+            cache,
+            searchOptions,
+            logger);
     }
 }

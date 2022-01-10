@@ -1,8 +1,7 @@
-﻿namespace Sfa.Tl.Find.Provider.Api.Models.Configuration
+﻿namespace Sfa.Tl.Find.Provider.Api.Models.Configuration;
+
+public class ApiSettings
 {
-    public class ApiSettings
-    {
-        public string AppId { get; set; }
-        public string ApiKey { get; set; }
-    }
+    public string AppId { get; set; }
+    public string ApiKey { get; set; }
 }

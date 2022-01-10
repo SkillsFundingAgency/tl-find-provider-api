@@ -1,15 +1,63 @@
-﻿using Sfa.Tl.Find.Provider.Api.Data;
+﻿using System;
+using System.Data;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NSubstitute;
+using Polly.Registry;
+using Sfa.Tl.Find.Provider.Api.Data;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+
+public class DbContextWrapperBuilder
 {
-    public class DbContextWrapperBuilder
+    public DbContextWrapper Build(
+        string connectionString = null,
+        IReadOnlyPolicyRegistry<string> policyRegistry = null,
+        ILogger<DbContextWrapper> logger = null)
     {
-        public DbContextWrapper Build(
-            string connectionString = null)
-        {
-            connectionString ??= "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
+        connectionString ??= "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
 
-            return new DbContextWrapper(connectionString);
-        }
+        var connectionStringOptions = new Func<IOptions<ConnectionStringSettings>>(() =>
+        {
+            var options = Substitute.For<IOptions<ConnectionStringSettings>>();
+            options.Value.Returns(new ConnectionStringSettings
+            {
+                SqlConnectionString = connectionString
+            });
+            return options;
+        }).Invoke();
+
+        policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
+
+        logger ??= Substitute.For<ILogger<DbContextWrapper>>();
+
+        return new DbContextWrapper(connectionStringOptions, policyRegistry, logger);
+    }
+
+    public (IDbContextWrapper, IDbConnection) BuildSubstituteWrapperAndConnection()
+    {
+        var dbConnection = Substitute.For<IDbConnection>();
+
+        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+        dbContextWrapper
+            .CreateConnection()
+            .Returns(dbConnection);
+
+        return (dbContextWrapper, dbConnection);
+    }
+
+    public (IDbContextWrapper, IDbConnection, IDbTransaction) BuildSubstituteWrapperAndConnectionWithTransaction()
+    {
+        var transaction = Substitute.For<IDbTransaction>();
+
+        var (dbContextWrapper, dbConnection) = BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .BeginTransaction(dbConnection)
+            .Returns(transaction);
+
+        return (dbContextWrapper, dbConnection, transaction);
     }
 }

@@ -2,20 +2,19 @@
 using System.Diagnostics;
 using Dapper.Contrib.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Api.Models
+namespace Sfa.Tl.Find.Provider.Api.Models;
+
+[DebuggerDisplay("{DebuggerDisplay(), nq}")]
+public class DeliveryYear
 {
-    [DebuggerDisplay("{DebuggerDisplay(), nq}")]
-    public class DeliveryYear
-    {
-        public short Year { get; init; }
+    public short Year { get; init; }
 
-        [Write(false)]
-        public bool IsAvailableNow { get; set; }
+    [Write(false)]
+    public bool IsAvailableNow { get; set; }
 
-        public ICollection<Qualification> Qualifications { get; init; } = new List<Qualification>();
+    public ICollection<Qualification> Qualifications { get; init; } = new List<Qualification>();
 
-        private string DebuggerDisplay()
-            => $"{Year} " +
-               $"{(Qualifications != null ? Qualifications.Count : "null")} Qualifications";
-    }
+    private string DebuggerDisplay()
+        => $"{Year} " +
+           $"{(Qualifications != null ? Qualifications.Count : "null")} Qualifications";
 }

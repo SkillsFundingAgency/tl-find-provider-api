@@ -38,13 +38,15 @@ builder.Services.AddSwagger("v1",
     "v1",
     $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
-builder.Services.AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins);
+builder.Services
+    .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins)
+    .AddPolicyRegistry()
+    .AddDapperRetryPolicy();
 
 builder.Services.AddHttpClients();
 
 builder.Services
-    .AddScoped<IDbContextWrapper>(_ =>
-        new DbContextWrapper(siteConfiguration.SqlConnectionString))
+    .AddScoped<IDbContextWrapper, DbContextWrapper>()
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
     .AddTransient<IProviderRepository, ProviderRepository>()

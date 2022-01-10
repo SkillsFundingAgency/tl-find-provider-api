@@ -53,9 +53,13 @@ Add a new row to the table with:
         "CourseDirectoryImportSchedule": "<CRON string>",
         "PostcodeApiSettings": {
             "BaseUri": "https://api.postcodes.io/"
+        },
+        "SearchSettings": {
+            "MergeAdditionalProviderData": false
         }
-    }
+    }   
 ```
+
 The API Settings are maintained by the T Levels DevOps team, and contain the Application ID and API Key used for HMAC. 
 
 Course directory API values can be obtained from the NCS API portal. Ask the NCS Course Directory Team for details.

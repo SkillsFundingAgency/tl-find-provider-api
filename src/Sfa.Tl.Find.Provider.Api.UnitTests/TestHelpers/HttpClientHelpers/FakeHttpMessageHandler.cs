@@ -5,33 +5,32 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
+
+public class FakeHttpMessageHandler : DelegatingHandler
 {
-    public class FakeHttpMessageHandler : DelegatingHandler
-    {
-        private readonly Dictionary<Uri, HttpResponseMessage> _fakeResponses =
-            // ReSharper disable once ArrangeObjectCreationWhenTypeEvident
+    private readonly Dictionary<Uri, HttpResponseMessage> _fakeResponses =
+        // ReSharper disable once ArrangeObjectCreationWhenTypeEvident
 #pragma warning disable IDE0090 // Use 'new(...)'
-            new Dictionary<Uri, HttpResponseMessage>();
+        new Dictionary<Uri, HttpResponseMessage>();
 #pragma warning restore IDE0090 // Use 'new(...)'
 
-        public void AddFakeResponse(Uri uri, HttpResponseMessage responseMessage)
+    public void AddFakeResponse(Uri uri, HttpResponseMessage responseMessage)
+    {
+        _fakeResponses.Add(uri, responseMessage);
+    }
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        if (request.RequestUri != null && 
+            _fakeResponses.ContainsKey(request.RequestUri))
         {
-            _fakeResponses.Add(uri, responseMessage);
+            return Task.FromResult(_fakeResponses[request.RequestUri]);
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)
         {
-            if (request.RequestUri != null && 
-                _fakeResponses.ContainsKey(request.RequestUri))
-            {
-                return Task.FromResult(_fakeResponses[request.RequestUri]);
-            }
-
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)
-            {
-                RequestMessage = request
-            });
-        }
+            RequestMessage = request
+        });
     }
 }

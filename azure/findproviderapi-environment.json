@@ -43,18 +43,6 @@
         //     "type": "string",
         //     "defaultValue": ""
         // }
-        // "bankHolidayGeneratorTrigger": {
-        //     "type": "string"
-        // }
-        // "employerFeedbackTrigger": {
-        //     "type": "string"
-        // },
-        // "providerFeedbackTrigger": {
-        //     "type": "string"
-        // },
-        // "providerReferenceTrigger": {
-        //     "type": "string"
-        // }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
@@ -307,22 +295,6 @@
         //                         "value": "Sfa.Tl.Find.Provider.Api"
         //                     },
         //                     {
-        //                         "name": "BankHolidayGeneratorTrigger",
-        //                         "value": "[parameters('bankHolidayGeneratorTrigger')]"
-        //                     },
-        //                     {
-        //                         "name": "EmployerFeedbackTrigger",
-        //                         "value": "[parameters('employerFeedbackTrigger')]"
-        //                     },
-        //                     {
-        //                         "name": "ProviderFeedbackTrigger",
-        //                         "value": "[parameters('providerFeedbackTrigger')]"
-        //                     },
-        //                     {
-        //                         "name": "ProviderReferenceTrigger",
-        //                         "value": "[parameters('providerReferenceTrigger')]"
-        //                     },
-        //                     {
         //                         "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
         //                         "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
         //                     },
@@ -344,7 +316,7 @@
         //                     },
         //                     {
         //                         "name": "FUNCTIONS_EXTENSION_VERSION",
-        //                         "value": "~3"
+        //                         "value": "~4"
         //                     }
         //                 ]
         //             }

@@ -2,18 +2,18 @@
 using System.Threading.Tasks;
 using Sfa.Tl.Find.Provider.Api.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.Interfaces
+namespace Sfa.Tl.Find.Provider.Api.Interfaces;
+
+public interface IProviderRepository
 {
-    public interface IProviderRepository
-    {
-        Task<bool> HasAny();
+    Task<bool> HasAny(bool isAdditionalData = false);
 
-        Task Save(IList<Models.Provider> providers);
+    Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);
 
-        Task<IEnumerable<ProviderSearchResult>> Search(
-            PostcodeLocation fromPostcodeLocation,
-            int? qualificationId,
-            int page,
-            int pageSize);
-    }
+    Task<IEnumerable<ProviderSearchResult>> Search(
+        PostcodeLocation fromPostcodeLocation,
+        int? qualificationId,
+        int page,
+        int pageSize,
+        bool mergeAdditionalData);
 }

@@ -4,6 +4,8 @@ public static class Constants
 {
     public const string CorsPolicyName = "CorsPolicy";
 
+    public const string DapperRetryPolicyName = "dapper-transient-error-retry";
+
     public const int DefaultPageSize = 5;
 
     public const int DefaultAbsoluteExpirationInMinutes = 60;

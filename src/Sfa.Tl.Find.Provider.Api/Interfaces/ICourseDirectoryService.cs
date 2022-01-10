@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace Sfa.Tl.Find.Provider.Api.Interfaces
-{
-    public interface ICourseDirectoryService
-    {
-        Task ImportProviders();
+namespace Sfa.Tl.Find.Provider.Api.Interfaces;
 
-        Task ImportQualifications();
-    }
+public interface ICourseDirectoryService
+{
+    Task ImportProviders();
+
+    Task ImportQualifications();
 }
