@@ -389,7 +389,7 @@ public class ProviderDataServiceTests
         provider.Website.Should().Be("https://biddulphhigh.co.uk/");
         provider.Email.Should().Be("office@biddulphhigh.co.uk");
         provider.Telephone.Should().Be("01782 523977");
-        provider.Town.Should().Be("STOKE-ON-TRENT");
+        provider.Town.Should().Be("Stoke-on-Trent");
 
         provider.IsAdditionalData.Should().BeTrue();
 
@@ -399,7 +399,7 @@ public class ProviderDataServiceTests
         var location = provider.Locations.First();
 
         location.Postcode.Should().Be("ST8 7AR");
-        location.Town.Should().Be("STOKE-ON-TRENT");
+        location.Town.Should().Be("Stoke-on-Trent");
         location.Latitude.Should().Be(53.105857);
         location.Longitude.Should().Be(-2.171092);
         location.Website.Should().Be("https://biddulphhigh.co.uk/");
