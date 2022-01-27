@@ -45,6 +45,8 @@ public class StringExtensionsTests
     [InlineData("abingdon and witney college", "Abingdon and Witney College")]
     [InlineData("Design, surveying and planning for Construction", "Design, Surveying and Planning for Construction")]
     [InlineData("Building services engineering for construction", "Building Services Engineering for Construction")]
+    [InlineData("Bob's burger's", "Bob's Burger's")]
+    [InlineData("Bob’s burger’s", "Bob’s Burger’s")]
     public void String_ToTitleCase_Data_Tests(string input, string expectedResult)
     {
         var result = input.ToTitleCase();
