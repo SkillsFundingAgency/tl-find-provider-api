@@ -381,15 +381,18 @@ public class ProviderDataServiceTests
 
         receivedProviders.Should().NotBeNullOrEmpty();
 
-        var provider = receivedProviders.SingleOrDefault(p => p.UkPrn == 10035123);
+        var provider = receivedProviders
+            .SingleOrDefault(p => 
+                p.UkPrn == 10042223);
         provider.Should().NotBeNull();
 
-        provider!.Name.Should().Be("BIDDULPH HIGH SCHOOL");
-        provider.Postcode.Should().Be("ST8 7AR");
-        provider.Website.Should().Be("https://biddulphhigh.co.uk/");
-        provider.Email.Should().Be("office@biddulphhigh.co.uk");
-        provider.Telephone.Should().Be("01782 523977");
-        provider.Town.Should().Be("Stoke-on-Trent");
+        // ReSharper disable once StringLiteralTypo
+        provider!.Name.Should().Be("BURNTWOOD SCHOOL");
+        provider.Postcode.Should().Be("SW17 0AQ");
+        provider.Website.Should().Be("https://www.burntwoodschool.com/");
+        provider.Email.Should().Be("info@burntwoodschool.com");
+        provider.Telephone.Should().Be("020 8946 6201");
+        provider.Town.Should().Be("London");
 
         provider.IsAdditionalData.Should().BeTrue();
 
@@ -398,13 +401,13 @@ public class ProviderDataServiceTests
 
         var location = provider.Locations.First();
 
-        location.Postcode.Should().Be("ST8 7AR");
-        location.Town.Should().Be("Stoke-on-Trent");
-        location.Latitude.Should().Be(53.105857);
-        location.Longitude.Should().Be(-2.171092);
-        location.Website.Should().Be("https://biddulphhigh.co.uk/");
-        location.Email.Should().Be("office@biddulphhigh.co.uk");
-        location.Telephone.Should().Be("01782 523977");
+        location.Postcode.Should().Be("SW17 0AQ");
+        location.Town.Should().Be("London");
+        location.Latitude.Should().Be(51.438125);
+        location.Longitude.Should().Be(-0.180083);
+        location.Website.Should().Be("https://www.burntwoodschool.com/");
+        location.Email.Should().Be("info@burntwoodschool.com");
+        location.Telephone.Should().Be("020 8946 6201");
         location.DeliveryYears.Should().NotBeNull();
         location.DeliveryYears.Count.Should().Be(1);
 
@@ -415,6 +418,6 @@ public class ProviderDataServiceTests
         deliveryYear.Qualifications.Count.Should().Be(1);
 
         var qualification = deliveryYear.Qualifications.First();
-        qualification.Id.Should().Be(41);
+        qualification.Id.Should().Be(38);
     }
 }
