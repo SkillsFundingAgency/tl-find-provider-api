@@ -9,11 +9,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
 
 public class FakeHttpMessageHandler : DelegatingHandler
 {
-    private readonly Dictionary<Uri, HttpResponseMessage> _fakeResponses =
-        // ReSharper disable once ArrangeObjectCreationWhenTypeEvident
-#pragma warning disable IDE0090 // Use 'new(...)'
-        new Dictionary<Uri, HttpResponseMessage>();
-#pragma warning restore IDE0090 // Use 'new(...)'
+    private readonly Dictionary<Uri, HttpResponseMessage> _fakeResponses = new();
 
     public void AddFakeResponse(Uri uri, HttpResponseMessage responseMessage)
     {
