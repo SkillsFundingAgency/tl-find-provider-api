@@ -56,7 +56,9 @@ public static class StringExtensions
                    ? " " + input.ToLower() // Return the prep/art lowercase
                    : " " + input));        // Otherwise return the valid word
 
+        //Fix S after apostrophe, if it is before space or at end of string
+        result = Regex.Replace(result, @"(['’])S(\s|$)", "$1s$2");
+
         return result.Trim();
     }
-
 }
