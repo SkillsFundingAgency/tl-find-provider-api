@@ -1,0 +1,16 @@
+{
+  "src": {
+    "default": "Frontend/src/",
+    "CSS": "Frontend/src/css/*.css",
+    "JS": "Frontend/src/js/*.js",
+    "Assets": "Frontend/src/assets/**/*"
+  },
+
+  "dist": {
+    "default": "wwwroot",
+    "CSS": "wwwroot/css",
+    "JS": "wwwroot/js",
+    "Assets": "wwwroot/files",
+    "Bootstrap": "wwwroot/bootstrap"
+  }
+}
