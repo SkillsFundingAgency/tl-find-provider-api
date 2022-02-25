@@ -39,4 +39,10 @@ include the site in `"AllowedCorsOrigins"` as below:
         });
 ```
 
+- type in message in LoadAdditionalProviderData - check in marcoms as well
+```
+     _logger.LogInformation("Saved {providerCount} providers from ", providers.Count);
+
+```
+
 - search from current location uses closest postcode. Could also pass the lat-long to a new API method
