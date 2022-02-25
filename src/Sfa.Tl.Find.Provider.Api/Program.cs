@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Sfa.Tl.Find.Provider.Api.Connected_Services.Sfa.Tl.Find.Provider.Api.UkRlp.Api.Client;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
@@ -45,11 +47,24 @@ builder.Services
 
 builder.Services.AddHttpClients();
 
+builder.Services.AddTransient<IProviderQueryPortTypeClient>(_ =>
+{
+    var client = new ProviderQueryPortTypeClient();
+
+    var timeoutTimeSpan = new TimeSpan(0, 5, 0);
+    client.Endpoint.Binding.SendTimeout = timeoutTimeSpan;
+    client.Endpoint.Binding.ReceiveTimeout = timeoutTimeSpan;
+
+    return client;
+});
+
 builder.Services
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
+    .AddTransient<IProviderReferenceDataService, ProviderReferenceDataService>()
     .AddTransient<IProviderRepository, ProviderRepository>()
+    .AddTransient<IProviderReferenceRepository, ProviderReferenceRepository>()
     .AddTransient<IQualificationRepository, QualificationRepository>()
     .AddTransient<IRouteRepository, RouteRepository>();
 

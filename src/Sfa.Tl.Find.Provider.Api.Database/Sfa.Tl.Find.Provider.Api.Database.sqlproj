@@ -65,6 +65,7 @@
   <ItemGroup>
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
+    <Build Include="Indexes\IX_ProviderReference_UkPrn.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
@@ -83,6 +84,9 @@
     <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
     <Build Include="Stored Procedures\UpdateProviders.sql" />
     <Build Include="Stored Procedures\UpdateQualifications.sql" />
+    <Build Include="Tables\ProviderReference.sql" />
+    <Build Include="Types\ProviderReferenceDataTableType.sql" />
+    <Build Include="Stored Procedures\UpdateProviderReferences.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

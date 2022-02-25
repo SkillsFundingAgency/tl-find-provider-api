@@ -160,6 +160,12 @@ public static class ServiceCollectionExtensions
                     .ForJob(startupJobKey)
                     .StartNow());
 
+            var providerReferenceJobKey = new JobKey("Import Provider Reference Data");
+            q.AddJob<ProviderReferenceImportJob>(opts => opts.WithIdentity(providerReferenceJobKey))
+                .AddTrigger(opts => opts
+                    .ForJob(providerReferenceJobKey)
+                    .StartNow());
+
             if (!string.IsNullOrEmpty(cronSchedule))
             {
                 var importJobKey = new JobKey("Import Course Data");
