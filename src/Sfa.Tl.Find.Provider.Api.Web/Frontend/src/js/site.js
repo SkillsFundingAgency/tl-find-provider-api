@@ -18,7 +18,7 @@ function addHmacAuthHeader(xhr, uri, appId, apiKey) {
 
     const hash = CryptoJS.HmacSHA256(data, apiKey);
     const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
-    const hashInBase64_2 = atob(hash);
+    //const hashInBase64_2 = atob(hash);
 
     xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
 }

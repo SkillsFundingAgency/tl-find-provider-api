@@ -17,7 +17,7 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
                 <div class="tl-card">
-                    <h1 class="govuk-heading-xl govuk-!-margin-top-2 govuk-!-margin-bottom-7">{{article.title}}</h1>
+                    <h1 class="govuk-heading-xl govuk-!-margin-top-2 govuk-!-margin-bottom-7">Find a Provider Test</h1>
                     <p class="govuk-body" id="tl-version"></p>
                     <p class="govuk-body">Search for schools and colleges delivering T Levels near you.</p>
                     <p class="govuk-body">You can contact them directly to find the right industry placement student for your business.</p>
@@ -90,7 +90,7 @@
 
             let findProvidersApiUrl = $('#searchApiUrlValue').val();
             if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
-            var articleBaseUrl = $('#article_base_url').val();
+            //var articleBaseUrl = $('#article_base_url').val();
 
             let currentPage = 0;
             let currentPostcode = 0;
@@ -214,7 +214,7 @@
                 const appId = $('#find_provider_api_app_id').val();
                 const apiKey = $('#find_provider_api_key').val();
                 const uri = findProvidersApiUrl + "providers?postcode=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
-                
+
                 $.ajax({
                     type: "GET",
                     url: uri,
@@ -283,6 +283,24 @@
                         if (providerLocation.telephone) searchResult += ' | ' + providerLocation.telephone;
                         if (providerLocation.website) searchResult += ' | <a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
                         if (providerLocation.email) searchResult += ' | <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
+                        searchResult += '</p>';
+
+                        let addressDetails = '';
+                        if (providerLocation.addressLine1) addressDetails += providerLocation.addressLine1;
+                        if (providerLocation.addressLine2) {
+                            if (addressDetails) addressDetails += ' | ';
+                            addressDetails += providerLocation.addressLine2;
+                        }
+                        if (providerLocation.county) {
+                            if (addressDetails) addressDetails += ' | ';
+                            addressDetails += providerLocation.county;
+                        }
+                        if (providerLocation.journeyToLink) {
+                            if (addressDetails) addressDetails += ' | ';
+                            addressDetails += '<a target="_blank" href="' + providerLocation.journeyToLink + '" class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">How do I get there?</a>';
+                        }
+
+                        if (addressDetails) searchResult += '<p class="govuk-body"><em>Address: </em>' + addressDetails + '</p>';
 
                         const locationDeliveryYears = [];
                         let availableNow = null;
@@ -307,7 +325,7 @@
                             availableNow.qualifications.sort(function(x, y) { return (x.name < y.name) ? -1 : ((x.name > y.name) ? 1 : 0) });
                         }
 
-                        searchResult += '</p><div class="tl-fap--courses">';
+                        searchResult += '<div class="tl-fap--courses">';
 
                         $.each(locationDeliveryYears,
                             function(_, deliveryYear) {
@@ -367,7 +385,7 @@
                 $("#tl-postcode-error").text(message);
                 $('#tl-postcode-error').removeClass("tl-hidden");
                 $('#tl-error').addClass("tl-hidden");
-            }            
+            }
         });
     </script>
 }
