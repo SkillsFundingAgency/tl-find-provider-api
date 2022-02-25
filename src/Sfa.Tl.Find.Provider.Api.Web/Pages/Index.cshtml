@@ -7,7 +7,7 @@
 @*<div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>*@
+    </div>*@
 
 <main id="main-content" role="main">
 
@@ -41,11 +41,15 @@
                         <button class="govuk-button tl-button--blue" id="tl-search-providers" data-module="govuk-button">
                             Search
                         </button>
+
+                        <div class="tl-geolocator">
+                            or <span id="tl-search-location">use current location</span>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-        
+
         <div class="govuk-grid-row tl-hidden" id="tl-error">
             <div class="govuk-grid-column-two-thirds govuk-!-margin-top-7">
                 <h1 class="govuk-heading-l" id="tl-error-header"></h1>
@@ -74,319 +78,377 @@
 
 <!-- Hidden fields to pass parameters to script -->
 <div>
-    <input type="hidden" id="searchApiUrlValue" value=@Model.SearchApiUrl >
-    <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId >
-    <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey >
-    <input type="hidden" id="qualification_article_map" value=@Model.QualificationArticleMap >
-    <input type="hidden" id="article_base_url" value=@Model.ArticleBaseUrl >
+    <input type="hidden" id="searchApiUrlValue" value=@Model.SearchApiUrl>
+    <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId>
+    <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey>
+    <input type="hidden" id="qualification_article_map" value=@Model.QualificationArticleMap>
+    <input type="hidden" id="article_base_url" value=@Model.ArticleBaseUrl>
 </div>
 @section Scripts {
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
-        //https://stackoverflow.com/questions/51005488/how-to-use-cryptojs-in-javascript
+    //https://stackoverflow.com/questions/51005488/how-to-use-cryptojs-in-javascript
 
-        $(document).ready(function() {
+    $(document).ready(function() {
 
-            let findProvidersApiUrl = $('#searchApiUrlValue').val();
-            if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
-            //var articleBaseUrl = $('#article_base_url').val();
+        let findProvidersApiUrl = $('#searchApiUrlValue').val();
+        if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
+        //var articleBaseUrl = $('#article_base_url').val();
 
-            let currentPage = 0;
-            let currentPostcode = 0;
-            let isSearchInProgress = false;
+        let currentPage = 0;
+        let currentPostcode = 0;
+        let isSearchInProgress = false;
 
-            //loadRoutes();
+        //loadRoutes();
 
-            //Load qualifications map
-            const qualificationArticleMap = JSON.parse($('#qualification_article_map').val());
+        //Load qualifications map
+        const qualificationArticleMap = JSON.parse($('#qualification_article_map').val());
 
-            //Check for search query param with postcode
-            let postcode = getUrlParameter("search");
-            if (postcode) {
-                postcode = urlDecode(postcode).toUpperCase();
-                $("#tl-postcode").val(postcode);
-                providerSearch(postcode);
+        //Check for search query param with postcode
+        let postcode = getUrlParameter("search");
+        if (postcode) {
+            postcode = urlDecode(postcode).toUpperCase();
+            $("#tl-postcode").val(postcode);
+            providerSearch(postcode);
 
-                //Remove query string from url
-                const urlSplit = (window.location.href).split("?");
-                const obj = { Title: document.title, Url: urlSplit[0] };
-                history.pushState(obj, obj.Title, obj.Url);
-            } else {
-                $('.tl-fap--noresult').removeClass("tl-hidden");
-            }
+            //Remove query string from url
+            const urlSplit = (window.location.href).split("?");
+            const obj = { Title: document.title, Url: urlSplit[0] };
+            history.pushState(obj, obj.Title, obj.Url);
+        } else {
+            $('.tl-fap--noresult').removeClass("tl-hidden");
+        }
 
-            $('#tl-postcode').keypress(function(e) {
-                if (e.which === 13) {
-                    $("#tl-search-providers").click();
-                    return false;
-                }
-            });
-
-            $("#tl-search-providers").click(function() {
-                return providerSearch($("#tl-postcode").val().trim(), 0, 5);
-            });
-
-            $(".tl-search-providers-form").submit(function() {
-                event.preventDefault();
-            });
-
-            $("#tl-next-results-link").click(function() {
-                event.stopPropagation();
-                event.preventDefault();
-                callProviderSearchApi(currentPostcode, currentPage + 1);
+        $('#tl-postcode').keypress(function(e) {
+            if (e.which === 13) {
+                $("#tl-search-providers").click();
                 return false;
-            });
-
-            function loadRoutes() {
-                const appId = $('#find_provider_api_app_id').val();
-                const apiKey = $('#find_provider_api_key').val();
-                const uri = findProvidersApiUrl + "routes";
-                $.ajax({
-                    type: "GET",
-                    url: uri,
-                    contentType: "application/json",
-                    beforeSend: function(xhr) {
-                        addHmacAuthHeader(xhr, uri, appId, apiKey);
-                    }
-                }).done(function(response) {
-                    //console.log('Routes request succeeded with JSON response:', response);
-                    populateRoutes(response);
-                }).fail(function(error) {
-                    console.log('Call to get routes failed. ' + error);
-                });
-            }
-
-            function populateRoutes(data) {
-                const select = $("#tl-routes");
-                select.find("option:not(:first)").remove();
-                $.each(data,
-                    function(_, item) {
-                        select.append(new Option(item.name, item.id));
-                    });
-            }
-
-            function providerSearch(postcode, page) {
-                //$("#tl-search-providers").disabled = true;
-                //$("#tl-next-results-link").disabled = true;
-                let error = null;
-                if (postcode === "") {
-                    error = "Enter a postcode";
-                    //event.stopPropagation();
-                    //showPostcodeError("Enter a postcode");
-                    //$("#tl-search-providers").disabled = false;
-                    //return false;
-                } else if (!postcode.match(/^[0-9a-zA-Z\s]+$/)) {
-                    console.log(postcode + "must be letters, numbers, and spaces only");
-                    error = "Enter a valid postcode";
-                    //event.stopPropagation();
-                    //showPostcodeError("Enter a valid postcode");
-                    //$("#tl-search-providers").disabled = false;
-                    //return false;
-                }
-
-                if (!postcode.match(/^[0-9a-zA-Z\s]+$/)) {
-                    event.stopPropagation();
-                    showPostcodeError(error);
-                    $("#tl-search-providers").disabled = false;
-                    return false;
-                }
-
-                clearProviderSearchResults();
-
-                callProviderSearchApi(postcode, page);
-
-                return true;
-            }
-
-            function callProviderSearchApi(postcode, page, pageSize) {
-                page = (page === undefined ? 0 : page);
-                pageSize = (pageSize === undefined ? 5 : pageSize);
-
-                //$("#tl-search-providers").disabled = true;
-                //$("#tl-next-results-link").disabled = true;
-                if (isSearchInProgress) {
-                    console.log("Already calling api");
-                    return false;
-                }
-                isSearchInProgress = true;
-
-                const appId = $('#find_provider_api_app_id').val();
-                const apiKey = $('#find_provider_api_key').val();
-                const uri = findProvidersApiUrl + "providers?postcode=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
-
-                $.ajax({
-                    type: "GET",
-                    url: uri,
-                    contentType: "application/json",
-                    beforeSend: function(xhr) {
-                        addHmacAuthHeader(xhr, uri, appId, apiKey);
-                    }
-                }).done(function(response) {
-                    //console.log(JSON.stringify(response));
-                    if (response.error) {
-                        console.log("Invalid postcode response received - " + response.error);
-                        showPostcodeError("Enter a valid postcode");
-                    } else {
-                        currentPage = page;
-                        currentPostcode = postcode;
-                        console.log("currentPage is now " + currentPage);
-                        populateProviderSearchResults(response);
-                    }
-                    $("#tl-search-providers").disabled = false;
-                    $("#tl-next-results-link").disabled = false;
-                    isSearchInProgress = false;
-                }).fail(function(jqxhr) {
-                    showError(jqxhr.status, jqxhr.responseText);
-                    $("#tl-search-providers").disabled = false;
-                    $("#tl-next-results-link").disabled = false;
-                    isSearchInProgress = false;
-                });
-
-                return true;
-            }
-
-            function clearProviderSearchResults() {
-                console.log('clearing...');
-                $('#tl-error').addClass("tl-hidden");
-                $('#tl-postcode-error').addClass("tl-hidden");
-                $('.tl-fap--noresult').addClass("tl-hidden");
-                $("#tl-next-results-link").addClass("tl-hidden");
-                $("#tl-fap--results").find(".tl-fap--result").remove();
-                currentPage = 0;
-            }
-
-            function populateProviderSearchResults(data) {
-                if (data.postcode) {
-                    $("#tl-postcode").val(data.postcode);
-                }
-
-                if (!data.searchResults || data.searchResults.length === 0) {
-                    $('.tl-fap--noresult').removeClass("tl-hidden");
-                    return;
-                }
-
-                $.each(data.searchResults,
-                    function(_, providerLocation) {
-                        let searchResult =
-                            '<div class="tl-fap--result"> \
-					     <h3 class="govuk-heading-m">' +
-                                providerLocation.providerName +
-                                ' <span class="tl-fap--distance">' +
-                                providerLocation.distance.toFixed(0) +
-                                ' miles</span></h3> \
-					     <p class="govuk-body">' +
-                                providerLocation.town +
-                                ' | ' +
-                                providerLocation.postcode;
-
-                        if (providerLocation.telephone) searchResult += ' | ' + providerLocation.telephone;
-                        if (providerLocation.website) searchResult += ' | <a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
-                        if (providerLocation.email) searchResult += ' | <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
-                        searchResult += '</p>';
-
-                        let addressDetails = '';
-                        if (providerLocation.addressLine1) addressDetails += providerLocation.addressLine1;
-                        if (providerLocation.addressLine2) {
-                            if (addressDetails) addressDetails += ' | ';
-                            addressDetails += providerLocation.addressLine2;
-                        }
-                        if (providerLocation.county) {
-                            if (addressDetails) addressDetails += ' | ';
-                            addressDetails += providerLocation.county;
-                        }
-                        if (providerLocation.journeyToLink) {
-                            if (addressDetails) addressDetails += ' | ';
-                            addressDetails += '<a target="_blank" href="' + providerLocation.journeyToLink + '" class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">How do I get there?</a>';
-                        }
-
-                        if (addressDetails) searchResult += '<p class="govuk-body"><em>Address: </em>' + addressDetails + '</p>';
-
-                        const locationDeliveryYears = [];
-                        let availableNow = null;
-                        $.each(providerLocation.deliveryYears,
-                            function(_, deliveryYear) {
-                                if (deliveryYear.isAvailableNow) {
-                                    if (availableNow) {
-                                        for (let i = 0; i < deliveryYear.qualifications.length; i++) {
-                                            if (availableNow.qualifications.filter(function(q) { return q.name === deliveryYear.qualifications[i].name; }).length === 0)
-                                                availableNow.qualifications.push(deliveryYear.qualifications[i]);
-                                        }
-                                    } else {
-                                        availableNow = deliveryYear;
-                                        locationDeliveryYears.push(availableNow);
-                                    }
-                                } else {
-                                    locationDeliveryYears.push(deliveryYear);
-                                }
-                            });
-
-                        if (availableNow) {
-                            availableNow.qualifications.sort(function(x, y) { return (x.name < y.name) ? -1 : ((x.name > y.name) ? 1 : 0) });
-                        }
-
-                        searchResult += '<div class="tl-fap--courses">';
-
-                        $.each(locationDeliveryYears,
-                            function(_, deliveryYear) {
-                                const availability = deliveryYear.isAvailableNow
-                                    ? 'Available now'
-                                    : 'From September ' + deliveryYear.year + ' onwards';
-
-                                searchResult += '<p class="govuk-body govuk-!-font-weight-bold">' +
-                                    availability +
-                                    ':</p> \
-							    <ul class="govuk-list govuk-list--bullet">';
-
-                                $.each(deliveryYear.qualifications,
-                                    function(_, qualification) {
-                                        const articleLink = qualificationArticleMap[qualification.id];
-                                        if (articleLink) {
-                                            searchResult += '<li><a target="_blank" class="govuk-link tl-fap--result-course" href="' + articleLink + '">' + qualification.name + '</a></li>';
-                                        } else {
-                                            searchResult += '<li>' + qualification.name + '</li>';
-                                        }
-                                    });
-
-                                searchResult += '</ul>';
-                            });
-
-                        searchResult += '</div> \
-                                <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible"> \
-                              </div>';
-
-                        $("#tl-fap--results").append(searchResult);
-                    });
-
-                $('#tl-next-results-link').removeClass("tl-hidden");
-            }
-
-            function showError(status, errorText) {
-                console.log("Error status " + status + " was encountered. " + errorText);
-
-                switch (status) {
-                case 0:
-                    console.log("case 0");
-                    $("#tl-error-header").text('There is a problem with your network connection.');
-                    $("#tl-error-detail").html('There is a problem with your network connection. Check you’re connected to the internet and try again.');
-                    break;
-                default:
-                    console.log("case default");
-                    $("#tl-error-header").text('Sorry, there is a problem with the service.');
-                    $("#tl-error-detail").html('Try again later or <a class="govuk-link tl-error--contact" href="https://test.employers.tlevels.gov.uk/hc/en-gb/requests/new">contact us</a> quoting error code ' + status);
-                }
-
-                console.log("unhiding");
-                clearProviderSearchResults();
-                $('#tl-error').removeClass("tl-hidden");
-            }
-
-            function showPostcodeError(message) {
-                $("#tl-postcode-error").text(message);
-                $('#tl-postcode-error').removeClass("tl-hidden");
-                $('#tl-error').addClass("tl-hidden");
             }
         });
-    </script>
+
+        $("#tl-search-providers").click(function() {
+            console.log("calling with defaults");
+            return providerSearch($("#tl-postcode").val().trim());
+        });
+
+        $(".tl-search-providers-form").submit(function() {
+            event.preventDefault();
+        });
+
+        $("#tl-search-location").click(function() {
+            geoFindMe();
+        });
+
+        $("#tl-next-results-link").click(function() {
+            event.stopPropagation();
+            event.preventDefault();
+            callProviderSearchApi(currentPostcode, currentPage + 1);
+            return false;
+        });
+
+        function loadRoutes() {
+            const appId = $('#find_provider_api_app_id').val();
+            const apiKey = $('#find_provider_api_key').val();
+            const uri = findProvidersApiUrl + "routes";
+            $.ajax({
+                type: "GET",
+                url: uri,
+                contentType: "application/json",
+                beforeSend: function(xhr) {
+                    addHmacAuthHeader(xhr, uri, appId, apiKey);
+                }
+            }).done(function(response) {
+                //console.log('Routes request succeeded with JSON response:', response);
+                populateRoutes(response);
+            }).fail(function(error) {
+                console.log('Call to get routes failed. ' + error);
+            });
+        }
+
+        function populateRoutes(data) {
+            const select = $("#tl-routes");
+            select.find("option:not(:first)").remove();
+            $.each(data,
+                function(_, item) {
+                    select.append(new Option(item.name, item.id));
+                });
+        }
+
+        function providerSearch(postcode, page) {
+            //$("#tl-search-providers").disabled = true;
+            //$("#tl-next-results-link").disabled = true;
+            let error = null;
+            if (postcode === "") {
+                error = "Enter a postcode";
+                //event.stopPropagation();
+                //showPostcodeError("Enter a postcode");
+                //$("#tl-search-providers").disabled = false;
+                //return false;
+            } else if (!postcode.match(/^[0-9a-zA-Z\s]+$/)) {
+                console.log(postcode + "must be letters, numbers, and spaces only");
+                error = "Enter a valid postcode";
+                //event.stopPropagation();
+                //showPostcodeError("Enter a valid postcode");
+                //$("#tl-search-providers").disabled = false;
+                //return false;
+            }
+
+            if (!postcode.match(/^[0-9a-zA-Z\s]+$/)) {
+                event.stopPropagation();
+                showPostcodeError(error);
+                $("#tl-search-providers").disabled = false;
+                return false;
+            }
+
+            clearProviderSearchResults();
+
+            callProviderSearchApi(postcode, page);
+
+            return true;
+        }
+
+        function callProviderSearchApi(postcode, page, pageSize) {
+            page = (page === undefined ? 0 : page);
+            pageSize = (pageSize === undefined ? 5 : pageSize);
+
+            //$("#tl-search-providers").disabled = true;
+            //$("#tl-next-results-link").disabled = true;
+            if (isSearchInProgress) {
+                console.log("Already calling api");
+                return false;
+            }
+            isSearchInProgress = true;
+
+            const appId = $('#find_provider_api_app_id').val();
+            const apiKey = $('#find_provider_api_key').val();
+            const uri = findProvidersApiUrl + "providers?postcode=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
+
+            $.ajax({
+                type: "GET",
+                url: uri,
+                contentType: "application/json",
+                beforeSend: function(xhr) {
+                    addHmacAuthHeader(xhr, uri, appId, apiKey);
+                }
+            }).done(function(response) {
+                //console.log(JSON.stringify(response));
+                if (response.error) {
+                    console.log("Invalid postcode response received - " + response.error);
+                    showPostcodeError("Enter a valid postcode");
+                } else {
+                    currentPage = page;
+                    currentPostcode = postcode;
+                    console.log("currentPage is now " + currentPage);
+                    populateProviderSearchResults(response);
+                }
+                $("#tl-search-providers").disabled = false;
+                $("#tl-next-results-link").disabled = false;
+                isSearchInProgress = false;
+            }).fail(function(jqxhr) {
+                showError(jqxhr.status, jqxhr.responseText);
+                $("#tl-search-providers").disabled = false;
+                $("#tl-next-results-link").disabled = false;
+                isSearchInProgress = false;
+            });
+
+            return true;
+        }
+
+        function clearProviderSearchResults() {
+            console.log('clearing...');
+            $('#tl-error').addClass("tl-hidden");
+            $('#tl-postcode-error').addClass("tl-hidden");
+            $('.tl-fap--noresult').addClass("tl-hidden");
+            $("#tl-next-results-link").addClass("tl-hidden");
+            $("#tl-fap--results").find(".tl-fap--result").remove();
+            currentPage = 0;
+        }
+
+        function populateProviderSearchResults(data) {
+            if (data.postcode) {
+                $("#tl-postcode").val(data.postcode);
+            }
+
+            if (!data.searchResults || data.searchResults.length === 0) {
+                $('.tl-fap--noresult').removeClass("tl-hidden");
+                return;
+            }
+
+            $.each(data.searchResults,
+                function(_, providerLocation) {
+                    let searchResult =
+                        '<div class="tl-fap--result"> \
+                     <h3 class="govuk-heading-m">' +
+                            providerLocation.providerName +
+                            ' <span class="tl-fap--distance">' +
+                            providerLocation.distance.toFixed(0) +
+                            ' miles</span></h3> \
+                     <p class="govuk-body">' +
+                            providerLocation.town +
+                            ' | ' +
+                            providerLocation.postcode;
+
+                    if (providerLocation.telephone) searchResult += ' | ' + providerLocation.telephone;
+                    if (providerLocation.website) searchResult += ' | <a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
+                    if (providerLocation.email) searchResult += ' | <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
+                    searchResult += '</p>';
+
+                    let addressDetails = '';
+                    if (providerLocation.addressLine1) addressDetails += providerLocation.addressLine1;
+                    if (providerLocation.addressLine2) {
+                        if (addressDetails) addressDetails += ' | ';
+                        addressDetails += providerLocation.addressLine2;
+                    }
+                    if (providerLocation.county) {
+                        if (addressDetails) addressDetails += ' | ';
+                        addressDetails += providerLocation.county;
+                    }
+                    if (providerLocation.journeyToLink) {
+                        if (addressDetails) addressDetails += ' | ';
+                        addressDetails += '<a target="_blank" href="' + providerLocation.journeyToLink + '" class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">How do I get there?</a>';
+                    }
+
+                    if (addressDetails) searchResult += '<p class="govuk-body"><em>Address: </em>' + addressDetails + '</p>';
+
+                    const locationDeliveryYears = [];
+                    let availableNow = null;
+                    $.each(providerLocation.deliveryYears,
+                        function(_, deliveryYear) {
+                            if (deliveryYear.isAvailableNow) {
+                                if (availableNow) {
+                                    for (let i = 0; i < deliveryYear.qualifications.length; i++) {
+                                        if (availableNow.qualifications.filter(function(q) { return q.name === deliveryYear.qualifications[i].name; }).length === 0)
+                                            availableNow.qualifications.push(deliveryYear.qualifications[i]);
+                                    }
+                                } else {
+                                    availableNow = deliveryYear;
+                                    locationDeliveryYears.push(availableNow);
+                                }
+                            } else {
+                                locationDeliveryYears.push(deliveryYear);
+                            }
+                        });
+
+                    if (availableNow) {
+                        availableNow.qualifications.sort(function(x, y) { return (x.name < y.name) ? -1 : ((x.name > y.name) ? 1 : 0) });
+                    }
+
+                    searchResult += '<div class="tl-fap--courses">';
+
+                    $.each(locationDeliveryYears,
+                        function(_, deliveryYear) {
+                            const availability = deliveryYear.isAvailableNow
+                                ? 'Available now'
+                                : 'From September ' + deliveryYear.year + ' onwards';
+
+                            searchResult += '<p class="govuk-body govuk-!-font-weight-bold">' +
+                                availability +
+                                ':</p> \
+                            <ul class="govuk-list govuk-list--bullet">';
+
+                            $.each(deliveryYear.qualifications,
+                                function(_, qualification) {
+                                    const articleLink = qualificationArticleMap[qualification.id];
+                                    if (articleLink) {
+                                        searchResult += '<li><a target="_blank" class="govuk-link tl-fap--result-course" href="' + articleLink + '">' + qualification.name + '</a></li>';
+                                    } else {
+                                        searchResult += '<li>' + qualification.name + '</li>';
+                                    }
+                                });
+
+                            searchResult += '</ul>';
+                        });
+
+                    searchResult += '</div> \
+                            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible"> \
+                          </div>';
+
+                    $("#tl-fap--results").append(searchResult);
+                });
+
+            $('#tl-next-results-link').removeClass("tl-hidden");
+        }
+
+        //Search for location
+        function geoFindMe() {
+            //const output = document.getElementById("Location");
+
+            if (!navigator.geolocation) {
+                console.log("Geolocation is not supported by your browser");
+                //output.placeholder = "Geolocation is not supported by your browser";
+                return;
+            }
+
+            function success(position) {
+                var latVal = position.coords.latitude,
+                    longVal = position.coords.longitude,
+                    url = "https://api.postcodes.io/postcodes?lon=" + longVal + "&lat=" + latVal + "&wideSearch=true",
+                    json;
+
+                console.log(`lat-long = ${latVal},${longVal}`);
+
+                //Load closest postcode from postcodes.io - do we need this?
+                $.get(url)
+                    .done(function(data) {
+                        //json = data;
+                        //console.log(json);
+                        const postcode = data.result[0].postcode;
+
+                        console.log(`closest postcode = ${postcode}`);
+
+                        //output.value = json.result[0].postcode;
+                        //output.placeholder = "";
+
+                        //Clear and call back end
+                        clearProviderSearchResults();
+                        callProviderSearchApi(postcode);
+                    })
+                    .fail(function() {
+                        console.log("Unable to retrieve postcode");
+                        //output.value = "Unable to retrieve postcode";
+                    });
+            };
+
+        function error() {
+            //output.placeholder = "Unable to retrieve your location";
+            output.placeholder = "Unable to retrieve your location";
+        };
+
+        //output.placeholder = "Locating…";
+
+        navigator.geolocation.getCurrentPosition(success, error, { maximumAge: 600000 });
+    }
+
+
+
+        function showError(status, errorText) {
+            console.log("Error status " + status + " was encountered. " + errorText);
+
+            switch (status) {
+            case 0:
+                console.log("case 0");
+                $("#tl-error-header").text('There is a problem with your network connection.');
+                $("#tl-error-detail").html('There is a problem with your network connection. Check you’re connected to the internet and try again.');
+                break;
+            default:
+                console.log("case default");
+                $("#tl-error-header").text('Sorry, there is a problem with the service.');
+                $("#tl-error-detail").html('Try again later or <a class="govuk-link tl-error--contact" href="https://test.employers.tlevels.gov.uk/hc/en-gb/requests/new">contact us</a> quoting error code ' + status);
+            }
+
+            console.log("unhiding");
+            clearProviderSearchResults();
+            $('#tl-error').removeClass("tl-hidden");
+        }
+
+        function showPostcodeError(message) {
+            $("#tl-postcode-error").text(message);
+            $('#tl-postcode-error').removeClass("tl-hidden");
+            $('#tl-error').addClass("tl-hidden");
+        }
+    });
+
+</script>
 }
 
