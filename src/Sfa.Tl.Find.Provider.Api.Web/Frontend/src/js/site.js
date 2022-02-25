@@ -1,6 +1,6 @@
 //js goes here
 
-function addHmacAuthHeader_NEW(xhr, uri, appId, apiKey) {
+function addHmacAuthHeader(xhr, uri, appId, apiKey) {
     //const appId = $('#find_provider_api_app_id').val();
     //const apiKey = $('#find_provider_api_key').val();
     const ts = Math.round((new Date()).getTime() / 1000);
