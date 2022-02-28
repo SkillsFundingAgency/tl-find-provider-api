@@ -9,6 +9,7 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     </div>*@
 
+@* ReSharper disable UnknownCssClass *@
 <main id="main-content" role="main">
 
     <div class="govuk-width-container govuk-main-wrapper govuk-!-padding-top-0">
@@ -74,7 +75,7 @@
         </div>
     </div>
 </main>
-
+@* ReSharper restore UnknownCssClass *@
 
 <!-- Hidden fields to pass parameters to script -->
 <div>
@@ -117,7 +118,9 @@
             const obj = { Title: document.title, Url: urlSplit[0] };
             history.pushState(obj, obj.Title, obj.Url);
         } else {
+// ReSharper disable StringLiteralTypo
             $('.tl-fap--noresult').removeClass("tl-hidden");
+// ReSharper restore StringLiteralTypo
         }
 
         $('#tl-postcode').keypress(function(e) {
@@ -245,6 +248,7 @@
                 $("#tl-search-providers").disabled = false;
                 $("#tl-next-results-link").disabled = false;
                 isSearchInProgress = false;
+               // ReSharper disable once IdentifierTypo
             }).fail(function(jqxhr) {
                 showError(jqxhr.status, jqxhr.responseText);
                 $("#tl-search-providers").disabled = false;
@@ -259,6 +263,7 @@
             console.log('clearing...');
             $('#tl-error').addClass("tl-hidden");
             $('#tl-postcode-error').addClass("tl-hidden");
+            // ReSharper disable once StringLiteralTypo
             $('.tl-fap--noresult').addClass("tl-hidden");
             $("#tl-next-results-link").addClass("tl-hidden");
             $("#tl-fap--results").find(".tl-fap--result").remove();
@@ -271,6 +276,7 @@
             }
 
             if (!data.searchResults || data.searchResults.length === 0) {
+                // ReSharper disable once StringLiteralTypo
                 $('.tl-fap--noresult').removeClass("tl-hidden");
                 return;
             }
@@ -383,16 +389,13 @@
             function success(position) {
                 var latVal = position.coords.latitude,
                     longVal = position.coords.longitude,
-                    url = "https://api.postcodes.io/postcodes?lon=" + longVal + "&lat=" + latVal + "&wideSearch=true",
-                    json;
+                    url = "https://api.postcodes.io/postcodes?lon=" + longVal + "&lat=" + latVal + "&wideSearch=true";
 
                 console.log(`lat-long = ${latVal},${longVal}`);
 
                 //Load closest postcode from postcodes.io - do we need this?
                 $.get(url)
                     .done(function(data) {
-                        //json = data;
-                        //console.log(json);
                         const postcode = data.result[0].postcode;
 
                         console.log(`closest postcode = ${postcode}`);
@@ -437,7 +440,7 @@
                 $("#tl-error-detail").html('Try again later or <a class="govuk-link tl-error--contact" href="https://test.employers.tlevels.gov.uk/hc/en-gb/requests/new">contact us</a> quoting error code ' + status);
             }
 
-            console.log("unhiding");
+            console.log("un-hiding");
             clearProviderSearchResults();
             $('#tl-error').removeClass("tl-hidden");
         }

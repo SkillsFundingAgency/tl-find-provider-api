@@ -22,7 +22,9 @@ gulp.task('dev', gulp.series('assets', 'css', 'js', 'favicon',
     }));
 
 
+// ReSharper disable CommentTypo
 //gulp.task('devwatch', gulp.series('assets', 'dev.sass', 'dev.js', 'sitemap', 'dev.sass:watch',
+// ReSharper restore CommentTypo
 //    (done) => {
 //        done();
 //    }));
