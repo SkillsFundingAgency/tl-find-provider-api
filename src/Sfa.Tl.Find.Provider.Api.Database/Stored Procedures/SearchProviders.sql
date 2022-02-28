@@ -14,6 +14,7 @@ AS
 	WITH ProvidersCTE AS (
 		SELECT	p.[Id],
 				p.[UkPrn],
+				COALESCE(ref.[Urn], 0) AS [Urn],
 				p.[Name], 
 				p.[Email],
 				p.[Telephone],
@@ -21,11 +22,14 @@ AS
 				--Need to filter so providers in the additional data set are overidden by ones in the main data set
 				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
 		FROM	[Provider] p
+		LEFT JOIN ProviderReference ref
+		ON		ref.[UkPrn] = p.[UkPrn]
 		WHERE	p.[IsDeleted] = 0
 		  --If not merging additional data, have to make sure we only include non-additional data
 		  AND	(@mergeAdditionalData = 1 OR (@mergeAdditionalData = 0 AND p.[IsAdditionalData] = 0))),
 	NearestLocationsCTE AS (
 	SELECT	p.[UkPrn],
+			p.[Urn],
 			p.[Name] AS [ProviderName],
 			l.[Id] AS [LocationId],
 			l.[Postcode],
@@ -60,6 +64,7 @@ AS
 	FETCH NEXT @pageSize ROWS ONLY)
 	--Step 2 - add in the qualifications (no filter for qualifications - return all for selected locations)
 		SELECT 	[UkPrn],
+				[Urn],
 				[ProviderName],
 				[Postcode],
 				[LocationName],
