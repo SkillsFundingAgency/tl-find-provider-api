@@ -285,15 +285,16 @@
                 function(_, providerLocation) {
                     let searchResult =
                         '<div class="tl-fap--result"> \
-                     <h3 class="govuk-heading-m">' +
-                            providerLocation.providerName +
-                            ' <span class="tl-fap--distance">' +
-                            providerLocation.distance.toFixed(0) +
-                            ' miles</span></h3> \
-                     <p class="govuk-body">' +
-                            providerLocation.town +
-                            ' | ' +
-                            providerLocation.postcode;
+                            <h3 class="govuk-heading-m">' +
+                                providerLocation.providerName +
+                                ' <span class="tl-fap--distance">' +
+                                providerLocation.distance.toFixed(0) +
+                            ' miles</span> \
+                            </h3> \
+                            <p class="govuk-body">' +
+                                providerLocation.town +
+                                ' | ' +
+                                providerLocation.postcode;
 
                     if (providerLocation.telephone) searchResult += ' | ' + providerLocation.telephone;
                     if (providerLocation.website) searchResult += ' | <a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
@@ -316,6 +317,13 @@
                     }
 
                     if (addressDetails) searchResult += '<p class="govuk-body"><em>Address: </em>' + addressDetails + '</p>';
+
+                    if (providerLocation.urn) {
+                        searchResult += '<p class="govuk-body"> \
+                              <a target="_blank" href=https://www.ofsted.gov.uk/oxedu_providers/full/(urn)/' + providerLocation.urn + ' class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">Show Ofsted inspection report</a> \
+                            | <a target="_blank" href=https://www.ukrlp.co.uk/ukrlp/ukrlp_provider.page_pls_provDetails?x=&pv_status=VERIFIED&pv_vis_code=L&pn_p_id=' + providerLocation.ukPrn + ' class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">Show UKRLP Details</a> \
+                            </p>';
+                    }
 
                     const locationDeliveryYears = [];
                     let availableNow = null;
