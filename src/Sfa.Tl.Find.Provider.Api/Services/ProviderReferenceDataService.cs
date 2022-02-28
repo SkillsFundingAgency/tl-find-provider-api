@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -9,23 +8,30 @@ using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Connected_Services.Sfa.Tl.Find.Provider.Api.UkRlp.Api.Client;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Api.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Api.Services;
 
 public class ProviderReferenceDataService : IProviderReferenceDataService
 {
-    private readonly ILogger<ProviderReferenceDataService> _logger;
+    private readonly IDateTimeService _dateTimeService;
     private readonly IProviderQueryPortTypeClient _providerQueryPortTypeClient;
+    private readonly IProviderReferenceRepository _providerReferenceRepository;
+    private readonly ILogger<ProviderReferenceDataService> _logger;
 
     public ProviderReferenceDataService(
         IProviderQueryPortTypeClient providerQueryPortTypeClient,
+        IProviderReferenceRepository providerReferenceRepository,
+        IDateTimeService dateTimeService,
         ILogger<ProviderReferenceDataService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _providerQueryPortTypeClient = providerQueryPortTypeClient ?? throw new ArgumentNullException(nameof(providerQueryPortTypeClient));
+        _providerReferenceRepository = providerReferenceRepository ?? throw new ArgumentNullException((nameof(providerReferenceRepository)));
+        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
     }
 
-    public async Task<List<ProviderReference>> GetAllAsync(DateTime lastUpdateDate)
+    public async Task<List<ProviderReference>> GetAll(DateTime lastUpdateDate)
     {
         var query = CreateQuery(lastUpdateDate);
 
@@ -45,6 +51,15 @@ public class ProviderReferenceDataService : IProviderReferenceDataService
         return providerReferences;
     }
 
+    public async Task<List<ProviderReference>> GetAllSinceLastUpdate()
+    {
+        var lastImportDate = await _providerReferenceRepository
+                                 .GetLastUpdateDate()
+                             ?? _dateTimeService.MinValue;
+
+        return await GetAll(lastImportDate);
+    }
+
     private static long ExtractUniqueReferenceNumber(IEnumerable<VerificationDetailsStructure> verificationDetails)
     {
         var urnString = verificationDetails?
@@ -56,10 +71,9 @@ public class ProviderReferenceDataService : IProviderReferenceDataService
             ? urn 
             : 0;
     }
+
     private static ProviderQueryParam CreateQuery(DateTime lastUpdateDate)
     {
-        //var activeStatus = UkRlpRecordStatus.Active.Humanize();
-
         var query = new ProviderQueryParam(new ProviderQueryStructure
         {
             QueryId = "1",
@@ -78,6 +92,16 @@ public class ProviderReferenceDataService : IProviderReferenceDataService
         });
 
         return query;
+    }
+
+    public async Task<bool> HasProviderReferences()
+    {
+        return await _providerReferenceRepository.HasAny();
+    }
+
+    public async Task Save(IEnumerable<ProviderReference> providerReferences)
+    {
+        await _providerReferenceRepository.Save(providerReferences);
     }
 
     private async Task<response> RetrieveAllAsync(ProviderQueryParam query)
@@ -100,18 +124,5 @@ public class ProviderReferenceDataService : IProviderReferenceDataService
 
         return null;
     }
-
-    public enum UkRlpRecordStatus
-    {
-        [Description("A")]
-        Active,
-        [Description("V")]
-        Verified,
-        [Description("PD1")]
-        DeactivationInProcess,
-        [Description("PD2")]
-        DeactivateComplete
-    }
-
 }
 

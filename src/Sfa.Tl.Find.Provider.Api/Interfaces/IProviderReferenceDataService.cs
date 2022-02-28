@@ -7,5 +7,11 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces;
 
 public interface IProviderReferenceDataService
 {
-    Task<List<ProviderReference>> GetAllAsync(DateTime lastUpdateDate);
+    Task<List<ProviderReference>> GetAll(DateTime lastUpdateDate);
+
+    Task<List<ProviderReference>> GetAllSinceLastUpdate();
+
+    Task<bool> HasProviderReferences();
+
+    Task Save(IEnumerable<ProviderReference> providerReferences);
 }

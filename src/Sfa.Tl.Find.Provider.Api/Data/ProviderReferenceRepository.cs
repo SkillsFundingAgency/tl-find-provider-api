@@ -50,7 +50,22 @@ public class ProviderReferenceRepository : IProviderReferenceRepository
             "ORDER BY Name");
     }
 
-    public async Task<ProviderReference> GetByUkPrn(long ukprn)
+    public async Task<DateTime?> GetLastUpdateDate()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        return await _dbContextWrapper.ExecuteScalarAsync<DateTime?>(
+            connection,
+            "SELECT " +
+                "   (SELECT MAX(MaxDates) " +
+                "    FROM(VALUES(MAX(CreatedOn)), " +
+                "               (MAX(ModifiedOn)) " +
+                "    ) T(MaxDates) " +
+                ") " +
+                "FROM ProviderReference");
+    }
+
+    public async Task<ProviderReference> GetByUkprn(long ukprn)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
