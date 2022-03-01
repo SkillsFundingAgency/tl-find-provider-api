@@ -13,7 +13,6 @@ public class ProviderSearchResult
     public long UkPrn { get; init; }
     public long Urn { get; init; }
     public string ProviderName { get; init; }
-    [JsonIgnore]
     public string LocationName { get; init; }
     public string Postcode { get; init; }
     public string AddressLine1 { get; init; }
