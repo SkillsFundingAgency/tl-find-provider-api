@@ -4,11 +4,6 @@
     ViewData["Title"] = "Home page";
 }
 
-@*<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    </div>*@
-
 @* ReSharper disable UnknownCssClass *@
 <main id="main-content" role="main">
 
@@ -23,34 +18,39 @@
                     <p class="govuk-body">Search for schools and colleges delivering T Levels near you.</p>
                     <p class="govuk-body">You can contact them directly to find the right industry placement student for your business.</p>
                     <form class="tl-search-providers-form">
-                        <span class="govuk-error-message tl-hidden" id="tl-postcode-error">Enter a postcode</span>
-                        <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-postcode" name="tl-postcode" type="text" placeholder="Enter a postcode">
-                        <select class="tl-hidden govuk-select govuk-body-s" id="tl-routes" name="routes">
-                            <option value="0">Choose an industry (optional)</option>
-                            <option value="1">Agriculture, environment and animal care</option>
-                            <option value="2">Business and administration</option>
-                            <option value="3">Catering</option>
-                            <option value="4">Construction</option>
-                            <option value="5">Creative and design</option>
-                            <option value="6">Digital and IT</option>
-                            <option value="7">Education and childcare</option>
-                            <option value="8">Engineering and manufacturing</option>
-                            <option value="9">Hair and beauty</option>
-                            <option value="10">Health and science</option>
-                            <option value="11">Legal, finance and accounting</option>
-                        </select>
-                        <button class="govuk-button tl-button--blue" id="tl-search-providers" data-module="govuk-button">
-                            Search
-                        </button>
+                        
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-one-half">
+                                <span class="govuk-error-message tl-hidden" id="tl-postcode-error">Enter a postcode</span>
+                                <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-postcode" name="tl-postcode" type="text" placeholder="Enter a postcode">
+                                <select class="tl-hidden govuk-select govuk-body-s" id="tl-routes" name="routes">
+                                    <option value="0">Choose an industry (optional)</option>
+                                    <option value="1">Agriculture, environment and animal care</option>
+                                    <option value="2">Business and administration</option>
+                                    <option value="3">Catering</option>
+                                    <option value="4">Construction</option>
+                                    <option value="5">Creative and design</option>
+                                    <option value="6">Digital and IT</option>
+                                    <option value="7">Education and childcare</option>
+                                    <option value="8">Engineering and manufacturing</option>
+                                    <option value="9">Hair and beauty</option>
+                                    <option value="10">Health and science</option>
+                                    <option value="11">Legal, finance and accounting</option>
+                                </select>
+                                <button class="govuk-button tl-button--blue" id="tl-search-providers" data-module="govuk-button">
+                                    Search
+                                </button>
 
-                        <div class="tl-geolocator">
-                            or <span id="tl-search-location">use current location</span>
-                        </div>
+                                <div class="tl-geolocator">
+                                    or <span id="tl-search-location">use current location</span>
+                                </div>
+                            </div>
 
-                        <details>
-                            <summary>Filter</summary>
+                        <div class="govuk-grid-column-one-half">
+                       @* <details>
+                            <summary>Filter</summary>*@
                             <div class="tl-pane">
-                                <h2 class="govuk-heading-s govuk-!-margin-top-7 govuk-!-margin-bottom-3">
+                                <h2 class="govuk-heading-s">
                                     Filter results by skill area
                                 </h2>
                                 <div class="govuk-form-group govuk-!-margin-bottom-4 tl-pane-expandable__content" style="background-color: white; padding: 10px">
@@ -87,7 +87,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </details>
+                        @*</details>*@
+                        
+                        </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -137,7 +140,7 @@
 
         let findProvidersApiUrl = $('#searchApiUrlValue').val();
         if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
-        //var articleBaseUrl = $('#article_base_url').val();
+        //const articleBaseUrl = $('#article_base_url').val();
 
         let currentPage = 0;
         let currentPostcode = 0;
@@ -189,10 +192,8 @@
 
         function getSkillAreaIds() {
             const skillAreaIds = [];
-            
             $('#tl-skill-area-filter .tl-checkbox:checked').each(
                 function(_, item) {
-                    console.log("item = " + item.id + " - " + item.name + " = " + item.value);
                     skillAreaIds.push(item.value);
                 });
 
@@ -305,11 +306,8 @@
             const apiKey = $('#find_provider_api_key').val();
             let uri = findProvidersApiUrl + "providers?postcode=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
 
-            console.log("nope");
-
             if (skillAreaIds && skillAreaIds.length > 0) {
                 skillAreaIds.forEach(function(skillAreaId) {
-                    console.log("skill area: " + skillAreaId);
                     uri += "&routeId=" + skillAreaId;
                 });
             }
@@ -388,28 +386,23 @@
                                 ' | ' +
                                 providerLocation.postcode;
 
+                    if (providerLocation.addressLine1) searchResult += 
+                        ' | ' + providerLocation.addressLine1;
+                    if (providerLocation.addressLine2) searchResult += 
+                        ' | ' + providerLocation.addressLine2;
+                    if (providerLocation.county) searchResult += 
+                        ' | ' + providerLocation.county;
+
+                    if (providerLocation.journeyToLink) searchResult += 
+                        ' | <a target="_blank" href="' + 
+                        providerLocation.journeyToLink + 
+                        '" class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">How do I get there?</a>';
+                    
                     if (providerLocation.telephone) searchResult += ' | ' + providerLocation.telephone;
                     if (providerLocation.website) searchResult += ' | <a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
                     if (providerLocation.email) searchResult += ' | <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
                     searchResult += '</p>';
-
-                    let addressDetails = '';
-                    if (providerLocation.addressLine1) addressDetails += providerLocation.addressLine1;
-                    if (providerLocation.addressLine2) {
-                        if (addressDetails) addressDetails += ' | ';
-                        addressDetails += providerLocation.addressLine2;
-                    }
-                    if (providerLocation.county) {
-                        if (addressDetails) addressDetails += ' | ';
-                        addressDetails += providerLocation.county;
-                    }
-                    if (providerLocation.journeyToLink) {
-                        if (addressDetails) addressDetails += ' | ';
-                        addressDetails += '<a target="_blank" href="' + providerLocation.journeyToLink + '" class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">How do I get there?</a>';
-                    }
-
-                    if (addressDetails) searchResult += '<p class="govuk-body"><em>Address: </em>' + addressDetails + '</p>';
-
+                    
                     if (providerLocation.urn) {
                         searchResult += '<p class="govuk-body"> \
                               <a target="_blank" href=https://www.ofsted.gov.uk/oxedu_providers/full/(urn)/' + providerLocation.urn + ' class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">Show Ofsted inspection report</a> \
@@ -487,27 +480,24 @@
             }
 
             function success(position) {
-                var latVal = position.coords.latitude,
+                const latVal = position.coords.latitude,
                     longVal = position.coords.longitude,
                     url = "https://api.postcodes.io/postcodes?lon=" + longVal + "&lat=" + latVal + "&wideSearch=true";
 
-                console.log(`lat-long = ${latVal},${longVal}`);
+                console.log(`current location lat-long = ${latVal},${longVal}`);
 
                 //Load closest postcode from postcodes.io - do we need this?
                 $.get(url)
                     .done(function(data) {
                         const postcode = data.result[0].postcode;
-
                         console.log(`closest postcode = ${postcode}`);
 
                         //output.value = json.result[0].postcode;
                         //output.placeholder = "";
 
-                        const skillAreaIds = getSelectedSkillAreas();
-
                         //Clear and call back end
                         clearProviderSearchResults();
-                        callProviderSearchApi(postcode, skillAreaIds);
+                        callProviderSearchApi(postcode, getSkillAreaIds());
                     })
                     .fail(function() {
                         console.log("Unable to retrieve postcode");
