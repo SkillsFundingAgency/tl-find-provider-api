@@ -28,7 +28,13 @@ include the site in `"AllowedCorsOrigins"` as below:
 - added address line 1/2 and county
 - added journey link
 - added search from current location. This does a call to get closest postcode
-- 
+- added links to Ofsted and UKRLP - data is imported from ULRLP and URN used to create link
+- IN PROGRESS - Add checkbox list with routes ("skill areas") and use that in search
+  - will need to allow multiple route parameters to do this - there is a spike for multiple qualifications
+- TODO: Autocomplete for towns/postcodes
+  - what does "search by town" mean? Find a centroid lat/long and search from there? 
+  - we only have a few towns in our data, so we'd need a service/API endpoint listing towns and lat/long
+
 
 ## TODO
 

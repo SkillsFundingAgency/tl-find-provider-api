@@ -45,4 +45,18 @@ function getUrlParameter(key, url) {
     return null;
 }
 
+//Select all checkboxes
+$('.tl-selectall').click(function () {
+    $('.tl-checkbox').prop('checked', this.checked);
+});
 
+// ReSharper disable StringLiteralTypo
+$(".tl-checkbox").change(function () {
+    if ($('.tl-checkbox:checked').length === $('.tl-checkbox').length) {
+        $('.tl-selectall').prop('checked', true);
+    }
+    else {
+        $('.tl-selectall').prop('checked', false);
+    }
+});
+// ReSharper restore StringLiteralTypo

@@ -25,7 +25,7 @@
                     <form class="tl-search-providers-form">
                         <span class="govuk-error-message tl-hidden" id="tl-postcode-error">Enter a postcode</span>
                         <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-postcode" name="tl-postcode" type="text" placeholder="Enter a postcode">
-                        <select class="govuk-select govuk-body-s" id="tl-routes" name="routes">
+                        <select class="tl-hidden govuk-select govuk-body-s" id="tl-routes" name="routes">
                             <option value="0">Choose an industry (optional)</option>
                             <option value="1">Agriculture, environment and animal care</option>
                             <option value="2">Business and administration</option>
@@ -46,6 +46,48 @@
                         <div class="tl-geolocator">
                             or <span id="tl-search-location">use current location</span>
                         </div>
+
+                        <details>
+                            <summary>Filter</summary>
+                            <div class="tl-pane">
+                                <h2 class="govuk-heading-s govuk-!-margin-top-7 govuk-!-margin-bottom-3">
+                                    Filter results by skill area
+                                </h2>
+                                <div class="govuk-form-group govuk-!-margin-bottom-4 tl-pane-expandable__content" style="background-color: white; padding: 10px">
+                                    <div class="govuk-checkboxes govuk-checkboxes--small" id="tl-skill-area-filter">
+                                        <div class="govuk-checkboxes__item">
+                                            <input type="checkbox"
+                                                   class="govuk-checkboxes__input"
+                                                   id="vehicle1"
+                                                   name="vehicle1"
+                                                   value="Bike">
+                                            <label class="govuk-body-s govuk-checkboxes__label"
+                                                   for="vehicle1"> I have a bike</label><br>
+                                        </div>
+
+                                        <div class="govuk-checkboxes__item">
+                                            <input type="checkbox"
+                                                   class="govuk-checkboxes__input"
+                                                   id="vehicle2"
+                                                   name="vehicle2"
+                                                   value="Car">
+                                            <label class="govuk-body-s govuk-checkboxes__label"
+                                                   for="vehicle2"> I have a car</label><br>
+                                        </div>
+
+                                        <div class="govuk-checkboxes__item">
+                                            <input type="checkbox"
+                                                   class="govuk-checkboxes__input"
+                                                   id="vehicle3"
+                                                   name="vehicle3"
+                                                   value="Boat">
+                                            <label class="govuk-body-s govuk-checkboxes__label"
+                                                   for="vehicle3"> I have a boat</label><br>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
                     </form>
                 </div>
             </div>
@@ -99,9 +141,10 @@
 
         let currentPage = 0;
         let currentPostcode = 0;
+        let currentSkillAreaIds = [];
         let isSearchInProgress = false;
 
-        //loadRoutes();
+        loadRoutes();
 
         //Load qualifications map
         const qualificationArticleMap = JSON.parse($('#qualification_article_map').val());
@@ -118,9 +161,9 @@
             const obj = { Title: document.title, Url: urlSplit[0] };
             history.pushState(obj, obj.Title, obj.Url);
         } else {
-// ReSharper disable StringLiteralTypo
+            // ReSharper disable StringLiteralTypo
             $('.tl-fap--noresult').removeClass("tl-hidden");
-// ReSharper restore StringLiteralTypo
+            // ReSharper restore StringLiteralTypo
         }
 
         $('#tl-postcode').keypress(function(e) {
@@ -131,8 +174,9 @@
         });
 
         $("#tl-search-providers").click(function() {
-            console.log("calling with defaults");
-            return providerSearch($("#tl-postcode").val().trim());
+            return providerSearch(
+                $("#tl-postcode").val().trim(), 
+                getSkillAreaIds());
         });
 
         $(".tl-search-providers-form").submit(function() {
@@ -143,10 +187,22 @@
             geoFindMe();
         });
 
+        function getSkillAreaIds() {
+            const skillAreaIds = [];
+            
+            $('#tl-skill-area-filter .tl-checkbox:checked').each(
+                function(_, item) {
+                    console.log("item = " + item.id + " - " + item.name + " = " + item.value);
+                    skillAreaIds.push(item.value);
+                });
+
+            return skillAreaIds;
+        }
+
         $("#tl-next-results-link").click(function() {
             event.stopPropagation();
             event.preventDefault();
-            callProviderSearchApi(currentPostcode, currentPage + 1);
+            callProviderSearchApi(currentPostcode, currentSkillAreaIds, currentPage + 1);
             return false;
         });
 
@@ -172,13 +228,35 @@
         function populateRoutes(data) {
             const select = $("#tl-routes");
             select.find("option:not(:first)").remove();
+            
+            const skillAreasList = $("#tl-skill-area-filter");
+            skillAreasList.empty();
+            
             $.each(data,
                 function(_, item) {
                     select.append(new Option(item.name, item.id));
-                });
+
+                    const checkboxItemContainer = 
+                        $(document.createElement('div')).prop({
+                            class: 'govuk-checkboxes__item'
+                        }).append(
+                            $(document.createElement('input')).prop({
+                                id: 'tl_skill_area_' + item.id,
+                                name: 'tl_skill_area_' + item.id,
+                                value: item.id,
+                                type: 'checkbox',
+                                class: 'tl-checkbox govuk-checkboxes__input'
+                            })).append(
+                            $(document.createElement('label')).prop({
+                                    for: 'tl_skill_area_' + item.id,
+                                    class: 'govuk-body-s govuk-checkboxes__label'})
+                                .html(item.name)
+                            );
+                    skillAreasList.append(checkboxItemContainer);
+            });
         }
 
-        function providerSearch(postcode, page) {
+        function providerSearch(postcode, skillAreaIds, page) {
             //$("#tl-search-providers").disabled = true;
             //$("#tl-next-results-link").disabled = true;
             let error = null;
@@ -206,12 +284,12 @@
 
             clearProviderSearchResults();
 
-            callProviderSearchApi(postcode, page);
+            callProviderSearchApi(postcode, skillAreaIds, page);
 
             return true;
         }
 
-        function callProviderSearchApi(postcode, page, pageSize) {
+        function callProviderSearchApi(postcode, skillAreaIds, page, pageSize) {
             page = (page === undefined ? 0 : page);
             pageSize = (pageSize === undefined ? 5 : pageSize);
 
@@ -225,7 +303,16 @@
 
             const appId = $('#find_provider_api_app_id').val();
             const apiKey = $('#find_provider_api_key').val();
-            const uri = findProvidersApiUrl + "providers?postcode=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
+            let uri = findProvidersApiUrl + "providers?postcode=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
+
+            console.log("nope");
+
+            if (skillAreaIds && skillAreaIds.length > 0) {
+                skillAreaIds.forEach(function(skillAreaId) {
+                    console.log("skill area: " + skillAreaId);
+                    uri += "&route=" + skillAreaId;
+                });
+            }
 
             $.ajax({
                 type: "GET",
@@ -242,6 +329,7 @@
                 } else {
                     currentPage = page;
                     currentPostcode = postcode;
+                    currentSkillAreaIds = skillAreaIds;
                     console.log("currentPage is now " + currentPage);
                     populateProviderSearchResults(response);
                 }
@@ -260,7 +348,6 @@
         }
 
         function clearProviderSearchResults() {
-            console.log('clearing...');
             $('#tl-error').addClass("tl-hidden");
             $('#tl-postcode-error').addClass("tl-hidden");
             // ReSharper disable once StringLiteralTypo
@@ -411,9 +498,11 @@
                         //output.value = json.result[0].postcode;
                         //output.placeholder = "";
 
+                        const skillAreaIds = getSelectedSkillAreas();
+
                         //Clear and call back end
                         clearProviderSearchResults();
-                        callProviderSearchApi(postcode);
+                        callProviderSearchApi(postcode, skillAreaIds);
                     })
                     .fail(function() {
                         console.log("Unable to retrieve postcode");
@@ -430,8 +519,6 @@
 
         navigator.geolocation.getCurrentPosition(success, error, { maximumAge: 600000 });
     }
-
-
 
         function showError(status, errorText) {
             console.log("Error status " + status + " was encountered. " + errorText);
