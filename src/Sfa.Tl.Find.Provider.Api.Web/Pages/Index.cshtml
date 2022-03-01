@@ -373,12 +373,17 @@
                     let searchResult =
                         '<div class="tl-fap--result"> \
                             <h3 class="govuk-heading-m">' +
-                                providerLocation.providerName +
-                                ' <span class="tl-fap--distance">' +
-                                providerLocation.distance.toFixed(0) +
+                            providerLocation.providerName +
+                            ' <span class="tl-fap--distance">' +
+                            providerLocation.distance.toFixed(0) +
                             ' miles</span> \
-                            </h3> \
-                            <p class="govuk-body">' +
+                            </h3>';
+                    if (providerLocation.locationName) {
+                        searchResult += '<h4 class="govuk-heading-s">' +
+                            providerLocation.locationName +
+                            '</h4>';
+                    }
+                    searchResult += '<p class="govuk-body">' +
                                 providerLocation.town +
                                 ' | ' +
                                 providerLocation.postcode;
