@@ -12,7 +12,8 @@ public interface IProviderRepository
 
     Task<IEnumerable<ProviderSearchResult>> Search(
         PostcodeLocation fromPostcodeLocation,
-        int? qualificationId,
+        IList<int> routeIds,
+        IList<int> qualificationIds,
         int page,
         int pageSize,
         bool mergeAdditionalData);

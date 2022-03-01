@@ -15,7 +15,8 @@ public interface IProviderDataService
 
     Task<ProviderSearchResponse> FindProviders(
         string postcode,
-        int? qualificationId = null,
+        IList<int> routeIds = null,
+        IList<int> qualificationIds = null,
         int page = 0,
         int pageSize = Constants.DefaultPageSize);
 

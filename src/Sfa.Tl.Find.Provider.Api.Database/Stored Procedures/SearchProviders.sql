@@ -1,7 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[SearchProviders]
 	@fromLatitude DECIMAL(9, 6),
 	@fromLongitude DECIMAL(9, 6),
-	@qualificationId INT,
+	@qualificationIds [dbo].[IdListTableType] READONLY,
+	@routeIds [dbo].[IdListTableType] READONLY,
 	@page INT,
 	@pageSize INT,
 	@mergeAdditionalData BIT
@@ -55,8 +56,13 @@ AS
 			ON		q.[Id] = lq.[QualificationId]
 			  AND	q.[IsDeleted] = 0
 			WHERE	lq.[LocationId] = l.[Id]
-			  AND	(q.[Id] = @qualificationId 
-					 OR ISNULL(@qualificationid, 0) = 0))
+			  AND	(NOT EXISTS(SELECT [Id] FROM @qualificationIds WHERE [Id] <> 0)
+					 OR q.[Id] IN (SELECT [Id] FROM @qualificationIds))
+			  AND	(NOT EXISTS(SELECT [Id] FROM @routeIds WHERE [Id] <> 0)
+					 OR q.[Id] IN (SELECT	rq.[QualificationId]
+								   FROM [RouteQualification] rq
+								   WHERE rq.[RouteId] in (SELECT Id FROM @routeIds)))
+					)
 	ORDER BY [Distance],
 			 p.[Name],
 			 l.[Name]

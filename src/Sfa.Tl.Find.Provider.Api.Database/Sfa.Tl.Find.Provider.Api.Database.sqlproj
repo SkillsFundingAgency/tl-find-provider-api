@@ -66,6 +66,7 @@
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
     <Build Include="Indexes\IX_ProviderReference_UkPrn.sql" />
+    <Build Include="Types\IdListTableType.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />

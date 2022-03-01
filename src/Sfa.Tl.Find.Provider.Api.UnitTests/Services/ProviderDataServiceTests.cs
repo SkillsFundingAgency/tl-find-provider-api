@@ -143,7 +143,8 @@ public class ProviderDataServiceTests
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
-                Arg.Any<int?>(),
+                Arg.Any<List<int>>(),
+                Arg.Any<List<int>>(),
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
@@ -175,7 +176,8 @@ public class ProviderDataServiceTests
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
-                Arg.Any<int?>(),
+                Arg.Any<List<int>>(),
+                Arg.Any<List<int>>(),
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
@@ -219,7 +221,8 @@ public class ProviderDataServiceTests
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
-                Arg.Any<int?>(),
+                Arg.Any<List<int>>(),
+                Arg.Any<List<int>>(),
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
@@ -254,7 +257,8 @@ public class ProviderDataServiceTests
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
                 Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
-                Arg.Any<int?>(),
+                Arg.Any<List<int>>(),
+                Arg.Any<List<int>>(),
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())

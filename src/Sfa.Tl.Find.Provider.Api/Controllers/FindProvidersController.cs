@@ -34,7 +34,8 @@ public class FindProvidersController : ControllerBase
     /// Search for providers.
     /// </summary>
     /// <param name="postcode">Postcode that the search should start from.</param>
-    /// <param name="qualificationId">Qualification id to filter by. Optional, defaults to null or zero.</param>
+    /// <param name="qualificationIds">Qualification ids to filter by. Optional, nulls or zeroes will be ignored.</param>
+    /// <param name="routeIds">Route ids to filter by. Optional, nulls or zeroes will be ignored.</param>
     /// <param name="page">Page to be displayed (zero-based).</param>
     /// <param name="pageSize">Number of items to return on a page.</param>
     /// <returns>Json with providers.</returns>
@@ -45,8 +46,10 @@ public class FindProvidersController : ControllerBase
     public async Task<IActionResult> GetProviders(
         [FromQuery]
         string postcode,
-        [FromQuery]
-        int? qualificationId = null,
+        [FromQuery(Name = "routeId")]
+        IList<int> routeIds = null,
+        [FromQuery(Name = "qualificationId")]
+        IList<int> qualificationIds = null,
         [FromQuery,
          Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")]
         int page = 0,
@@ -66,7 +69,8 @@ public class FindProvidersController : ControllerBase
 
             var providersSearchResponse = await _providerDataService.FindProviders(
                 postcode,
-                qualificationId is > 0 ? qualificationId : null,
+                routeIds,
+                qualificationIds,
                 page,
                 pageSize);
 
