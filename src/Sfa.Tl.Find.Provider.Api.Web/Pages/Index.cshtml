@@ -18,7 +18,7 @@
                     <p class="govuk-body">Search for schools and colleges delivering T Levels near you.</p>
                     <p class="govuk-body">You can contact them directly to find the right industry placement student for your business.</p>
                     <form class="tl-search-providers-form">
-                        
+
                         <div class="govuk-grid-row">
                             <div class="govuk-grid-column-one-half">
                                 <span class="govuk-error-message tl-hidden" id="tl-postcode-error">Enter a postcode</span>
@@ -41,55 +41,59 @@
                                     Search
                                 </button>
 
-                                <div class="tl-geolocator">
-                                    or <span id="tl-search-location">use current location</span>
+                                <div>
+                                    <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-town" name="tl-town" type="text" placeholder="Enter a town">
+                                    <button class="govuk-button tl-button--blue" id="tl-search-locations" data-module="govuk-button">
+                                        Search
+                                    </button>
                                 </div>
+                                
+                                <div class="tl-geolocator">
+                                    or <span id="tl-search-current-location">use current location</span>
+                                </div>
+
                             </div>
 
-                        <div class="govuk-grid-column-one-half">
-                       @* <details>
-                            <summary>Filter</summary>*@
-                            <div class="tl-pane">
-                                <h2 class="govuk-heading-s">
-                                    Filter results by skill area
-                                </h2>
-                                <div class="govuk-form-group govuk-!-margin-bottom-4 tl-pane-expandable__content" style="background-color: white; padding: 10px">
-                                    <div class="govuk-checkboxes govuk-checkboxes--small" id="tl-skill-area-filter">
-                                        <div class="govuk-checkboxes__item">
-                                            <input type="checkbox"
-                                                   class="govuk-checkboxes__input"
-                                                   id="vehicle1"
-                                                   name="vehicle1"
-                                                   value="Bike">
-                                            <label class="govuk-body-s govuk-checkboxes__label"
-                                                   for="vehicle1"> I have a bike</label><br>
-                                        </div>
+                            <div class="govuk-grid-column-one-half">
+                                <div class="tl-pane">
+                                    <h2 class="govuk-heading-s">
+                                        Filter results by skill area
+                                    </h2>
+                                    <div class="govuk-form-group govuk-!-margin-bottom-4 tl-pane-expandable__content" style="background-color: white; padding: 10px">
+                                        <div class="govuk-checkboxes govuk-checkboxes--small" id="tl-skill-area-filter">
+                                            <div class="govuk-checkboxes__item">
+                                                <input type="checkbox"
+                                                       class="govuk-checkboxes__input"
+                                                       id="vehicle1"
+                                                       name="vehicle1"
+                                                       value="Bike">
+                                                <label class="govuk-body-s govuk-checkboxes__label"
+                                                       for="vehicle1"> I have a bike</label><br>
+                                            </div>
 
-                                        <div class="govuk-checkboxes__item">
-                                            <input type="checkbox"
-                                                   class="govuk-checkboxes__input"
-                                                   id="vehicle2"
-                                                   name="vehicle2"
-                                                   value="Car">
-                                            <label class="govuk-body-s govuk-checkboxes__label"
-                                                   for="vehicle2"> I have a car</label><br>
-                                        </div>
+                                            <div class="govuk-checkboxes__item">
+                                                <input type="checkbox"
+                                                       class="govuk-checkboxes__input"
+                                                       id="vehicle2"
+                                                       name="vehicle2"
+                                                       value="Car">
+                                                <label class="govuk-body-s govuk-checkboxes__label"
+                                                       for="vehicle2"> I have a car</label><br>
+                                            </div>
 
-                                        <div class="govuk-checkboxes__item">
-                                            <input type="checkbox"
-                                                   class="govuk-checkboxes__input"
-                                                   id="vehicle3"
-                                                   name="vehicle3"
-                                                   value="Boat">
-                                            <label class="govuk-body-s govuk-checkboxes__label"
-                                                   for="vehicle3"> I have a boat</label><br>
+                                            <div class="govuk-checkboxes__item">
+                                                <input type="checkbox"
+                                                       class="govuk-checkboxes__input"
+                                                       id="vehicle3"
+                                                       name="vehicle3"
+                                                       value="Boat">
+                                                <label class="govuk-body-s govuk-checkboxes__label"
+                                                       for="vehicle3"> I have a boat</label><br>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @*</details>*@
-                        
-                        </div>
                         </div>
                     </form>
                 </div>
@@ -178,15 +182,52 @@
 
         $("#tl-search-providers").click(function() {
             return providerSearch(
-                $("#tl-postcode").val().trim(), 
+                $("#tl-postcode").val().trim(),
                 getSkillAreaIds());
+        });
+
+        $("#tl-search-locations").click(function() {
+            const searchTerm = $("#tl-town").val().trim();
+
+            $.ajax({
+                type: "GET",
+                url: "api/locations/search?term=" + encodeURIComponent(searchTerm)
+            }).done(function(response) {
+                console.log(response);
+                if(response.length) {
+                    const lat = response[0].lat,
+                        lon = response[0].long,
+                        postcodeUrl = "https://api.postcodes.io/postcodes?lon=" + lon + "&lat=" + lat + "&wideSearch=true";
+
+                    console.log("town: " + response[0].locationName);
+                    console.log("county: " + response[0].county);
+                    console.log(`lat/lon: (${lat}), (${lon})`);
+
+                    //Load closest postcode from postcodes.io - do we need this?
+                    $.get(postcodeUrl)
+                        .done(function(data) {
+                            const closestPostcode = data.result[0].postcode;
+                            console.log(`closest postcode = ${closestPostcode}`);
+
+                            clearProviderSearchResults();
+                            callProviderSearchApi(closestPostcode, getSkillAreaIds());
+                        })
+                        .fail(function() {
+                            console.log("Unable to retrieve postcode");
+                        });
+                }
+            }).fail(function(error) {
+                console.log('Call to get location failed. ' + error);
+            });
+
+            return true;
         });
 
         $(".tl-search-providers-form").submit(function() {
             event.preventDefault();
         });
 
-        $("#tl-search-location").click(function() {
+        $("#tl-search-current-location").click(function() {
             geoFindMe();
         });
 
@@ -229,15 +270,15 @@
         function populateRoutes(data) {
             const select = $("#tl-routes");
             select.find("option:not(:first)").remove();
-            
+
             const skillAreasList = $("#tl-skill-area-filter");
             skillAreasList.empty();
-            
+
             $.each(data,
                 function(_, item) {
                     select.append(new Option(item.name, item.id));
 
-                    const checkboxItemContainer = 
+                    const checkboxItemContainer =
                         $(document.createElement('div')).prop({
                             class: 'govuk-checkboxes__item'
                         }).append(
@@ -386,23 +427,23 @@
                                 ' | ' +
                                 providerLocation.postcode;
 
-                    if (providerLocation.addressLine1) searchResult += 
+                    if (providerLocation.addressLine1) searchResult +=
                         ' | ' + providerLocation.addressLine1;
-                    if (providerLocation.addressLine2) searchResult += 
+                    if (providerLocation.addressLine2) searchResult +=
                         ' | ' + providerLocation.addressLine2;
-                    if (providerLocation.county) searchResult += 
+                    if (providerLocation.county) searchResult +=
                         ' | ' + providerLocation.county;
 
-                    if (providerLocation.journeyToLink) searchResult += 
-                        ' | <a target="_blank" href="' + 
-                        providerLocation.journeyToLink + 
-                        '" class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">How do I get there?</a>';
-                    
+                    //if (providerLocation.journeyToLink) searchResult +=
+                    //    ' | <a target="_blank" href="' +
+                    //    providerLocation.journeyToLink +
+                    //    '" class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">How do I get there?</a>';
+
                     if (providerLocation.telephone) searchResult += ' | ' + providerLocation.telephone;
                     if (providerLocation.website) searchResult += ' | <a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
                     if (providerLocation.email) searchResult += ' | <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
                     searchResult += '</p>';
-                    
+
                     if (providerLocation.urn) {
                         searchResult += '<p class="govuk-body"> \
                               <a target="_blank" href=https://www.ofsted.gov.uk/oxedu_providers/full/(urn)/' + providerLocation.urn + ' class="govuk-link tl-fap--result-website" tl-margin-left--20 tl-results--transport">Show Ofsted inspection report</a> \

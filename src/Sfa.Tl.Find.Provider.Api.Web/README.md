@@ -28,14 +28,19 @@ include the site in `"AllowedCorsOrigins"` as below:
 - added address line 1/2 and county
 - added journey link
 - added location name
-  - rty EX4 3RX or NG7 2SZ
+  - try EX4 3RX or NG7 2SZ
+  - Can Course Directory supply group name?
+    - but look at group name vs provider name vs location name
 - added search from current location. This does a call to get closest postcode
 - added links to Ofsted and UKRLP - data is imported from ULRLP and URN used to create link
 - added checkbox list with routes ("skill areas") and use that in search
 - TODO: Autocomplete for towns/postcodes
   - what does "search by town" mean? Find a centroid lat/long and search from there? 
   - we only have a few towns in our data, so we'd need a service/API endpoint listing towns and lat/long
-
+- locations - Ordnance Survey API, loooks like it's free for public sector
+  - https://developer.ordnancesurvey.co.uk/os-places-api
+  - https://osdatahub.os.uk/
+  - 
 
 ## TODO
 
