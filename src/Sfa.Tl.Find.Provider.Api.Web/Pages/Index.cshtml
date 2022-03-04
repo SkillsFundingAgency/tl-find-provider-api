@@ -141,6 +141,7 @@
     //https://stackoverflow.com/questions/51005488/how-to-use-cryptojs-in-javascript
 
     $(document).ready(function() {
+        console.log("document.ready");
 
         let findProvidersApiUrl = $('#searchApiUrlValue').val();
         if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
@@ -201,7 +202,7 @@
 
                     console.log("town: " + response[0].locationName);
                     console.log("county: " + response[0].county);
-                    console.log(`lat/lon: (${lat}), (${lon})`);
+                    console.log(`lat/lon: (${lat}, ${lon})`);
 
                     //Load closest postcode from postcodes.io - do we need this?
                     $.get(postcodeUrl)
@@ -582,7 +583,5 @@
             $('#tl-error').addClass("tl-hidden");
         }
     });
-
 </script>
 }
-

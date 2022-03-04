@@ -26,7 +26,6 @@ include the site in `"AllowedCorsOrigins"` as below:
 ## Changes to demo
 
 - added address line 1/2 and county
-- added journey link
 - added location name
   - try EX4 3RX or NG7 2SZ
   - Can Course Directory supply group name?
@@ -40,7 +39,12 @@ include the site in `"AllowedCorsOrigins"` as below:
 - locations - Ordnance Survey API, loooks like it's free for public sector
   - https://developer.ordnancesurvey.co.uk/os-places-api
   - https://osdatahub.os.uk/
-  - 
+  - ArcGIS 
+    - https://developers.arcgis.com/javascript/3/
+    - https://gis.stackexchange.com/questions/141660/is-arcgis-javascript-api-and-sdk-free
+  - ONS - https://www.api.gov.uk/ons/open-geography-portal/#open-geography-portal
+  - - open geography - https://geoportal.statistics.gov.uk/datasets/ons::built-up-area-to-built-up-area-sub-division-march-2011-lookup-in-england-and-wales/api
+    - 
 
 ## TODO
 
