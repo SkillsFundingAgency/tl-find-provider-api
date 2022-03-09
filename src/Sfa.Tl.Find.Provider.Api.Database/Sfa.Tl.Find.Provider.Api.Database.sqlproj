@@ -83,6 +83,9 @@
     <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
     <Build Include="Stored Procedures\UpdateProviders.sql" />
     <Build Include="Stored Procedures\UpdateQualifications.sql" />
+    <Build Include="Tables\Town.sql" />
+    <Build Include="Indexes\IX_Town_TownName.sql" />
+    <Build Include="Types\IdListTableType.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
