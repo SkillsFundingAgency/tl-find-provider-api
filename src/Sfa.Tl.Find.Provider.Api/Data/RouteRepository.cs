@@ -22,9 +22,15 @@ public class RouteRepository : IRouteRepository
 
         return await _dbContextWrapper.QueryAsync<Route>(
             connection,
-            "SELECT Id, Name " +
-            "FROM dbo.Route " +
-            "WHERE IsDeleted = 0 " +
-            "ORDER BY Name");
+            "SELECT r.Id, r.Name, COUNT(q.Id) AS NumberOfQualifications " +
+            "FROM dbo.Route r " +
+            "LEFT JOIN dbo.RouteQualification rq " +
+            "ON rq.RouteId = r.Id " +
+            "LEFT JOIN dbo.Qualification q " +
+            "ON q.Id = rq.QualificationId " +
+            "AND q.IsDeleted = 0 " +
+            "WHERE r.IsDeleted = 0 " +
+            "GROUP BY r.Id, r.Name " +
+            "ORDER BY r.Name");
     }
 }

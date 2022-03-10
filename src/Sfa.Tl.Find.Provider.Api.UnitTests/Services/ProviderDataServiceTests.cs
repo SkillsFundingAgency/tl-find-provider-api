@@ -49,8 +49,7 @@ public class ProviderDataServiceTests
             .Build(qualificationRepository: qualificationRepository);
 
         var results = (await service.GetQualifications()).ToList();
-        results.Should().NotBeNullOrEmpty();
-        results.Count.Should().Be(qualifications.Count);
+        results.Should().BeEquivalentTo(qualifications);
 
         await qualificationRepository
             .Received(1)
@@ -60,6 +59,8 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task GetQualifications_Returns_Expected_List_From_Cache()
     {
+        var qualifications = new QualificationBuilder().BuildList();
+
         var qualificationRepository = Substitute.For<IQualificationRepository>();
 
         var cache = Substitute.For<IMemoryCache>();
@@ -68,7 +69,7 @@ public class ProviderDataServiceTests
             {
                 if ((string)x[0] == CacheKeys.QualificationsKey)
                 {
-                    x[1] = new QualificationBuilder().BuildList();
+                    x[1] = qualifications;
                     return true;
                 }
 
@@ -80,7 +81,7 @@ public class ProviderDataServiceTests
                 cache: cache);
 
         var results = await service.GetQualifications();
-        results.Should().NotBeNullOrEmpty();
+        results.Should().BeEquivalentTo(qualifications);
 
         await qualificationRepository
             .DidNotReceive()
@@ -102,8 +103,7 @@ public class ProviderDataServiceTests
             .Build(routeRepository: routeRepository);
 
         var results = (await service.GetRoutes()).ToList();
-        results.Should().NotBeNullOrEmpty();
-        results.Count.Should().Be(routes.Count);
+        results.Should().BeEquivalentTo(routes);
 
         await routeRepository
             .Received(1)
@@ -113,6 +113,8 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task GetRoutes_Returns_Expected_List_From_Cache()
     {
+        var routes = new RouteBuilder().BuildList();
+
         var routeRepository = Substitute.For<IRouteRepository>();
 
         var cache = Substitute.For<IMemoryCache>();
@@ -121,7 +123,7 @@ public class ProviderDataServiceTests
             {
                 if ((string)x[0] == CacheKeys.RoutesKey)
                 {
-                    x[1] = new RouteBuilder().BuildList();
+                    x[1] = routes;
                     return true;
                 }
 
@@ -133,7 +135,7 @@ public class ProviderDataServiceTests
                 cache: cache);
 
         var results = await service.GetRoutes();
-        results.Should().NotBeNullOrEmpty();
+        results.Should().BeEquivalentTo(routes);
 
         await routeRepository
             .DidNotReceive()
