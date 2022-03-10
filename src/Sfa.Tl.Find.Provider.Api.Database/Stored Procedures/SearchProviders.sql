@@ -1,7 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[SearchProviders]
 	@fromLatitude DECIMAL(9, 6),
 	@fromLongitude DECIMAL(9, 6),
-	@qualificationId INT,
+	@routeIds [dbo].[IdListTableType] READONLY,
+	@qualificationIds [dbo].[IdListTableType] READONLY,
 	@page INT,
 	@pageSize INT,
 	@mergeAdditionalData BIT
@@ -50,9 +51,17 @@ AS
 			INNER JOIN	[dbo].[Qualification] q
 			ON		q.[Id] = lq.[QualificationId]
 			  AND	q.[IsDeleted] = 0
+			INNER JOIN	[dbo].[RouteQualification] rq
+			ON		rq.[QualificationId] = q.[Id]
+			INNER JOIN	[dbo].[Route] r
+			ON		r.[Id] = rq.[RouteId]
+			  AND	r.[IsDeleted] = 0
 			WHERE	lq.[LocationId] = l.[Id]
-			  AND	(q.[Id] = @qualificationId 
-					 OR ISNULL(@qualificationid, 0) = 0))
+			  AND	((NOT EXISTS(SELECT [Id] FROM @qualificationIds WHERE [Id] <> 0)
+					   OR q.[Id] IN (SELECT [Id] FROM @qualificationIds))
+					 OR	(NOT EXISTS(SELECT [Id] FROM @routeIds WHERE [Id] <> 0)
+						  OR r.[Id] IN (SELECT [Id] FROM @routeIds))
+					))
 	ORDER BY [Distance],
 			 p.[Name],
 			 l.[Name]
@@ -71,6 +80,8 @@ AS
 				[Telephone],
 				[Website],
 				[Distance],
+				rq.[RouteId],
+				r.[Name] AS [RouteName],
 				lq.[DeliveryYear] AS [Year],
 				q.[Id] AS [Id],
 				q.[Name] AS [Name]
@@ -80,6 +91,11 @@ AS
 		INNER JOIN	[dbo].[Qualification] q
 		ON		q.[Id] = lq.[QualificationId]
 		  AND	q.[IsDeleted] = 0
+		INNER JOIN	[dbo].[RouteQualification] rq
+		ON		rq.[QualificationId] = q.[Id]
+			INNER JOIN	[dbo].[Route] r
+			ON		r.[Id] = rq.[RouteId]
+			  AND	r.[IsDeleted] = 0
 		ORDER BY [Distance],
 				 [ProviderName],
 				 [LocationName],

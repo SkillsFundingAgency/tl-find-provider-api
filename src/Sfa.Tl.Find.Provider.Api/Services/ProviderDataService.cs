@@ -79,7 +79,8 @@ public class ProviderDataService : IProviderDataService
 
     public async Task<ProviderSearchResponse> FindProviders(
         string postcode,
-        int? qualificationId = null,
+        IList<int> routeIds = null,
+        IList<int> qualificationIds = null,
         int page = 0,
         int pageSize = Constants.DefaultPageSize)
     {
@@ -89,7 +90,14 @@ public class ProviderDataService : IProviderDataService
 
             var postcodeLocation = await GetPostcode(postcode);
 
-            var searchResults = await _providerRepository.Search(postcodeLocation, qualificationId, page, pageSize, _mergeAdditionalProviderData);
+            var searchResults = await _providerRepository
+                .Search(postcodeLocation, 
+                        routeIds, 
+                        qualificationIds, 
+                        page, 
+                        pageSize, 
+                        _mergeAdditionalProviderData);
+
             return new ProviderSearchResponse
             {
                 Postcode = postcodeLocation.Postcode,

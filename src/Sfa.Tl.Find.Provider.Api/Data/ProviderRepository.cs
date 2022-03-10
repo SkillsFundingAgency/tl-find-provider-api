@@ -66,7 +66,7 @@ public class ProviderRepository : IProviderRepository
             var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
 
             await retryPolicy
-                .ExecuteAsync(async _ => 
+                .ExecuteAsync(async _ =>
                     await PerformSave(providers, locationData, locationQualificationData, isAdditionalData),
                     context);
         }
@@ -109,7 +109,7 @@ public class ProviderRepository : IProviderRepository
                 new
                 {
                     data = locationData.AsTableValuedParameter("dbo.LocationDataTableType"),
-                    isAdditionalData 
+                    isAdditionalData
                 },
                 transaction,
                 commandType: CommandType.StoredProcedure);
@@ -137,7 +137,8 @@ public class ProviderRepository : IProviderRepository
 
     public async Task<IEnumerable<ProviderSearchResult>> Search(
         PostcodeLocation fromPostcodeLocation,
-        int? qualificationId,
+        IList<int> routeIds,
+        IList<int> qualificationIds,
         int page,
         int pageSize,
         bool mergeAdditionalData)
@@ -183,7 +184,8 @@ public class ProviderRepository : IProviderRepository
                 {
                     fromLatitude = fromPostcodeLocation.Latitude,
                     fromLongitude = fromPostcodeLocation.Longitude,
-                    qualificationId,
+                    routeIds = routeIds?.AsTableValuedParameter("dbo.IdListTableType"),
+                    qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
                     page,
                     pageSize,
                     mergeAdditionalData
