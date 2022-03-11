@@ -8,4 +8,6 @@ public interface IPostcodeLookupService
     Task<PostcodeLocation> GetPostcode(string postcode);
 
     Task<PostcodeLocation> GetOutcode(string outcode);
+
+    Task<PostcodeLocation> GetNearestPostcode(double latitude, double longitude);
 }

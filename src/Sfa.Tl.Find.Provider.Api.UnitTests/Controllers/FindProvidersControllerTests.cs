@@ -18,7 +18,9 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 
 public class FindProvidersControllerTests
 {
-    private const string TestPostcode = "AB1 2XY";
+    private const string TestPostcode = "CV1 2WT";
+    private const double TestLatitude = 52.400997;
+    private const double TestLongitude = -1.508122;
     private const string InvalidPostcode = "CV99 XXX";
     private const string PostcodeWithInitialNonLetter = "1V1 2WT";
     private const string PostcodeWithIllegalCharacters = "CV99 XX$";
@@ -406,6 +408,31 @@ public class FindProvidersControllerTests
 
         statusCodeResult!.StatusCode.Should().Be(500);
         statusCodeResult!.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+    }
+
+    [Fact]
+    public async Task GetProviders_By_LatLong_Passes_All_Parameters()
+    {
+        var dataService = Substitute.For<IProviderDataService>();
+        dataService.FindProviders(Arg.Any<double>(), Arg.Any<double>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
+            .Returns(new ProviderSearchResponseBuilder()
+                .BuildWithMultipleSearchResults());
+
+        var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+        await controller.GetProviders(null, TestLatitude, TestLongitude, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
+
+        await dataService
+            .Received()
+            .FindProviders(
+                // ReSharper disable CompareOfFloatsByEqualityOperator
+                Arg.Is<double>(l => l == TestLatitude),
+                Arg.Is<double>(l => l == TestLongitude),
+                // ReSharper restore CompareOfFloatsByEqualityOperator
+                Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
+                Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
+                Arg.Is<int>(p => p == TestPage),
+                Arg.Is<int>(s => s == TestPageSize));
     }
 
     [Fact]

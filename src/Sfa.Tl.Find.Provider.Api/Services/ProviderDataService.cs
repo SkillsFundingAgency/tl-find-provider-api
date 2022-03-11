@@ -49,7 +49,10 @@ public class ProviderDataService : IProviderDataService
 
     public async Task<IEnumerable<Qualification>> GetQualifications()
     {
-        _logger.LogDebug("Getting qualifications");
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting qualifications");
+        }
 
         const string key = CacheKeys.QualificationsKey;
         if (!_cache.TryGetValue(key, out IList<Qualification> qualifications))
@@ -64,7 +67,10 @@ public class ProviderDataService : IProviderDataService
 
     public async Task<IEnumerable<Route>> GetRoutes()
     {
-        _logger.LogDebug("Getting routes");
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting routes");
+        }
 
         const string key = CacheKeys.RoutesKey;
         if (!_cache.TryGetValue(key, out IList<Route> routes))
@@ -86,7 +92,10 @@ public class ProviderDataService : IProviderDataService
     {
         try
         {
-            _logger.LogDebug("Searching for postcode {postcode}", postcode);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Searching for postcode {postcode}", postcode);
+            }
 
             var postcodeLocation = await GetPostcode(postcode);
 
@@ -97,6 +106,48 @@ public class ProviderDataService : IProviderDataService
                         page, 
                         pageSize, 
                         _mergeAdditionalProviderData);
+
+            return new ProviderSearchResponse
+            {
+                Postcode = postcodeLocation.Postcode,
+                SearchResults = searchResults
+            };
+        }
+        catch (PostcodeNotFoundException pex)
+        {
+            _logger.LogError(pex, "Postcode {Postcode} was not found. Returning an error result.",
+                pex.Postcode);
+            return new ProviderSearchResponse
+            {
+                Error = "The postcode was not found"
+            };
+        }
+    }
+
+    public async Task<ProviderSearchResponse> FindProviders(
+        double latitude,
+        double longitude,
+        IList<int> routeIds = null,
+        IList<int> qualificationIds = null,
+        int page = 0,
+        int pageSize = Constants.DefaultPageSize)
+    {
+        try
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Searching for postcode near ({latitude}, {longitude})", latitude, longitude);
+            }
+
+            var postcodeLocation = await GetNearestPostcode(latitude, longitude);
+
+            var searchResults = await _providerRepository
+                .Search(postcodeLocation,
+                    routeIds,
+                    qualificationIds,
+                    page,
+                    pageSize,
+                    _mergeAdditionalProviderData);
 
             return new ProviderSearchResponse
             {
@@ -146,6 +197,28 @@ public class ProviderDataService : IProviderDataService
                     _logger));
         }
 
+        return postcodeLocation;
+    }
+
+    private async Task<PostcodeLocation> GetNearestPostcode(double latitude, double longitude)
+    {
+        var key = CacheKeys.LatLongKey(latitude, longitude);
+
+        if (!_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
+        {
+            postcodeLocation = await _postcodeLookupService.GetNearestPostcode(latitude, longitude);
+
+            //if (postcodeLocation is null)
+            //{
+            //    throw new PostcodeNotFoundException(postcode);
+            //}
+
+            _cache.Set(key, postcodeLocation,
+                CacheUtilities.DefaultMemoryCacheEntryOptions(
+                    _dateTimeService,
+                    _logger));
+        }
+        
         return postcodeLocation;
     }
 

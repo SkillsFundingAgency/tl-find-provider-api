@@ -26,6 +26,9 @@ public static class PostcodeLookupJsonBuilder
     public static string BuildInvalidPostcodeResponse() => 
         BuildResponse("invalidpostcoderesponse");
 
+    public static string BuildNearestPostcodeResponse() =>
+        BuildResponse("nearestpostcoderesponse");
+    
     public static string BuildPostcodeNotFoundResponse() => 
         BuildResponse("postcodenotfoundresponse");
         

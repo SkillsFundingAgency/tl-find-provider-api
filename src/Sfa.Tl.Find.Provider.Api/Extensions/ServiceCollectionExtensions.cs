@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -202,6 +203,9 @@ public static class ServiceCollectionExtensions
                     Title = title,
                     Version = version
                 });
+
+            c.ResolveConflictingActions(apiDescriptions 
+                => apiDescriptions.First());
 
             if (xmlFile != null)
             {

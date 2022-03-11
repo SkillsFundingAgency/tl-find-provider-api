@@ -20,5 +20,13 @@ public interface IProviderDataService
         int page = 0,
         int pageSize = Constants.DefaultPageSize);
 
+    Task<ProviderSearchResponse> FindProviders(
+        double latitude,
+        double longitude,
+        IList<int> routeIds = null,
+        IList<int> qualificationIds = null,
+        int page = 0,
+        int pageSize = Constants.DefaultPageSize);
+
     Task LoadAdditionalProviderData();
 }

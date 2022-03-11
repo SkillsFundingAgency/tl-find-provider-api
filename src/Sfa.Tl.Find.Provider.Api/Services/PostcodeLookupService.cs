@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -47,6 +48,15 @@ public class PostcodeLookupService : IPostcodeLookupService
                 "outcode");
     }
 
+    public async Task<PostcodeLocation> GetNearestPostcode(double latitude, double longitude)
+    {
+        var responseMessage = await _httpClient.GetAsync($"postcodes?lon={longitude}&lat={latitude}");
+
+        return responseMessage.StatusCode != HttpStatusCode.OK
+            ? null
+            : await ReadPostcodeLocationFromResponse(responseMessage);
+    }
+
     private static async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(
         HttpResponseMessage responseMessage,
         string postcodeFieldName = "postcode")
@@ -56,6 +66,19 @@ public class PostcodeLookupService : IPostcodeLookupService
         var resultElement = jsonDocument
             .RootElement
             .GetProperty("result");
+
+        if (resultElement.ValueKind is JsonValueKind.Array)
+        {
+            var firstItem = resultElement.EnumerateArray().FirstOrDefault();
+            {
+                return new PostcodeLocation
+                {
+                    Postcode = firstItem.SafeGetString(postcodeFieldName),
+                    Latitude = firstItem.SafeGetDouble("latitude", Constants.DefaultLatitude),
+                    Longitude = firstItem.SafeGetDouble("longitude")
+                };
+            }
+        }
 
         return new PostcodeLocation
         {

@@ -6,12 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Builders\Assets\postcodenotfoundresponse.json" />
     <None Remove="Builders\Assets\terminatedpostcodewithnulllatlongresponse.json" />
     <None Remove="Builders\Assets\validoutcodewithnulllatlongresponse.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Builders\Assets\postcodenotfoundresponse.json" />
+    <EmbeddedResource Include="Builders\Assets\nearestpostcoderesponse.json" />
     <EmbeddedResource Include="Builders\Assets\invalidpostcoderesponse.json" />
     <EmbeddedResource Include="Builders\Assets\tlevels.json" />
     <EmbeddedResource Include="Builders\Assets\tleveldefinitions.json" />
