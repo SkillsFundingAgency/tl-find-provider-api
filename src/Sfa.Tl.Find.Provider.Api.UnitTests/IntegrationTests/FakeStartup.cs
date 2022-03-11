@@ -89,6 +89,18 @@ public class FakeStartup
                         Postcode = (string)x[0],
                         SearchResults = new List<ProviderSearchResult>()
                     });
+                providerDataService.FindProviders(
+                        Arg.Any<double>(),
+                        Arg.Any<double>(),
+                        Arg.Any<List<int>>(),
+                        Arg.Any<List<int>>(),
+                        Arg.Any<int>())
+                    .Returns(x => new ProviderSearchResponse
+                    {
+                        Postcode = "CV1 2WT",
+                        SearchResults = new List<ProviderSearchResult>()
+                    });
+
                 return providerDataService;
             })
             .AddTransient(_ => Substitute.For<IProviderRepository>())

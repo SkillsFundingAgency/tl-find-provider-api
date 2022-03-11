@@ -100,13 +100,13 @@ public class FindProvidersController : ControllerBase
     [Route("providers", Name = "GetProvidersV2")]
     [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetProviders(
+    public async Task<IActionResult> GetProvidersV2(
         [FromQuery]
-        string postcode,
-        [FromQuery]
-        double? latitude,
-        [FromQuery]
-        double? longitude,
+        string postcode = null,
+        [FromQuery(Name = "lat")]
+        double? latitude = null,
+        [FromQuery(Name = "lon")]
+        double? longitude = null,
         [FromQuery(Name = "routeId")]
         IList<int> routeIds = null,
         [FromQuery(Name = "qualificationId")]
@@ -218,11 +218,13 @@ public class FindProvidersController : ControllerBase
     {
         errorMessage = null;
 
-        if (!string.IsNullOrWhiteSpace(postcode) &&
-            !latitude.HasValue &&
-            !longitude.HasValue)
+        if (string.IsNullOrWhiteSpace(postcode) && !(latitude.HasValue && longitude.HasValue))
         {
-            errorMessage = "Either postcode or lat/ long required, but not both.";
+            errorMessage = "Either postcode or both lat/long required.";
+        }
+        else if (!string.IsNullOrWhiteSpace(postcode) && (latitude.HasValue || longitude.HasValue))
+        {
+            errorMessage = "Either postcode or lat/long required, but not both.";
         }
         else if (string.IsNullOrWhiteSpace(postcode))
         {

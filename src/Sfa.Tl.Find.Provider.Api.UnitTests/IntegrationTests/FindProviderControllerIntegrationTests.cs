@@ -20,11 +20,31 @@ public class FindProviderControllerIntegrationTests : IClassFixture<TestServerFa
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v1/findproviders/providers?postcode=CV1+2WT&qualificationId=40&page=0&pageSize=5");
+            .GetAsync("/api/v1/findproviders/providers?postcode=CV1+2WT&qualificationId=40&routeId=5&page=0&pageSize=5");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
+    [Fact]
+    public async Task GetProviders_V2_Returns_OK_Result_For_Valid_Postcode_Url()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v2/findproviders/providers?postcode=CV1+2WT&page=0&pageSize=5");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task GetProviders_V2_Returns_OK_Result_For_Valid_Lat_Long_Url()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v2/findproviders/providers?lat=52.400997&lon=-1.508122&page=0&pageSize=5");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
     [Fact]
     public async Task GetProviders_Returns_OK_Result_For_Short_Postcode_Url()
     {

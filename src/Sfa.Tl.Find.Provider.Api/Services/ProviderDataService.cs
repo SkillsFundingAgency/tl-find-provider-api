@@ -208,11 +208,6 @@ public class ProviderDataService : IProviderDataService
         {
             postcodeLocation = await _postcodeLookupService.GetNearestPostcode(latitude, longitude);
 
-            //if (postcodeLocation is null)
-            //{
-            //    throw new PostcodeNotFoundException(postcode);
-            //}
-
             _cache.Set(key, postcodeLocation,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(
                     _dateTimeService,

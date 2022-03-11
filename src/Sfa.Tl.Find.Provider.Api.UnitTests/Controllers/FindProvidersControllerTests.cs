@@ -411,7 +411,7 @@ public class FindProvidersControllerTests
     }
 
     [Fact]
-    public async Task GetProviders_By_LatLong_Passes_All_Parameters()
+    public async Task GetProviders_V2_By_LatLong_Passes_All_Parameters()
     {
         var dataService = Substitute.For<IProviderDataService>();
         dataService.FindProviders(Arg.Any<double>(), Arg.Any<double>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
@@ -420,7 +420,7 @@ public class FindProvidersControllerTests
 
         var controller = new FindProvidersControllerBuilder().Build(dataService);
 
-        await controller.GetProviders(null, TestLatitude, TestLongitude, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
+        await controller.GetProvidersV2(null, TestLatitude, TestLongitude, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
 
         await dataService
             .Received()
@@ -433,6 +433,65 @@ public class FindProvidersControllerTests
                 Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
                 Arg.Is<int>(p => p == TestPage),
                 Arg.Is<int>(s => s == TestPageSize));
+    }
+
+    [Fact]
+    public async Task GetProviders_V2_Validates_Postcode_Or_Lat_Long_Exclusive()
+    {
+        var dataService = Substitute.For<IProviderDataService>();
+
+        var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+        var result = 
+        await controller.GetProvidersV2(TestPostcode, TestLatitude, TestLongitude, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var results = okResult.Value as ProviderSearchResponse;
+        results!.Error.Should().Be("Either postcode or lat/long required, but not both.");
+    }
+
+    [Fact]
+    public async Task GetProviders_V2_Validates_Allow_Postcode_With_No_Lat_Long()
+    {
+        var dataService = Substitute.For<IProviderDataService>();
+        dataService.FindProviders(TestPostcode, Arg.Any<IList<int>>(), Arg.Any<IList<int>>(), Arg.Any<int>(), Arg.Any<int>())
+            //dataService.FindProviders(Arg.Any<double>(), Arg.Any<double>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
+            .Returns(new ProviderSearchResponseBuilder()
+                .BuildWithMultipleSearchResults());
+
+        var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+        var result = await controller.GetProvidersV2(TestPostcode, null, null, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var results = okResult.Value as ProviderSearchResponse;
+        results!.Error.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetProviders_V2_Validates_Allow_Lat_Long_With_No_Postcode()
+    {
+        var dataService = Substitute.For<IProviderDataService>();
+        dataService.FindProviders(Arg.Any<double>(), Arg.Any<double>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
+            .Returns(new ProviderSearchResponseBuilder()
+                .BuildWithMultipleSearchResults());
+
+        var controller = new FindProvidersControllerBuilder().Build(dataService);
+
+        var result = await controller.GetProvidersV2(null, TestLatitude, TestLongitude, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var results = okResult.Value as ProviderSearchResponse;
+        results!.Error.Should().BeNull();
     }
 
     [Fact]
