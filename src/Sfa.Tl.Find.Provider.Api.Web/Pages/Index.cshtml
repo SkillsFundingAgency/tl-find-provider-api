@@ -145,6 +145,8 @@
 
         let findProvidersApiUrl = $('#searchApiUrlValue').val();
         if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
+        const findProvidersApiV2Url = findProvidersApiUrl.replace("/v1/", "/v2/");
+
         //const articleBaseUrl = $('#article_base_url').val();
 
         let currentPage = 0;
@@ -302,6 +304,8 @@
         function providerSearch(postcode, skillAreaIds, page) {
             //$("#tl-search-providers").disabled = true;
             //$("#tl-next-results-link").disabled = true;
+            clearProviderSearchResults();
+
             let error = null;
             if (postcode === "") {
                 error = "Enter a postcode";
@@ -325,7 +329,7 @@
                 return false;
             }
 
-            clearProviderSearchResults();
+            //clearProviderSearchResults();
 
             callProviderSearchApi(postcode, skillAreaIds, page);
 
@@ -336,8 +340,6 @@
             page = (page === undefined ? 0 : page);
             pageSize = (pageSize === undefined ? 5 : pageSize);
 
-            //$("#tl-search-providers").disabled = true;
-            //$("#tl-next-results-link").disabled = true;
             if (isSearchInProgress) {
                 console.log("Already calling api");
                 return false;
@@ -369,6 +371,72 @@
                 } else {
                     currentPage = page;
                     currentPostcode = postcode;
+                    currentSkillAreaIds = skillAreaIds;
+                    console.log("currentPage is now " + currentPage);
+                    populateProviderSearchResults(response);
+                }
+                $("#tl-search-providers").disabled = false;
+                $("#tl-next-results-link").disabled = false;
+                isSearchInProgress = false;
+               // ReSharper disable once IdentifierTypo
+            }).fail(function(jqxhr) {
+                showError(jqxhr.status, jqxhr.responseText);
+                $("#tl-search-providers").disabled = false;
+                $("#tl-next-results-link").disabled = false;
+                isSearchInProgress = false;
+            });
+
+            return true;
+        }
+
+        function callProviderSearchApiV2(postcode, latitude, longitude, skillAreaIds, page, pageSize) {
+            page = (page === undefined ? 0 : page);
+            pageSize = (pageSize === undefined ? 5 : pageSize);
+
+            if (isSearchInProgress) {
+                console.log("Already calling api");
+                return false;
+            }
+            isSearchInProgress = true;
+
+            const appId = $('#find_provider_api_app_id').val();
+            const apiKey = $('#find_provider_api_key').val();
+            let uri = findProvidersApiV2Url + "providers?";
+
+            if (postcode !== undefined && postcode !== null) {
+                console.log('adding postcode ' + postcode);
+                uri += "postcode=" + encodeURIComponent(postcode);
+            } else {
+                console.log('adding latitude ' + latitude);
+                console.log('adding longitude ' + longitude);
+                uri += "lat=" + latitude + "&lon=" + longitude;
+            }
+
+            if (skillAreaIds && skillAreaIds.length > 0) {
+                skillAreaIds.forEach(function(skillAreaId) {
+                    uri += "&routeId=" + skillAreaId;
+                });
+            }
+
+            uri += "&page=" + page + "&pageSize=" + pageSize;
+
+            $.ajax({
+                type: "GET",
+                url: uri,
+                contentType: "application/json",
+                beforeSend: function(xhr) {
+                    addHmacAuthHeader(xhr, uri, appId, apiKey);
+                }
+            }).done(function(response) {
+                //console.log(JSON.stringify(response));
+                if (response.error) {
+                    console.log("Invalid postcode response received - " + response.error);
+                    showPostcodeError("Enter a valid postcode");
+                } else {
+                    currentPage = page;
+                    //Use incoming postcode since we won't already have it'
+                    //TODO: probably need to validate that this exists
+                    currentPostcode = response.postcode;
                     currentSkillAreaIds = skillAreaIds;
                     console.log("currentPage is now " + currentPage);
                     populateProviderSearchResults(response);
@@ -547,14 +615,20 @@
                     });
             };
 
-        function error() {
-            //output.placeholder = "Unable to retrieve your location";
-            output.placeholder = "Unable to retrieve your location";
-        };
+            function successCallApi(position) {
+                clearProviderSearchResults();
+                callProviderSearchApiV2(null, position.coords.latitude, position.coords.longitude, getSkillAreaIds());
+            };
+
+            function error() {
+                //output.placeholder = "Unable to retrieve your location";
+                output.placeholder = "Unable to retrieve your location";
+            };
 
         //output.placeholder = "Locating…";
 
-        navigator.geolocation.getCurrentPosition(success, error, { maximumAge: 600000 });
+        //navigator.geolocation.getCurrentPosition(success, error, { maximumAge: 600000 });
+        navigator.geolocation.getCurrentPosition(successCallApi, error, { maximumAge: 600000 });
     }
 
         function showError(status, errorText) {
