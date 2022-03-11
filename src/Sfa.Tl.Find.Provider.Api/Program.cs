@@ -55,7 +55,9 @@ builder.Services
     .AddTransient<IRouteRepository, RouteRepository>()
     .AddTransient<ITownRepository, TownRepository>();
 
-builder.Services.AddQuartzServices(siteConfiguration.CourseDirectoryImportSchedule);
+builder.Services.AddQuartzServices(
+    siteConfiguration.CourseDirectoryImportSchedule,
+    siteConfiguration.TownDataImportSchedule);
 
 builder.Services
     .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()

@@ -51,13 +51,15 @@ internal class SettingsBuilder
         PostcodeApiSettings postcodeApiSettings = null,
         SearchSettings searchSettings = null,
         string sqlConnectionString = "TestConnection",
-        string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI") => new()
+        string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI",
+        string townDataImportSchedule = "0 0 10 * * MON-FRI") => new()
         {
             ApiSettings = apiSettings ?? BuildApiSettings(),
             CourseDirectoryApiSettings = courseDirectoryApiSettings ?? BuildCourseDirectoryApiSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             SqlConnectionString = sqlConnectionString,
-            CourseDirectoryImportSchedule = courseDirectoryImportSchedule
+            CourseDirectoryImportSchedule = courseDirectoryImportSchedule,
+            TownDataImportSchedule = townDataImportSchedule
         };
 }

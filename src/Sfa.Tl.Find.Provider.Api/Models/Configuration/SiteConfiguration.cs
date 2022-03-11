@@ -10,4 +10,5 @@ public class SiteConfiguration
     public PostcodeApiSettings PostcodeApiSettings { get; init; }
     public SearchSettings SearchSettings { get; init; }
     public string SqlConnectionString { get; init; }
+    public string TownDataImportSchedule { get; init; }
 }

@@ -147,7 +147,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddQuartzServices(
         this IServiceCollection services,
-        string cronSchedule)
+        string courseDirectoryImportCronSchedule = null,
+        string townDataImportCronSchedule = null)
     {
         services.AddQuartz(q =>
         {
@@ -161,15 +162,26 @@ public static class ServiceCollectionExtensions
                     .ForJob(startupJobKey)
                     .StartNow());
 
-            if (!string.IsNullOrEmpty(cronSchedule))
+            if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
-                var importJobKey = new JobKey("Import Course Data");
-                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(importJobKey))
+                var courseImportJobKey = new JobKey("Import Course Data");
+                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(courseImportJobKey))
                     .AddTrigger(opts => opts
-                        .ForJob(importJobKey)
+                        .ForJob(courseImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(cronSchedule)));
+                                .CronSchedule(courseDirectoryImportCronSchedule)));
+            }
+            
+            if (!string.IsNullOrEmpty(townDataImportCronSchedule))
+            {
+                var townImportJobKey = new JobKey("Import Town Data");
+                q.AddJob<TownDataImportJob>(opts => opts.WithIdentity(townImportJobKey))
+                    .AddTrigger(opts => opts
+                        .ForJob(townImportJobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(townDataImportCronSchedule)));
             }
         });
 
@@ -177,7 +189,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
+    
     public static IServiceCollection AddRateLimitPolicy(
         this IServiceCollection services)
     {

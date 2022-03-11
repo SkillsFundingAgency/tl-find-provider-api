@@ -51,6 +51,7 @@ Add a new row to the table with:
             "ApiKey": "<API Key>"
         },
         "CourseDirectoryImportSchedule": "<CRON string>",
+        "TownDataImportSchedule": "<CRON string>",
         "PostcodeApiSettings": {
             "BaseUri": "https://api.postcodes.io/"
         },
