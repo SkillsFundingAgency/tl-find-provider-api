@@ -173,11 +173,31 @@ public class FindProviderControllerIntegrationTests : IClassFixture<TestServerFa
     }
 
     [Fact]
+    public async Task GetQualifications_V2_Returns_OK_Result_For_Valid_Url()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v2/findproviders/qualifications");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
     public async Task GetRoutes_Returns_Ok_Result_For_Valid_Url()
     {
         var response = await _fixture
             .CreateClient()
             .GetAsync("/api/v1/findproviders/routes");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task GetRoutes_V2_Returns_Ok_Result_For_Valid_Url()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v2/findproviders/routes");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
