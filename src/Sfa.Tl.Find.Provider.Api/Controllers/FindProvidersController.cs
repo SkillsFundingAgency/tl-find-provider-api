@@ -14,7 +14,6 @@ using Sfa.Tl.Find.Provider.Api.Models;
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
 [ApiController]
-[ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [HmacAuthorization]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
@@ -41,6 +40,7 @@ public class FindProvidersController : ControllerBase
     /// <param name="pageSize">Number of items to return on a page.</param>
     /// <returns>Json with providers.</returns>
     [HttpGet]
+    [ApiVersion("1.0")]
     [Route("providers", Name = "GetProviders")]
     [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -158,6 +158,8 @@ public class FindProvidersController : ControllerBase
     /// </summary>
     /// <returns>Json with qualifications.</returns>
     [HttpGet]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("qualifications", Name = "GetQualifications")]
     [ProducesResponseType(typeof(IEnumerable<Qualification>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -168,12 +170,14 @@ public class FindProvidersController : ControllerBase
             ? Ok(qualifications)
             : NotFound();
     }
-
+    
     /// <summary>
     /// Returns a list of all routes.
     /// </summary>
     /// <returns>Json with routes.</returns>
     [HttpGet]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("routes", Name = "GetRoutes")]
     [ProducesResponseType(typeof(IEnumerable<Route>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -95,7 +95,7 @@ public class FakeStartup
                         Arg.Any<List<int>>(),
                         Arg.Any<List<int>>(),
                         Arg.Any<int>())
-                    .Returns(x => new ProviderSearchResponse
+                    .Returns(new ProviderSearchResponse
                     {
                         Postcode = "CV1 2WT",
                         SearchResults = new List<ProviderSearchResult>()
