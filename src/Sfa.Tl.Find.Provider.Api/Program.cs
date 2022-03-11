@@ -49,9 +49,11 @@ builder.Services
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
+    .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IProviderRepository, ProviderRepository>()
     .AddTransient<IQualificationRepository, QualificationRepository>()
-    .AddTransient<IRouteRepository, RouteRepository>();
+    .AddTransient<IRouteRepository, RouteRepository>()
+    .AddTransient<ITownRepository, TownRepository>();
 
 builder.Services.AddQuartzServices(siteConfiguration.CourseDirectoryImportSchedule);
 

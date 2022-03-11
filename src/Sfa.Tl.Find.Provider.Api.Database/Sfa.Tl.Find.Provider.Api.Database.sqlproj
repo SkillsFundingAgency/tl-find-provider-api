@@ -91,6 +91,7 @@
     <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
     <Build Include="Stored Procedures\UpdateProviders.sql" />
     <Build Include="Stored Procedures\UpdateQualifications.sql" />
+    <Build Include="Types\TownDataTableType.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

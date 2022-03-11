@@ -70,6 +70,7 @@ public class RouteBuilder
             {
                 Id = 11, 
                 Name = "Legal, finance and accounting",
-                NumberOfQualifications= 11 }
+                NumberOfQualifications= 11
+            }
         };
 }

@@ -29,10 +29,13 @@ public class InitializationJobTests
     public async Task Execute_Job_Calls_Expected_Services_When_No_Qualifications_Or_Providers()
     {
         var courseDirectoryService = Substitute.For<ICourseDirectoryService>();
-            
+
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.HasProviders().Returns(false);
         providerDataService.HasQualifications().Returns(false);
+
+        var townDataService = Substitute.For<ITownDataService>();
+        townDataService.HasTowns().Returns(false);
 
         var trigger = Substitute.For<ITrigger>();
         trigger.JobKey.Returns(new JobKey("Test"));
@@ -40,12 +43,15 @@ public class InitializationJobTests
         jobContext.Trigger.Returns(trigger);
 
         var job = new InitializationJobBuilder()
-            .Build(courseDirectoryService, providerDataService);
+            .Build(courseDirectoryService,
+                   providerDataService,
+                   townDataService);
 
         await job.Execute(jobContext);
 
         await courseDirectoryService.Received(1).ImportQualifications();
         await courseDirectoryService.Received(1).ImportProviders();
+        await townDataService.Received(1).ImportTowns();
     }
 
     [Fact]
