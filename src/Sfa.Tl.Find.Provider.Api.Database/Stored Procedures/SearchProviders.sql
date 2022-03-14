@@ -11,6 +11,17 @@ AS
 	SET NOCOUNT ON;
 
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326);
+
+	DECLARE @allQualificationIds TABLE ([Id] INT)
+
+	INSERT INTO @allQualificationIds
+	SELECT [QualificationId] 
+	FROM @routeIds r
+	INNER JOIN [RouteQualification] rq
+	ON	rq.[RouteId] = r.[Id]
+	UNION
+	SELECT [Id] 
+	FROM @qualificationIds;
 	
 	WITH ProvidersCTE AS (
 		SELECT	p.[Id],
@@ -57,10 +68,8 @@ AS
 			ON		r.[Id] = rq.[RouteId]
 			  AND	r.[IsDeleted] = 0
 			WHERE	lq.[LocationId] = l.[Id]
-			  AND	((NOT EXISTS(SELECT [Id] FROM @qualificationIds WHERE [Id] <> 0)
-					   OR q.[Id] IN (SELECT [Id] FROM @qualificationIds))
-					 AND (NOT EXISTS(SELECT [Id] FROM @routeIds WHERE [Id] <> 0)
-						  OR r.[Id] IN (SELECT [Id] FROM @routeIds))
+			  AND	((NOT EXISTS(SELECT [Id] FROM @allQualificationIds WHERE [Id] <> 0)
+					   OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds))
 					))
 	ORDER BY [Distance],
 			 p.[Name],
