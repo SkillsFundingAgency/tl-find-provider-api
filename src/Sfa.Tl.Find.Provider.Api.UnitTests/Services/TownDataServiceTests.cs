@@ -47,7 +47,7 @@ public class TownDataServiceTests
             .HasAny();
     }
 
-    //[Fact]
+    [Fact]
     public async Task ImportTowns_Creates_Expected_Towns()
     {
         //var responses = new Dictionary<string, string>
