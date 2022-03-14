@@ -14,6 +14,7 @@ AS
 	(
 		t.[Name] = s.[Name]
 		AND t.[County] = s.[County]
+		AND t.[LocalAuthorityName] = s.[LocalAuthorityName]
 	)
 	WHEN MATCHED 
 		 AND (t.[Latitude] <> s.[Latitude]
@@ -26,6 +27,7 @@ AS
 	(
 		[Name],
 		[County],
+		[LocalAuthorityName],
 		[Latitude],
 		[Longitude]
 	)
@@ -33,6 +35,7 @@ AS
 	(
 		s.[Name],
 		s.[County],
+		s.[LocalAuthorityName],
 		s.[Latitude],
 		s.[Longitude]
 	)

@@ -75,7 +75,7 @@ public class TownRepository : ITownRepository
                 transaction,
                 commandType: CommandType.StoredProcedure);
 
-        _logger.LogChangeResults(updateResult, nameof(QualificationRepository),
+        _logger.LogChangeResults(updateResult, nameof(TownRepository),
             nameof(towns));
 
         transaction.Commit();

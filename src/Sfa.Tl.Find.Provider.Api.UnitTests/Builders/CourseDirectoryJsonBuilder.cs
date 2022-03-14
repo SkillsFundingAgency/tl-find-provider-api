@@ -5,14 +5,11 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 // ReSharper disable StringLiteralTypo
 public static class CourseDirectoryJsonBuilder
 {
-    public static string BuildValidTLevelDefinitionsResponse() => 
-        BuildResponse("tleveldefinitions");
-
-    public static string BuildValidTLevelsResponse() => 
-        BuildResponse("tlevels");
-
-    private static string BuildResponse(string assetName) =>
+    public static string BuildValidTLevelDefinitionsResponse() =>
         typeof(CourseDirectoryJsonBuilder)
-            .ReadManifestResourceStreamAsString(
-                $"Assets.{assetName}.json");
+            .BuildJsonFromResourceStream("tleveldefinitions");
+
+    public static string BuildValidTLevelsResponse() =>
+        typeof(CourseDirectoryJsonBuilder)
+            .BuildJsonFromResourceStream("tlevels");
 }

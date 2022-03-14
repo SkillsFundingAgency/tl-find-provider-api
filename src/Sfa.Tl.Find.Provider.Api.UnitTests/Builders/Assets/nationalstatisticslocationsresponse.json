@@ -1,0 +1,95 @@
+{
+  "objectIdFieldName": "FID",
+  "uniqueIdField": {
+    "name": "FID",
+    "isSystemMaintained": true
+  },
+  "globalIdFieldName": "",
+  "fields": [
+    {
+      "name": "placeid",
+      "type": "esriFieldTypeInteger",
+      "alias": "placeid",
+      "sqlType": "sqlTypeInteger",
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "place15nm",
+      "type": "esriFieldTypeString",
+      "alias": "place15nm",
+      "sqlType": "sqlTypeNVarchar",
+      "length": 256,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "ctry15nm",
+      "type": "esriFieldTypeString",
+      "alias": "ctry15nm",
+      "sqlType": "sqlTypeNVarchar",
+      "length": 256,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "cty15nm",
+      "type": "esriFieldTypeString",
+      "alias": "cty15nm",
+      "sqlType": "sqlTypeNVarchar",
+      "length": 256,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "ctyltnm",
+      "type": "esriFieldTypeString",
+      "alias": "ctyltnm",
+      "sqlType": "sqlTypeNVarchar",
+      "length": 256,
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "lat",
+      "type": "esriFieldTypeDouble",
+      "alias": "lat",
+      "sqlType": "sqlTypeFloat",
+      "domain": null,
+      "defaultValue": null
+    },
+    {
+      "name": "long",
+      "type": "esriFieldTypeDouble",
+      "alias": "long",
+      "sqlType": "sqlTypeFloat",
+      "domain": null,
+      "defaultValue": null
+    }
+  ],
+  "features": [
+    {
+      "attributes": {
+        "placeid": 2,
+        "place15nm": "Abbas and Templecombe",
+        "ctry15nm": "England",
+        "cty15nm": "Somerset",
+        "ctyltnm": "Somerset",
+        "lat": 51.002593,
+        "long": -2.411563
+      }
+    },
+    {
+      "attributes": {
+        "placeid": 4,
+        "place15nm": "Abberley",
+        "ctry15nm": "England",
+        "cty15nm": "Worcestershire",
+        "ctyltnm": "Worcestershire",
+        "lat": 52.302702,
+        "long": -2.391708
+      }
+    }
+  ],
+  "exceededTransferLimit": false
+}

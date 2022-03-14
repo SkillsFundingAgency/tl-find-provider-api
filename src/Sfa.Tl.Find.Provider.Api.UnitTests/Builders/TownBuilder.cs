@@ -10,17 +10,17 @@ public class TownBuilder
         {
             new()
             {
-                Id = 1,
                 Name = "Coventry",
-                County = "Coventry",
+                County = "West Midlands",
+                LocalAuthorityName = "West Midlands",
                 Latitude = 52.41695M,
                 Longitude = -1.50721M
             },
             new()
             {
-                Id = 2,
                 Name = "Oxford",
                 County = "Oxfordshire",
+                LocalAuthorityName = "Oxfordshire",
                 Latitude = 51.740811M,
                 Longitude = -1.217524M
             }

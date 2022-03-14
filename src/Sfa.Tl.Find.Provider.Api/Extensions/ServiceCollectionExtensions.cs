@@ -142,6 +142,16 @@ public static class ServiceCollectionExtensions
             })
             .AddRetryPolicyHandler<CourseDirectoryService>();
 
+        services
+            .AddHttpClient<ITownDataService, TownDataService>(
+                (_, client) =>
+                {
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+            )
+            .AddRetryPolicyHandler<TownDataService>();
+
         return services;
     }
 
