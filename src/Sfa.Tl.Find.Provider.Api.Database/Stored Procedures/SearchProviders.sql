@@ -59,7 +59,7 @@ AS
 			WHERE	lq.[LocationId] = l.[Id]
 			  AND	((NOT EXISTS(SELECT [Id] FROM @qualificationIds WHERE [Id] <> 0)
 					   OR q.[Id] IN (SELECT [Id] FROM @qualificationIds))
-					 OR	(NOT EXISTS(SELECT [Id] FROM @routeIds WHERE [Id] <> 0)
+					 AND (NOT EXISTS(SELECT [Id] FROM @routeIds WHERE [Id] <> 0)
 						  OR r.[Id] IN (SELECT [Id] FROM @routeIds))
 					))
 	ORDER BY [Distance],
