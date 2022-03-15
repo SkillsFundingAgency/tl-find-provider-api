@@ -16,8 +16,12 @@ AS
 	)
 	WHEN MATCHED 
 		 AND (t.[Name] <> s.[Name]
-			  OR t.[County] <> s.[County]
-			  OR t.[LocalAuthorityName] <> s.[LocalAuthorityName]
+	  		  OR ISNULL(NULLIF(t.[County] COLLATE Latin1_General_CS_AS, s.[County] COLLATE Latin1_General_CS_AS), 
+						NULLIF(s.[County] COLLATE Latin1_General_CS_AS, t.[County] COLLATE Latin1_General_CS_AS))
+				 IS NOT NULL
+	  		  OR ISNULL(NULLIF(t.[LocalAuthorityName] COLLATE Latin1_General_CS_AS, s.[LocalAuthorityName] COLLATE Latin1_General_CS_AS), 
+						NULLIF(s.[LocalAuthorityName] COLLATE Latin1_General_CS_AS, t.[LocalAuthorityName] COLLATE Latin1_General_CS_AS))
+				 IS NOT NULL
 			  OR t.[Latitude] <> s.[Latitude]
 			  OR t.[Longitude] <> s.[Longitude])
 	THEN UPDATE SET
