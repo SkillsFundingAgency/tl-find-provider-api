@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -11,20 +10,13 @@ using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 
 public class ServiceCollectionExtensionsTests
 {
     private const string CorsTestPolicyName = "TestPolicy";
-
-    private readonly ITestOutputHelper _output;
-
-    public ServiceCollectionExtensionsTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    
     [Fact]
     public void AddApiVersioningPolicy_Should_AddService()
     {
