@@ -99,7 +99,7 @@ public class TownDataService : ITownDataService
     public Uri GetUri(int offset, int recordSize) =>
         new($"{NationalOfficeOfStatisticsLocationUrl}&resultRecordCount={recordSize}&resultOffSet={offset}");
 
-    private static async Task<(List<LocationApiItem>, bool)> ReadLocationApiDataResponse(
+    private static async Task<(IEnumerable<LocationApiItem>, bool)> ReadLocationApiDataResponse(
         HttpResponseMessage responseMessage)
     {
         var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
@@ -111,32 +111,25 @@ public class TownDataService : ITownDataService
                                         .TryGetProperty("exceededTransferLimit", out var property)
                                     && property.GetBoolean();
 
-        var towns = new List<LocationApiItem>();
-
-        foreach (var attributeElement in root
-                     .GetProperty("features")
-                     .EnumerateArray())
-        {
-            var attribute = attributeElement.GetProperty("attributes");
-
-            // ReSharper disable once StringLiteralTypo
-            var town = new LocationApiItem
+        var towns = //new List<LocationApiItem>();
+            root
+            .GetProperty("features")
+            .EnumerateArray()
+            .Select(attr => new { attributeElement = attr.GetProperty("attributes") })
+            .Select(x => new LocationApiItem
             {
                 // ReSharper disable StringLiteralTypo
-                Id = attribute.SafeGetInt32("placeid"),
-                Name = attribute.SafeGetString("place15nm", Constants.LocationNameMaxLength),
-                County = attribute.SafeGetString("cty15nm", Constants.CountyMaxLength),
-                LocalAuthorityName = attribute.SafeGetString("ctyltnm", Constants.CountyMaxLength),
-                LocalAuthorityDistrict = attribute.SafeGetString("lad15nm"),
-                LocalAuthorityDistrictDescription = attribute.SafeGetString("laddescnm"),
-                PlaceNameDescription = attribute.SafeGetString("descnm"),
-                Latitude = attribute.SafeGetDecimal("lat"),
-                Longitude = attribute.SafeGetDecimal("long")
-                // ReSharper restore StringLiteralTypo
-            };
-
-            towns.Add(town);
-        }
+                Id = x.attributeElement.SafeGetInt32("placeid"),
+                Name = x.attributeElement.SafeGetString("place15nm", Constants.LocationNameMaxLength),
+                County = x.attributeElement.SafeGetString("cty15nm", Constants.CountyMaxLength),
+                LocalAuthorityName = x.attributeElement.SafeGetString("ctyltnm", Constants.CountyMaxLength),
+                LocalAuthorityDistrict = x.attributeElement.SafeGetString("lad15nm"),
+                LocalAuthorityDistrictDescription = x.attributeElement.SafeGetString("laddescnm"),
+                PlaceNameDescription = x.attributeElement.SafeGetString("descnm"),
+                Latitude = x.attributeElement.SafeGetDecimal("lat"),
+                Longitude = x.attributeElement.SafeGetDecimal("long")
+                //ReSharper restore StringLiteralTypo
+            });
 
         return (towns, exceededTransferLimit);
     }
