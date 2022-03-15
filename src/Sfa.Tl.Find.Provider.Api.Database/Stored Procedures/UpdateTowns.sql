@@ -12,19 +12,24 @@ AS
 	USING @data AS s
 	ON
 	(
-		t.[Name] = s.[Name]
-		AND t.[County] = s.[County]
-		AND t.[LocalAuthorityName] = s.[LocalAuthorityName]
+		t.[Id] = s.[Id]
 	)
 	WHEN MATCHED 
-		 AND (t.[Latitude] <> s.[Latitude]
+		 AND (t.[Name] <> s.[Name]
+			  OR t.[County] <> s.[County]
+			  OR t.[LocalAuthorityName] <> s.[LocalAuthorityName]
+			  OR t.[Latitude] <> s.[Latitude]
 			  OR t.[Longitude] <> s.[Longitude])
 	THEN UPDATE SET
+		t.[Name] = s.[Name],
+		t.[County] = s.[County],
+		t.[LocalAuthorityName] = s.[LocalAuthorityName],
 		t.[Latitude] = s.[Latitude],
 		t.[Longitude] = s.[Longitude]
 
 	WHEN NOT MATCHED BY TARGET THEN INSERT
 	(
+		[Id],
 		[Name],
 		[County],
 		[LocalAuthorityName],
@@ -33,6 +38,7 @@ AS
 	)
 	VALUES
 	(
+		s.[Id],
 		s.[Name],
 		s.[County],
 		s.[LocalAuthorityName],

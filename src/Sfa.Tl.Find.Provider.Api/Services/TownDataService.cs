@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -17,7 +18,7 @@ public class TownDataService : ITownDataService
     private readonly ITownRepository _townRepository;
     private readonly ILogger<TownDataService> _logger;
 
-    public const string NationalOfficeOfStatisticsLocationUrl = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/IPN_GB_2016/FeatureServer/0/query?where=ctry15nm%20%3D%20'ENGLAND'%20AND%20popcnt%20%3E%3D%20500%20AND%20popcnt%20%3C%3D%2010000000&outFields=placeid,place15nm,ctry15nm,cty15nm,ctyltnm,lat,long&returnDistinctValues=true&outSR=4326&f=json";
+    public const string NationalOfficeOfStatisticsLocationUrl = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/IPN_GB_2016/FeatureServer/0/query?where=ctry15nm%20%3D%20'ENGLAND'%20AND%20popcnt%20%3E%3D%20500%20AND%20popcnt%20%3C%3D%2010000000&outFields=placeid,place15nm,ctry15nm,cty15nm,ctyltnm,lad15nm,laddescnm,lat,long,descnm&returnDistinctValues=true&outSR=4326&f=json";
 
     public TownDataService(
         HttpClient httpClient,
@@ -40,7 +41,7 @@ public class TownDataService : ITownDataService
         const int recordSize = 2000;
         var moreData = true;
 
-        var towns = new List<Town>();
+        var featureItems = new List<LocationApiItem>();
 
         while (moreData)
         {
@@ -56,24 +57,54 @@ public class TownDataService : ITownDataService
 
             responseMessage.EnsureSuccessStatusCode();
 
-            (var items, moreData) = await ReadTownDataResponse(
+            (var items, moreData) = await ReadLocationApiDataResponse(
                 responseMessage);
 
             offSet += recordSize;
 
-            towns.AddRange(items);
+            featureItems.AddRange(items);
         }
+
+        //Deduplicate
+        var towns = featureItems 
+            .Where(item => !string.IsNullOrEmpty(item.Name) &&
+                           !string.IsNullOrEmpty(item.County) &&
+                           !string.IsNullOrEmpty(item.LocalAuthorityName))
+                            //item.PlaceNameDescription != PlaceNameDescription.None).ToList()
+            .GroupBy(c => new
+            {
+                c.LocalAuthorityName, 
+                c.Name, 
+                c.LocalAuthorityDistrict
+            })
+            .Select(item => item.First())
+            .GroupBy(c => new
+            {
+                c.Id
+            })
+            .Select(SelectDuplicateByLocalAuthorityDistrictDescription)
+            .Select(item => new Town
+            {
+                Id = item.Id,
+                Name = item.Name,
+                County = item.County,
+                LocalAuthorityName = item.LocalAuthorityName,
+                Latitude = item.Latitude,
+                Longitude = item.Longitude
+            })
+            .ToList();
 
         await _townRepository.Save(towns);
     }
-
+    
     public Uri GetUri(int offset, int recordSize) =>
         new($"{NationalOfficeOfStatisticsLocationUrl}&resultRecordCount={recordSize}&resultOffSet={offset}");
 
-    private static async Task<(List<Town>, bool)> ReadTownDataResponse(
+    private static async Task<(List<LocationApiItem>, bool)> ReadLocationApiDataResponse(
             HttpResponseMessage responseMessage)
     {
         var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+        //var json = jsonDocument.PrettifyJson();
 
         var root = jsonDocument.RootElement;
 
@@ -81,7 +112,7 @@ public class TownDataService : ITownDataService
             .TryGetProperty("exceededTransferLimit", out var property)
                 && property.GetBoolean();
 
-        var towns = new List<Town>();
+        var towns = new List<LocationApiItem>();
 
         foreach (var attributeElement in root
                      .GetProperty("features")
@@ -89,20 +120,50 @@ public class TownDataService : ITownDataService
         {
             var attribute = attributeElement.GetProperty("attributes");
 
-            var town = new Town
+            // ReSharper disable once StringLiteralTypo
+            if (attribute.SafeGetString("descnm") != "None")
             {
-                // ReSharper disable StringLiteralTypo
-                Name = attribute.SafeGetString("place15nm", Constants.LocationNameMaxLength),
-                County = attribute.SafeGetString("cty15nm", Constants.CountyMaxLength),
-                LocalAuthorityName = attribute.SafeGetString("ctyltnm", Constants.CountyMaxLength),
-                Latitude = attribute.SafeGetDecimal("lat"),
-                Longitude = attribute.SafeGetDecimal("long")
-                // ReSharper restore StringLiteralTypo
-            };
+                var town = new LocationApiItem
+                {
+                    // ReSharper disable StringLiteralTypo
+                    Id = attribute.SafeGetInt32("placeid"),
+                    Name = attribute.SafeGetString("place15nm", Constants.LocationNameMaxLength),
+                    County = attribute.SafeGetString("cty15nm", Constants.CountyMaxLength),
+                    LocalAuthorityName = attribute.SafeGetString("ctyltnm", Constants.CountyMaxLength),
+                    LocalAuthorityDistrict = attribute.SafeGetString("lad15nm"),
+                    LocalAuthorityDistrictDescription = attribute.SafeGetString("laddescnm"),
+                    Latitude = attribute.SafeGetDecimal("lat"),
+                    Longitude = attribute.SafeGetDecimal("long")
+                    // ReSharper restore StringLiteralTypo
+                };
 
-            towns.Add(town);
+                towns.Add(town);
+            }
+            else
+            {
+            }
         }
 
         return (towns, exceededTransferLimit);
+    }
+
+    private static LocationApiItem SelectDuplicateByLocalAuthorityDistrictDescription(IEnumerable<LocationApiItem> items)
+    {
+        var values = items.ToList();
+
+        if (values.Count > 1)
+        {
+            var orderByDescending = values.OrderByDescending(c => c.LocalAuthorityDistrict).ToList();
+            var locationApiItem = orderByDescending.FirstOrDefault(c => !string.IsNullOrEmpty(c.LocalAuthorityDistrictDescription)
+                                                                        && c.Name.Equals(c.LocalAuthorityDistrict, StringComparison.CurrentCultureIgnoreCase));
+            if (locationApiItem != null)
+            {
+                return locationApiItem;
+            }
+            return orderByDescending
+                .FirstOrDefault(c => !string.IsNullOrEmpty(c.LocalAuthorityDistrictDescription));
+        }
+
+        return values.FirstOrDefault();
     }
 }

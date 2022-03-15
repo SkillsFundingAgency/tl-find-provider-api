@@ -61,6 +61,7 @@
     <Folder Include="Stored Procedures" />
     <Folder Include="Types" />
     <Folder Include="PostDeployment" />
+    <Folder Include="PreDeployment" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
@@ -99,5 +100,8 @@
     <None Include="PostDeployment\Seed Qualifications.sql" />
     <None Include="PostDeployment\Seed Routes.sql" />
     <None Include="PostDeployment\Seed RouteQualification.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="PreDeployment\PreDeploymentScript.sql" />
   </ItemGroup>
 </Project>
