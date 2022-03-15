@@ -78,8 +78,11 @@ public static class ServiceCollectionExtensions
     {
         if (!string.IsNullOrWhiteSpace(allowedOrigins))
         {
-            var splitterChars = new[] { ';', ',' };
-            var corsOrigins = allowedOrigins.Split(splitterChars);
+            var corsOrigins = allowedOrigins
+                .Split(';', ',')
+                .Select(s => s.TrimEnd('/'))
+                .ToArray();
+
             services.AddCors(options => options.AddPolicy(policyName, builder =>
                 builder
                     .WithMethods(HttpMethod.Get.Method)
