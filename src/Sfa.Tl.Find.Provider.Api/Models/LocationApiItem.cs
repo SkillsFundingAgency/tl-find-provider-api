@@ -12,7 +12,7 @@ public class LocationApiItem
     public string LocalAuthorityName { get; init; }
     public string LocalAuthorityDistrict { get; init; }
     public string LocalAuthorityDistrictDescription { get; init; }
-    //public string PlaceNameDescription { get; init; }
+    public string PlaceNameDescription { get; init; }
     public decimal Latitude { get; init; }
     public decimal Longitude { get; init; }
 }

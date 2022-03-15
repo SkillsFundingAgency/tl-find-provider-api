@@ -65,16 +65,15 @@ public class TownDataService : ITownDataService
             featureItems.AddRange(items);
         }
 
-        //Deduplicate
-        var towns = featureItems 
+        var towns = featureItems
             .Where(item => !string.IsNullOrEmpty(item.Name) &&
-                           !string.IsNullOrEmpty(item.County) &&
-                           !string.IsNullOrEmpty(item.LocalAuthorityName))
-                            //item.PlaceNameDescription != PlaceNameDescription.None).ToList()
+                           !string.IsNullOrEmpty(item.LocalAuthorityName) &&
+                           !string.IsNullOrEmpty(item.LocalAuthorityDistrict) &&
+                            item.PlaceNameDescription != "None")
             .GroupBy(c => new
             {
-                c.LocalAuthorityName, 
-                c.Name, 
+                c.LocalAuthorityName,
+                c.Name,
                 c.LocalAuthorityDistrict
             })
             .Select(item => item.First())
@@ -96,12 +95,12 @@ public class TownDataService : ITownDataService
 
         await _townRepository.Save(towns);
     }
-    
+
     public Uri GetUri(int offset, int recordSize) =>
         new($"{NationalOfficeOfStatisticsLocationUrl}&resultRecordCount={recordSize}&resultOffSet={offset}");
 
     private static async Task<(List<LocationApiItem>, bool)> ReadLocationApiDataResponse(
-            HttpResponseMessage responseMessage)
+        HttpResponseMessage responseMessage)
     {
         var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
         //var json = jsonDocument.PrettifyJson();
@@ -109,8 +108,8 @@ public class TownDataService : ITownDataService
         var root = jsonDocument.RootElement;
 
         var exceededTransferLimit = root
-            .TryGetProperty("exceededTransferLimit", out var property)
-                && property.GetBoolean();
+                                        .TryGetProperty("exceededTransferLimit", out var property)
+                                    && property.GetBoolean();
 
         var towns = new List<LocationApiItem>();
 
@@ -121,27 +120,22 @@ public class TownDataService : ITownDataService
             var attribute = attributeElement.GetProperty("attributes");
 
             // ReSharper disable once StringLiteralTypo
-            if (attribute.SafeGetString("descnm") != "None")
+            var town = new LocationApiItem
             {
-                var town = new LocationApiItem
-                {
-                    // ReSharper disable StringLiteralTypo
-                    Id = attribute.SafeGetInt32("placeid"),
-                    Name = attribute.SafeGetString("place15nm", Constants.LocationNameMaxLength),
-                    County = attribute.SafeGetString("cty15nm", Constants.CountyMaxLength),
-                    LocalAuthorityName = attribute.SafeGetString("ctyltnm", Constants.CountyMaxLength),
-                    LocalAuthorityDistrict = attribute.SafeGetString("lad15nm"),
-                    LocalAuthorityDistrictDescription = attribute.SafeGetString("laddescnm"),
-                    Latitude = attribute.SafeGetDecimal("lat"),
-                    Longitude = attribute.SafeGetDecimal("long")
-                    // ReSharper restore StringLiteralTypo
-                };
+                // ReSharper disable StringLiteralTypo
+                Id = attribute.SafeGetInt32("placeid"),
+                Name = attribute.SafeGetString("place15nm", Constants.LocationNameMaxLength),
+                County = attribute.SafeGetString("cty15nm", Constants.CountyMaxLength),
+                LocalAuthorityName = attribute.SafeGetString("ctyltnm", Constants.CountyMaxLength),
+                LocalAuthorityDistrict = attribute.SafeGetString("lad15nm"),
+                LocalAuthorityDistrictDescription = attribute.SafeGetString("laddescnm"),
+                PlaceNameDescription = attribute.SafeGetString("descnm"),
+                Latitude = attribute.SafeGetDecimal("lat"),
+                Longitude = attribute.SafeGetDecimal("long")
+                // ReSharper restore StringLiteralTypo
+            };
 
-                towns.Add(town);
-            }
-            else
-            {
-            }
+            towns.Add(town);
         }
 
         return (towns, exceededTransferLimit);
