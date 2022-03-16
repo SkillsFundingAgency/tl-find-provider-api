@@ -38,6 +38,30 @@ public class TownRepository : ITownRepository
         return result != 0;
     }
 
+    public async Task<IEnumerable<Town>> Search(string searchString,
+        int maxResults)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        var results = await _dbContextWrapper.QueryAsync<Town>(
+            connection,
+            "SELECT TOP (@maxResults) " +
+            "            [Name], " +
+            "            [County], " +
+            "            [LocalAuthorityName], " +
+            "            [Latitude], " +
+            "            [Longitude] " +
+            "FROM dbo.[Town] " +
+            "WHERE [Name] LIKE @query",
+            new
+            {
+                maxResults,
+                query = $"{searchString}%"
+            });
+
+        return results;
+    }
+
     public async Task Save(IEnumerable<Town> towns)
     {
         try
@@ -48,7 +72,6 @@ public class TownRepository : ITownRepository
                 .ExecuteAsync(async _ =>
                         await PerformSave(towns),
                     context);
-
         }
         catch (Exception ex)
         {

@@ -7,19 +7,16 @@ using Sfa.Tl.Find.Provider.Api.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
 
-public class FindProvidersControllerBuilder
+public class LocationsControllerBuilder
 {
-    public FindProvidersController Build(
-        IProviderDataService providerDataService = null,
+    public LocationsController Build(
         ITownDataService townDataService = null,
-        ILogger<FindProvidersController> logger = null)
+        ILogger<LocationsController> logger = null)
     {
-        providerDataService ??= Substitute.For<IProviderDataService>();
         townDataService ??= Substitute.For<ITownDataService>();
-        logger ??= Substitute.For<ILogger<FindProvidersController>>();
+        logger ??= Substitute.For<ILogger<LocationsController>>();
 
-        var controller = new FindProvidersController(
-            providerDataService, 
+        var controller = new LocationsController(
             townDataService, 
             logger)
         {

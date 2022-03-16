@@ -96,6 +96,11 @@ public class TownDataService : ITownDataService
         await _townRepository.Save(towns);
     }
 
+    public async Task<IEnumerable<Town>> Search(string searchString, int maxResults = Constants.TownSearchDefaultMaxResults)
+    {
+        return await _townRepository.Search(searchString, maxResults);
+    }
+
     public Uri GetUri(int offset, int recordSize) =>
         new($"{NationalOfficeOfStatisticsLocationUrl}&resultRecordCount={recordSize}&resultOffSet={offset}");
 

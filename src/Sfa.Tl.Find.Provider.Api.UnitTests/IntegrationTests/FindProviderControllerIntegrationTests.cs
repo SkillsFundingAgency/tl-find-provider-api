@@ -121,8 +121,7 @@ public class FindProviderControllerIntegrationTests : IClassFixture<TestServerFa
         searchResponse.Should().NotBeNull();
         searchResponse!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
     }
-
-
+    
     [Fact]
     public async Task GetProviders_Returns_Error_Message_Result_For_Postcode_Starting_With_Number()
     {

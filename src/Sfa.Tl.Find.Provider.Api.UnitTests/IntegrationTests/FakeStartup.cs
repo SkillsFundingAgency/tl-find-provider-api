@@ -103,7 +103,20 @@ public class FakeStartup
 
                 return providerDataService;
             })
+            .AddTransient(_ =>
+            {
+                var townDataService = Substitute.For<ITownDataService>();
+                townDataService.Search(
+                        Arg.Any<string>())
+                    .Returns(_ => 
+                        new TownBuilder()
+                        .BuildList());
+
+                return townDataService;
+            })
+
             .AddTransient(_ => Substitute.For<IProviderRepository>())
-            .AddTransient(_ => Substitute.For<IQualificationRepository>());
+            .AddTransient(_ => Substitute.For<IQualificationRepository>())
+            .AddTransient(_ => Substitute.For<ITownRepository>());
     }
 }

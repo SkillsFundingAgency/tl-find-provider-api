@@ -152,7 +152,60 @@ public class TownDataServiceTests
             51.674302M,
             -1.282302M);
     }
-    
+
+    [Fact]
+    public async Task Search_Calls_Repository()
+    {
+        const string searchString = "Coventry";
+
+        var towns = new TownBuilder()
+            .BuildList()
+            .ToList();
+
+        var townRepository = Substitute.For<ITownRepository>();
+        townRepository.Search(searchString, Constants.TownSearchDefaultMaxResults)
+            .Returns(towns);
+
+        var service = new TownDataServiceBuilder()
+            .Build(townRepository: townRepository);
+
+        var result = await service
+            .Search(searchString);
+
+        result.Should().BeEquivalentTo(towns);
+
+        await townRepository
+            .Received(1)
+            .Search(searchString, Constants.TownSearchDefaultMaxResults);
+    }
+
+    [Fact]
+    public async Task Search_Calls_Repository_With_Max_Results()
+    {
+        const string searchString = "Coventry";
+        const int maxResults = 10;
+
+        var towns = new TownBuilder()
+            .BuildList()
+            .ToList();
+
+        var townRepository = Substitute.For<ITownRepository>();
+        townRepository.Search(searchString, maxResults)
+            .Returns(towns);
+
+        var service = new TownDataServiceBuilder()
+            .Build(townRepository: townRepository);
+
+        var result = await service
+            .Search(searchString, maxResults);
+
+        result.Should().BeEquivalentTo(towns);
+
+        await townRepository
+            .Received(1)
+            .Search(searchString, maxResults);
+    }
+
     private static void ValidateTown(Town town, 
         int id, 
         string name, 
