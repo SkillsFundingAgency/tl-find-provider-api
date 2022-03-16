@@ -20,16 +20,13 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class FindProvidersController : ControllerBase
 {
     private readonly IProviderDataService _providerDataService;
-    private readonly ITownDataService _townDataService;
     private readonly ILogger<FindProvidersController> _logger;
 
     public FindProvidersController(
         IProviderDataService providerDataService,
-        ITownDataService townDataService,
         ILogger<FindProvidersController> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -194,22 +191,6 @@ public class FindProvidersController : ControllerBase
         return routes != null
             ? Ok(routes)
             : NotFound();
-    }
-
-    /// <summary>
-    /// Search for locations by partial name.
-    /// </summary>
-    /// <param name="searchString">Search string.</param>
-    /// <returns>A list of results.</returns>
-    [HttpGet]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
-    [Route("locations", Name = "GetLocations")]
-    [ProducesResponseType(typeof(IEnumerable<Town>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchLocations(string searchString)
-    {
-        var towns = await _townDataService.Search(searchString);
-        return Ok(towns);
     }
 
     private static bool TryValidate(string postcode, out string errorMessage)

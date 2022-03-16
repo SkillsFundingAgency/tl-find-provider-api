@@ -462,7 +462,7 @@ public class FindProvidersControllerTests
         var controller = new FindProvidersControllerBuilder()
             .Build(providerDataService);
 
-        var result = 
+        var result =
         await controller.GetProvidersV2(TestPostcode, TestLatitude, TestLongitude, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
 
         var okResult = result as OkObjectResult;
@@ -560,30 +560,5 @@ public class FindProvidersControllerTests
 
         results.Single().Id.Should().Be(routes.Single().Id);
         results.Single().Name.Should().Be(routes.Single().Name);
-    }
-    
-    [Fact]
-    public async Task SearchTowns_Returns_Expected_List()
-    {
-        const string searchString = "Coventry";
-        var towns = new TownBuilder()
-            .BuildList()
-            .ToList();
-
-        var townDataService = Substitute.For<ITownDataService>();
-        townDataService.Search(searchString)
-            .Returns(towns);
-
-        var controller = new FindProvidersControllerBuilder()
-            .Build(townDataService: townDataService);
-
-        var result = await controller.SearchLocations(searchString);
-
-        var okResult = result as OkObjectResult;
-        okResult.Should().NotBeNull();
-        okResult!.StatusCode.Should().Be(200);
-
-        var results = okResult.Value as IEnumerable<Town>;
-        results.Should().NotBeNullOrEmpty();
     }
 }
