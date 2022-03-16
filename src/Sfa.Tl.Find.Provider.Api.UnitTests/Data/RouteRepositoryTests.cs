@@ -33,10 +33,18 @@ public class RouteRepositoryTests
             .QueryAsync<Route>(dbConnection, Arg.Any<string>())
             .Returns(routes);
 
+        const string expectedSqlFragment =
+            "SELECT r.Id, r.Name, COUNT(q.Id) AS NumberOfQualifications FROM dbo.Route r";
+
         var repository = new RouteRepositoryBuilder().Build(dbContextWrapper);
 
         var results = (await repository.GetAll()).ToList();
-        results.Should().NotBeNullOrEmpty();
-        results.Count.Should().Be(routes.Count);
+        results.Should().BeEquivalentTo(routes);
+
+        await dbContextWrapper
+            .Received(1)
+            .QueryAsync<Route>(dbConnection,
+                Arg.Is<string>(sql => 
+                    sql.Contains(expectedSqlFragment)));
     }
 }
