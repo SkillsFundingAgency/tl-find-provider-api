@@ -16,7 +16,6 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class LocationsController : ControllerBase
 {
     private readonly ITownDataService _townDataService;
-    // ReSharper disable once NotAccessedField.Local
     private readonly ILogger<LocationsController> _logger;
 
     public LocationsController(
@@ -37,6 +36,11 @@ public class LocationsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<Town>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Search(string searchString)
     {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(LocationsController)} {nameof(Search)} called.");
+        }
+
         var towns = await _townDataService.Search(searchString);
         return Ok(towns);
     }
