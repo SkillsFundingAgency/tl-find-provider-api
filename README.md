@@ -87,18 +87,39 @@ When running locally, assuming localhost with port 55961, you can either use the
 > - https://localhost:55961/swagger/v1/swagger.json
 >   - This can be saved into `\api-definitions\findaproviderapi.json`
 > 
-> **Routes** *(Skill Areas)*
-> - https://localhost:55961/api/v1/findproviders/routes
+> **V1 API Calls** *(Obsolete)*
 > 
-> **Qualifications**
-> - https://localhost:55961/api/v1/findproviders/qualifications
+>> **Routes** *(Skill Areas)*
+>> - https://localhost:55961/api/v1/findproviders/routes
+>> 
+>> **Qualifications**
+>> - https://localhost:55961/api/v1/findproviders/qualifications
+>> 
+>> **Provider search**
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&routeId=6
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=3
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
+>
+> **V2 API Calls**
 > 
-> **Provider search**
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&routeId=6
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=3
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
+>> **Routes** *(Skill Areas)*
+>> - https://localhost:55961/api/v2/routes
+>>  
+>> **Qualifications**
+>> - https://localhost:55961/api/v2/qualifications
+>> 
+>> **Provider search**
+>> 
+>> *Note the use of searchTerm instead of postcode*
+>> - https://localhost:55961/api/v2/providers?lat=51.742141&lon=-1.295653
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&routeId=6
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37&page=3
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37&page=0&pageSize=10
+
 
 For provider search, the postcode at the end of the url is required. 
 The `qualificationId` and `routeId` filters are optional and defaults to null or 0; 

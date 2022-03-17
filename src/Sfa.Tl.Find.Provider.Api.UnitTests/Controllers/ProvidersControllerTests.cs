@@ -248,7 +248,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field is required.");
+        results!.Error.Should().Be("Either postcode or both lat/long required.");
     }
 
     [Fact]
@@ -266,8 +266,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field is required.");
-//        Expected results!.Error to be "The postcode field is required." with a length of 31, but "Either postcode or both lat/long required." has a length of 42, differs near "Eit"(index 0).
+        results!.Error.Should().Be("Either postcode or both lat/long required.");
     }
 
     [Fact]

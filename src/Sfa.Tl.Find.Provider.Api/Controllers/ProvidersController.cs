@@ -34,7 +34,7 @@ public class ProvidersController : ControllerBase
     /// <summary>
     /// Search for providers.
     /// </summary>
-    /// <param name="postcode">Postcode that the search should start from.</param>
+    /// <param name="searchTerm">Postcode that the search should start from.</param>
     /// <param name="latitude">Latitude that the search should start from.</param>
     /// <param name="longitude">Longitude that the search should start from.</param>
     /// <param name="qualificationIds">Qualification ids to filter by. Optional, nulls or zeroes will be ignored.</param>
@@ -48,7 +48,7 @@ public class ProvidersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProviders(
         [FromQuery]
-        string postcode = null,
+        string searchTerm = null,
         [FromQuery(Name = "lat")]
         double? latitude = null,
         [FromQuery(Name = "lon")]
@@ -66,7 +66,7 @@ public class ProvidersController : ControllerBase
     {
         try
         {
-            if (!TryValidate(postcode, latitude, longitude, out var validationMessage))
+            if (!TryValidate(searchTerm, latitude, longitude, out var validationMessage))
             {
                 return Ok(new ProviderSearchResponse
                 {
@@ -75,7 +75,7 @@ public class ProvidersController : ControllerBase
             }
 
             var providersSearchResponse =
-                postcode.IsNullOrWhiteSpace()
+                searchTerm.IsNullOrWhiteSpace()
                     ? await _providerDataService.FindProviders(
                         latitude!.Value,
                         longitude!.Value,
@@ -84,7 +84,7 @@ public class ProvidersController : ControllerBase
                         page,
                         pageSize)
                     : await _providerDataService.FindProviders(
-                        postcode,
+                        searchTerm,
                         routeIds,
                         qualificationIds,
                         page,
