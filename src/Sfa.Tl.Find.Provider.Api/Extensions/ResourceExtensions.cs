@@ -6,10 +6,10 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
 public static class ResourceExtensions
 {
-    public static string BuildJsonFromResourceStream(this Type type, string assetName) =>
-        type
-            .ReadManifestResourceStreamAsString(
-                $"Assets.{assetName}.json");
+    public static string BuildJsonFromResourceStream(this Type type, string assetFolderPath, string assetName) =>
+    type
+    .ReadManifestResourceStreamAsString(
+        $"{assetFolderPath}.{assetName}.json");
 
     public static string ReadManifestResourceStreamAsString(this Type type, string resourcePath)
     {
