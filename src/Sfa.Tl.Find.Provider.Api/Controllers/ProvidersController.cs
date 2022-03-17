@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Quartz.Util;
 using Sfa.Tl.Find.Provider.Api.Attributes;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 
@@ -15,8 +15,8 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
 [HmacAuthorization]
+[Route("api/v{version:apiVersion}/[controller]")]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class ProvidersController : ControllerBase
 {
@@ -66,7 +66,7 @@ public class ProvidersController : ControllerBase
     {
         try
         {
-            if (!TryValidate(searchTerm, latitude, longitude, out var validationMessage))
+            if (!searchTerm.TryValidate(latitude, longitude, out var validationMessage))
             {
                 return Ok(new ProviderSearchResponse
                 {
@@ -97,61 +97,5 @@ public class ProvidersController : ControllerBase
             _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
-    }
-    
-    private static bool TryValidate(string postcode, out string errorMessage)
-    {
-        errorMessage = null;
-
-        if (string.IsNullOrWhiteSpace(postcode))
-        {
-            errorMessage = "The postcode field is required.";
-        }
-        else
-        {
-            errorMessage = postcode.Length switch
-            {
-                < 2 => "The postcode field must be at least 2 characters.",
-                > 8 => "The postcode field must be no more than 8 characters.",
-                _ => errorMessage
-            };
-
-            var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z\s]*$");
-            if (!regex.IsMatch(postcode))
-                errorMessage = "The postcode field must start with a letter and contain only letters, numbers, and an optional space.";
-        }
-
-        return errorMessage is null;
-    }
-
-    private static bool TryValidate(
-        string postcode,
-        double? latitude,
-        double? longitude,
-        out string errorMessage)
-    {
-        errorMessage = null;
-
-        if (string.IsNullOrWhiteSpace(postcode) && !(latitude.HasValue && longitude.HasValue))
-        {
-            errorMessage = "Either postcode or both lat/long required.";
-        }
-        else if (!string.IsNullOrWhiteSpace(postcode) && (latitude.HasValue || longitude.HasValue))
-        {
-            errorMessage = "Either postcode or lat/long required, but not both.";
-        }
-        else if (string.IsNullOrWhiteSpace(postcode))
-        {
-            if (!latitude.HasValue || !longitude.HasValue)
-            {
-                errorMessage = "Both latitude or long required if postcode is not provided.";
-            }
-        }
-        else
-        {
-            TryValidate(postcode, out errorMessage);
-        }
-
-        return errorMessage is null;
     }
 }

@@ -19,8 +19,6 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 public class FindProvidersControllerTests
 {
     private const string TestPostcode = "CV1 2WT";
-    private const double TestLatitude = 52.400997;
-    private const double TestLongitude = -1.508122;
     private const string InvalidPostcode = "CV99 XXX";
     private const string PostcodeWithInitialNonLetter = "1V1 2WT";
     private const string PostcodeWithIllegalCharacters = "CV99 XX$";

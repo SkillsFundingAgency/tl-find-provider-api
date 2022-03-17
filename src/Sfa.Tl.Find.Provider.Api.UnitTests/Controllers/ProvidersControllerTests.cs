@@ -241,7 +241,7 @@ public class ProvidersControllerTests
         var controller = new ProvidersControllerBuilder()
             .Build(providerDataService);
 
-        var result = await controller.GetProviders(null);
+        var result = await controller.GetProviders();
 
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();

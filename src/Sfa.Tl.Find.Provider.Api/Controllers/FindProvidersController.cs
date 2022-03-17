@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Api.Attributes;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 
@@ -14,6 +14,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
+[HmacAuthorization]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class FindProvidersController : ControllerBase
@@ -58,7 +59,7 @@ public class FindProvidersController : ControllerBase
     {
         try
         {
-            if (!TryValidate(postcode, out var validationMessage))
+            if (!postcode.TryValidate(out var validationMessage))
             {
                 return Ok(new ProviderSearchResponse
                 {
@@ -112,30 +113,5 @@ public class FindProvidersController : ControllerBase
         return routes != null
             ? Ok(routes)
             : NotFound();
-    }
-
-    private static bool TryValidate(string postcode, out string errorMessage)
-    {
-        errorMessage = null;
-
-        if (string.IsNullOrWhiteSpace(postcode))
-        {
-            errorMessage = "The postcode field is required.";
-        }
-        else
-        {
-            errorMessage = postcode.Length switch
-            {
-                < 2 => "The postcode field must be at least 2 characters.",
-                > 8 => "The postcode field must be no more than 8 characters.",
-                _ => errorMessage
-            };
-
-            var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z\s]*$");
-            if (!regex.IsMatch(postcode))
-                errorMessage = "The postcode field must start with a letter and contain only letters, numbers, and an optional space.";
-        }
-
-        return errorMessage is null;
     }
 }
