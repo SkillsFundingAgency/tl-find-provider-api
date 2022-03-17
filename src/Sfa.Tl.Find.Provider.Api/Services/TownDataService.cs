@@ -96,9 +96,9 @@ public class TownDataService : ITownDataService
         await _townRepository.Save(towns);
     }
 
-    public async Task<IEnumerable<Town>> Search(string searchString, int maxResults = Constants.TownSearchDefaultMaxResults)
+    public async Task<IEnumerable<Town>> Search(string searchTerm, int maxResults = Constants.TownSearchDefaultMaxResults)
     {
-        return await _townRepository.Search(searchString, maxResults);
+        return await _townRepository.Search(searchTerm, maxResults);
     }
 
     public Uri GetUri(int offset, int recordSize) =>

@@ -32,19 +32,19 @@ public class LocationsControllerTests
     [Fact]
     public async Task SearchTowns_Returns_Expected_List()
     {
-        const string searchString = "Coventry";
+        const string searchTerm = "Coventry";
         var towns = new TownBuilder()
             .BuildList()
             .ToList();
 
         var townDataService = Substitute.For<ITownDataService>();
-        townDataService.Search(searchString)
+        townDataService.Search(searchTerm)
             .Returns(towns);
 
         var controller = new LocationsControllerBuilder()
             .Build(townDataService);
 
-        var result = await controller.Search(searchString);
+        var result = await controller.Search(searchTerm);
 
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();

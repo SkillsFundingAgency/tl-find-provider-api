@@ -156,33 +156,33 @@ public class TownDataServiceTests
     [Fact]
     public async Task Search_Calls_Repository()
     {
-        const string searchString = "Coventry";
+        const string searchTerm = "Coventry";
 
         var towns = new TownBuilder()
             .BuildList()
             .ToList();
 
         var townRepository = Substitute.For<ITownRepository>();
-        townRepository.Search(searchString, Constants.TownSearchDefaultMaxResults)
+        townRepository.Search(searchTerm, Constants.TownSearchDefaultMaxResults)
             .Returns(towns);
 
         var service = new TownDataServiceBuilder()
             .Build(townRepository: townRepository);
 
         var result = await service
-            .Search(searchString);
+            .Search(searchTerm);
 
         result.Should().BeEquivalentTo(towns);
 
         await townRepository
             .Received(1)
-            .Search(searchString, Constants.TownSearchDefaultMaxResults);
+            .Search(searchTerm, Constants.TownSearchDefaultMaxResults);
     }
 
     [Fact]
     public async Task Search_Calls_Repository_With_Max_Results()
     {
-        const string searchString = "Coventry";
+        const string searchTerm = "Coventry";
         const int maxResults = 10;
 
         var towns = new TownBuilder()
@@ -190,20 +190,20 @@ public class TownDataServiceTests
             .ToList();
 
         var townRepository = Substitute.For<ITownRepository>();
-        townRepository.Search(searchString, maxResults)
+        townRepository.Search(searchTerm, maxResults)
             .Returns(towns);
 
         var service = new TownDataServiceBuilder()
             .Build(townRepository: townRepository);
 
         var result = await service
-            .Search(searchString, maxResults);
+            .Search(searchTerm, maxResults);
 
         result.Should().BeEquivalentTo(towns);
 
         await townRepository
             .Received(1)
-            .Search(searchString, maxResults);
+            .Search(searchTerm, maxResults);
     }
 
     private static void ValidateTown(Town town, 

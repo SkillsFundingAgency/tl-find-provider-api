@@ -146,7 +146,7 @@ public class TownRepositoryTests
     [Fact]
     public async Task Search_Returns_Expected_Results()
     {
-        const string searchString = "Coventry";
+        const string searchTerm = "Coventry";
         const int maxResults = 10;
 
         var towns = new TownBuilder()
@@ -162,7 +162,7 @@ public class TownRepositoryTests
 
         var repository = new TownRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.Search(searchString, maxResults)).ToList();
+        var results = (await repository.Search(searchTerm, maxResults)).ToList();
         results.Should().BeEquivalentTo(towns);
         await dbContextWrapper
             .Received(1)

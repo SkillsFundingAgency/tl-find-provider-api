@@ -38,7 +38,7 @@ public class TownRepository : ITownRepository
         return result != 0;
     }
 
-    public async Task<IEnumerable<Town>> Search(string searchString,
+    public async Task<IEnumerable<Town>> Search(string searchTerm,
         int maxResults)
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -56,7 +56,7 @@ public class TownRepository : ITownRepository
             new
             {
                 maxResults,
-                query = $"{searchString}%"
+                query = $"{searchTerm}%"
             });
 
         return results;

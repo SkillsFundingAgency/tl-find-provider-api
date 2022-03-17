@@ -29,19 +29,19 @@ public class LocationsController : ControllerBase
     /// <summary>
     /// Search for locations by partial name.
     /// </summary>
-    /// <param name="searchString">Search string.</param>
+    /// <param name="searchTerm">Search string.</param>
     /// <returns>A list of results.</returns>
     [HttpGet]
     [Route("search", Name = "SearchLocations")]
     [ProducesResponseType(typeof(IEnumerable<Town>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(string searchString)
+    public async Task<IActionResult> Search(string searchTerm)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug($"{nameof(LocationsController)} {nameof(Search)} called.");
         }
 
-        var towns = await _townDataService.Search(searchString);
+        var towns = await _townDataService.Search(searchTerm);
         return Ok(towns);
     }
 }
