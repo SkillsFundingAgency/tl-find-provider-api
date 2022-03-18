@@ -42,7 +42,7 @@ AS
 	SELECT	r.[Id], 
 			r.[Name], 
 			COUNT(cte.[RouteId]) AS [NumberOfQualifications],
-			COALESCE(SUM(cte.[QualificationCount]), 0) AS [NumberOfOfferedQualifications]
+			COALESCE(SUM(cte.[QualificationCount]), 0) AS [NumberOfQualificationsOffered]
 	FROM [Route] r
 	LEFT JOIN RouteQualificationsCTE cte
 	ON r.Id = cte.[RouteId]
