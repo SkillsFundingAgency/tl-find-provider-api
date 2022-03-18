@@ -306,23 +306,23 @@ public class ProvidersControllerTests
         results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
     }
 
-    [Fact]
-    public async Task GetProviders_Validates_Postcode_Maximum_Length()
-    {
-        var providerDataService = Substitute.For<IProviderDataService>();
+    //[Fact]
+    //public async Task GetProviders_Validates_Postcode_Maximum_Length()
+    //{
+    //    var providerDataService = Substitute.For<IProviderDataService>();
 
-        var controller = new ProvidersControllerBuilder()
-            .Build(providerDataService);
+    //    var controller = new ProvidersControllerBuilder()
+    //        .Build(providerDataService);
 
-        var result = await controller.GetProviders(PostcodeWithTooManyCharacters);
+    //    var result = await controller.GetProviders(PostcodeWithTooManyCharacters);
 
-        var okResult = result as OkObjectResult;
-        okResult.Should().NotBeNull();
-        okResult!.StatusCode.Should().Be(200);
+    //    var okResult = result as OkObjectResult;
+    //    okResult.Should().NotBeNull();
+    //    okResult!.StatusCode.Should().Be(200);
 
-        var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must be no more than 8 characters.");
-    }
+    //    var results = okResult.Value as ProviderSearchResponse;
+    //    results!.Error.Should().Be("The postcode field must be no more than 8 characters.");
+    //}
 
     [Fact]
     public async Task GetProviders_Validates_Postcode_Minimum_Length()
@@ -416,8 +416,13 @@ public class ProvidersControllerTests
         var controller = new ProvidersControllerBuilder()
             .Build(providerDataService);
 
-        var result =
-        await controller.GetProviders(TestPostcode, TestLatitude, TestLongitude, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
+        var result = await controller.GetProviders(
+            TestPostcode, 
+            TestLatitude, TestLongitude, 
+            _testRouteIds, 
+            _testQualificationIds, 
+            TestPage, 
+            TestPageSize);
 
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();

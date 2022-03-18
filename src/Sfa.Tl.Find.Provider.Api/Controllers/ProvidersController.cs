@@ -66,6 +66,27 @@ public class ProvidersController : ControllerBase
     {
         try
         {
+            //initial check - does this look like a postcode?
+            //Approach will be - validate here for basic things - if no postcode then need lat/long etc
+            //Pass to service, where it can do the IsPostcode check
+            //If it's not a postcode, search for town to get lat/long then get search results,
+            //otherwise there will need to be an error response back to client
+            if (!string.IsNullOrWhiteSpace(searchTerm) &&
+                !searchTerm.IsFullOrPartialPostcode() &&
+                latitude is null &&
+                longitude is null)
+            {
+                var searchResponse =
+                    await _providerDataService.FindProviders(
+                        searchTerm,
+                        routeIds,
+                        qualificationIds,
+                        page,
+                        pageSize);
+                
+                return Ok(searchResponse);
+            }
+
             if (!searchTerm.TryValidate(latitude, longitude, out var validationMessage))
             {
                 return Ok(new ProviderSearchResponse

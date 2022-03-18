@@ -8,9 +8,43 @@ namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
 public static class StringExtensions
 {
+    // adapted from http://stackoverflow.com/a/164994/1882637
+    private const string PostcodeRegex =
+            @"(GIR 0AA)|((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX‌​]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY]))))\s?[0-9][A-Z-[C‌​IKMOV]]{2})(\w)*$"
+        ;
+
+    private const string PartialPostcodeRegex =
+            @"((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))))$"
+        ;
+
     public static string FormatPostcodeForUri(this string postcode)
     {
         return Uri.EscapeDataString(postcode.Trim().ToUpper());
+    }
+
+    public static bool IsPostcode(this string postcode)
+    {
+        return CheckPostcode(postcode, PostcodeRegex);
+    }
+
+    public static bool IsPartialPostcode(this string postcode)
+    {
+        return CheckPostcode(postcode, PartialPostcodeRegex);
+    }
+
+    public static bool IsFullOrPartialPostcode(this string postcode)
+    {
+        return postcode.IsPostcode() || postcode.IsPartialPostcode();
+    }
+
+    private static bool CheckPostcode(string postcode, string regex)
+    {
+        if (string.IsNullOrWhiteSpace(postcode))
+            return false;
+
+        var formattedPostcode = postcode.Trim().ToUpperInvariant();
+
+        return Regex.IsMatch(formattedPostcode, regex);
     }
 
     public static string ParseTLevelDefinitionName(this string fullName, int maxLength = -1)

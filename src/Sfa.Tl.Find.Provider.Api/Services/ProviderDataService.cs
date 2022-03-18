@@ -17,6 +17,7 @@ namespace Sfa.Tl.Find.Provider.Api.Services;
 public class ProviderDataService : IProviderDataService
 {
     private readonly IDateTimeService _dateTimeService;
+    private readonly ITownDataService _townDataService;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IProviderRepository _providerRepository;
     private readonly IQualificationRepository _qualificationRepository;
@@ -31,6 +32,7 @@ public class ProviderDataService : IProviderDataService
         IProviderRepository providerRepository,
         IQualificationRepository qualificationRepository,
         IRouteRepository routeRepository,
+        ITownDataService townDataService,
         IMemoryCache cache,
         IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
@@ -40,6 +42,7 @@ public class ProviderDataService : IProviderDataService
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
+        _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -88,7 +91,7 @@ public class ProviderDataService : IProviderDataService
     }
 
     public async Task<ProviderSearchResponse> FindProviders(
-        string postcode,
+        string searchTerm,
         IList<int> routeIds = null,
         IList<int> qualificationIds = null,
         int page = 0,
@@ -98,17 +101,55 @@ public class ProviderDataService : IProviderDataService
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Searching for postcode {postcode}", postcode);
+                _logger.LogDebug("Searching for postcode or town '{searchTerm}'", searchTerm);
             }
 
-            var postcodeLocation = await GetPostcode(postcode);
+            PostcodeLocation postcodeLocation = null;
+
+            if (searchTerm.IsFullOrPartialPostcode())
+            {
+                postcodeLocation = await GetPostcode(searchTerm);
+            }
+            else
+            {
+                var towns = await _townDataService.Search(searchTerm);
+                var town = towns.FirstOrDefault();
+                if (town != null)
+                {
+                    var latitude = Convert.ToDouble(town.Latitude);
+                    var longitude = Convert.ToDouble(town.Longitude);
+
+                    //TODO: Add a search by lat/long method and proc, rather than this hack
+                    //postcodeLocation = await GetNearestPostcode(
+                    //    Convert.ToDouble(town.Latitude), 
+                    //    Convert.ToDouble(town.Longitude));
+
+                    //TODO: Need a FormatTown extension - 
+                    var townName = town.Name;
+                    if (town.County != null)
+                        townName += $", {town.County}";
+                    
+                    postcodeLocation = new PostcodeLocation
+                    {
+                        Postcode = townName,
+                        Latitude = latitude,
+                        Longitude = longitude
+                    };
+                }
+
+                if (postcodeLocation == null)
+                {
+                    throw new PostcodeNotFoundException(searchTerm);
+                }
+            }
+
 
             var searchResults = await _providerRepository
-                .Search(postcodeLocation, 
-                        routeIds, 
-                        qualificationIds, 
-                        page, 
-                        pageSize, 
+                .Search(postcodeLocation,
+                        routeIds,
+                        qualificationIds,
+                        page,
+                        pageSize,
                         _mergeAdditionalProviderData);
 
             return new ProviderSearchResponse
@@ -217,7 +258,7 @@ public class ProviderDataService : IProviderDataService
                     _dateTimeService,
                     _logger));
         }
-        
+
         return postcodeLocation;
     }
 

@@ -62,6 +62,7 @@ public class PostcodeLookupService : IPostcodeLookupService
         string postcodeFieldName = "postcode")
     {
         var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+        //var json = jsonDocument.PrettifyJson();
 
         var resultElement = jsonDocument
             .RootElement
