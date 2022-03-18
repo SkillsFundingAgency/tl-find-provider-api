@@ -51,7 +51,6 @@
                                 <div class="tl-geolocator">
                                     or <span id="tl-search-current-location">use current location</span>
                                 </div>
-
                             </div>
 
                             <div class="govuk-grid-column-one-half">
@@ -61,35 +60,6 @@
                                     </h2>
                                     <div class="govuk-form-group govuk-!-margin-bottom-4 tl-pane-expandable__content" style="background-color: white; padding: 10px">
                                         <div class="govuk-checkboxes govuk-checkboxes--small" id="tl-skill-area-filter">
-                                            <div class="govuk-checkboxes__item">
-                                                <input type="checkbox"
-                                                       class="govuk-checkboxes__input"
-                                                       id="vehicle1"
-                                                       name="vehicle1"
-                                                       value="Bike">
-                                                <label class="govuk-body-s govuk-checkboxes__label"
-                                                       for="vehicle1"> I have a bike</label><br>
-                                            </div>
-
-                                            <div class="govuk-checkboxes__item">
-                                                <input type="checkbox"
-                                                       class="govuk-checkboxes__input"
-                                                       id="vehicle2"
-                                                       name="vehicle2"
-                                                       value="Car">
-                                                <label class="govuk-body-s govuk-checkboxes__label"
-                                                       for="vehicle2"> I have a car</label><br>
-                                            </div>
-
-                                            <div class="govuk-checkboxes__item">
-                                                <input type="checkbox"
-                                                       class="govuk-checkboxes__input"
-                                                       id="vehicle3"
-                                                       name="vehicle3"
-                                                       value="Boat">
-                                                <label class="govuk-body-s govuk-checkboxes__label"
-                                                       for="vehicle3"> I have a boat</label><br>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -134,15 +104,15 @@
     <input type="hidden" id="qualification_article_map" value=@Model.QualificationArticleMap>
     <input type="hidden" id="article_base_url" value=@Model.ArticleBaseUrl>
 </div>
-@section Scripts {
 
-<script type="text/javascript">
+@section Scripts {
+    <script src="~/js/locationAutocomplete.js"></script>
+
+    <script type="text/javascript">
 
     //https://stackoverflow.com/questions/51005488/how-to-use-cryptojs-in-javascript
 
     $(document).ready(function() {
-        console.log("document.ready");
-
         let findProvidersApiUrl = $('#searchApiUrlValue').val();
         if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
         const findProvidersApiV2Url = findProvidersApiUrl.replace("/v1/", "/v2/");
@@ -191,20 +161,23 @@
 
         $("#tl-search-locations").click(function() {
             const searchTerm = $("#tl-town").val().trim();
-
+            const uri = findProvidersApiUrl + "locations/search?searchstring=" + encodeURIComponent(searchTerm);
+            console.log("search uri is " + uri);
             $.ajax({
                 type: "GET",
-                url: "api/locations/search?term=" + encodeURIComponent(searchTerm)
+                //https://dev.api.findatlevelprovider.education.gov.uk/api/v2/locations/search?searchString=cov
+                url: uri
             }).done(function(response) {
                 console.log(response);
                 if(response.length) {
-                    const lat = response[0].lat,
-                        lon = response[0].long,
+                    console.log(response);
+                    const lat = response[0].latitude,
+                        lon = response[0].longitude,
                         postcodeUrl = "https://api.postcodes.io/postcodes?lon=" + lon + "&lat=" + lat + "&wideSearch=true";
 
-                    console.log("town: " + response[0].locationName);
+                    console.log("town: " + response[0].name);//.locationName);
                     console.log("county: " + response[0].county);
-                    console.log(`lat/lon: (${lat}, ${lon})`);
+                    console.log(`lat/lon: (${response[0].latitude}, ${response[0].longitude})`);
 
                     //Load closest postcode from postcodes.io - do we need this?
                     $.get(postcodeUrl)
@@ -271,17 +244,13 @@
         }
 
         function populateRoutes(data) {
-            const select = $("#tl-routes");
-            select.find("option:not(:first)").remove();
-
             const skillAreasList = $("#tl-skill-area-filter");
             skillAreasList.empty();
 
             $.each(data,
                 function(_, item) {
-                    select.append(new Option(item.name, item.id));
-
-                    const checkboxItemContainer =
+                    if (item.numberOfQualificationsOffered) {
+                        skillAreasList.append(
                         $(document.createElement('div')).prop({
                             class: 'govuk-checkboxes__item'
                         }).append(
@@ -295,11 +264,12 @@
                             $(document.createElement('label')).prop({
                                     for: 'tl_skill_area_' + item.id,
                                     class: 'govuk-body-s govuk-checkboxes__label'})
-                                .html(item.name)
-                            );
-                    skillAreasList.append(checkboxItemContainer);
+                                .html(item.name + " (" + item.numberOfQualifications + "/" + item.numberOfQualificationsOffered + ")")
+                            ));
+                    //skillAreasList.append(checkboxItemContainer);
+                    }
             });
-        }
+    }
 
         function providerSearch(postcode, skillAreaIds, page) {
             //$("#tl-search-providers").disabled = true;
@@ -348,7 +318,7 @@
 
             const appId = $('#find_provider_api_app_id').val();
             const apiKey = $('#find_provider_api_key').val();
-            let uri = findProvidersApiUrl + "providers?postcode=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
+            let uri = findProvidersApiUrl + "providers?searchTerm=" + encodeURIComponent(postcode) + '&page=' + page + '&pageSize=' + pageSize;
 
             if (skillAreaIds && skillAreaIds.length > 0) {
                 skillAreaIds.forEach(function(skillAreaId) {
