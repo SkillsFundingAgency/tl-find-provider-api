@@ -250,7 +250,13 @@ public class ProviderRepositoryTests
         var repository = await BuildRepositoryWithDataToSearchProviders();
 
         var searchResults = await repository
-            .Search(fromPostcodeLocation, null, null, 0, 5, true);
+            .Search(
+                fromPostcodeLocation,
+                null,
+                null, 
+                0, 
+                5, 
+                true);
 
         var searchResultsList = searchResults?.ToList();
         searchResultsList.Should().NotBeNull();

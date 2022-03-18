@@ -141,7 +141,7 @@ public class ProviderRepository : IProviderRepository
         IList<int> qualificationIds,
         int page,
         int pageSize,
-        bool mergeAdditionalData)
+        bool includeAdditionalData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -188,7 +188,7 @@ public class ProviderRepository : IProviderRepository
                     qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
                     page,
                     pageSize,
-                    mergeAdditionalData
+                    includeAdditionalData
                 },
                 splitOn: "UkPrn, Postcode, Year, Id",
                 commandType: CommandType.StoredProcedure);

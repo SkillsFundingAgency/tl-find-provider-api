@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
@@ -32,21 +33,26 @@ public class RouteRepositoryTests
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .QueryAsync<Route>(dbConnection, Arg.Any<string>())
+            .QueryAsync<Route>(dbConnection, 
+                "GetRoutes",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
             .Returns(routes);
-
-        const string expectedSqlFragment =
-            "SELECT r.Id, r.Name, COUNT(q.Id) AS NumberOfQualifications FROM dbo.Route r";
 
         var repository = new RouteRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetAll()).ToList();
+        var results = (await repository
+            .GetAll(true))
+            .ToList();
+
         results.Should().BeEquivalentTo(routes);
 
         await dbContextWrapper
             .Received(1)
             .QueryAsync<Route>(dbConnection,
-                Arg.Is<string>(sql => 
-                    sql.Contains(expectedSqlFragment)));
+                "GetRoutes",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure
+                );
     }
 }

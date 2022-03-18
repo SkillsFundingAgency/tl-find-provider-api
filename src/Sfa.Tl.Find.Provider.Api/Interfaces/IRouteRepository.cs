@@ -6,5 +6,5 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces;
 
 public interface IRouteRepository
 {
-    Task<IEnumerable<Route>> GetAll();
+    Task<IEnumerable<Route>> GetAll(bool includeAdditionalData);
 }

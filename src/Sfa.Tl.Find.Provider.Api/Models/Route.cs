@@ -10,4 +10,5 @@ public class Route
     public int Id { get; init; }
     public string Name { get; init; }
     public int NumberOfQualifications { get; init; }
+    public int NumberOfOfferedQualifications { get; init; }
 }

@@ -97,7 +97,7 @@ public class ProviderDataServiceTests
             .ToList();
 
         var routeRepository = Substitute.For<IRouteRepository>();
-        routeRepository.GetAll()
+        routeRepository.GetAll(true)
             .Returns(routes);
 
         var service = new ProviderDataServiceBuilder()
@@ -108,7 +108,7 @@ public class ProviderDataServiceTests
 
         await routeRepository
             .Received(1)
-            .GetAll();
+            .GetAll(true);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class ProviderDataServiceTests
 
         await routeRepository
             .DidNotReceive()
-            .GetAll();
+            .GetAll(true);
     }
 
     [Fact]

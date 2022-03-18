@@ -16,5 +16,5 @@ public interface IProviderRepository
         IList<int> qualificationIds,
         int page,
         int pageSize,
-        bool mergeAdditionalData);
+        bool includeAdditionalData);
 }

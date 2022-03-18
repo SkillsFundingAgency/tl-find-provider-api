@@ -57,7 +57,9 @@ public class ProviderDataService : IProviderDataService
         const string key = CacheKeys.QualificationsKey;
         if (!_cache.TryGetValue(key, out IList<Qualification> qualifications))
         {
-            qualifications = (await _qualificationRepository.GetAll()).ToList();
+            qualifications = (await _qualificationRepository
+                .GetAll())
+                .ToList();
             _cache.Set(key, qualifications,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
         }
@@ -75,7 +77,9 @@ public class ProviderDataService : IProviderDataService
         const string key = CacheKeys.RoutesKey;
         if (!_cache.TryGetValue(key, out IList<Route> routes))
         {
-            routes = (await _routeRepository.GetAll()).ToList();
+            routes = (await _routeRepository
+                .GetAll(_mergeAdditionalProviderData))
+                .ToList();
             _cache.Set(key, routes,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
         }
