@@ -62,30 +62,37 @@ public class PostcodeLookupService : IPostcodeLookupService
         string postcodeFieldName = "postcode")
     {
         var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
-        //var json = jsonDocument.PrettifyJson();
 
         var resultElement = jsonDocument
             .RootElement
             .GetProperty("result");
 
-        if (resultElement.ValueKind is JsonValueKind.Array)
+        switch (resultElement.ValueKind)
         {
-            var firstItem = resultElement.EnumerateArray().FirstOrDefault();
+            case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
+                return null;
+            case JsonValueKind.Array:
             {
+                var firstItem = resultElement.EnumerateArray().FirstOrDefault();
+                {
+                    return new PostcodeLocation
+                    {
+                        Postcode = firstItem.SafeGetString(postcodeFieldName),
+                        Latitude = firstItem.SafeGetDouble("latitude", Constants.DefaultLatitude),
+                        Longitude = firstItem.SafeGetDouble("longitude")
+                    };
+                }
+            }
+            case JsonValueKind.Object:
                 return new PostcodeLocation
                 {
-                    Postcode = firstItem.SafeGetString(postcodeFieldName),
-                    Latitude = firstItem.SafeGetDouble("latitude", Constants.DefaultLatitude),
-                    Longitude = firstItem.SafeGetDouble("longitude")
+                    Postcode = resultElement.SafeGetString(postcodeFieldName),
+                    Latitude = resultElement.SafeGetDouble("latitude", Constants.DefaultLatitude),
+                    Longitude = resultElement.SafeGetDouble("longitude")
                 };
-            }
+            default:
+                throw new InvalidOperationException();
         }
-
-        return new PostcodeLocation
-        {
-            Postcode = resultElement.SafeGetString(postcodeFieldName),
-            Latitude = resultElement.SafeGetDouble("latitude", Constants.DefaultLatitude),
-            Longitude = resultElement.SafeGetDouble("longitude")
-        };
     }
 }

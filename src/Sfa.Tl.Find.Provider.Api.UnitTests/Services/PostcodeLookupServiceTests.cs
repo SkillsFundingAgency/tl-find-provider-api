@@ -71,6 +71,26 @@ public class PostcodeLookupServiceTests
     }
 
     [Fact]
+    public async Task GetNearestPostcode_Null_Response_Returns_Expected_Result()
+    {
+        var validPostcode = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+
+        var postcodeUriFragment = $"postcodes?lon={validPostcode.Longitude}&lat={validPostcode.Latitude}";
+
+        var responses = new Dictionary<string, string>
+        {
+            { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildNullPostcodeResponse() }
+        };
+
+        var service = new PostcodeLookupServiceBuilder()
+            .Build(responses);
+
+        var result = await service.GetNearestPostcode(validPostcode.Latitude, validPostcode.Longitude);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
     public async Task GetPostcode_For_Valid_Postcode_Outward_Code_Returns_Expected_Result()
     {
         var validPostcode = PostcodeLocationBuilder.BuildValidOutwardPostcodeLocation();

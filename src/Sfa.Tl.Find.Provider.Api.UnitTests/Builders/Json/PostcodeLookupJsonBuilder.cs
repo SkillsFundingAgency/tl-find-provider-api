@@ -54,6 +54,11 @@ public static class PostcodeLookupJsonBuilder
             .BuildJsonFromResourceStream(
                 AssetFolderPath, "nearestpostcoderesponse");
 
+    public static string BuildNullPostcodeResponse() =>
+        typeof(PostcodeLookupJsonBuilder)
+            .BuildJsonFromResourceStream(
+                AssetFolderPath, "nullpostcoderesponse");
+
     public static string BuildPostcodeNotFoundResponse() =>
         typeof(PostcodeLookupJsonBuilder)
             .BuildJsonFromResourceStream(

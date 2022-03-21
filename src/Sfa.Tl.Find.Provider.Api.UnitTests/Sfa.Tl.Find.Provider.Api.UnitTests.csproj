@@ -8,12 +8,14 @@
   <ItemGroup>
     <None Remove="Builders\Json\Assets\nationalstatisticslocationsresponse.json" />
     <None Remove="Builders\Json\Assets\postcodenotfoundresponse.json" />
+    <None Remove="Builders\Json\Assets\Postcodes\nullpostcoderesponse.json" />
     <None Remove="Builders\Json\Assets\terminatedpostcodewithnulllatlongresponse.json" />
     <None Remove="Builders\Json\Assets\validoutcodewithnulllatlongresponse.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Builders\Json\Assets\NationalStatistics\nationalstatisticslocationsresponse.json" />
+    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\nullpostcoderesponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\postcodenotfoundresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\nearestpostcoderesponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\invalidpostcoderesponse.json" />
