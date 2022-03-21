@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
@@ -20,6 +21,15 @@ public static class StringExtensions
     public static string FormatPostcodeForUri(this string postcode)
     {
         return Uri.EscapeDataString(postcode.Trim().ToUpper());
+    }
+
+    public static string FormatTownName(this Town town)
+    {
+        var townName = town.Name;
+        if (!string.IsNullOrWhiteSpace(town.County))
+            townName += $", {town.County}";
+
+        return townName;
     }
 
     public static bool IsPostcode(this string postcode)

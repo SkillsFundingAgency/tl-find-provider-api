@@ -294,7 +294,7 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field is required.");
+        results!.Error.Should().Be("The search term is required.");
     }
 
     [Fact]
@@ -312,7 +312,7 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field is required.");
+        results!.Error.Should().Be("The search term is required.");
     }
 
     [Fact]
@@ -366,7 +366,7 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must be no more than 8 characters.");
+        results!.Error.Should().Be("The postcode must be no more than 8 characters.");
     }
 
     [Fact]
@@ -384,7 +384,7 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must be at least 2 characters.");
+        results!.Error.Should().Be("The search term must be at least 2 characters.");
     }
 
     [Fact]

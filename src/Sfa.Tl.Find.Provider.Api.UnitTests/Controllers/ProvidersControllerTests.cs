@@ -249,7 +249,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("Either postcode or both lat/long required.");
+        results!.Error.Should().Be("Either search term or both lat/long required.");
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("Either postcode or both lat/long required.");
+        results!.Error.Should().Be("Either search term or both lat/long required.");
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        results!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
 
     [Fact]
@@ -303,26 +303,26 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        results!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
 
-    //[Fact]
-    //public async Task GetProviders_Validates_Postcode_Maximum_Length()
-    //{
-    //    var providerDataService = Substitute.For<IProviderDataService>();
+    [Fact]
+    public async Task GetProviders_Validates_Postcode_Maximum_Length()
+    {
+        var providerDataService = Substitute.For<IProviderDataService>();
 
-    //    var controller = new ProvidersControllerBuilder()
-    //        .Build(providerDataService);
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService);
 
-    //    var result = await controller.GetProviders(PostcodeWithTooManyCharacters);
+        var result = await controller.GetProviders(PostcodeWithTooManyCharacters);
 
-    //    var okResult = result as OkObjectResult;
-    //    okResult.Should().NotBeNull();
-    //    okResult!.StatusCode.Should().Be(200);
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
 
-    //    var results = okResult.Value as ProviderSearchResponse;
-    //    results!.Error.Should().Be("The postcode field must be no more than 8 characters.");
-    //}
+        var results = okResult.Value as ProviderSearchResponse;
+        results!.Error.Should().Be("The postcode must be no more than 8 characters.");
+    }
 
     [Fact]
     public async Task GetProviders_Validates_Postcode_Minimum_Length()
@@ -339,7 +339,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must be at least 2 characters.");
+        results!.Error.Should().Be("The search term must be at least 2 characters.");
     }
 
     [Fact]
@@ -429,7 +429,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("Either postcode or lat/long required, but not both.");
+        results!.Error.Should().Be("Either search term or lat/long required, but not both.");
     }
 
     [Fact]

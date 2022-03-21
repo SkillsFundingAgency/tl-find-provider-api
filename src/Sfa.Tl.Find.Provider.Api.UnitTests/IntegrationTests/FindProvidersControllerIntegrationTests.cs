@@ -48,11 +48,11 @@ public class FindProvidersControllerIntegrationTests : IClassFixture<TestServerF
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
         searchResponse.Should().NotBeNull();
-        searchResponse!.Error.Should().Be("The postcode field is required.");
+        searchResponse!.Error.Should().Be("The search term is required.");
     }
 
     [Fact]
-    public async Task GetProviders_Returns_Error_Message_Result_For_Postcode_Too_Long()
+    public async Task GetProviders_Returns_No_Error_Message_Result_For_Long_Search_Term()
     {
         var response = await _fixture
             .CreateClient()
@@ -61,7 +61,7 @@ public class FindProvidersControllerIntegrationTests : IClassFixture<TestServerF
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
         searchResponse.Should().NotBeNull();
-        searchResponse!.Error.Should().Be("The postcode field must be no more than 8 characters.");
+        searchResponse!.Error.Should().BeNull();
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class FindProvidersControllerIntegrationTests : IClassFixture<TestServerF
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
         searchResponse.Should().NotBeNull();
-        searchResponse!.Error.Should().Be("The postcode field must be at least 2 characters.");
+        searchResponse!.Error.Should().Be("The search term must be at least 2 characters.");
     }
 
     [Fact]

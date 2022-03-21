@@ -119,19 +119,9 @@ public class ProviderDataService : IProviderDataService
                     var latitude = Convert.ToDouble(town.Latitude);
                     var longitude = Convert.ToDouble(town.Longitude);
 
-                    //TODO: Add a search by lat/long method and proc, rather than this hack
-                    //postcodeLocation = await GetNearestPostcode(
-                    //    Convert.ToDouble(town.Latitude), 
-                    //    Convert.ToDouble(town.Longitude));
-
-                    //TODO: Need a FormatTown extension - 
-                    var townName = town.Name;
-                    if (town.County != null)
-                        townName += $", {town.County}";
-                    
                     postcodeLocation = new PostcodeLocation
                     {
-                        Postcode = townName,
+                        Postcode = town.FormatTownName(),
                         Latitude = latitude,
                         Longitude = longitude
                     };
@@ -142,8 +132,7 @@ public class ProviderDataService : IProviderDataService
                     throw new PostcodeNotFoundException(searchTerm);
                 }
             }
-
-
+            
             var searchResults = await _providerRepository
                 .Search(postcodeLocation,
                         routeIds,

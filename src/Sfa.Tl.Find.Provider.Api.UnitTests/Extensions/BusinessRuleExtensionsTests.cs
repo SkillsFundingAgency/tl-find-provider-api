@@ -50,7 +50,7 @@ public class BusinessRuleExtensionsTests
 
     [Theory(DisplayName = nameof(BusinessRuleExtensions.CreateJourneyLink) + " Data Tests")]
     [MemberData(nameof(JourneyLinksForPostcodeLocations))]
-    public void PostcodeLocation_CreateJourneyLink_Data_Tests_2(
+    public void PostcodeLocation_CreateJourneyLink_Data_Tests(
         PostcodeLocation fromPostcodeLocation, 
         PostcodeLocation toPostcodeLocation, 
         string expectedResult)
@@ -61,7 +61,7 @@ public class BusinessRuleExtensionsTests
 
     [Theory(DisplayName = nameof(BusinessRuleExtensions.CreateJourneyLink) + " Data Tests")]
     [MemberData(nameof(JourneyLinksForPostcodeLocations))]
-    public void PostcodeLocation_CreateJourneyLink_To_Postcode_Data_Tests_2(
+    public void PostcodeLocation_CreateJourneyLink_To_Postcode_String_Data_Tests(
         PostcodeLocation fromPostcodeLocation,
         PostcodeLocation toPostcodeLocation,
         string expectedResult)
