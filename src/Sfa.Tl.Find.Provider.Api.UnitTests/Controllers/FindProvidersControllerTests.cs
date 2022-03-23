@@ -223,7 +223,7 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results!.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
         results.SearchResults.Should().NotBeNullOrEmpty();
     }
 
@@ -249,7 +249,7 @@ public class FindProvidersControllerTests
             as ProviderSearchResponse;
 
         results.Should().NotBeNull();
-        results!.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results!.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         results.SearchResults.Count().Should().Be(1);

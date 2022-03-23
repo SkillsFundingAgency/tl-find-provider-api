@@ -12,13 +12,13 @@ public class ProviderSearchResponse
     public string Error { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string Postcode { get; init; }
+    public string SearchTerm { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IEnumerable<ProviderSearchResult> SearchResults { get; init; }
 
     private string DebuggerDisplay()
-        => $"{Postcode ?? "No postcode"}, " +
+        => $"{SearchTerm ?? "No search term"}, " +
            $"{(SearchResults != null ? SearchResults.Count() : "null")} SearchResults " +
            $"{Error ?? ""}";
 }

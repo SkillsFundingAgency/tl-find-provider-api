@@ -143,7 +143,7 @@ public class ProviderDataService : IProviderDataService
 
             return new ProviderSearchResponse
             {
-                Postcode = postcodeLocation.Postcode,
+                SearchTerm = postcodeLocation.Postcode,
                 SearchResults = searchResults
             };
         }
@@ -185,7 +185,7 @@ public class ProviderDataService : IProviderDataService
 
             return new ProviderSearchResponse
             {
-                Postcode = postcodeLocation.Postcode,
+                SearchTerm = postcodeLocation.Postcode,
                 SearchResults = searchResults
             };
         }

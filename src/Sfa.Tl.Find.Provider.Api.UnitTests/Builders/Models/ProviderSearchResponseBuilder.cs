@@ -13,7 +13,7 @@ public class ProviderSearchResponseBuilder
     public ProviderSearchResponse BuildWithMultipleSearchResults() =>
         new()
         {
-            Postcode = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
+            SearchTerm = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
             SearchResults = new List<ProviderSearchResult>
             {
                 new()
@@ -104,7 +104,7 @@ public class ProviderSearchResponseBuilder
     public ProviderSearchResponse BuildWithSingleSearchResult() =>
         new()
         {
-            Postcode = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
+            SearchTerm = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
             SearchResults = new List<ProviderSearchResult>
             {
                 new()

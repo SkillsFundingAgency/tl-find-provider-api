@@ -178,7 +178,7 @@ public class ProviderDataServiceTests
                 TestPageSize);
 
         results.Should().NotBeNull();
-        results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
@@ -225,7 +225,7 @@ public class ProviderDataServiceTests
 
         var results = await service.FindProviders(fromPostcodeLocation.Postcode);
         results.Should().NotBeNull();
-        results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
@@ -270,7 +270,7 @@ public class ProviderDataServiceTests
 
         var results = await service.FindProviders(fromPostcodeLocation.Postcode);
         results.Should().NotBeNull();
-        results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
@@ -303,7 +303,7 @@ public class ProviderDataServiceTests
 
         var results = await service.FindProviders(fromPostcodeLocation.Postcode);
         results.Should().NotBeNull();
-        results.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
@@ -344,7 +344,7 @@ public class ProviderDataServiceTests
         var results = await service.FindProviders(fromPostcodeLocation.Postcode);
         results.Should().NotBeNull();
         results.Error.Should().Be("The postcode was not found");
-        results.Postcode.Should().BeNull();
+        results.SearchTerm.Should().BeNull();
         results.SearchResults.Should().BeNull();
 
         //await postcodeLookupService

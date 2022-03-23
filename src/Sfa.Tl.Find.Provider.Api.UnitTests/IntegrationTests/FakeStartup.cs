@@ -86,7 +86,7 @@ public class FakeStartup
                         Arg.Any<int>())
                     .Returns(x => new ProviderSearchResponse
                     {
-                        Postcode = (string)x[0],
+                        SearchTerm = (string)x[0],
                         SearchResults = new List<ProviderSearchResult>()
                     });
                 providerDataService.FindProviders(
@@ -97,7 +97,7 @@ public class FakeStartup
                         Arg.Any<int>())
                     .Returns(new ProviderSearchResponse
                     {
-                        Postcode = "CV1 2WT",
+                        SearchTerm = "CV1 2WT",
                         SearchResults = new List<ProviderSearchResult>()
                     });
 
