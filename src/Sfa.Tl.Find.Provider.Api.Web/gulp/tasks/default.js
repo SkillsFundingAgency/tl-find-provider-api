@@ -18,6 +18,7 @@ gulp.task('js', () => {
     'node_modules/crypto-js/sha256.js',
     'node_modules/crypto-js/hmac.js',
     'node_modules/crypto-js/hmac-sha256.js',
+    'node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js',
     (paths.src.JS)
     ])
         .pipe(gulp.dest(paths.dist.JS));
