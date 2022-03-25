@@ -109,7 +109,10 @@ When running locally, assuming localhost with port 55961, you can either use the
 >>  
 >> **Qualifications**
 >> - https://localhost:55961/api/v2/qualifications
->> 
+>>  
+>> **Locations**
+>> - https://localhost:55961/api/v2/locations?searchTerm=Oxford
+>>
 >> **Provider search**
 >> 
 >> *Note the use of searchTerm instead of postcode*
@@ -128,6 +131,7 @@ The `qualificationId` and `routeId` filters are optional and defaults to null or
 If the postcode is not found in provider search, the API will return a 404 result with a message indicating the postcode was not found.
 
 API calls need to include an `Authorization` header with an HMAC signature.
+(Locations currently does not require the authorization header.)
 
 
 
