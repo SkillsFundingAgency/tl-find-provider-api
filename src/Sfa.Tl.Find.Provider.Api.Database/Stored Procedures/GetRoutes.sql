@@ -47,4 +47,4 @@ AS
 	LEFT JOIN RouteQualificationsCTE cte
 	ON r.Id = cte.[RouteId]
 	GROUP BY r.[Id], r.[Name]
-		ORDER BY r.[Name];
+	ORDER BY r.[Name];

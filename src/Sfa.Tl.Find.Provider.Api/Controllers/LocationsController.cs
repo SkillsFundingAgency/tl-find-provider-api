@@ -32,9 +32,29 @@ public class LocationsController : ControllerBase
     /// <param name="searchTerm">Search string.</param>
     /// <returns>A list of results.</returns>
     [HttpGet]
-    [Route("search", Name = "SearchLocations")]
+    [Route("", Name = "SearchLocations")]
     [ProducesResponseType(typeof(IEnumerable<Town>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Search(string searchTerm)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(LocationsController)} {nameof(Search)} called.");
+        }
+
+        var towns = await _townDataService.Search(searchTerm);
+        return Ok(towns);
+    }
+
+    /// <summary>
+    /// Search for locations by partial name.
+    /// </summary>
+    /// <param name="searchTerm">Search string.</param>
+    /// <returns>A list of results.</returns>
+    [HttpGet]
+    [Route("search", Name = "SearchLocations_OLD")]
+    [ProducesResponseType(typeof(IEnumerable<Town>), StatusCodes.Status200OK)]
+    [Obsolete]
+    public async Task<IActionResult> SearchOld(string searchTerm)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {

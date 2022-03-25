@@ -19,7 +19,7 @@ public class LocationsControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/locations/search?searchTerm=test");
+            .GetAsync("/api/v2/locations?searchTerm=test");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
