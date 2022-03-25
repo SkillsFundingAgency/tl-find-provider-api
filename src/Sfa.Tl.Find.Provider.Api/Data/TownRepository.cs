@@ -46,6 +46,7 @@ public class TownRepository : ITownRepository
         var results = await _dbContextWrapper.QueryAsync<Town>(
             connection,
             "SELECT TOP (@maxResults) " +
+            "            [Id], " +
             "            [Name], " +
             "            [County], " +
             "            [LocalAuthorityName], " +

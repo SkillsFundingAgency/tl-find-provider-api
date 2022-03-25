@@ -73,7 +73,14 @@ public class ProvidersController : ControllerBase
                     Error = validationMessage
                 });
             }
-            
+
+            //HACK: Remove last part of search term to remove county, if present
+            //      This will be fixed soon by sending the town id as a search hint
+            if (!searchTerm.IsNullOrWhiteSpace() && searchTerm!.Contains(','))
+            {
+                searchTerm = searchTerm.Remove(searchTerm.LastIndexOf(','));
+            }
+
             var providersSearchResponse =
                 !searchTerm.IsNullOrWhiteSpace()
                     ? await _providerDataService.FindProviders(

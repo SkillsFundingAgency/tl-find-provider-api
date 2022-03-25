@@ -99,7 +99,7 @@ public class FindProvidersControllerIntegrationTests : IClassFixture<TestServerF
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
         searchResponse.Should().NotBeNull();
-        searchResponse!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        searchResponse!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
     
     [Fact]
@@ -112,7 +112,7 @@ public class FindProvidersControllerIntegrationTests : IClassFixture<TestServerF
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
         searchResponse.Should().NotBeNull();
-        searchResponse!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        searchResponse!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
 
     [Fact]

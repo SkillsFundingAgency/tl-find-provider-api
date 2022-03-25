@@ -10,6 +10,7 @@ public class TownBuilder
         {
             new()
             {
+                Id = 1,
                 Name = "Coventry",
                 County = "West Midlands",
                 LocalAuthorityName = "West Midlands",
@@ -18,6 +19,7 @@ public class TownBuilder
             },
             new()
             {
+                Id = 2,
                 Name = "Oxford",
                 County = "Oxfordshire",
                 LocalAuthorityName = "Oxfordshire",

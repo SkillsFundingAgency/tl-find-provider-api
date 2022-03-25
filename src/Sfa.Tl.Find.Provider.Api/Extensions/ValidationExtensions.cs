@@ -7,7 +7,8 @@ public static class ValidationExtensions
     public static bool TryValidate(this string searchTerm, out string errorMessage)
     {
         errorMessage = null;
-        var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z\s]*$");
+        //NOTE: Comma and dot also allowed as it could be part of a town name
+        var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z,\.\s]*$");
 
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
@@ -15,7 +16,7 @@ public static class ValidationExtensions
         }
         else if (!regex.IsMatch(searchTerm))
         {
-            errorMessage = "The postcode field must start with a letter and contain only letters, numbers, and an optional space.";
+            errorMessage = "The search term must start with a letter and contain only letters, numbers, and spaces.";
         }
         else if (searchTerm.Length < 2)
         {
@@ -75,13 +76,14 @@ public static class ValidationExtensions
         }
         else
         {
-            var lettersAndDigitsRegex = new Regex(@"^[a-zA-Z][0-9a-zA-Z\s]*$");
-            if (!lettersAndDigitsRegex.IsMatch(searchTerm))
-            {
-                errorMessage =
-                    "The search term must start with a letter and contain only letters, numbers, and spaces.";
-            }
-            else
+            //NOTE: Comma and dot also allowed as it could be part of a town name
+            //var lettersAndDigitsRegex = new Regex(@"^[a-zA-Z][0-9a-zA-Z,\.\s]*$");
+            //if (!lettersAndDigitsRegex.IsMatch(searchTerm))
+            //{
+            //    errorMessage =
+            //        "The search term must start with a letter and contain only letters, numbers, and spaces.";
+            //}
+            //else
             {
                 searchTerm.TryValidate(out errorMessage);
             }

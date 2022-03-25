@@ -330,7 +330,7 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        results!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
 
     [Fact]
@@ -348,7 +348,7 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        results!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
 
     [Fact]
