@@ -9,8 +9,9 @@ public class Town
 {
     public int Id { get; init; }
     public string Name { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string County { get; init; }
-    [JsonIgnore]
+    [JsonPropertyName("la")]
     public string LocalAuthorityName { get; init; }
     [JsonIgnore]
     public decimal Latitude { get; init; }

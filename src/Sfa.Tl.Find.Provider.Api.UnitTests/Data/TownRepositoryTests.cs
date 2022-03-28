@@ -171,7 +171,7 @@ public class TownRepositoryTests
             .Received(1)
             .QueryAsync<Town>(dbConnection,
                 Arg.Is<string>(sql => 
-                    sql.Contains("FROM dbo.[Town]")),
+                    sql.Contains("FROM dbo.[TownSearchView]")),
                 Arg.Any<object>());
     }
 }

@@ -62,6 +62,8 @@
     <Folder Include="Types" />
     <Folder Include="PostDeployment" />
     <Folder Include="PreDeployment" />
+    <Folder Include="Views" />
+    <Folder Include="Functions" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
@@ -95,6 +97,9 @@
     <Build Include="Types\TownDataTableType.sql" />
     <Build Include="Stored Procedures\UpdateTowns.sql" />
     <Build Include="Stored Procedures\GetRoutes.sql" />
+    <Build Include="Views\TownSearchView.sql" />
+    <Build Include="Functions\ReplaceAllFunction.sql" />
+    <Build Include="Indexes\IX_TownSearchView_Search.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

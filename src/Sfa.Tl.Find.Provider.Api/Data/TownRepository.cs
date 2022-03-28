@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
@@ -43,6 +44,12 @@ public class TownRepository : ITownRepository
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
+        //Remove special chars and replace & with "and"
+        var cleanedSearchTerm =
+            Regex.Replace(
+                Regex.Replace(searchTerm, @"(\s+|,|'|\(|\)|/)", ""),
+                @"(&)", "and");
+        
         var results = await _dbContextWrapper.QueryAsync<Town>(
             connection,
             "SELECT TOP (@maxResults) " +
@@ -52,12 +59,14 @@ public class TownRepository : ITownRepository
             "            [LocalAuthorityName], " +
             "            [Latitude], " +
             "            [Longitude] " +
-            "FROM dbo.[Town] " +
-            "WHERE [Name] LIKE @query",
+            "FROM dbo.[TownSearchView] " +
+            // ReSharper disable once StringLiteralTypo
+            "WITH(NOEXPAND) " +
+            "WHERE [Search] LIKE @query",
             new
             {
                 maxResults,
-                query = $"{searchTerm}%"
+                query = $"{cleanedSearchTerm}%"
             });
 
         return results;
