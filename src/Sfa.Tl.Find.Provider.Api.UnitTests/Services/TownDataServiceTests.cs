@@ -208,6 +208,32 @@ public class TownDataServiceTests
             .Search(searchTerm, maxResults);
     }
 
+    [Fact]
+    public async Task Search_Does_Not_Call_Repository_For_Postcode()
+    {
+        const string searchTerm = "CV1 2WT";
+
+        var towns = new TownBuilder()
+            .BuildList()
+            .ToList();
+
+        var townRepository = Substitute.For<ITownRepository>();
+        townRepository.Search(searchTerm, Constants.TownSearchDefaultMaxResults)
+            .Returns(towns);
+
+        var service = new TownDataServiceBuilder()
+            .Build(townRepository: townRepository);
+
+        var result = await service
+            .Search(searchTerm);
+
+        result.Should().BeEmpty();
+
+        await townRepository
+            .DidNotReceive()
+            .Search(Arg.Any<string>(), Arg.Any<int>());
+    }
+
     private static void ValidateTown(Town town, 
         int id, 
         string name, 

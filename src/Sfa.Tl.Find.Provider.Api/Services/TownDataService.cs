@@ -98,6 +98,11 @@ public class TownDataService : ITownDataService
 
     public async Task<IEnumerable<Town>> Search(string searchTerm, int maxResults = Constants.TownSearchDefaultMaxResults)
     {
+        if (searchTerm.IsFullOrPartialPostcode())
+        {
+            return new List<Town>();
+        }
+
         return await _townRepository.Search(searchTerm, maxResults);
     }
 
