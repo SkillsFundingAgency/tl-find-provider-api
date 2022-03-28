@@ -21,6 +21,7 @@
                         <label class="govuk-visually-hidden" for="tl-search-term">Enter a postcode or town</label>
                         <p>For example, S1 2JF, S1 or Sheffield</p>
                         <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-search-term" name="tl-search-term" type="text" placeholder="Enter a postcode or town">
+                        <input id="tl-selected-search-term-id" type="hidden">
                         <button class="govuk-button tl-button--blue" id="tl-search-providers" data-module="govuk-button">
                             Search
                         </button>
@@ -192,13 +193,13 @@
         function providerSearch(searchTerm, skillAreaIds, page) {
             clearProviderSearchResults();
             if (searchTerm === "") {
-                event.stopPropagation();
+                if(event) event.stopPropagation();
                 showSearchTermError("Enter a postcode or town");
                 return false;
             }
 
-            if (!searchTerm.match(/^[0-9a-zA-Z\s]+$/)) {
-                event.stopPropagation();
+            if (!searchTerm.match(/^[0-9a-zA-Z,\.\s]+$/)) {
+                if(event) event.stopPropagation();
                 showSearchTermError("Enter a valid postcode or town");
                 return false;
             }
@@ -216,6 +217,11 @@
             pageSize = (pageSize === undefined ? 5 : pageSize);
 
             let uri = findProvidersApiUrl + "providers?searchTerm=" + encodeURIComponent(searchTerm) + '&page=' + page + '&pageSize=' + pageSize;
+
+            if ($("#tl-selected-search-term-id").val()) {
+                console.log("adding &searchTermId=" + $("#tl-selected-search-term-id").val());
+                uri += "&searchTermId=" + $("#tl-selected-search-term-id").val();
+            }
 
             if (skillAreaIds && skillAreaIds.length > 0) {
                 skillAreaIds.forEach(function(skillAreaId) {
@@ -435,9 +441,11 @@
         if ($keywordsInput.length > 0) {
             $keywordsInput.wrap('<div id="autocomplete-container" class="tl-autocomplete-wrap"></div>');
             var container = document.querySelector('#autocomplete-container');
+            console.log(container);
             $(container).empty();
         }
 
+        let locationsSearchResult = null;
         function getSuggestions(query, populateResults) {
             var results = [];
             $.ajax({
@@ -446,14 +454,36 @@
                 dataType: 'json',
                 data: { searchTerm: query }
             }).done(function (data) {
+                locationsSearchResult = data;
                 results = data.map(function (r) {
-                    return r.name;
+                    return getLocationDisplayName(r);
                 });
                 populateResults(results);
             });
         }
-        function onConfirm(confirmed) {
+
+        function getLocationDisplayName(item)
+        {
+            console.log(`"${item.name} - ${item.county} - ${item.la}`);
+            return item.name + 
+                (item.county ? ', ' + item.county : item.la);
         }
+
+        function onConfirm(confirmed) {
+            console.log('confirmed: ' + confirmed);
+            console.log(this.id);
+            $.each(locationsSearchResult, function () {
+                if (getLocationDisplayName(this) === confirmed) {
+                    console.log(`found id ${this.id} for ${confirmed}`);
+                    $("#tl-selected-search-term-id").val(this.id);
+                }
+            });
+
+            setTimeout(function() {
+                $("#tl-search-providers").click();
+            }, 200);
+        }
+
         accessibleAutocomplete({
             element: container,
             id: 'tl-search-term',
