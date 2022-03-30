@@ -19,15 +19,15 @@ AS
 	  		  OR ISNULL(NULLIF(t.[County] COLLATE Latin1_General_CS_AS, s.[County] COLLATE Latin1_General_CS_AS), 
 						NULLIF(s.[County] COLLATE Latin1_General_CS_AS, t.[County] COLLATE Latin1_General_CS_AS))
 				 IS NOT NULL
-	  		  OR ISNULL(NULLIF(t.[LocalAuthorityName] COLLATE Latin1_General_CS_AS, s.[LocalAuthorityName] COLLATE Latin1_General_CS_AS), 
-						NULLIF(s.[LocalAuthorityName] COLLATE Latin1_General_CS_AS, t.[LocalAuthorityName] COLLATE Latin1_General_CS_AS))
+	  		  OR ISNULL(NULLIF(t.[LocalAuthority] COLLATE Latin1_General_CS_AS, s.[LocalAuthority] COLLATE Latin1_General_CS_AS), 
+						NULLIF(s.[LocalAuthority] COLLATE Latin1_General_CS_AS, t.[LocalAuthority] COLLATE Latin1_General_CS_AS))
 				 IS NOT NULL
 			  OR t.[Latitude] <> s.[Latitude]
 			  OR t.[Longitude] <> s.[Longitude])
 	THEN UPDATE SET
 		t.[Name] = s.[Name],
 		t.[County] = s.[County],
-		t.[LocalAuthorityName] = s.[LocalAuthorityName],
+		t.[LocalAuthority] = s.[LocalAuthority],
 		t.[Latitude] = s.[Latitude],
 		t.[Longitude] = s.[Longitude]
 
@@ -36,7 +36,7 @@ AS
 		[Id],
 		[Name],
 		[County],
-		[LocalAuthorityName],
+		[LocalAuthority],
 		[Latitude],
 		[Longitude]
 	)
@@ -45,7 +45,7 @@ AS
 		s.[Id],
 		s.[Name],
 		s.[County],
-		s.[LocalAuthorityName],
+		s.[LocalAuthority],
 		s.[Latitude],
 		s.[Longitude]
 	)

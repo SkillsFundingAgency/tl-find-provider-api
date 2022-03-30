@@ -14,7 +14,7 @@ public interface IProviderDataService
     Task<bool> HasProviders();
 
     Task<ProviderSearchResponse> FindProviders(
-        string postcode,
+        string searchTerms,
         IList<int> routeIds = null,
         IList<int> qualificationIds = null,
         int page = 0,

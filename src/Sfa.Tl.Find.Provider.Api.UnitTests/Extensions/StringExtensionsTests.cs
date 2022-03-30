@@ -119,4 +119,21 @@ public class StringExtensionsTests
 
         result.Should().Be(expectedResult);
     }
+
+    [Theory(DisplayName = nameof(StringExtensions.ToSearchableString) + " Data Tests")]
+    // ReSharper disable StringLiteralTypo
+    [InlineData(null, null)]
+    [InlineData("CV1 2WT", "cv12wt")]
+    [InlineData("St. Albans", "stalbans")]
+    [InlineData("Colton & the Ridwares", "coltonandtheridwares")]
+    [InlineData("Coates (Cotswold),	Gloucestershire", "coatescotswoldgloucestershire")]
+    [InlineData("Coleorton/Griffydam, Leicestershire", "coleortongriffydamleicestershire")]
+    [InlineData("Collett's Green", "collettsgreen")]
+    // ReSharper restore StringLiteralTypo
+    public void String_ToSearchableString_Data_Tests(string input, string expectedResult)
+    {
+        var result = input.ToSearchableString();
+
+        result.Should().Be(expectedResult);
+    }
 }

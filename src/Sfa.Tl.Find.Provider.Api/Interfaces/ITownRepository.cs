@@ -10,5 +10,5 @@ public interface ITownRepository
 
     Task Save(IEnumerable<Town> qualifications);
 
-    Task<IEnumerable<Town>> Search(string searchTerm, int maxResults);
+    Task<IEnumerable<Town>> Search(string searchTerms, int maxResults);
 }

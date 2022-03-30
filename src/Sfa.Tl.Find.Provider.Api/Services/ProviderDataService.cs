@@ -91,7 +91,7 @@ public class ProviderDataService : IProviderDataService
     }
 
     public async Task<ProviderSearchResponse> FindProviders(
-        string searchTerm,
+        string searchTerms,
         IList<int> routeIds = null,
         IList<int> qualificationIds = null,
         int page = 0,
@@ -101,18 +101,18 @@ public class ProviderDataService : IProviderDataService
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Searching for postcode or town '{searchTerm}'", searchTerm);
+                _logger.LogDebug("Searching for postcode or town '{searchTerm}'", searchTerms);
             }
 
             PostcodeLocation postcodeLocation = null;
 
-            if (searchTerm.IsFullOrPartialPostcode())
+            if (searchTerms.IsFullOrPartialPostcode())
             {
-                postcodeLocation = await GetPostcode(searchTerm);
+                postcodeLocation = await GetPostcode(searchTerms);
             }
             else
             {
-                var towns = await _townDataService.Search(searchTerm);
+                var towns = await _townDataService.Search(searchTerms);
                 var town = towns.FirstOrDefault();
                 if (town != null)
                 {
@@ -129,7 +129,7 @@ public class ProviderDataService : IProviderDataService
 
                 if (postcodeLocation == null)
                 {
-                    throw new PostcodeNotFoundException(searchTerm);
+                    throw new PostcodeNotFoundException(searchTerms);
                 }
             }
             

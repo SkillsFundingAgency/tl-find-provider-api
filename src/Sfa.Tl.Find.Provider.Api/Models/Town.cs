@@ -12,7 +12,7 @@ public class Town
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string County { get; init; }
     [JsonPropertyName("la")]
-    public string LocalAuthorityName { get; init; }
+    public string LocalAuthority { get; init; }
     [JsonIgnore]
     public decimal Latitude { get; init; }
     [JsonIgnore]

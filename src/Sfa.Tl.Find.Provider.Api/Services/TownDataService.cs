@@ -87,7 +87,7 @@ public class TownDataService : ITownDataService
                 Id = item.Id,
                 Name = item.Name,
                 County = item.County,
-                LocalAuthorityName = item.LocalAuthorityName,
+                LocalAuthority = item.LocalAuthorityName,
                 Latitude = item.Latitude,
                 Longitude = item.Longitude
             })

@@ -71,6 +71,17 @@ public static class StringExtensions
             : name;
     }
 
+    public static string ToSearchableString(this string value)
+    {
+        if (value == null)
+            return null;
+
+        return Regex.Replace(
+                Regex.Replace(value, @"(\s+|,|\.|'|\(|\)|/)", ""),
+                @"(&)", "and")
+                .ToLower();
+    }
+
     public static string ToTitleCase(this string value)
     {
         if (value == null)

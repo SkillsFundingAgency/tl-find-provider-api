@@ -34,7 +34,7 @@ public class ProvidersController : ControllerBase
     /// <summary>
     /// Search for providers.
     /// </summary>
-    /// <param name="searchTerm">Postcode that the search should start from.</param>
+    /// <param name="searchTerms">Postcode that the search should start from.</param>
     /// <param name="latitude">Latitude that the search should start from.</param>
     /// <param name="longitude">Longitude that the search should start from.</param>
     /// <param name="qualificationIds">Qualification ids to filter by. Optional, nulls or zeroes will be ignored.</param>
@@ -47,8 +47,8 @@ public class ProvidersController : ControllerBase
     [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProviders(
-        [FromQuery]
-        string searchTerm = null,
+        [FromQuery(Name = "searchTerm")]
+        string searchTerms = null,
         [FromQuery(Name = "lat")]
         double? latitude = null,
         [FromQuery(Name = "lon")]
@@ -66,7 +66,7 @@ public class ProvidersController : ControllerBase
     {
         try
         {
-            if (!searchTerm.TryValidate(latitude, longitude, out var validationMessage))
+            if (!searchTerms.TryValidate(latitude, longitude, out var validationMessage))
             {
                 return Ok(new ProviderSearchResponse
                 {
@@ -74,17 +74,10 @@ public class ProvidersController : ControllerBase
                 });
             }
 
-            //HACK: Remove last part of search term to remove county, if present
-            //      This will be fixed soon by sending the town id as a search hint
-            if (!searchTerm.IsNullOrWhiteSpace() && searchTerm!.Contains(','))
-            {
-                searchTerm = searchTerm.Remove(searchTerm.LastIndexOf(','));
-            }
-
             var providersSearchResponse =
-                !searchTerm.IsNullOrWhiteSpace()
+                !searchTerms.IsNullOrWhiteSpace()
                     ? await _providerDataService.FindProviders(
-                        searchTerm,
+                        searchTerms,
                         routeIds,
                         qualificationIds,
                         page,

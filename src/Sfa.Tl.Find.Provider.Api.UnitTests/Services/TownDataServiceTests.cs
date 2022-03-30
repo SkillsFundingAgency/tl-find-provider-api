@@ -238,9 +238,7 @@ public class TownDataServiceTests
         int id, 
         string name, 
         string county, 
-        string localAuthorityName,
-        //string localAuthorityDistrict,
-        //string localAuthorityDistrictDescription,
+        string localAuthority,
         decimal latitude, 
         decimal longitude)
     {
@@ -248,9 +246,7 @@ public class TownDataServiceTests
         town.Id.Should().Be(id);
         town.Name.Should().Be(name);
         town.County.Should().Be(county);
-        town.LocalAuthorityName.Should().Be(localAuthorityName);
-        //town.LocalAuthorityDistrict.Should().Be(localAuthorityDistrict);
-        //town.LocalAuthorityDistrictDescription.Should().Be(localAuthorityDistrictDescription);
+        town.LocalAuthority.Should().Be(localAuthority);
         town.Latitude.Should().Be(latitude);
         town.Longitude.Should().Be(longitude);
     }

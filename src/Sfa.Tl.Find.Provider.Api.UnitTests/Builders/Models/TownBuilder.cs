@@ -13,7 +13,7 @@ public class TownBuilder
                 Id = 1,
                 Name = "Coventry",
                 County = "West Midlands",
-                LocalAuthorityName = "West Midlands",
+                LocalAuthority = "West Midlands",
                 Latitude = 52.41695M,
                 Longitude = -1.50721M
             },
@@ -22,7 +22,7 @@ public class TownBuilder
                 Id = 2,
                 Name = "Oxford",
                 County = "Oxfordshire",
-                LocalAuthorityName = "Oxfordshire",
+                LocalAuthority = "Oxfordshire",
                 Latitude = 51.740811M,
                 Longitude = -1.217524M
             }
