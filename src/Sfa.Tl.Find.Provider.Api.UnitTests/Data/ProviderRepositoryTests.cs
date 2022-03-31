@@ -223,14 +223,14 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task Search_Returns_Expected_List_For_Single_Result_Row()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var expectedResult = new ProviderSearchResultBuilder()
-            .BuildSingleSearchResultWithSearchOrigin(fromPostcodeLocation);
+            .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
         var repository = await BuildRepositoryWithDataToSearchProviders();
 
-        var searchResults = await repository.Search(fromPostcodeLocation, null, null, 0, 5, false);
+        var searchResults = await repository.Search(fromGeoLocation, null, null, 0, 5, false);
 
         var searchResultsList = searchResults?.ToList();
         searchResultsList.Should().NotBeNull();
@@ -242,16 +242,16 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task Search_Merges_Additional_Data()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var expectedResult = new ProviderSearchResultBuilder()
-             .BuildSingleSearchResultWithSearchOrigin(fromPostcodeLocation);
+             .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
         var repository = await BuildRepositoryWithDataToSearchProviders();
 
         var searchResults = await repository
             .Search(
-                fromPostcodeLocation,
+                fromGeoLocation,
                 null,
                 null, 
                 0, 

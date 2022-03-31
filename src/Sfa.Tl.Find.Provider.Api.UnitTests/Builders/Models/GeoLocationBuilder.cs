@@ -2,77 +2,77 @@
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 
-public static class PostcodeLocationBuilder
+public static class GeoLocationBuilder
 {
-    public static PostcodeLocation BuildValidPostcodeLocation() =>
+    public static GeoLocation BuildValidPostcodeLocation() =>
         new()
         {
-            Postcode = "CV1 2WT",
+            Location = "CV1 2WT",
             Latitude = 52.400997,
             Longitude = -1.508122
         };
 
-    public static PostcodeLocation BuildValidOutwardPostcodeLocation() =>
+    public static GeoLocation BuildValidOutwardPostcodeLocation() =>
         new()
         {
-            Postcode = "CV1",
+            Location = "CV1",
             Latitude = 52.4093942342931,
             Longitude = -1.50652551178011,
         };
 
-    public static PostcodeLocation BuildNotFoundPostcodeLocation() =>
+    public static GeoLocation BuildNotFoundPostcodeLocation() =>
         new()
         {
-            Postcode = "CV1 9XT",
+            Location = "CV1 9XT",
             Latitude = double.NaN,
             Longitude = double.NaN
         };
 
-    public static PostcodeLocation BuildInvalidPostcodeLocation() =>
+    public static GeoLocation BuildInvalidPostcodeLocation() =>
         new()
         {
-            Postcode = "CV99 XXX",
+            Location = "CV99 XXX",
             Latitude = double.NaN,
             Longitude = double.NaN
         };
 
-    public static PostcodeLocation BuildTerminatedPostcodeLocation() =>
+    public static GeoLocation BuildTerminatedPostcodeLocation() =>
         new()
         {
-            Postcode = "S70 2YW",
+            Location = "S70 2YW",
             Latitude = 53.551618,
             Longitude = -1.482797
         };
 
-    public static PostcodeLocation BuildPostcodeLocationWithDefaultLatLong() =>
+    public static GeoLocation BuildPostcodeLocationWithDefaultLatLong() =>
         new()
         {
-            Postcode = "GY1 4AL",
+            Location = "GY1 4AL",
             Latitude = Constants.DefaultLatitude,
             Longitude = Constants.DefaultLongitude
         };
 
-    public static PostcodeLocation BuildOutwardPostcodeLocationWithDefaultLatLong() =>
+    public static GeoLocation BuildOutwardPostcodeLocationWithDefaultLatLong() =>
         new()
         {
-            Postcode = "IM4",
+            Location = "IM4",
             Latitude = Constants.DefaultLatitude,
             Longitude = Constants.DefaultLongitude,
         };
 
-    public static PostcodeLocation BuildTerminatedPostcodeLocationWithDefaultLatLong() =>
+    public static GeoLocation BuildTerminatedPostcodeLocationWithDefaultLatLong() =>
         new()
         {
-            Postcode = "IM4 4AQ",
+            Location = "IM4 4AQ",
             Latitude = Constants.DefaultLatitude,
             Longitude = Constants.DefaultLongitude,
         };
 
-    public static PostcodeLocation BuildPostcodeLocation(
-        string postcode) =>
+    public static GeoLocation BuildGeoLocation(
+        string location) =>
         new()
         {
-            Postcode = postcode,
+            Location = location,
             Latitude = 50.0,
             Longitude = -1.0
         };

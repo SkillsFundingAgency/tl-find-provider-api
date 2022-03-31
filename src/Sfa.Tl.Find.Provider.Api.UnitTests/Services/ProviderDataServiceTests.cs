@@ -146,11 +146,11 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task FindProviders_Passes_All_Parameters()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
-                Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
+                Arg.Is<GeoLocation>(p => p.Location == fromGeoLocation.Location),
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
@@ -159,8 +159,8 @@ public class ProviderDataServiceTests
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
-        postcodeLookupService.GetPostcode(fromPostcodeLocation.Postcode)
-            .Returns(fromPostcodeLocation);
+        postcodeLookupService.GetPostcode(fromGeoLocation.Location)
+            .Returns(fromGeoLocation);
 
         var searchSettings = new SettingsBuilder()
             .BuildSearchSettings();
@@ -171,27 +171,27 @@ public class ProviderDataServiceTests
             searchSettings: searchSettings);
 
         var results = await service
-            .FindProviders(fromPostcodeLocation.Postcode,
+            .FindProviders(fromGeoLocation.Location,
                 _testRouteIds,
                 _testQualificationIds,
                 TestPage,
                 TestPageSize);
 
         results.Should().NotBeNull();
-        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
             .Received(1)
-            .GetPostcode(fromPostcodeLocation.Postcode);
+            .GetPostcode(fromGeoLocation.Location);
 
         await providerRepository
             .Received()
-            .Search(Arg.Is<PostcodeLocation>(p =>
-                    p.Postcode == fromPostcodeLocation.Postcode &&
+            .Search(Arg.Is<GeoLocation>(p =>
+                    p.Location == fromGeoLocation.Location &&
                     // ReSharper disable CompareOfFloatsByEqualityOperator
-                    p.Latitude == fromPostcodeLocation.Latitude &&
-                    p.Longitude == fromPostcodeLocation.Longitude),
+                    p.Latitude == fromGeoLocation.Latitude &&
+                    p.Longitude == fromGeoLocation.Longitude),
                     // ReSharper restore CompareOfFloatsByEqualityOperator
                     Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
                 Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
@@ -203,11 +203,11 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task FindProviders_Returns_Expected_List_For_Valid_Postcode()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
-                Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
+                Arg.Is<GeoLocation>(p => p.Location == fromGeoLocation.Location),
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
@@ -216,31 +216,31 @@ public class ProviderDataServiceTests
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
-        postcodeLookupService.GetPostcode(fromPostcodeLocation.Postcode)
-            .Returns(fromPostcodeLocation);
+        postcodeLookupService.GetPostcode(fromGeoLocation.Location)
+            .Returns(fromGeoLocation);
 
         var service = new ProviderDataServiceBuilder().Build(
             postcodeLookupService: postcodeLookupService,
             providerRepository: providerRepository);
 
-        var results = await service.FindProviders(fromPostcodeLocation.Postcode);
+        var results = await service.FindProviders(fromGeoLocation.Location);
         results.Should().NotBeNull();
-        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
             .Received(1)
-            .GetPostcode(fromPostcodeLocation.Postcode);
+            .GetPostcode(fromGeoLocation.Location);
     }
 
     [Fact]
     public async Task FindProviders_Returns_Expected_List_For_Valid_Postcode_From_Cache()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
-                Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
+                Arg.Is<GeoLocation>(p => p.Location == fromGeoLocation.Location),
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
@@ -251,12 +251,12 @@ public class ProviderDataServiceTests
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
         var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<PostcodeLocation>())
+        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
             .Returns(x =>
             {
-                if (((string)x[0]).Contains(fromPostcodeLocation.Postcode.Replace(" ", "")))
+                if (((string)x[0]).Contains(fromGeoLocation.Location.Replace(" ", "")))
                 {
-                    x[1] = PostcodeLocationBuilder.BuildPostcodeLocation(fromPostcodeLocation.Postcode);
+                    x[1] = GeoLocationBuilder.BuildGeoLocation(fromGeoLocation.Location);
                     return true;
                 }
 
@@ -268,9 +268,9 @@ public class ProviderDataServiceTests
             providerRepository: providerRepository,
             cache: cache);
 
-        var results = await service.FindProviders(fromPostcodeLocation.Postcode);
+        var results = await service.FindProviders(fromGeoLocation.Location);
         results.Should().NotBeNull();
-        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
@@ -281,11 +281,11 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task FindProviders_Returns_Expected_List_For_Valid_Outcode()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidOutwardPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidOutwardPostcodeLocation();
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
-                Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
+                Arg.Is<GeoLocation>(p => p.Location == fromGeoLocation.Location),
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
@@ -294,34 +294,34 @@ public class ProviderDataServiceTests
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
-        postcodeLookupService.GetOutcode(fromPostcodeLocation.Postcode)
-            .Returns(fromPostcodeLocation);
+        postcodeLookupService.GetOutcode(fromGeoLocation.Location)
+            .Returns(fromGeoLocation);
 
         var service = new ProviderDataServiceBuilder().Build(
             postcodeLookupService: postcodeLookupService,
             providerRepository: providerRepository);
 
-        var results = await service.FindProviders(fromPostcodeLocation.Postcode);
+        var results = await service.FindProviders(fromGeoLocation.Location);
         results.Should().NotBeNull();
-        results.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
+        results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         await postcodeLookupService
             .DidNotReceive()
-            .GetPostcode(fromPostcodeLocation.Postcode);
+            .GetPostcode(fromGeoLocation.Location);
         await postcodeLookupService
             .Received(1)
-            .GetOutcode(fromPostcodeLocation.Postcode);
+            .GetOutcode(fromGeoLocation.Location);
     }
 
     [Fact]
     public async Task FindProviders_Returns_Expected_Error_Details_For_Bad_Postcode()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildInvalidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildInvalidPostcodeLocation();
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
-                Arg.Is<PostcodeLocation>(p => p.Postcode == fromPostcodeLocation.Postcode),
+                Arg.Is<GeoLocation>(p => p.Location == fromGeoLocation.Location),
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
@@ -330,8 +330,8 @@ public class ProviderDataServiceTests
             .Returns(new ProviderSearchResultBuilder().BuildList());
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
-        postcodeLookupService.GetPostcode(fromPostcodeLocation.Postcode)
-            .Returns((PostcodeLocation)null);
+        postcodeLookupService.GetPostcode(fromGeoLocation.Location)
+            .Returns((GeoLocation)null);
 
         var townDataService = Substitute.For<ITownDataService>();
         townDataService.Search(Arg.Any<string>())
@@ -339,17 +339,21 @@ public class ProviderDataServiceTests
         
         var service = new ProviderDataServiceBuilder().Build(
             postcodeLookupService: postcodeLookupService,
-            providerRepository: providerRepository);
+            providerRepository: providerRepository,
+            townDataService: townDataService);
 
-        var results = await service.FindProviders(fromPostcodeLocation.Postcode);
+        var results = await service.FindProviders(fromGeoLocation.Location);
         results.Should().NotBeNull();
         results.Error.Should().Be("The postcode was not found");
         results.SearchTerm.Should().BeNull();
         results.SearchResults.Should().BeNull();
 
-        //await postcodeLookupService
-        //    .Received(1)
-        //    .GetPostcode(fromPostcodeLocation.Postcode);
+        await postcodeLookupService
+            .DidNotReceive()
+            .GetPostcode(Arg.Any<string>());
+        await townDataService
+            .Received(1)
+            .Search(fromGeoLocation.Location);
     }
 
     [Fact]

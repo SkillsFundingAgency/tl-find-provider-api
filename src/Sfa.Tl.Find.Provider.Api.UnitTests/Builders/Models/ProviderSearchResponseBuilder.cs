@@ -6,14 +6,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 
 public class ProviderSearchResponseBuilder
 {
-    private PostcodeLocation _searchOrigin;
+    private GeoLocation _searchOrigin;
         
     private const string DefaultPostcode = "CV1 2WT";
         
     public ProviderSearchResponse BuildWithMultipleSearchResults() =>
         new()
         {
-            SearchTerm = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
+            SearchTerm = _searchOrigin != null ? _searchOrigin.Location : DefaultPostcode,
             SearchResults = new List<ProviderSearchResult>
             {
                 new()
@@ -30,7 +30,7 @@ public class ProviderSearchResponseBuilder
                     Telephone = "011 111 1111",
                     Website = "https://www.provider1.ac.uk",
                     Distance = 10.0,
-                    JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation { Postcode = "AA1 1AA" }),
+                    JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation { Location = "AA1 1AA" }),
                     DeliveryYears = new List<DeliveryYear>
                     {
                         new()
@@ -67,7 +67,7 @@ public class ProviderSearchResponseBuilder
                     Telephone = "022 222 2222",
                     Website = "https://www.provider2.ac.uk",
                     Distance = 12.0,
-                    JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation { Postcode = "BB2 2BB" }),
+                    JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation { Location = "BB2 2BB" }),
                     DeliveryYears = new List<DeliveryYear>
                     {
                         new()
@@ -104,7 +104,7 @@ public class ProviderSearchResponseBuilder
     public ProviderSearchResponse BuildWithSingleSearchResult() =>
         new()
         {
-            SearchTerm = _searchOrigin != null ? _searchOrigin.Postcode : DefaultPostcode,
+            SearchTerm = _searchOrigin != null ? _searchOrigin.Location : DefaultPostcode,
             SearchResults = new List<ProviderSearchResult>
             {
                 new()
@@ -121,7 +121,7 @@ public class ProviderSearchResponseBuilder
                     Telephone = "011 111 1111",
                     Website = "https://www.provider1.ac.uk",
                     Distance = 10.0,
-                    JourneyToLink = _searchOrigin.CreateJourneyLink(new PostcodeLocation { Postcode = "AA1 1AA" }),
+                    JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation { Location = "AA1 1AA" }),
                     DeliveryYears = new List<DeliveryYear>
                     {
                         new()
@@ -148,7 +148,7 @@ public class ProviderSearchResponseBuilder
             Error = errorMessage
         };
 
-    public ProviderSearchResponseBuilder WithSearchOrigin(PostcodeLocation origin)
+    public ProviderSearchResponseBuilder WithSearchOrigin(GeoLocation origin)
     {
         _searchOrigin = origin;
 

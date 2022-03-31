@@ -93,10 +93,6 @@ public class DbContextWrapperTests
             sql,
             map);
 
-        //await policy.Received(1).ExecuteAsync(
-        //    Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),
-        //    Arg.Any<Context>());
-
         await policy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),
             Arg.Is<Context>(ctx =>

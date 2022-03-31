@@ -2,11 +2,11 @@
 
 namespace Sfa.Tl.Find.Provider.Api.Models;
 
-[DebuggerDisplay(" {" + nameof(Postcode) + ", nq}" +
+[DebuggerDisplay(" {" + nameof(Location) + ", nq}" +
                  " ({" + nameof(Latitude) + "}, {" + nameof(Longitude) + "})")]
-public class PostcodeLocation
+public class GeoLocation
 {
-    public string Postcode { get; init; }
+    public string Location { get; init; }
     public double Latitude { get; init; }
     public double Longitude { get; init; }
 }

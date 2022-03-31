@@ -20,7 +20,7 @@ public class PostcodeLookupService : IPostcodeLookupService
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
-    public async Task<PostcodeLocation> GetPostcode(string postcode)
+    public async Task<GeoLocation> GetPostcode(string postcode)
     {
         var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
 
@@ -38,7 +38,7 @@ public class PostcodeLookupService : IPostcodeLookupService
         return await ReadPostcodeLocationFromResponse(responseMessage);
     }
 
-    public async Task<PostcodeLocation> GetOutcode(string outcode)
+    public async Task<GeoLocation> GetOutcode(string outcode)
     {
         var responseMessage = await _httpClient.GetAsync($"outcodes/{outcode}");
 
@@ -48,7 +48,7 @@ public class PostcodeLookupService : IPostcodeLookupService
                 "outcode");
     }
 
-    public async Task<PostcodeLocation> GetNearestPostcode(double latitude, double longitude)
+    public async Task<GeoLocation> GetNearestPostcode(double latitude, double longitude)
     {
         var responseMessage = await _httpClient.GetAsync($"postcodes?lon={longitude}&lat={latitude}");
 
@@ -57,7 +57,7 @@ public class PostcodeLookupService : IPostcodeLookupService
             : await ReadPostcodeLocationFromResponse(responseMessage);
     }
 
-    private static async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(
+    private static async Task<GeoLocation> ReadPostcodeLocationFromResponse(
         HttpResponseMessage responseMessage,
         string postcodeFieldName = "postcode")
     {
@@ -76,18 +76,18 @@ public class PostcodeLookupService : IPostcodeLookupService
             {
                 var firstItem = resultElement.EnumerateArray().FirstOrDefault();
                 {
-                    return new PostcodeLocation
+                    return new GeoLocation
                     {
-                        Postcode = firstItem.SafeGetString(postcodeFieldName),
+                        Location = firstItem.SafeGetString(postcodeFieldName),
                         Latitude = firstItem.SafeGetDouble("latitude", Constants.DefaultLatitude),
                         Longitude = firstItem.SafeGetDouble("longitude")
                     };
                 }
             }
             case JsonValueKind.Object:
-                return new PostcodeLocation
+                return new GeoLocation
                 {
-                    Postcode = resultElement.SafeGetString(postcodeFieldName),
+                    Location = resultElement.SafeGetString(postcodeFieldName),
                     Latitude = resultElement.SafeGetDouble("latitude", Constants.DefaultLatitude),
                     Longitude = resultElement.SafeGetDouble("longitude")
                 };

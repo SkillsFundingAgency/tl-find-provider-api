@@ -206,50 +206,50 @@ public class FindProvidersControllerTests
     [Fact]
     public async Task GetProviders_Returns_Expected_List_Of_Search_Results()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService.FindProviders(fromPostcodeLocation.Postcode)
+        providerDataService.FindProviders(fromGeoLocation.Location)
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildWithMultipleSearchResults());
 
         var controller = new FindProvidersControllerBuilder()
             .Build(providerDataService);
 
-        var result = await controller.GetProviders(fromPostcodeLocation.Postcode);
+        var result = await controller.GetProviders(fromGeoLocation.Location);
 
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
+        results!.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
     }
 
     [Fact]
     public async Task GetProviders_Returns_Expected_Value_For_One_Search_Result()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var providerSearchResponse = new ProviderSearchResponseBuilder()
-            .WithSearchOrigin(fromPostcodeLocation)
+            .WithSearchOrigin(fromGeoLocation)
             .BuildWithSingleSearchResult();
 
         var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService.FindProviders(fromPostcodeLocation.Postcode)
+        providerDataService.FindProviders(fromGeoLocation.Location)
             .Returns(providerSearchResponse);
 
         var controller = new FindProvidersControllerBuilder()
             .Build(providerDataService);
 
-        var result = await controller.GetProviders(fromPostcodeLocation.Postcode);
+        var result = await controller.GetProviders(fromGeoLocation.Location);
 
         var results = (result as OkObjectResult)?.Value
             as ProviderSearchResponse;
 
         results.Should().NotBeNull();
-        results!.SearchTerm.Should().Be(fromPostcodeLocation.Postcode);
+        results!.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         results.SearchResults.Count().Should().Be(1);

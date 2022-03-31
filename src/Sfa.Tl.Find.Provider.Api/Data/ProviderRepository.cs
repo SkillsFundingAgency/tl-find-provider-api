@@ -136,7 +136,7 @@ public class ProviderRepository : IProviderRepository
     }
 
     public async Task<IEnumerable<ProviderSearchResult>> Search(
-        PostcodeLocation fromPostcodeLocation,
+        GeoLocation fromGeoLocation,
         IList<int> routeIds,
         IList<int> qualificationIds,
         int page,
@@ -157,7 +157,7 @@ public class ProviderRepository : IProviderRepository
                     if (!providerSearchResults.TryGetValue(key, out var searchResult))
                     {
                         providerSearchResults.Add(key, searchResult = p);
-                        searchResult.JourneyToLink = fromPostcodeLocation.CreateJourneyLink(searchResult.Postcode);
+                        searchResult.JourneyToLink = fromGeoLocation.CreateJourneyLink(searchResult.Postcode);
                     }
 
                     var deliveryYear = searchResult
@@ -182,8 +182,8 @@ public class ProviderRepository : IProviderRepository
                 },
                 new
                 {
-                    fromLatitude = fromPostcodeLocation.Latitude,
-                    fromLongitude = fromPostcodeLocation.Longitude,
+                    fromLatitude = fromGeoLocation.Latitude,
+                    fromLongitude = fromGeoLocation.Longitude,
                     routeIds = routeIds?.AsTableValuedParameter("dbo.IdListTableType"),
                     qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
                     page,

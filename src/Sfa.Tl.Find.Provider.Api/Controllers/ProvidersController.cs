@@ -75,16 +75,16 @@ public class ProvidersController : ControllerBase
             }
 
             var providersSearchResponse =
-                !searchTerms.IsNullOrWhiteSpace()
+                searchTerms.IsNullOrWhiteSpace()
                     ? await _providerDataService.FindProviders(
-                        searchTerms,
+                        latitude!.Value,
+                        longitude!.Value,
                         routeIds,
                         qualificationIds,
                         page,
                         pageSize)
                     : await _providerDataService.FindProviders(
-                        latitude!.Value,
-                        longitude!.Value,
+                        searchTerms,
                         routeIds,
                         qualificationIds,
                         page,

@@ -5,9 +5,9 @@ namespace Sfa.Tl.Find.Provider.Api.Interfaces;
 
 public interface IPostcodeLookupService
 {
-    Task<PostcodeLocation> GetPostcode(string postcode);
+    Task<GeoLocation> GetPostcode(string postcode);
 
-    Task<PostcodeLocation> GetOutcode(string outcode);
+    Task<GeoLocation> GetOutcode(string outcode);
 
-    Task<PostcodeLocation> GetNearestPostcode(double latitude, double longitude);
+    Task<GeoLocation> GetNearestPostcode(double latitude, double longitude);
 }

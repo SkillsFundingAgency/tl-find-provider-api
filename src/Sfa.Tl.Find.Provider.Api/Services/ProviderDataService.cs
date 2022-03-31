@@ -104,11 +104,11 @@ public class ProviderDataService : IProviderDataService
                 _logger.LogDebug("Searching for postcode or town '{searchTerm}'", searchTerms);
             }
 
-            PostcodeLocation postcodeLocation = null;
+            GeoLocation geoLocation = null;
 
             if (searchTerms.IsFullOrPartialPostcode())
             {
-                postcodeLocation = await GetPostcode(searchTerms);
+                geoLocation = await GetPostcode(searchTerms);
             }
             else
             {
@@ -119,22 +119,22 @@ public class ProviderDataService : IProviderDataService
                     var latitude = Convert.ToDouble(town.Latitude);
                     var longitude = Convert.ToDouble(town.Longitude);
 
-                    postcodeLocation = new PostcodeLocation
+                    geoLocation = new GeoLocation
                     {
-                        Postcode = town.FormatTownName(),
+                        Location = town.FormatTownName(),
                         Latitude = latitude,
                         Longitude = longitude
                     };
                 }
 
-                if (postcodeLocation == null)
+                if (geoLocation == null)
                 {
                     throw new PostcodeNotFoundException(searchTerms);
                 }
             }
             
             var searchResults = await _providerRepository
-                .Search(postcodeLocation,
+                .Search(geoLocation,
                         routeIds,
                         qualificationIds,
                         page,
@@ -143,7 +143,7 @@ public class ProviderDataService : IProviderDataService
 
             return new ProviderSearchResponse
             {
-                SearchTerm = postcodeLocation.Postcode,
+                SearchTerm = geoLocation.Location,
                 SearchResults = searchResults
             };
         }
@@ -173,10 +173,10 @@ public class ProviderDataService : IProviderDataService
                 _logger.LogDebug("Searching for postcode near ({latitude}, {longitude})", latitude, longitude);
             }
 
-            var postcodeLocation = await GetNearestPostcode(latitude, longitude);
+            var geoLocation = await GetNearestPostcode(latitude, longitude);
 
             var searchResults = await _providerRepository
-                .Search(postcodeLocation,
+                .Search(geoLocation,
                     routeIds,
                     qualificationIds,
                     page,
@@ -185,7 +185,7 @@ public class ProviderDataService : IProviderDataService
 
             return new ProviderSearchResponse
             {
-                SearchTerm = postcodeLocation.Postcode,
+                SearchTerm = geoLocation.Location,
                 SearchResults = searchResults
             };
         }
@@ -210,45 +210,45 @@ public class ProviderDataService : IProviderDataService
         return await _providerRepository.HasAny();
     }
 
-    private async Task<PostcodeLocation> GetPostcode(string postcode)
+    private async Task<GeoLocation> GetPostcode(string postcode)
     {
         var key = CacheKeys.PostcodeKey(postcode);
 
-        if (!_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
+        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
         {
-            postcodeLocation = postcode.Length <= 4
+            geoLocation = postcode.Length <= 4
                 ? await _postcodeLookupService.GetOutcode(postcode)
                 : await _postcodeLookupService.GetPostcode(postcode);
 
-            if (postcodeLocation is null)
+            if (geoLocation is null)
             {
                 throw new PostcodeNotFoundException(postcode);
             }
 
-            _cache.Set(key, postcodeLocation,
+            _cache.Set(key, geoLocation,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(
                     _dateTimeService,
                     _logger));
         }
 
-        return postcodeLocation;
+        return geoLocation;
     }
 
-    private async Task<PostcodeLocation> GetNearestPostcode(double latitude, double longitude)
+    private async Task<GeoLocation> GetNearestPostcode(double latitude, double longitude)
     {
         var key = CacheKeys.LatLongKey(latitude, longitude);
 
-        if (!_cache.TryGetValue(key, out PostcodeLocation postcodeLocation))
+        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
         {
-            postcodeLocation = await _postcodeLookupService.GetNearestPostcode(latitude, longitude);
+            geoLocation = await _postcodeLookupService.GetNearestPostcode(latitude, longitude);
 
-            _cache.Set(key, postcodeLocation,
+            _cache.Set(key, geoLocation,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(
                     _dateTimeService,
                     _logger));
         }
 
-        return postcodeLocation;
+        return geoLocation;
     }
 
     public async Task LoadAdditionalProviderData()
