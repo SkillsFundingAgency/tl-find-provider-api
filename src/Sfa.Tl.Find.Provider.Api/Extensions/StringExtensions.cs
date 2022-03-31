@@ -25,11 +25,11 @@ public static class StringExtensions
 
     public static string FormatTownName(this Town town)
     {
-        var townName = town.Name;
         if (!string.IsNullOrWhiteSpace(town.County))
-            townName += $", {town.County}";
-
-        return townName;
+            return $"{town.Name}, {town.County}";
+        else if (!string.IsNullOrWhiteSpace(town.LocalAuthority))
+            return $"{town.Name}, {town.LocalAuthority}";
+        return $"{town.Name}";
     }
 
     public static bool IsPostcode(this string postcode)

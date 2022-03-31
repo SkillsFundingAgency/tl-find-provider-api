@@ -18,16 +18,18 @@ public class StringExtensionsTests
     }
 
     [Theory(DisplayName = nameof(StringExtensions.FormatTownName) + " Data Tests")]
-    [InlineData("Oxford", "Oxfordshire", "Oxford, Oxfordshire")]
-    [InlineData("Coventry", null, "Coventry")]
-    [InlineData("Coventry", "", "Coventry")]
-    [InlineData("Coventry", "Some County", "Coventry, Some County")]
-    public void String_FormatTown_Data_Tests(string name, string county, string expectedResult)
+    [InlineData("Oxford", "Oxfordshire", "Oxfordshire", "Oxford, Oxfordshire")]
+    [InlineData("Bristol", null, "Gloucestershire", "Bristol, Gloucestershire")]
+    [InlineData("Coventry", "West Midlands", "West Midlands", "Coventry, West Midlands")]
+    [InlineData("Coventry", "", "", "Coventry")]
+    [InlineData("Some Town (Somewhere)", "Some County", null, "Some Town (Somewhere), Some County")]
+    public void String_FormatTownName_Data_Tests(string name, string county, string localAuthority, string expectedResult)
     {
         var town = new Town
         {
             Name = name,
-            County = county
+            County = county,
+            LocalAuthority = localAuthority
         };
 
         var result = town.FormatTownName();
