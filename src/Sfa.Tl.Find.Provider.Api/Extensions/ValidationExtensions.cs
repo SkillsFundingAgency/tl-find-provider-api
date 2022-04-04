@@ -8,7 +8,7 @@ public static class ValidationExtensions
     {
         errorMessage = null;
         //Special characters found in town names include '-!&(),./
-        var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z,\.|'\-!&\(|\)\s]*$");
+        var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z,\.|'\-!&\(|\)/\s]*$");
                                               
         if (string.IsNullOrWhiteSpace(searchTerm))
         {

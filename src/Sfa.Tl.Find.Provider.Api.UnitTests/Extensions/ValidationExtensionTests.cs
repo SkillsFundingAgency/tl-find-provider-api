@@ -24,6 +24,7 @@ public class ValidationExtensionTests
     [InlineData("Oakthorpe & Donisthorpe", true, null)]
     [InlineData("Bede, Tyne & Wear", true, null)]
     [InlineData("Bishop's Castle, Shropshire", true, null)]
+    [InlineData("Accrington/Rossendale, Lancashire", true, null)]
     // ReSharper restore StringLiteralTypo
     public void Validate_Town_Names_With_Special_Character_SearchTerm_Data_Tests(string searchTerm, bool expectedValidationResult, string expectedErrorMessage)
     {
