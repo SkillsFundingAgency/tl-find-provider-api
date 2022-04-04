@@ -17,7 +17,7 @@ SELECT  [Id],
 					ELSE
 						CONCAT([Name], ' ',  [County])
 					END, 
-					'%[ ,.''()/]%', 1, ''), 
+					'%[ ,.''()/!-]%', 1, ''), 
 				'%[&]%', 1, 'and'),
 			--Performance trick - append id so clustered index will work
 			'+', convert(nvarchar, Id))) AS Search
