@@ -55,10 +55,17 @@ public class FindProvidersController : ControllerBase
         int page = 0,
         [FromQuery,
          Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")]
-        int pageSize = Constants.DefaultPageSize)
+        int pageSize = Constants.DefaultPageSize,
+        [FromQuery]
+        string searchTerm = null)
     {
         try
         {
+            if (postcode == null && searchTerm != null)
+            {
+                postcode = searchTerm;
+            }
+
             if (!postcode.TryValidate(out var validationMessage))
             {
                 return Ok(new ProviderSearchResponse
