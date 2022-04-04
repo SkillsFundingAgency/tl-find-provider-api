@@ -34,6 +34,7 @@ public class FindProvidersController : ControllerBase
     /// Search for providers.
     /// </summary>
     /// <param name="postcode">Postcode that the search should start from.</param>
+    /// <param name="searchTerm">Can be used for postcode - allowed in case a v1 uri is used with v2 parameters.</param>
     /// <param name="qualificationIds">Qualification ids to filter by. Optional, nulls or zeroes will be ignored.</param>
     /// <param name="routeIds">Route ids to filter by. Optional, nulls or zeroes will be ignored.</param>
     /// <param name="page">Page to be displayed (zero-based).</param>

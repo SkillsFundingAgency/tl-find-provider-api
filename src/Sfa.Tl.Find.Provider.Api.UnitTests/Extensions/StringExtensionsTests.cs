@@ -133,7 +133,6 @@ public class StringExtensionsTests
     [InlineData("Collett's Green", "collettsgreen")]
     [InlineData("Newcastle-under-Lyme, Staffordshire", "newcastleunderlymestaffordshire")]
     [InlineData("Westward Ho!", "westwardho")]
-    [InlineData("Wymondham(Melton), Leicestershire", "wymondhammeltonleicestershire")]
     [InlineData("Oakthorpe & Donisthorpe", "oakthorpeanddonisthorpe")]
     [InlineData("Bede, Tyne & Wear", "bedetyneandwear")]
     [InlineData("Bishop's Castle, Shropshire", "bishopscastleshropshire")]
