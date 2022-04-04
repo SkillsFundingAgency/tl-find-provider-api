@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
@@ -7,9 +8,9 @@ public static class ValidationExtensions
     public static bool TryValidate(this string searchTerm, out string errorMessage)
     {
         errorMessage = null;
-        //NOTE: Comma and dot also allowed as it could be part of a town name
-        var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z,\.\s]*$");
-
+        //Special characters found in town names include '-!&(),./
+        var regex = new Regex(@"^[a-zA-Z][0-9a-zA-Z,\.|'\-!&\(|\)\s]*$");
+                                              
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
             errorMessage = "The search term is required.";
@@ -76,17 +77,7 @@ public static class ValidationExtensions
         }
         else
         {
-            //NOTE: Comma and dot also allowed as it could be part of a town name
-            //var lettersAndDigitsRegex = new Regex(@"^[a-zA-Z][0-9a-zA-Z,\.\s]*$");
-            //if (!lettersAndDigitsRegex.IsMatch(searchTerm))
-            //{
-            //    errorMessage =
-            //        "The search term must start with a letter and contain only letters, numbers, and spaces.";
-            //}
-            //else
-            {
-                searchTerm.TryValidate(out errorMessage);
-            }
+            searchTerm.TryValidate(out errorMessage);
         }
 
         return errorMessage is null;

@@ -16,6 +16,22 @@ public class ValidationExtensionTests
         errorMessage.Should().Be(expectedErrorMessage);
     }
 
+    [Theory(DisplayName = nameof(ValidationExtensions.TryValidate) + " Search Term Data Tests")]
+    // ReSharper disable StringLiteralTypo
+    [InlineData("Newcastle-under-Lyme, Staffordshire", true, null)]
+    [InlineData("Westward Ho!", true, null)]
+    [InlineData("Wymondham(Melton), Leicestershire", true, null)]
+    [InlineData("Oakthorpe & Donisthorpe", true, null)]
+    [InlineData("Bede, Tyne & Wear", true, null)]
+    [InlineData("Bishop's Castle, Shropshire", true, null)]
+    // ReSharper restore StringLiteralTypo
+    public void Validate_Town_Names_With_Special_Character_SearchTerm_Data_Tests(string searchTerm, bool expectedValidationResult, string expectedErrorMessage)
+    {
+        searchTerm!.TryValidate(out var errorMessage).Should().Be(expectedValidationResult);
+        errorMessage.Should().Be(expectedErrorMessage);
+    }
+
+
     [Theory(DisplayName = nameof(ValidationExtensions.TryValidate) + " Lat/Long Data Tests")]
     [InlineData(51.0, -2.0, true, null)]
     [InlineData(null, null, false, "Both latitude and longitude required if postcode is not provided.")]

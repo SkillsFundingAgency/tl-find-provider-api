@@ -96,8 +96,8 @@ public class StringExtensionsTests
     [InlineData("T Level Education - Education and Childcare", "Education", 10)]
     public void String_ParseTLevelDefinitionName_Data_Tests(string input, string expectedResult, int maxLength = -1)
     {
-        var result = maxLength < 0 
-            ? input.ParseTLevelDefinitionName() 
+        var result = maxLength < 0
+            ? input.ParseTLevelDefinitionName()
             : input.ParseTLevelDefinitionName(maxLength);
 
         result.Should().Be(expectedResult);
@@ -131,6 +131,12 @@ public class StringExtensionsTests
     [InlineData("Coates (Cotswold),	Gloucestershire", "coatescotswoldgloucestershire")]
     [InlineData("Coleorton/Griffydam, Leicestershire", "coleortongriffydamleicestershire")]
     [InlineData("Collett's Green", "collettsgreen")]
+    [InlineData("Newcastle-under-Lyme, Staffordshire", "newcastleunderlymestaffordshire")]
+    [InlineData("Westward Ho!", "westwardho")]
+    [InlineData("Wymondham(Melton), Leicestershire", "wymondhammeltonleicestershire")]
+    [InlineData("Oakthorpe & Donisthorpe", "oakthorpeanddonisthorpe")]
+    [InlineData("Bede, Tyne & Wear", "bedetyneandwear")]
+    [InlineData("Bishop's Castle, Shropshire", "bishopscastleshropshire")]
     // ReSharper restore StringLiteralTypo
     public void String_ToSearchableString_Data_Tests(string input, string expectedResult)
     {

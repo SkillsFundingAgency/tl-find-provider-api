@@ -76,8 +76,10 @@ public static class StringExtensions
         if (value == null)
             return null;
 
+        //Remove special characters and spaces, and replace & with and
+        const string knownSpecialCharacters = @"(\s+|,|\.|'|\-|!|\(|\)|/)";
         return Regex.Replace(
-                Regex.Replace(value, @"(\s+|,|\.|'|\(|\)|/)", ""),
+                Regex.Replace(value, knownSpecialCharacters, ""),
                 @"(&)", "and")
                 .ToLower();
     }
