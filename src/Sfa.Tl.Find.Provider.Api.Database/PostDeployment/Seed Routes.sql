@@ -9,7 +9,7 @@ USING (VALUES
   (1, N'Agriculture, environment and animal care', 0),
   (2, N'Business and administration', 0),
   (3, N'Catering', 0),
-  (4, N'‘Construction and the built environment', 0),
+  (4, N'Construction and the built environment', 0),
   (5, N'Creative and design', 0),
   (6, N'Digital and IT', 0),
   (7, N'Education and childcare', 0),
