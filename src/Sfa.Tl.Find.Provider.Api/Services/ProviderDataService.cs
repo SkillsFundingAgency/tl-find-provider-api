@@ -112,8 +112,17 @@ public class ProviderDataService : IProviderDataService
             }
             else
             {
-                var towns = await _townDataService.Search(searchTerms);
-                var town = towns.FirstOrDefault();
+                var towns = (await _townDataService.Search(searchTerms)).ToList();
+
+                var town = towns.Count switch
+                {
+                    1 => towns.Single(),
+                    > 1 => towns.FirstOrDefault(t => string.Compare(t.FormatTownName(), searchTerms, StringComparison.CurrentCultureIgnoreCase) == 0)
+                                                     ?? towns.FirstOrDefault(t => string.Compare(t.Name, searchTerms, StringComparison.CurrentCultureIgnoreCase) == 0)
+                                                     ?? towns.FirstOrDefault(t => t.FormatTownName().StartsWith(searchTerms, StringComparison.CurrentCultureIgnoreCase)),
+                    _ => null
+                };
+
                 if (town != null)
                 {
                     var latitude = Convert.ToDouble(town.Latitude);
@@ -132,7 +141,7 @@ public class ProviderDataService : IProviderDataService
                     throw new PostcodeNotFoundException(searchTerms);
                 }
             }
-            
+
             var searchResults = await _providerRepository
                 .Search(geoLocation,
                         routeIds,

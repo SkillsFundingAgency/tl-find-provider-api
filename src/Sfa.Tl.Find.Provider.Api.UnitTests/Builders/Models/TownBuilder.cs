@@ -27,4 +27,27 @@ public class TownBuilder
                 Longitude = -1.217524M
             }
         };
+
+    public IEnumerable<Town> BuildListForStAgnes() =>
+        new List<Town>
+        {
+            new()
+            {
+                Id = 1,
+                Name = "St Agnes",
+                County = null,
+                LocalAuthority = "Cornwall",
+                Latitude = 50.309347M,
+                Longitude = -5.203885M
+            },
+            new()
+            {
+                Id = 2,
+                Name = "St. Agnes",
+                County = null,
+                LocalAuthority = "Cornwall",
+                Latitude = 50.275615M,
+                Longitude = -5.205394M
+            }
+        };
 }
