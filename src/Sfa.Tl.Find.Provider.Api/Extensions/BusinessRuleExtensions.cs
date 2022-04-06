@@ -12,20 +12,20 @@ public static class BusinessRuleExtensions
                || (deliveryYear == today.Year && today.Month >= 9);
     }
 
-    public static string CreateJourneyLink(this PostcodeLocation from, string toPostcode)
+    public static string CreateJourneyLink(this GeoLocation from, string toPostcode)
     {
-        return from.CreateJourneyLink(new PostcodeLocation { Postcode = toPostcode });
+        return from.CreateJourneyLink(new GeoLocation { Location = toPostcode });
     }
 
-    public static string CreateJourneyLink(this PostcodeLocation from, PostcodeLocation to)
+    public static string CreateJourneyLink(this GeoLocation from, GeoLocation to)
     {
-        if (string.IsNullOrEmpty(from?.Postcode) ||
-            string.IsNullOrEmpty(to?.Postcode))
+        if (string.IsNullOrEmpty(from?.Location) ||
+            string.IsNullOrEmpty(to?.Location))
             return null;
 
         return "https://www.google.com/maps/dir/?api=1&" +
-               $"origin={WebUtility.UrlEncode(from.Postcode.Trim())}" +
-               $"&destination={WebUtility.UrlEncode(to.Postcode.Trim())}" +
+               $"origin={WebUtility.UrlEncode(from.Location.Trim())}" +
+               $"&destination={WebUtility.UrlEncode(to.Location.Trim())}" +
                "&travelmode=transit";
     }
 }

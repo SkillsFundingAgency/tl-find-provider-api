@@ -9,7 +9,7 @@ using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Services;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 
@@ -81,17 +81,42 @@ public class FakeStartup
                 var providerDataService = Substitute.For<IProviderDataService>();
                 providerDataService.FindProviders(
                         Arg.Any<string>(), 
-                        Arg.Any<int?>(), 
-                        Arg.Any<int>(), 
+                        Arg.Any<List<int>>(), 
+                        Arg.Any<List<int>>(),
                         Arg.Any<int>())
                     .Returns(x => new ProviderSearchResponse
                     {
-                        Postcode = (string)x[0],
+                        SearchTerm = (string)x[0],
                         SearchResults = new List<ProviderSearchResult>()
                     });
+                providerDataService.FindProviders(
+                        Arg.Any<double>(),
+                        Arg.Any<double>(),
+                        Arg.Any<List<int>>(),
+                        Arg.Any<List<int>>(),
+                        Arg.Any<int>())
+                    .Returns(new ProviderSearchResponse
+                    {
+                        SearchTerm = "CV1 2WT",
+                        SearchResults = new List<ProviderSearchResult>()
+                    });
+
                 return providerDataService;
             })
+            .AddTransient(_ =>
+            {
+                var townDataService = Substitute.For<ITownDataService>();
+                townDataService.Search(
+                        Arg.Any<string>())
+                    .Returns(_ => 
+                        new TownBuilder()
+                        .BuildList());
+
+                return townDataService;
+            })
+
             .AddTransient(_ => Substitute.For<IProviderRepository>())
-            .AddTransient(_ => Substitute.For<IQualificationRepository>());
+            .AddTransient(_ => Substitute.For<IQualificationRepository>())
+            .AddTransient(_ => Substitute.For<ITownRepository>());
     }
 }

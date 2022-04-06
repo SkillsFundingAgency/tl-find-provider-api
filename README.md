@@ -51,6 +51,7 @@ Add a new row to the table with:
             "ApiKey": "<API Key>"
         },
         "CourseDirectoryImportSchedule": "<CRON string>",
+        "TownDataImportSchedule": "<CRON string>",
         "PostcodeApiSettings": {
             "BaseUri": "https://api.postcodes.io/"
         },
@@ -86,22 +87,51 @@ When running locally, assuming localhost with port 55961, you can either use the
 > - https://localhost:55961/swagger/v1/swagger.json
 >   - This can be saved into `\api-definitions\findaproviderapi.json`
 > 
-> **Qualifications**
-> - https://localhost:55961/api/v1/findproviders/qualifications
+> **V1 API Calls** *(Obsolete)*
 > 
-> **Provider search**
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=3
-> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
+>> **Routes** *(Skill Areas)*
+>> - https://localhost:55961/api/v1/findproviders/routes
+>> 
+>> **Qualifications**
+>> - https://localhost:55961/api/v1/findproviders/qualifications
+>> 
+>> **Provider search**
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&routeId=6
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=3
+>> - https://localhost:55961/api/v1/findproviders/providers?postcode=CV1%202WT&qualificationId=37&page=0&pageSize=10
+>
+> **V2 API Calls**
+> 
+>> **Routes** *(Skill Areas)*
+>> - https://localhost:55961/api/v2/routes
+>>  
+>> **Qualifications**
+>> - https://localhost:55961/api/v2/qualifications
+>>  
+>> **Locations**
+>> - https://localhost:55961/api/v2/locations?searchTerm=Oxford
+>>
+>> **Provider search**
+>> 
+>> *Note the use of searchTerm instead of postcode*
+>> - https://localhost:55961/api/v2/providers?lat=51.742141&lon=-1.295653
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&routeId=6
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37&page=3
+>> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37&page=0&pageSize=10
+
 
 For provider search, the postcode at the end of the url is required. 
-The `qualificationId` filter is optional and defaults to null or 0; 
+The `qualificationId` and `routeId` filters are optional and defaults to null or 0; 
 `page` and `pageSize` are also optional and default to 0 and 5 respectively.
 
 If the postcode is not found in provider search, the API will return a 404 result with a message indicating the postcode was not found.
 
 API calls need to include an `Authorization` header with an HMAC signature.
+(Locations currently does not require the authorization header.)
 
 
 

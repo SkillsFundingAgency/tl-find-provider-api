@@ -3,6 +3,11 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
+    "AllowedCorsOrigins": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "AllowedCorsOrigins"
+    },
     "ApiSettings": {
       "properties": {
         "AppId": {
@@ -82,10 +87,10 @@
       "type": "string",
       "environmentVariable": "CourseDirectoryImportSchedule"
     },
-    "AllowedCorsOrigins": {
+    "TownDataImportSchedule": {
       "minLength": 1,
       "type": "string",
-      "environmentVariable": "AllowedCorsOrigins"
+      "environmentVariable": "TownDataImportSchedule"
     }
   },
   "additionalProperties": false,

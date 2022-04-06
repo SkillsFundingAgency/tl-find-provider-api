@@ -15,11 +15,11 @@ public static class LoggerExtensions
     {
         var (inserted, updated, deleted) = updateResult.ConvertToTuple();
 
-        logger.LogInformation("{repositoryName} saved {typeName} data.",
-            repositoryName, typeName);
+        var details = $"{(includeInserted ? $" Inserted { inserted} row(s)." : null)}" +
+                       $"{(includeUpdated ? $" Updated {updated} row(s)." : null)}" +
+                       $"{(includeDeleted ? $" Deleted {deleted} row(s)." : null)}";
 
-        if (includeInserted) logger.LogInformation(" Inserted {inserted} row(s).", inserted);
-        if (includeUpdated) logger.LogInformation(" Updated {updated} row(s).", updated);
-        if (includeDeleted) logger.LogInformation(" Deleted {deleted} row(s).", deleted);
+        logger.LogInformation("{repositoryName} saved {typeName} data.{details}",
+            repositoryName, typeName, details);
     }
 }

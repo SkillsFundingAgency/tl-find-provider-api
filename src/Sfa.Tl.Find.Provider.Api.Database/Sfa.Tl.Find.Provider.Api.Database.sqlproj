@@ -61,10 +61,14 @@
     <Folder Include="Stored Procedures" />
     <Folder Include="Types" />
     <Folder Include="PostDeployment" />
+    <Folder Include="PreDeployment" />
+    <Folder Include="Views" />
+    <Folder Include="Functions" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
+    <Build Include="Types\IdListTableType.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
@@ -73,7 +77,14 @@
     <Build Include="Tables\LocationQualification.sql" />
     <Build Include="Tables\Route.sql" />
     <Build Include="Tables\RouteQualification.sql" />
+    <Build Include="Tables\Town.sql" />
+    <Build Include="Indexes\IX_LocationQualification_LocationId.sql" />
+    <Build Include="Indexes\IX_LocationQualification_QualificationId.sql" />
+    <Build Include="Indexes\IX_RouteQualification_QualificationId.sql" />
+    <Build Include="Indexes\IX_RouteQualification_RouteId.sql" />
+    <Build Include="Indexes\IX_Town_TownName.sql" />
     <Build Include="Indexes\SPATIAL_Location_Location.sql" />
+    <Build Include="Types\IdListTableType.sql" />
     <Build Include="Types\QualificationDataTableType.sql" />
     <Build Include="Types\ProviderDataTableType.sql" />
     <Build Include="Types\LocationDataTableType.sql" />
@@ -83,11 +94,20 @@
     <Build Include="Stored Procedures\UpdateLocationQualifications.sql" />
     <Build Include="Stored Procedures\UpdateProviders.sql" />
     <Build Include="Stored Procedures\UpdateQualifications.sql" />
+    <Build Include="Types\TownDataTableType.sql" />
+    <Build Include="Stored Procedures\UpdateTowns.sql" />
+    <Build Include="Stored Procedures\GetRoutes.sql" />
+    <Build Include="Views\TownSearchView.sql" />
+    <Build Include="Functions\ReplaceAllFunction.sql" />
+    <Build Include="Indexes\IX_TownSearchView_Search.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
     <None Include="PostDeployment\Seed Qualifications.sql" />
     <None Include="PostDeployment\Seed Routes.sql" />
     <None Include="PostDeployment\Seed RouteQualification.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="PreDeployment\PreDeploymentScript.sql" />
   </ItemGroup>
 </Project>

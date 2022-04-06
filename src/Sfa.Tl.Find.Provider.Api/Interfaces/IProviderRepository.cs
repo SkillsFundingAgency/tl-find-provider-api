@@ -11,9 +11,10 @@ public interface IProviderRepository
     Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);
 
     Task<IEnumerable<ProviderSearchResult>> Search(
-        PostcodeLocation fromPostcodeLocation,
-        int? qualificationId,
+        GeoLocation fromGeoLocation,
+        IList<int> routeIds,
+        IList<int> qualificationIds,
         int page,
         int pageSize,
-        bool mergeAdditionalData);
+        bool includeAdditionalData);
 }

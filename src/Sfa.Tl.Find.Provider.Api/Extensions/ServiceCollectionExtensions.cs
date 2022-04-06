@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -77,8 +78,11 @@ public static class ServiceCollectionExtensions
     {
         if (!string.IsNullOrWhiteSpace(allowedOrigins))
         {
-            var splitterChars = new[] { ';', ',' };
-            var corsOrigins = allowedOrigins.Split(splitterChars);
+            var corsOrigins = allowedOrigins
+                .Split(';', ',')
+                .Select(s => s.TrimEnd('/'))
+                .ToArray();
+
             services.AddCors(options => options.AddPolicy(policyName, builder =>
                 builder
                     .WithMethods(HttpMethod.Get.Method)
@@ -141,12 +145,23 @@ public static class ServiceCollectionExtensions
             })
             .AddRetryPolicyHandler<CourseDirectoryService>();
 
+        services
+            .AddHttpClient<ITownDataService, TownDataService>(
+                (_, client) =>
+                {
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+            )
+            .AddRetryPolicyHandler<TownDataService>();
+
         return services;
     }
 
     public static IServiceCollection AddQuartzServices(
         this IServiceCollection services,
-        string cronSchedule)
+        string courseDirectoryImportCronSchedule = null,
+        string townDataImportCronSchedule = null)
     {
         services.AddQuartz(q =>
         {
@@ -160,15 +175,26 @@ public static class ServiceCollectionExtensions
                     .ForJob(startupJobKey)
                     .StartNow());
 
-            if (!string.IsNullOrEmpty(cronSchedule))
+            if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
-                var importJobKey = new JobKey("Import Course Data");
-                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(importJobKey))
+                var courseImportJobKey = new JobKey("Import Course Data");
+                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(courseImportJobKey))
                     .AddTrigger(opts => opts
-                        .ForJob(importJobKey)
+                        .ForJob(courseImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(cronSchedule)));
+                                .CronSchedule(courseDirectoryImportCronSchedule)));
+            }
+            
+            if (!string.IsNullOrEmpty(townDataImportCronSchedule))
+            {
+                var townImportJobKey = new JobKey("Import Town Data");
+                q.AddJob<TownDataImportJob>(opts => opts.WithIdentity(townImportJobKey))
+                    .AddTrigger(opts => opts
+                        .ForJob(townImportJobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(townDataImportCronSchedule)));
             }
         });
 
@@ -176,7 +202,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
+    
     public static IServiceCollection AddRateLimitPolicy(
         this IServiceCollection services)
     {
@@ -202,6 +228,9 @@ public static class ServiceCollectionExtensions
                     Title = title,
                     Version = version
                 });
+
+            c.ResolveConflictingActions(apiDescriptions 
+                => apiDescriptions.First());
 
             if (xmlFile != null)
             {

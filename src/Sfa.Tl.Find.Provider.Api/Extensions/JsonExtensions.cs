@@ -1,9 +1,45 @@
-﻿using System.Text.Json;
+﻿using System.IO;
+using System.Text;
+using System.Text.Json;
+// ReSharper disable UnusedMember.Global
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
 public static class JsonExtensions
 {
+    public static string PrettifyJson(this string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return string.Empty;
+        }
+
+        var jsonDocument = JsonDocument.Parse(json);
+
+        return jsonDocument.PrettifyJson();
+    }
+
+    public static string PrettifyJson(this JsonDocument jsonDocument)
+    {
+        if (jsonDocument is null)
+        {
+            return string.Empty;
+        }
+
+        var options = new JsonWriterOptions
+        {
+            Indented = true
+        };
+
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream, options))
+        {
+            jsonDocument.WriteTo(writer);
+        }
+
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
+
     public static bool SafeGetBoolean(this JsonElement element, 
         string propertyName)
     {
@@ -30,6 +66,17 @@ public static class JsonExtensions
         return element.TryGetProperty(propertyName, out var property)
                && property.ValueKind == JsonValueKind.Number
                && property.TryGetInt64(out var val)
+            ? val
+            : defaultValue;
+    }
+
+    public static decimal SafeGetDecimal(this JsonElement element,
+        string propertyName,
+        decimal defaultValue = default)
+    {
+        return element.TryGetProperty(propertyName, out var property)
+               && property.ValueKind == JsonValueKind.Number
+               && property.TryGetDecimal(out var val)
             ? val
             : defaultValue;
     }

@@ -29,4 +29,6 @@ public static class Constants
     public const int EmailMaxLength = 320;
     public const int TelephoneMaxLength = 150;
     public const int WebsiteMaxLength = 150;
+
+    public const int TownSearchDefaultMaxResults = 50;
 }

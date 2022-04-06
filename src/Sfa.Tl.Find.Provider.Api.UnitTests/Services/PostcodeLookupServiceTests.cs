@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Services;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Json;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
 using Xunit;
@@ -31,7 +33,7 @@ public class PostcodeLookupServiceTests
     [Fact]
     public async Task GetPostcode_For_Valid_Postcode_Returns_Expected_Result()
     {
-        var validPostcode = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var validPostcode = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var postcodeUriFragment = $"postcodes/{validPostcode.GetUriFormattedPostcode()}";
 
@@ -43,17 +45,57 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetPostcode(validPostcode.Postcode);
+        var result = await service.GetPostcode(validPostcode.Location);
 
         Verify(result, validPostcode);
     }
 
     [Fact]
+    public async Task GetNearestPostcode_Returns_Expected_Result()
+    {
+        var validPostcode = GeoLocationBuilder.BuildValidPostcodeLocation();
+
+        var postcodeUriFragment = $"postcodes?lon={validPostcode.Longitude}&lat={validPostcode.Latitude}";
+
+        var responses = new Dictionary<string, string>
+        {
+            { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildNearestPostcodeResponse() }
+        };
+
+        var service = new PostcodeLookupServiceBuilder()
+            .Build(responses);
+
+        var result = await service.GetNearestPostcode(validPostcode.Latitude, validPostcode.Longitude);
+
+        Verify(result, validPostcode);
+    }
+
+    [Fact]
+    public async Task GetNearestPostcode_Null_Response_Returns_Expected_Result()
+    {
+        var validPostcode = GeoLocationBuilder.BuildValidPostcodeLocation();
+
+        var postcodeUriFragment = $"postcodes?lon={validPostcode.Longitude}&lat={validPostcode.Latitude}";
+
+        var responses = new Dictionary<string, string>
+        {
+            { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildNullPostcodeResponse() }
+        };
+
+        var service = new PostcodeLookupServiceBuilder()
+            .Build(responses);
+
+        var result = await service.GetNearestPostcode(validPostcode.Latitude, validPostcode.Longitude);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
     public async Task GetPostcode_For_Valid_Postcode_Outward_Code_Returns_Expected_Result()
     {
-        var validPostcode = PostcodeLocationBuilder.BuildValidOutwardPostcodeLocation();
+        var validPostcode = GeoLocationBuilder.BuildValidOutwardPostcodeLocation();
 
-        var postcodeUriFragment = $"outcodes/{validPostcode.Postcode}";
+        var postcodeUriFragment = $"outcodes/{validPostcode.Location}";
 
         var responses = new Dictionary<string, string>
         {
@@ -63,7 +105,7 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetOutcode(validPostcode.Postcode);
+        var result = await service.GetOutcode(validPostcode.Location);
 
         Verify(result, validPostcode);
     }
@@ -71,7 +113,7 @@ public class PostcodeLookupServiceTests
     [Fact]
     public async Task GetPostcode_For_Terminated_Postcode_Returns_Expected_Result()
     {
-        var terminatedPostcode = PostcodeLocationBuilder.BuildTerminatedPostcodeLocation();
+        var terminatedPostcode = GeoLocationBuilder.BuildTerminatedPostcodeLocation();
 
         var uriFormattedPostcode = terminatedPostcode.GetUriFormattedPostcode();
         var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
@@ -91,7 +133,7 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetPostcode(terminatedPostcode.Postcode);
+        var result = await service.GetPostcode(terminatedPostcode.Location);
 
         Verify(result, terminatedPostcode);
     }
@@ -99,7 +141,7 @@ public class PostcodeLookupServiceTests
     [Fact]
     public async Task GetPostcode_For_Valid_Postcode_With_No_Lat_Long_Returns_Expected_Result()
     {
-        var noLocationPostcode = PostcodeLocationBuilder.BuildPostcodeLocationWithDefaultLatLong();
+        var noLocationPostcode = GeoLocationBuilder.BuildPostcodeLocationWithDefaultLatLong();
 
         var postcodeUriFragment = $"postcodes/{noLocationPostcode.GetUriFormattedPostcode()}";
 
@@ -111,7 +153,7 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetPostcode(noLocationPostcode.Postcode);
+        var result = await service.GetPostcode(noLocationPostcode.Location);
 
         Verify(result, noLocationPostcode);
     }
@@ -119,7 +161,7 @@ public class PostcodeLookupServiceTests
     [Fact]
     public async Task GetPostcode_For_Terminated_Postcode_With_No_Lat_Long_Returns_Expected_Result()
     {
-        var noLocationTerminatedPostcode = PostcodeLocationBuilder.BuildTerminatedPostcodeLocationWithDefaultLatLong();
+        var noLocationTerminatedPostcode = GeoLocationBuilder.BuildTerminatedPostcodeLocationWithDefaultLatLong();
 
         var uriFormattedPostcode = noLocationTerminatedPostcode.GetUriFormattedPostcode();
         var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
@@ -139,7 +181,7 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetPostcode(noLocationTerminatedPostcode.Postcode);
+        var result = await service.GetPostcode(noLocationTerminatedPostcode.Location);
 
         Verify(result, noLocationTerminatedPostcode);
 
@@ -148,9 +190,9 @@ public class PostcodeLookupServiceTests
     [Fact]
     public async Task GetPostcode_For_Valid_Postcode_Outward_Code_With_No_Lat_Long_Returns_Expected_Result()
     {
-        var noLocationOutcode = PostcodeLocationBuilder.BuildOutwardPostcodeLocationWithDefaultLatLong();
+        var noLocationOutcode = GeoLocationBuilder.BuildOutwardPostcodeLocationWithDefaultLatLong();
 
-        var postcodeUriFragment = $"outcodes/{noLocationOutcode.Postcode}";
+        var postcodeUriFragment = $"outcodes/{noLocationOutcode.Location}";
 
         var responses = new Dictionary<string, string>
         {
@@ -160,7 +202,7 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetOutcode(noLocationOutcode.Postcode);
+        var result = await service.GetOutcode(noLocationOutcode.Location);
 
         Verify(result, noLocationOutcode);
     }
@@ -168,7 +210,7 @@ public class PostcodeLookupServiceTests
     [Fact]
     public async Task GetPostcode_For_Invalid_Postcode_Returns_Expected_Result()
     {
-        var invalidPostcode = PostcodeLocationBuilder.BuildInvalidPostcodeLocation();
+        var invalidPostcode = GeoLocationBuilder.BuildInvalidPostcodeLocation();
 
         var uriFormattedPostcode = invalidPostcode.GetUriFormattedPostcode();
         var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
@@ -189,7 +231,7 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetPostcode(invalidPostcode.Postcode);
+        var result = await service.GetPostcode(invalidPostcode.Location);
 
         result.Should().BeNull();
     }
@@ -197,7 +239,7 @@ public class PostcodeLookupServiceTests
     [Fact]
     public async Task GetPostcode_For_NotFound_Postcode_Returns_Expected_Result()
     {
-        var invalidPostcode = PostcodeLocationBuilder.BuildNotFoundPostcodeLocation();
+        var invalidPostcode = GeoLocationBuilder.BuildNotFoundPostcodeLocation();
 
         var uriFormattedPostcode = invalidPostcode.GetUriFormattedPostcode();
         var postcodeUriFragment = $"postcodes/{uriFormattedPostcode}";
@@ -218,17 +260,17 @@ public class PostcodeLookupServiceTests
         var service = new PostcodeLookupServiceBuilder()
             .Build(responses);
 
-        var result = await service.GetPostcode(invalidPostcode.Postcode);
+        var result = await service.GetPostcode(invalidPostcode.Location);
 
         result.Should().BeNull();
     }
 
-    private static void Verify(PostcodeLocation postcodeLocation,
-        PostcodeLocation expectedPostcodeLocation)
+    private static void Verify(GeoLocation geoLocation,
+        GeoLocation expectedGeoLocation)
     {
-        postcodeLocation.Should().NotBeNull();
-        postcodeLocation.Postcode.Should().Be(expectedPostcodeLocation.Postcode);
-        postcodeLocation.Latitude.Should().Be(expectedPostcodeLocation.Latitude);
-        postcodeLocation.Longitude.Should().Be(expectedPostcodeLocation.Longitude);
+        geoLocation.Should().NotBeNull();
+        geoLocation.Location.Should().Be(expectedGeoLocation.Location);
+        geoLocation.Latitude.Should().Be(expectedGeoLocation.Latitude);
+        geoLocation.Longitude.Should().Be(expectedGeoLocation.Longitude);
     }
 }

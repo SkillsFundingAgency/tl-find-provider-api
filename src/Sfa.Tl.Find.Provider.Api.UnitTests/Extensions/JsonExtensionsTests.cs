@@ -14,6 +14,8 @@ public class JsonExtensionsTests
         "\"myInt64\": 1000000000," +
         "\"myPositiveDouble\": 100.999," +
         "\"myNegativeDouble\": -100.999," +
+        "\"myPositiveDecimal\": 99.999," +
+        "\"myNegativeDecimal\": -99.999," +
         "\"myNull\": null," +
         "\"myTrueBool\": true," +
         "\"myFalseBool\": false," +
@@ -92,6 +94,36 @@ public class JsonExtensionsTests
     {
         var prop = _jsonDocument.RootElement.GetProperty("anElement");
         var result = prop.SafeGetInt64(propertyName, defaultValue);
+
+        result.Should().Be(expectedResult);
+    }
+
+
+    [Theory(DisplayName = nameof(JsonExtensions.SafeGetDecimal) + " Data Tests")]
+    [InlineData("myPositiveDecimal", 99.999)]
+    [InlineData("myNegativeDecimal", -99.999)]
+    [InlineData("myInt64", 1000000000)]
+    [InlineData("myString", 0)]
+    [InlineData("notANumber", 0)]
+    [InlineData("myTrueBool", 0)]
+    [InlineData("myFalseBool", 0)]
+    public void JsonElement_SafeGetDecimal_Data_Tests(string propertyName, decimal expectedResult)
+    {
+        var prop = _jsonDocument.RootElement.GetProperty("anElement");
+        var result = prop.SafeGetDecimal(propertyName);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory(DisplayName = nameof(JsonExtensions.SafeGetDecimal) + " with Default Data Tests")]
+    [InlineData("myPositiveDecimal", 1, 99.999)]
+    [InlineData("myNegativeDecimal", -1, -99.999)]
+    [InlineData("notANumber", 10, 10)]
+    [InlineData("myNull", 5.5, 5.5)]
+    public void JsonElement_SafeGetDecimal_With_Default_Data_Tests(string propertyName, decimal defaultValue, decimal expectedResult)
+    {
+        var prop = _jsonDocument.RootElement.GetProperty("anElement");
+        var result = prop.SafeGetDecimal(propertyName, defaultValue);
 
         result.Should().Be(expectedResult);
     }

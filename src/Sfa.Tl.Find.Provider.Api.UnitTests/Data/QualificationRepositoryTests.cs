@@ -9,7 +9,10 @@ using NSubstitute;
 using Polly;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -23,7 +26,7 @@ public class QualificationRepositoryTests
         typeof(QualificationRepository)
             .ShouldNotAcceptNullConstructorArguments();
     }
-        
+
     [Fact]
     public async Task GetAll_Returns_Expected_List()
     {
@@ -38,11 +41,18 @@ public class QualificationRepositoryTests
             .QueryAsync<Qualification>(dbConnection, Arg.Any<string>())
             .Returns(qualifications);
 
+        const string expectedSql =
+            "SELECT Id, Name FROM dbo.Qualification WHERE IsDeleted = 0 ORDER BY Name";
+
         var repository = new QualificationRepositoryBuilder().Build(dbContextWrapper);
 
         var results = (await repository.GetAll()).ToList();
-        results.Should().NotBeNullOrEmpty();
-        results.Count.Should().Be(qualifications.Count);
+        results.Should().BeEquivalentTo(qualifications);
+
+        await dbContextWrapper
+            .Received(1)
+            .QueryAsync<Qualification>(dbConnection,
+                Arg.Is<string>(sql => sql == expectedSql));
     }
 
     [Fact]
@@ -91,7 +101,7 @@ public class QualificationRepositoryTests
             .WithUpdates(2)
             .WithDeletes(1)
             .Build();
-            
+
         var receivedSqlArgs = new List<string>();
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
@@ -151,11 +161,11 @@ public class QualificationRepositoryTests
         var logger = Substitute.For<ILogger<QualificationRepository>>();
 
         var repository = new QualificationRepositoryBuilder()
-            .Build(policyRegistry: pollyPolicyRegistry, 
+            .Build(policyRegistry: pollyPolicyRegistry,
                 logger: logger);
 
         await repository.Save(new List<Qualification>());
-        
+
         await pollyPolicy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task>>(),
             Arg.Is<Context>(ctx =>

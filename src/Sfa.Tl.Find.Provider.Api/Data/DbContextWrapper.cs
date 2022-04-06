@@ -70,7 +70,7 @@ public class DbContextWrapper : IDbContextWrapper
         CommandType? commandType = null)
     {
         var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
-        
+
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection

@@ -31,42 +31,42 @@ public class BusinessRuleExtensionsTests
         new List<object[]>
         {
             new object[] { null, null, null },
-            new object[] { new PostcodeLocation { Postcode = "" }, new PostcodeLocation { Postcode = "" }, null },
-            new object[] { new PostcodeLocation { Postcode = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 }, null, null },
-            new object[] { null, new PostcodeLocation { Postcode = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 }, null },
+            new object[] { new GeoLocation { Location = "" }, new GeoLocation { Location = "" }, null },
+            new object[] { new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 }, null, null },
+            new object[] { null, new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 }, null },
             new object[]
             {
-                new PostcodeLocation { Postcode = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },
-                new PostcodeLocation { Postcode = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
+                new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },
+                new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
                 "https://www.google.com/maps/dir/?api=1&origin=CV1+2WT&destination=SW1A+2HE&travelmode=transit"
             },
             new object[]
             {
-                new PostcodeLocation { Postcode = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
-                new PostcodeLocation { Postcode = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },
+                new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
+                new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },
                 "https://www.google.com/maps/dir/?api=1&origin=SW1A+2HE&destination=CV1+2WT&travelmode=transit"
             }
         };
 
     [Theory(DisplayName = nameof(BusinessRuleExtensions.CreateJourneyLink) + " Data Tests")]
     [MemberData(nameof(JourneyLinksForPostcodeLocations))]
-    public void PostcodeLocation_CreateJourneyLink_Data_Tests_2(
-        PostcodeLocation fromPostcodeLocation, 
-        PostcodeLocation toPostcodeLocation, 
+    public void GeoLocation_CreateJourneyLink_Data_Tests(
+        GeoLocation fromGeoLocation, 
+        GeoLocation toGeoLocation, 
         string expectedResult)
     {
-        var result = fromPostcodeLocation.CreateJourneyLink(toPostcodeLocation);
+        var result = fromGeoLocation.CreateJourneyLink(toGeoLocation);
         result.Should().Be(expectedResult);
     }
 
     [Theory(DisplayName = nameof(BusinessRuleExtensions.CreateJourneyLink) + " Data Tests")]
     [MemberData(nameof(JourneyLinksForPostcodeLocations))]
-    public void PostcodeLocation_CreateJourneyLink_To_Postcode_Data_Tests_2(
-        PostcodeLocation fromPostcodeLocation,
-        PostcodeLocation toPostcodeLocation,
+    public void GeoLocation_CreateJourneyLink_To_Postcode_String_Data_Tests(
+        GeoLocation fromGeoLocation,
+        GeoLocation toGeoLocation,
         string expectedResult)
     {
-        var result = fromPostcodeLocation.CreateJourneyLink(toPostcodeLocation?.Postcode);
+        var result = fromGeoLocation.CreateJourneyLink(toGeoLocation?.Location);
         result.Should().Be(expectedResult);
     }
 }
