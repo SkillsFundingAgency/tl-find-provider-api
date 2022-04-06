@@ -88,7 +88,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint(
         "/swagger/v1/swagger.json",
-        "T Levels Find a Provider.Api v1"));
+        "T Levels Find a Provider.Api v2"));
 }
 
 if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))

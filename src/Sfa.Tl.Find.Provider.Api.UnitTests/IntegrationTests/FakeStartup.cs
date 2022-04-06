@@ -62,7 +62,7 @@ public class FakeStartup
         services
             .AddControllers()
             //https://stackoverflow.com/questions/58679912/how-to-use-a-controller-in-another-assembly-in-asp-net-core-3-0
-            .AddApplicationPart(typeof(FindProvidersController).Assembly);
+            .AddApplicationPart(typeof(ProvidersController).Assembly);
 
         services.Configure<RouteOptions>(options =>
         {
