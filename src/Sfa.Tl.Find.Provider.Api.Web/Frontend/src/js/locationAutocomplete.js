@@ -15,14 +15,11 @@
     }
 
     function getSuggestions(query, populateResults) {
-        if (typeof isSearchInProgress !== 'undefined') console.log("isSearchInProgress not undefined");
-        if (typeof isSearchInProgress === 'undefined') console.log("isSearchInProgress undefined");
         if ((typeof isSearchInProgress !== 'undefined' && isSearchInProgress)
             || /\d/.test(query)) {
             console.log('has number - could be a postcode');
             return;
         }
-        console.log('getting suggestions');
         var results = [];
         $.ajax({
             url: findProvidersApiUrl + "locations",
@@ -33,8 +30,6 @@
             results = data.map(function (r) {
                 return getLocationDisplayName(r);
             });
-            console.log('populating autocomplete results');
-            console.log(results);
             populateResults(results);
         });
     }
@@ -49,13 +44,11 @@
     }
 
     function onConfirm(confirmed) {
-        console.log('confirmed: ' + confirmed);
         //    setTimeout(function () {
         //        $("#tl-search-providers").click();
         //    }, 200);
     }
 
-    console.log('creating autocomplete');
     accessibleAutocomplete({
         element: container,
         id: 'tl-search-term',

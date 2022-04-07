@@ -231,11 +231,11 @@
                     return false;
                 }
 
-                if (!searchTerm.match(/^[0-9a-zA-Z,\.\s]+$/)) {
-                    if (event) event.stopPropagation();
-                    showSearchTermError("Enter a valid postcode or town");
-                    return false;
-                }
+                //if (!searchTerm.match(/^[0-9a-zA-Z,\.'\-!&\(\)/\s]+$/)) {
+                //    if (event) event.stopPropagation();
+                //    showSearchTermError("Enter a valid postcode or town");
+                //    return false;
+                //}
 
                 callProviderSearchApi(searchTerm, skillAreaIds, page);
 
@@ -249,7 +249,10 @@
                 page = (page === undefined ? 0 : page);
                 pageSize = (pageSize === undefined ? 5 : pageSize);
 
-                let uri = findProvidersApiUrl + "providers?searchTerm=" + encodeURIComponent(searchTerm) + '&page=' + page + '&pageSize=' + pageSize;
+                //https://stackoverflow.com/questions/7298770/how-do-you-pass-an-apostrophe-through-a-url
+                //trackArtistTitle.replace(/'/g, '%27')
+                const encodedSearchTerm = encodeURIComponent(searchTerm).replace(/'/g, '%27');
+                let uri = findProvidersApiUrl + "providers?searchTerm=" + encodedSearchTerm + '&page=' + page + '&pageSize=' + pageSize;
 
                 if (skillAreaIds && skillAreaIds.length > 0) {
                     skillAreaIds.forEach(function(skillAreaId) {
@@ -474,6 +477,13 @@
                 const hash = CryptoJS.HmacSHA256(data, apiKey);
                 const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
 
+                console.log('------|');
+                console.log('uri:   ' + uri);
+                console.log('nonce: ' + nonce);
+                console.log('ts:    ' + ts);
+                console.log(data);
+                console.log('------|');
+
                 xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
             }
 
@@ -502,76 +512,4 @@
     <script src="~/js/locationAutocomplete.js" asp-append-version="true"></script>
     @*<script src="{{asset 'locationAutocomplete.js'}}"></script>*@
     @*put script in here so we can change it on the fly*@
-    <script>
-    //$(document).ready(function() {
-    //    //(function($) {
-    //        //Autocomplete for find provider search term
-
-    //        console.log('in function that creates autocomplete');
-    //        //let findProvidersApiUrl = "{{ settings.find_provider_api_uri }}";
-    //        //Next line is for use in local testing only
-    //        if ($('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-    //        if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
-
-    //        const $keywordsInput = $('#tl-search-term');
-    //        if ($keywordsInput.length > 0) {
-    //            $keywordsInput.wrap('<div id="autocomplete-container" class="tl-autocomplete-wrap"></div>');
-    //            var container = document.querySelector('#autocomplete-container');
-    //            $(container).empty();
-    //        }
-
-    //        function getSuggestions(query, populateResults) {
-    //            if (isSearchInProgress || /\d/.test(query)) {
-    //                console.log('has number - could be a postcode');
-    //                return;
-    //            }
-    //            console.log('getting suggestions');
-    //            var results = [];
-    //            $.ajax({
-    //                url: findProvidersApiUrl + "locations",
-    //                type: "get",
-    //                dataType: 'json',
-    //                data: { searchTerm: query }
-    //            }).done(function(data) {
-    //                results = data.map(function(r) {
-    //                    return getLocationDisplayName(r);
-    //                });
-    //                console.log('populating autocomplete results');
-    //                console.log(results);
-    //                populateResults(results);
-    //            });
-    //        }
-
-    //        function getLocationDisplayName(item) {
-    //            if (item.county) {
-    //                return item.name + ', ' + item.county;
-    //            } else if (item.la) {
-    //                return item.name + ', ' + item.la;
-    //            }
-    //            return item.name;
-    //        }
-
-    //        function onConfirm(confirmed) {
-    //            console.log('confirmed: ' + confirmed);
-    //            //    setTimeout(function () {
-    //            //        $("#tl-search-providers").click();
-    //            //    }, 200);
-    //        }
-
-    //        console.log('creating autocomplete');
-    //        accessibleAutocomplete({
-    //            element: container,
-    //            id: 'tl-search-term',
-    //            name: 'tl-search-term',
-    //            displayMenu: 'overlay',
-    //            showNoOptionsFound: false,
-    //            minLength: 3,
-    //            source: getSuggestions,
-    //            placeholder: "Enter a postcode or town",
-    //            onConfirm: onConfirm,
-    //            confirmOnBlur: false,
-    //            autoselect: true
-    //        });
-    //    });//(jQuery);
-    </script>
 }
