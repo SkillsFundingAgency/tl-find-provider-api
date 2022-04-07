@@ -142,13 +142,19 @@ public class ProviderDataService : IProviderDataService
                 }
             }
 
-            var searchResults = await _providerRepository
+            var searchResults = (await _providerRepository
                 .Search(geoLocation,
                         routeIds,
                         qualificationIds,
                         page,
                         pageSize,
-                        _mergeAdditionalProviderData);
+                        _mergeAdditionalProviderData))
+                .ToList();
+
+            foreach (var item in searchResults)
+            {
+                item.Town = item.Town.ToTitleCase();
+            }
 
             return new ProviderSearchResponse
             {
