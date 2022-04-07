@@ -8,6 +8,9 @@ public static class Constants
 
     public const int DefaultPageSize = 5;
 
+    public const int DefaultApiMajorVersion = 1;
+    public const int DefaultApiMinorVersion = 0;
+
     public const int DefaultAbsoluteExpirationInMinutes = 60;
     public const int DefaultSlidingExpirationInMinutes = 10;
 

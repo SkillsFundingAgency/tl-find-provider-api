@@ -54,7 +54,9 @@ public class FakeStartup
 
         services.AddApiVersioning(config =>
         {
-            config.DefaultApiVersion = new ApiVersion(1, 0);
+            config.DefaultApiVersion = new ApiVersion(
+                Constants.DefaultApiMajorVersion, 
+                Constants.DefaultApiMinorVersion);
             config.AssumeDefaultVersionWhenUnspecified = true;
             config.ReportApiVersions = true;
         });
