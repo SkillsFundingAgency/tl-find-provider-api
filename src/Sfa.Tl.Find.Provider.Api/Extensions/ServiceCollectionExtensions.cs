@@ -13,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Jobs;
+using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.Services;
 
@@ -27,7 +28,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddApiVersioning(config =>
         {
-            config.DefaultApiVersion = new ApiVersion(1, 0);
+            config.DefaultApiVersion = new ApiVersion(
+                Constants.DefaultApiMajorVersion, 
+                Constants.DefaultApiMinorVersion);
             config.AssumeDefaultVersionWhenUnspecified = true;
             config.ReportApiVersions = true;
         });

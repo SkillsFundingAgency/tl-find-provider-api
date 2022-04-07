@@ -33,9 +33,9 @@ builder.Services.Configure<RouteOptions>(options =>
 
 builder.Services.AddControllers();
 
-builder.Services.AddSwagger("v1",
+builder.Services.AddSwagger("v2",
     "T Levels Find a Provider Api",
-    "v1",
+    "v2",
     $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
 builder.Services
@@ -87,7 +87,7 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint(
-        "/swagger/v1/swagger.json",
+        "/swagger/v2/swagger.json",
         "T Levels Find a Provider.Api v2"));
 }
 
