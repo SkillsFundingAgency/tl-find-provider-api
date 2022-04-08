@@ -8,7 +8,8 @@ using NSubstitute;
 using Polly;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -91,10 +92,6 @@ public class DbContextWrapperTests
             connection,
             sql,
             map);
-
-        //await policy.Received(1).ExecuteAsync(
-        //    Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),
-        //    Arg.Any<Context>());
 
         await policy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),

@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
@@ -13,157 +13,115 @@ public class LoggerExtensionTests
     [Fact]
     public void LogChangeResults_Calls_Logger_With_Expected_Parameters()
     {
+        const int insertCount = 3;
+        const int updateCount = 2;
+        const int deleteCount = 1;
+
         var changeResult = new DataBaseChangeResultBuilder()
-            .WithInserts(3)
-            .WithUpdates(2)
-            .WithDeletes(1)
+            .WithInserts(insertCount)
+            .WithUpdates(updateCount)
+            .WithDeletes(deleteCount)
             .Build();
+
+        var expected = "TestRepository saved TestData data. " +
+            $"Inserted {insertCount} row(s). " +
+            $"Updated {updateCount} row(s). " +
+            $"Deleted {deleteCount} row(s).";
 
         var logger = Substitute.For<ILogger<object>>();
 
         logger.LogChangeResults(changeResult, "TestRepository", "TestData");
 
-        logger.ReceivedCalls().Count().Should().Be(4);
-
+        logger.ReceivedCalls().Count().Should().Be(1);
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
             .Contain(args =>
                 args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
-
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => 
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Inserted 3 row(s).");
-
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => 
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Updated 2 row(s).");
-
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => 
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Deleted 1 row(s).");
+                args[2] != null && args[2].ToString() == expected);
     }
 
     [Fact]
     public void LogChangeResults_With_No_Inserts_Calls_Logger_With_Expected_Parameters()
     {
+        const int updateCount = 2;
+        const int deleteCount = 1;
+
+        var expected = "TestRepository saved TestData data. " +
+            $"Updated {updateCount} row(s). " +
+            $"Deleted {deleteCount} row(s).";
+
         var changeResult = new DataBaseChangeResultBuilder()
-            .WithUpdates(2)
-            .WithDeletes(1)
+            .WithUpdates(updateCount)
+            .WithDeletes(deleteCount)
             .Build();
 
         var logger = Substitute.For<ILogger<object>>();
 
         logger.LogChangeResults(changeResult, "TestRepository", "TestData", false);
 
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information);
-
-        logger.ReceivedCalls().Count().Should().Be(3);
-        
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => 
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
-        
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args => 
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Updated 2 row(s).");
-        
+        logger.ReceivedCalls().Count().Should().Be(1);
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
             .Contain(args =>
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information && 
-                args[2] != null && args[2].ToString() == " Deleted 1 row(s).");
+                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
+                args[2] != null && args[2].ToString() == expected);
     }
 
     [Fact]
     public void LogChangeResults_With_No_Updates_Calls_Logger_With_Expected_Parameters()
     {
+        const int insertCount = 3;
+        const int deleteCount = 1;
+
         var changeResult = new DataBaseChangeResultBuilder()
-            .WithInserts(3)
-            .WithDeletes(1)
+            .WithInserts(insertCount)
+            .WithDeletes(deleteCount)
             .Build();
+
+        var expected = "TestRepository saved TestData data. " +
+            $"Inserted {insertCount} row(s). " +
+            $"Deleted {deleteCount} row(s).";
 
         var logger = Substitute.For<ILogger<object>>();
 
         logger.LogChangeResults(changeResult, "TestRepository", "TestData", includeUpdated: false);
 
-        logger.ReceivedCalls().Count().Should().Be(3);
-
+        logger.ReceivedCalls().Count().Should().Be(1);
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
             .Contain(args =>
                 args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
-
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args =>
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Inserted 3 row(s).");
-        
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args =>
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Deleted 1 row(s).");
+                args[2] != null && args[2].ToString() == expected);
     }
 
     [Fact]
     public void LogChangeResults_With_NoDeletes_Calls_Logger_With_Expected_Parameters()
     {
+        const int insertCount = 1;
+        const int updateCount = 1;
+
         var changeResult = new DataBaseChangeResultBuilder()
-            .WithInserts(1)
-            .WithUpdates(1)
+            .WithInserts(insertCount)
+            .WithUpdates(updateCount)
             .Build();
+
+        var expected = "TestRepository saved TestData data. " +
+            $"Inserted {insertCount} row(s). " +
+            $"Updated {updateCount} row(s).";
 
         var logger = Substitute.For<ILogger<object>>();
 
         logger.LogChangeResults(changeResult, "TestRepository", "TestData", includeDeleted: false);
 
-        logger.ReceivedCalls().Count().Should().Be(3);
-
+        logger.ReceivedCalls().Count().Should().Be(1);
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
             .Contain(args =>
                 args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == "TestRepository saved TestData data.");
-
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args =>
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Inserted 1 row(s).");
-
-        logger.ReceivedCalls()
-            .Select(call => call.GetArguments())
-            .Should()
-            .Contain(args =>
-                args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information &&
-                args[2] != null && args[2].ToString() == " Updated 1 row(s).");
+                args[2] != null && args[2].ToString() == expected);
     }
 }

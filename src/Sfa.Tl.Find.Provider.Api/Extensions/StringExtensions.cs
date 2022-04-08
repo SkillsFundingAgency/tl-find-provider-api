@@ -3,14 +3,58 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
 public static class StringExtensions
 {
+    // adapted from http://stackoverflow.com/a/164994/1882637
+    private const string PostcodeRegex =
+            @"(GIR 0AA)|((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX‌​]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY]))))\s?[0-9][A-Z-[C‌​IKMOV]]{2})(\w)*$"
+        ;
+
+    private const string PartialPostcodeRegex =
+            @"((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))))$"
+        ;
+
     public static string FormatPostcodeForUri(this string postcode)
     {
         return Uri.EscapeDataString(postcode.Trim().ToUpper());
+    }
+
+    public static string FormatTownName(this Town town)
+    {
+        if (!string.IsNullOrWhiteSpace(town.County))
+            return $"{town.Name}, {town.County}";
+        else if (!string.IsNullOrWhiteSpace(town.LocalAuthority))
+            return $"{town.Name}, {town.LocalAuthority}";
+        return $"{town.Name}";
+    }
+
+    public static bool IsPostcode(this string postcode)
+    {
+        return CheckPostcode(postcode, PostcodeRegex);
+    }
+
+    public static bool IsPartialPostcode(this string postcode)
+    {
+        return CheckPostcode(postcode, PartialPostcodeRegex);
+    }
+
+    public static bool IsFullOrPartialPostcode(this string postcode)
+    {
+        return postcode.IsPostcode() || postcode.IsPartialPostcode();
+    }
+
+    private static bool CheckPostcode(string postcode, string regex)
+    {
+        if (string.IsNullOrWhiteSpace(postcode))
+            return false;
+
+        var formattedPostcode = postcode.Trim().ToUpperInvariant();
+
+        return Regex.IsMatch(formattedPostcode, regex);
     }
 
     public static string ParseTLevelDefinitionName(this string fullName, int maxLength = -1)
@@ -25,6 +69,19 @@ public static class StringExtensions
         return name is not null && maxLength > 0 && name.Length > maxLength
             ? name[..maxLength].Trim()
             : name;
+    }
+
+    public static string ToSearchableString(this string value)
+    {
+        if (value == null)
+            return null;
+
+        //Remove special characters and spaces, and replace & with and
+        const string knownSpecialCharacters = @"(\s+|,|\.|'|\-|!|\(|\)|/)";
+        return Regex.Replace(
+                Regex.Replace(value, knownSpecialCharacters, ""),
+                @"(&)", "and")
+                .ToLower();
     }
 
     public static string ToTitleCase(this string value)
@@ -58,6 +115,10 @@ public static class StringExtensions
 
         //Fix S after apostrophe, if it is before space or at end of string
         result = Regex.Replace(result, @"(['’])S(\s|$)", "$1s$2");
+        
+        //Fix known town name patterns missed by code above
+        result = Regex.Replace(result, @"(-on-|-in-|-under-)", 
+            m => m.Value.ToLower(), RegexOptions.IgnoreCase);
 
         return result.Trim();
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
@@ -16,15 +17,17 @@ public class RouteRepository : IRouteRepository
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
     }
 
-    public async Task<IEnumerable<Route>> GetAll()
+    public async Task<IEnumerable<Route>> GetAll(bool includeAdditionalData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         return await _dbContextWrapper.QueryAsync<Route>(
             connection,
-            "SELECT Id, Name " +
-            "FROM dbo.Route " +
-            "WHERE IsDeleted = 0 " +
-            "ORDER BY Name");
+            "GetRoutes",
+            new
+            {
+                includeAdditionalData
+            },
+            commandType: CommandType.StoredProcedure);
     }
 }

@@ -10,7 +10,8 @@ using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -18,16 +19,18 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 
 public class FindProvidersControllerTests
 {
-    private const string TestPostcode = "AB1 2XY";
+    private const string TestPostcode = "CV1 2WT";
     private const string InvalidPostcode = "CV99 XXX";
     private const string PostcodeWithInitialNonLetter = "1V1 2WT";
     private const string PostcodeWithIllegalCharacters = "CV99 XX$";
     private const string PostcodeWithTooManyCharacters = "CV99 XG2 Z15";
     private const string PostcodeWithTooFewCharacters = "C";
     private const string PostcodeWithMinimumCharacters = "L1";
-    private const int TestQualificationId = 51;
     private const int TestPage = 3;
     private const int TestPageSize = Constants.DefaultPageSize + 10;
+
+    private readonly IList<int> _testRouteIds = new List<int> { 6, 7 };
+    private readonly IList<int> _testQualificationIds = new List<int> { 37, 40, 51 };
 
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
@@ -50,10 +53,11 @@ public class FindProvidersControllerTests
             .BuildList()
             .ToList();
 
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.GetQualifications().Returns(qualifications);
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetQualifications().Returns(qualifications);
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetQualifications();
 
@@ -73,10 +77,11 @@ public class FindProvidersControllerTests
             .Take(1)
             .ToList();
 
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.GetQualifications().Returns(qualifications);
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetQualifications().Returns(qualifications);
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetQualifications();
 
@@ -91,79 +96,109 @@ public class FindProvidersControllerTests
     [Fact]
     public async Task GetProviders_Passes_Default_Parameters()
     {
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(Arg.Any<string>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildWithMultipleSearchResults());
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         await controller.GetProviders(TestPostcode);
 
-        await dataService
+        await providerDataService
             .Received()
             .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                Arg.Is<int?>(q => q == null),
+                Arg.Is<IList<int>>(q => q == null),
+                Arg.Is<IList<int>>(q => q == null),
                 Arg.Is<int>(p => p == 0),
                 Arg.Is<int>(s => s == Constants.DefaultPageSize));
     }
 
     [Fact]
-    public async Task GetProviders_Passes_QualificationId_And_Default_Parameters()
+    public async Task GetProviders_Passes_QualificationIds_And_Default_Parameters()
     {
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(Arg.Any<string>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildWithMultipleSearchResults());
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
-        await controller.GetProviders(TestPostcode, TestQualificationId);
+        await controller.GetProviders(TestPostcode, qualificationIds: _testQualificationIds);
 
-        await dataService
+        await providerDataService
             .Received()
             .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                Arg.Is<int?>(q => q == TestQualificationId),
+                Arg.Is<IList<int>>(r => r == null),
+                Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
                 Arg.Is<int>(p => p == 0),
                 Arg.Is<int>(s => s == Constants.DefaultPageSize));
     }
 
     [Fact]
-    public async Task GetProviders_Passes_QualificationId_And_Page_And_Default_Parameters()
+    public async Task GetProviders_Passes_QualificationIds_And_Page_And_Default_Parameters()
     {
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(Arg.Any<string>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildWithMultipleSearchResults());
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
-        await controller.GetProviders(TestPostcode, TestQualificationId, TestPage);
+        await controller.GetProviders(TestPostcode, qualificationIds: _testQualificationIds, page: TestPage);
 
-        await dataService
+        await providerDataService
             .Received()
             .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                Arg.Is<int?>(q => q == TestQualificationId),
+                Arg.Is<IList<int>>(r => r == null),
+                Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
                 Arg.Is<int>(p => p == TestPage),
+                Arg.Is<int>(s => s == Constants.DefaultPageSize));
+    }
+
+    [Fact]
+    public async Task GetProviders_Passes_RouteIds_And_Default_Parameters()
+    {
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(Arg.Any<string>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
+            .Returns(new ProviderSearchResponseBuilder()
+                .BuildWithMultipleSearchResults());
+
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
+
+        await controller.GetProviders(TestPostcode, routeIds: _testRouteIds);
+
+        await providerDataService
+            .Received()
+            .FindProviders(Arg.Is<string>(p => p == TestPostcode),
+                Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
+                Arg.Is<IList<int>>(q => q == null),
+                Arg.Is<int>(p => p == 0),
                 Arg.Is<int>(s => s == Constants.DefaultPageSize));
     }
 
     [Fact]
     public async Task GetProviders_Passes_All_Parameters()
     {
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(Arg.Any<string>(), Arg.Any<List<int>>(), Arg.Any<List<int>>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildWithMultipleSearchResults());
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
-        await controller.GetProviders(TestPostcode, TestQualificationId, TestPage, TestPageSize);
+        await controller.GetProviders(TestPostcode, _testRouteIds, _testQualificationIds, TestPage, TestPageSize);
 
-        await dataService
+        await providerDataService
             .Received()
             .FindProviders(Arg.Is<string>(p => p == TestPostcode),
-                Arg.Is<int?>(q => q == TestQualificationId),
+                Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
+                Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
                 Arg.Is<int>(p => p == TestPage),
                 Arg.Is<int>(s => s == TestPageSize));
     }
@@ -171,48 +206,50 @@ public class FindProvidersControllerTests
     [Fact]
     public async Task GetProviders_Returns_Expected_List_Of_Search_Results()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(fromPostcodeLocation.Postcode)
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(fromGeoLocation.Location)
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildWithMultipleSearchResults());
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
-        var result = await controller.GetProviders(fromPostcodeLocation.Postcode);
+        var result = await controller.GetProviders(fromGeoLocation.Location);
 
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results!.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
     }
 
     [Fact]
     public async Task GetProviders_Returns_Expected_Value_For_One_Search_Result()
     {
-        var fromPostcodeLocation = PostcodeLocationBuilder.BuildValidPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var providerSearchResponse = new ProviderSearchResponseBuilder()
-            .WithSearchOrigin(fromPostcodeLocation)
+            .WithSearchOrigin(fromGeoLocation)
             .BuildWithSingleSearchResult();
 
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(fromPostcodeLocation.Postcode)
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(fromGeoLocation.Location)
             .Returns(providerSearchResponse);
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
-        var result = await controller.GetProviders(fromPostcodeLocation.Postcode);
+        var result = await controller.GetProviders(fromGeoLocation.Location);
 
-        var results = (result as OkObjectResult)?.Value 
+        var results = (result as OkObjectResult)?.Value
             as ProviderSearchResponse;
 
         results.Should().NotBeNull();
-        results!.Postcode.Should().Be(fromPostcodeLocation.Postcode);
+        results!.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
 
         results.SearchResults.Count().Should().Be(1);
@@ -224,12 +261,13 @@ public class FindProvidersControllerTests
     {
         var errorMessage = $"Postcode {InvalidPostcode} was not found";
 
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(InvalidPostcode)
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(InvalidPostcode)
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildErrorResponse(errorMessage));
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(InvalidPostcode);
 
@@ -244,9 +282,10 @@ public class FindProvidersControllerTests
     [Fact]
     public async Task GetProviders_Validates_Null_Postcode()
     {
-        var dataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<IProviderDataService>();
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(null);
 
@@ -255,15 +294,16 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field is required.");
+        results!.Error.Should().Be("The search term is required.");
     }
 
     [Fact]
     public async Task GetProviders_Validates_Empty_Postcode()
     {
-        var dataService = Substitute.For<IProviderDataService>();
-            
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var providerDataService = Substitute.For<IProviderDataService>();
+
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders("");
 
@@ -272,15 +312,16 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field is required.");
+        results!.Error.Should().Be("The search term is required.");
     }
 
     [Fact]
     public async Task GetProviders_Validates_Illegal_Postcode_Characters()
     {
-        var dataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<IProviderDataService>();
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(PostcodeWithIllegalCharacters);
 
@@ -289,15 +330,16 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        results!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
 
     [Fact]
     public async Task GetProviders_Validates_Postcode_Does_Not_Start_With_Letter()
     {
-        var dataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<IProviderDataService>();
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(PostcodeWithInitialNonLetter);
 
@@ -306,15 +348,16 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must start with a letter and contain only letters, numbers, and an optional space.");
+        results!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
 
     [Fact]
     public async Task GetProviders_Validates_Postcode_Maximum_Length()
     {
-        var dataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<IProviderDataService>();
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(PostcodeWithTooManyCharacters);
 
@@ -323,15 +366,16 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must be no more than 8 characters.");
+        results!.Error.Should().Be("The postcode must be no more than 8 characters.");
     }
 
     [Fact]
     public async Task GetProviders_Validates_Postcode_Minimum_Length()
     {
-        var dataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<IProviderDataService>();
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(PostcodeWithTooFewCharacters);
 
@@ -340,18 +384,19 @@ public class FindProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.Error.Should().Be("The postcode field must be at least 2 characters.");
+        results!.Error.Should().Be("The search term must be at least 2 characters.");
     }
-        
+
     [Fact]
     public async Task GetProviders_Allows_Postcode_With_Minimum_Length()
     {
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(PostcodeWithMinimumCharacters, Arg.Any<int?>(), Arg.Any<int>(), Arg.Any<int>())
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(PostcodeWithMinimumCharacters, Arg.Any<IList<int>>(), Arg.Any<IList<int>>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(new ProviderSearchResponseBuilder()
                 .BuildWithSingleSearchResult());
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(PostcodeWithMinimumCharacters);
 
@@ -366,11 +411,12 @@ public class FindProvidersControllerTests
     [Fact]
     public async Task GetProviders_Returns_Error_Result_For_Internal_Error()
     {
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.FindProviders(InvalidPostcode)
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(InvalidPostcode)
             .Throws(new Exception("Test exception"));
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetProviders(InvalidPostcode);
 
@@ -388,10 +434,11 @@ public class FindProvidersControllerTests
             .BuildList()
             .ToList();
 
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.GetRoutes().Returns(routes);
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetRoutes().Returns(routes);
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetRoutes();
 
@@ -411,10 +458,11 @@ public class FindProvidersControllerTests
             .Take(1)
             .ToList();
 
-        var dataService = Substitute.For<IProviderDataService>();
-        dataService.GetRoutes().Returns(routes);
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetRoutes().Returns(routes);
 
-        var controller = new FindProvidersControllerBuilder().Build(dataService);
+        var controller = new FindProvidersControllerBuilder()
+            .Build(providerDataService);
 
         var result = await controller.GetRoutes();
 

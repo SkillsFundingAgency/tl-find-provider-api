@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -19,7 +20,7 @@ public class PostcodeLookupService : IPostcodeLookupService
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
-    public async Task<PostcodeLocation> GetPostcode(string postcode)
+    public async Task<GeoLocation> GetPostcode(string postcode)
     {
         var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
 
@@ -37,7 +38,7 @@ public class PostcodeLookupService : IPostcodeLookupService
         return await ReadPostcodeLocationFromResponse(responseMessage);
     }
 
-    public async Task<PostcodeLocation> GetOutcode(string outcode)
+    public async Task<GeoLocation> GetOutcode(string outcode)
     {
         var responseMessage = await _httpClient.GetAsync($"outcodes/{outcode}");
 
@@ -47,7 +48,16 @@ public class PostcodeLookupService : IPostcodeLookupService
                 "outcode");
     }
 
-    private static async Task<PostcodeLocation> ReadPostcodeLocationFromResponse(
+    public async Task<GeoLocation> GetNearestPostcode(double latitude, double longitude)
+    {
+        var responseMessage = await _httpClient.GetAsync($"postcodes?lon={longitude}&lat={latitude}");
+
+        return responseMessage.StatusCode != HttpStatusCode.OK
+            ? null
+            : await ReadPostcodeLocationFromResponse(responseMessage);
+    }
+
+    private static async Task<GeoLocation> ReadPostcodeLocationFromResponse(
         HttpResponseMessage responseMessage,
         string postcodeFieldName = "postcode")
     {
@@ -57,11 +67,32 @@ public class PostcodeLookupService : IPostcodeLookupService
             .RootElement
             .GetProperty("result");
 
-        return new PostcodeLocation
+        switch (resultElement.ValueKind)
         {
-            Postcode = resultElement.SafeGetString(postcodeFieldName),
-            Latitude = resultElement.SafeGetDouble("latitude", Constants.DefaultLatitude),
-            Longitude = resultElement.SafeGetDouble("longitude")
-        };
+            case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
+                return null;
+            case JsonValueKind.Array:
+            {
+                var firstItem = resultElement.EnumerateArray().FirstOrDefault();
+                {
+                    return new GeoLocation
+                    {
+                        Location = firstItem.SafeGetString(postcodeFieldName),
+                        Latitude = firstItem.SafeGetDouble("latitude", Constants.DefaultLatitude),
+                        Longitude = firstItem.SafeGetDouble("longitude")
+                    };
+                }
+            }
+            case JsonValueKind.Object:
+                return new GeoLocation
+                {
+                    Location = resultElement.SafeGetString(postcodeFieldName),
+                    Latitude = resultElement.SafeGetDouble("latitude", Constants.DefaultLatitude),
+                    Longitude = resultElement.SafeGetDouble("longitude")
+                };
+            default:
+                throw new InvalidOperationException();
+        }
     }
 }

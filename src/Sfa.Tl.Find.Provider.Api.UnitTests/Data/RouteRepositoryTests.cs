@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -30,13 +33,26 @@ public class RouteRepositoryTests
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .QueryAsync<Route>(dbConnection, Arg.Any<string>())
+            .QueryAsync<Route>(dbConnection, 
+                "GetRoutes",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
             .Returns(routes);
 
         var repository = new RouteRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetAll()).ToList();
-        results.Should().NotBeNullOrEmpty();
-        results.Count.Should().Be(routes.Count);
+        var results = (await repository
+            .GetAll(true))
+            .ToList();
+
+        results.Should().BeEquivalentTo(routes);
+
+        await dbContextWrapper
+            .Received(1)
+            .QueryAsync<Route>(dbConnection,
+                "GetRoutes",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure
+                );
     }
 }

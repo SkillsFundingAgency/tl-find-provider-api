@@ -1,11 +1,14 @@
 ﻿using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.Models.Configuration;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
@@ -13,7 +16,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 public class ServiceCollectionExtensionsTests
 {
     private const string CorsTestPolicyName = "TestPolicy";
-
+    
     [Fact]
     public void AddApiVersioningPolicy_Should_AddService()
     {
@@ -74,7 +77,7 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddCorsPolicy_Should_Add_Policy_With_Allowed_Origins()
+    public async Task AddCorsPolicy_Should_Add_Policy_With_Allowed_Origins_All()
     {
         const string allowedOrigins = "*";
 
@@ -83,6 +86,41 @@ public class ServiceCollectionExtensionsTests
         services.AddCorsPolicy(CorsTestPolicyName, allowedOrigins);
 
         services.Should().Contain(t => t.ServiceType.Name == "ICorsService");
+        services.Should().Contain(t => t.ServiceType.Name == "ICorsPolicyProvider");
+
+        var serviceProvider = services
+            .BuildServiceProvider();
+
+        var corsPolicyProvider = serviceProvider.GetRequiredService<ICorsPolicyProvider>();
+        var corsPolicy = await corsPolicyProvider.GetPolicyAsync(new DefaultHttpContext(), CorsTestPolicyName);
+
+        corsPolicy.Should().NotBeNull();
+        corsPolicy?.Origins.Should().NotBeNullOrEmpty();
+        corsPolicy?.Origins.Should().Contain("*");
+    }
+
+    [Fact]
+    public async Task AddCorsPolicy_Should_Add_Policy_With_Allowed_Origins_And_Remove_Trailing_Slash()
+    {
+        const string allowedOrigins = "https://test.com;https://test.with.trailing.slash.com/;";
+
+        var services = new ServiceCollection();
+
+        services.AddCorsPolicy(CorsTestPolicyName, allowedOrigins);
+
+        services.Should().Contain(t => t.ServiceType.Name == "ICorsService");
+        services.Should().Contain(t => t.ServiceType.Name == "ICorsPolicyProvider");
+
+        var serviceProvider = services
+            .BuildServiceProvider();
+
+        var corsPolicyProvider = serviceProvider.GetRequiredService<ICorsPolicyProvider>();
+        var corsPolicy = await corsPolicyProvider.GetPolicyAsync(new DefaultHttpContext(), CorsTestPolicyName);
+
+        corsPolicy.Should().NotBeNull();
+        corsPolicy?.Origins.Should().NotBeNullOrEmpty();
+        corsPolicy?.Origins.Should().Contain("https://test.com");
+        corsPolicy?.Origins.Should().Contain("https://test.with.trailing.slash.com");
     }
 
     [Fact]
@@ -109,7 +147,9 @@ public class ServiceCollectionExtensionsTests
     {
         var services = new ServiceCollection();
 
-        services.AddQuartzServices("0 0 9 ? * MON-FRI");
+        services.AddQuartzServices(
+            "0 0 9 ? * MON-FRI",
+            "0 0 10 ? * *");
 
         services.Should().Contain(t =>
             t.ImplementationType != null &&
@@ -121,7 +161,7 @@ public class ServiceCollectionExtensionsTests
     {
         var services = new ServiceCollection();
 
-        services.AddQuartzServices(null);
+        services.AddQuartzServices();
 
         services.Should().Contain(t =>
             t.ImplementationType != null &&
