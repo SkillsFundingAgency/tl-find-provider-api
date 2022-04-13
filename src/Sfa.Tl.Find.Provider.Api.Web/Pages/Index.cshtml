@@ -131,13 +131,6 @@
                 $('.tl-fap--noresult').removeClass("tl-hidden");
             }
 
-
-            console.log($('#tl-search-term__listbox').hasClass("autocomplete__menu--visible"));
-            //if ($('#tl-search-term__listbox').hasClass("autocomplete__menu--visible")) {
-            //    console.log('clearing styles');
-            //    $('#tl-search-term__listbox').removeClass("autocomplete__menu--visible");
-            //    $('#tl-search-term__listbox').addClass("autocomplete__menu--hidden");
-            //}
             
             $('#tl-search-term').keypress(function(e) {
                 if (e.which === 13) {
@@ -278,7 +271,6 @@
                         populateProviderSearchResults(response);
                     }
                     setTimeout(function () {
-                        console.log('setting isSearchInProgress off');
                         isSearchInProgress = false;
                     }, 200);
 
@@ -429,7 +421,6 @@
 
                 $('#tl-next-results-link').removeClass("tl-hidden");
 
-                console.log('finished populating results - ' + $('#tl-search-term__listbox').hasClass("autocomplete__menu--visible"));
                 if ($('#tl-search-term__listbox').hasClass("autocomplete__menu--visible")) {
                     console.log('clearing styles');
                     $('#tl-search-term__listbox').removeClass("autocomplete__menu--visible");
@@ -477,13 +468,6 @@
                 const hash = CryptoJS.HmacSHA256(data, apiKey);
                 const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
 
-                console.log('------|');
-                console.log('uri:   ' + uri);
-                console.log('nonce: ' + nonce);
-                console.log('ts:    ' + ts);
-                console.log(data);
-                console.log('------|');
-
                 xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
             }
 
@@ -512,4 +496,49 @@
     <script src="~/js/locationAutocomplete.js" asp-append-version="true"></script>
     @*<script src="{{asset 'locationAutocomplete.js'}}"></script>*@
     @*put script in here so we can change it on the fly*@
-}
+    
+    <script type="text/javascript">
+    $(document).ready(function() {
+
+        //See https://stackoverflow.com/questions/17604379/shopping-cart-cookies-only-holding-2-5-items
+
+        console.log('checking cookie');
+        const cookieSelectedProviders = readCookie('selected_provider_basket');
+
+        if (cookieSelectedProviders) {
+            console.log('selected providers cookie found');
+            console.log(cookieSelectedProviders);
+            let selectedProviders = JSON.parse(cookieSelectedProviders);
+            console.log(selectedProviders);
+            $.each(JSON.parse(cookieSelectedProviders),
+                function(_, item) {
+                    console.log(item.ukPrn);
+                    console.log(item.name);
+                });
+        } else {
+            console.log('creating selected providers cookie');
+            const data = [
+                {
+                    ukPrn: 1,
+                    name: 'test 1'
+                },
+                {
+                    ukPrn: 1,
+                    name: 'test 2'
+                }
+            ];
+
+            console.log('writing cookie');
+            writeCookie('selected_provider_basket', JSON.stringify(data), 60);
+            console.log('wrote cookie');
+            //writeCookie('selected_provider_basket', data, 60);
+            $.each(data,
+                function(_, item) {
+                    console.log('item: ');
+                    console.log(item.ukPrn);
+                    console.log(item.name);
+                });
+        }
+    });
+
+    </script>}
