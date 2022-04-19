@@ -117,10 +117,12 @@ try
 }
 catch (Exception ex)
 {
-    var message = $"Severe startup issue. {ex.Message}. \n {ex.StackTrace}";
+    var message = $"Startup failed.\n{ex.Message}.\n{ex.StackTrace}";
     Console.WriteLine(message);
 
-    var appInsightsInstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+    var appInsightsInstrumentationKey = Environment
+        .GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+
     if (!string.IsNullOrEmpty(appInsightsInstrumentationKey))
     {
         var client = new TelemetryClient(TelemetryConfiguration.CreateDefault())
@@ -128,7 +130,6 @@ catch (Exception ex)
             InstrumentationKey = appInsightsInstrumentationKey
         };
 
-        client.TrackTrace("Severe startup issue.", SeverityLevel.Critical);
         client.TrackTrace(message, SeverityLevel.Critical);
     }
 }
