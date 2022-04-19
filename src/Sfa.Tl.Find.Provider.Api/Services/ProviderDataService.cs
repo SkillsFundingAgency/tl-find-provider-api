@@ -151,11 +151,6 @@ public class ProviderDataService : IProviderDataService
                         _mergeAdditionalProviderData))
                 .ToList();
 
-            foreach (var item in searchResults)
-            {
-                item.Town = item.Town.ToTitleCase();
-            }
-
             return new ProviderSearchResponse
             {
                 SearchTerm = geoLocation.Location,

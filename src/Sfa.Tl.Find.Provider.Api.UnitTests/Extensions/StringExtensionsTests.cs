@@ -104,7 +104,6 @@ public class StringExtensionsTests
     }
 
     [Theory(DisplayName = nameof(StringExtensions.ToTitleCase) + "Data Tests")]
-    // ReSharper disable StringLiteralTypo
     [InlineData(null, null)]
     [InlineData("", "")]
     [InlineData("hello world", "Hello World")]
@@ -116,20 +115,6 @@ public class StringExtensionsTests
     [InlineData("Building services engineering for construction", "Building Services Engineering for Construction")]
     [InlineData("Bob's burger's", "Bob's Burger's")]
     [InlineData("Bob’s burger’s", "Bob’s Burger’s")]
-    [InlineData("HIGH WYCOMBE", "High Wycombe")]
-    [InlineData("Henley-on-thames", "Henley-on-Thames")]
-    [InlineData("BARROW-IN-FURNESS", "Barrow-in-Furness")]
-    [InlineData("Barrow-in-Furness", "Barrow-in-Furness")]
-    [InlineData("Newcastle-under-Lyme College", "Newcastle-under-Lyme College")]
-    [InlineData("Leigh-on-Sea", "Leigh-on-Sea")]
-    [InlineData("Southend-on-Sea", "Southend-on-Sea")]
-    [InlineData("WESTON-SUPER-MARE", "Weston-Super-Mare")]
-    [InlineData("Ashton-under-Lyne", "Ashton-under-Lyne")]
-    [InlineData("ashton-under-lyne", "Ashton-under-Lyne")]
-    [InlineData("Burton-on-Trent", "Burton-on-Trent")]
-    [InlineData("Henley-on-Thames", "Henley-on-Thames")]
-    [InlineData("Stockton-on-Tees", "Stockton-on-Tees")]
-    // ReSharper restore StringLiteralTypo
     public void String_ToTitleCase_Data_Tests(string input, string expectedResult)
     {
         var result = input.ToTitleCase();
