@@ -54,7 +54,9 @@ public class FakeStartup
 
         services.AddApiVersioning(config =>
         {
-            config.DefaultApiVersion = new ApiVersion(1, 0);
+            config.DefaultApiVersion = new ApiVersion(
+                Constants.DefaultApiMajorVersion, 
+                Constants.DefaultApiMinorVersion);
             config.AssumeDefaultVersionWhenUnspecified = true;
             config.ReportApiVersions = true;
         });
@@ -62,7 +64,7 @@ public class FakeStartup
         services
             .AddControllers()
             //https://stackoverflow.com/questions/58679912/how-to-use-a-controller-in-another-assembly-in-asp-net-core-3-0
-            .AddApplicationPart(typeof(FindProvidersController).Assembly);
+            .AddApplicationPart(typeof(ProvidersController).Assembly);
 
         services.Configure<RouteOptions>(options =>
         {
