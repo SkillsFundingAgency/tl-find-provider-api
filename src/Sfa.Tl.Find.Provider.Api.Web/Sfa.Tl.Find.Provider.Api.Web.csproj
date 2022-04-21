@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Frontend\css\**" />
+    <Content Remove="Frontend\css\**" />
+    <EmbeddedResource Remove="Frontend\css\**" />
+    <None Remove="Frontend\css\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Frontend\src\css\site.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Frontend\src\css\site.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Frontend\src\assets\" />
+    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
+  </ItemGroup>
+
+</Project>
