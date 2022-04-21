@@ -46,14 +46,6 @@
                     <button class="govuk-button tl-button--green" id="tl-update-search-providers" data-module="govuk-button">
                         Update results
                     </button>
-
-                </div>
-
-                <div class="govuk-grid-row tl-hidden" id="tl-error">
-                    <div class="govuk-grid-column-two-thirds govuk-!-margin-top-7">
-                        <h1 class="govuk-heading-l" id="tl-error-header"></h1>
-                        <p class="govuk-body" id="tl-error-detail"></p>
-                    </div>
                 </div>
             </form>
 
@@ -69,8 +61,13 @@
                 </div>
                 <p class="govuk-body"><a class="govuk-link tl-hidden" id="tl-next-results-link" href="more-results">Show more results</a></p>
             </div>
+            
+            <!-- Error -->
+            <div class="govuk-grid-column-two-thirds tl-hidden" id="tl-error">
+                <h2 class="govuk-heading-l" id="tl-error-header"></h2>
+                <p class="govuk-body" id="tl-error-detail"></p>
+            </div>
         </div>
-
     </div>
 </main>
 @* ReSharper restore UnknownCssClass *@
