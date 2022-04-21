@@ -21,8 +21,15 @@ gulp.task('js', () => {
 gulp.task('fapJs', () => {
     return src([
             'Frontend/src/fapJs/findProvider.js',
-            'Frontend/src/fapJs/locationAutocomplete'
+            'Frontend/src/fapJs/locationAutocomplete.js',
+            'node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js',
+            'node_modules/crypto-js/core.js',
+            'node_modules/crypto-js/enc-base64.js',
+            'node_modules/crypto-js/sha256.js',
+            'node_modules/crypto-js/hmac.js',
+            'node_modules/crypto-js/hmac-sha256.js'
         ])
+        .pipe(concat('fap.js'))
         .pipe(gulp.dest(paths.dist.JS));
 });
 
