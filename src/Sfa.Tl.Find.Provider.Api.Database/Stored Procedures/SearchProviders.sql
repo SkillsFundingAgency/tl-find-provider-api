@@ -13,22 +13,30 @@ AS
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326);
 
 	DECLARE @allQualificationIds TABLE ([Id] INT)
-	DECLARE @hasQualificationIds BIT = 0
+	--DECLARE @hasQualificationIds BIT = 0
 
-	IF(EXISTS(SELECT 1 from @routeIds) OR 
-	   EXISTS(SELECT 1 from @qualificationIds))
-	BEGIN
-		SET @hasQualificationIds = 1
+	INSERT INTO @allQualificationIds
+	SELECT [QualificationId] 
+	FROM @routeIds r
+	INNER JOIN [RouteQualification] rq
+	ON	rq.[RouteId] = r.[Id]
+	UNION
+	SELECT [Id] 
+	FROM @qualificationIds;
+	--IF(EXISTS(SELECT 1 from @routeIds) OR 
+	--   EXISTS(SELECT 1 from @qualificationIds))
+	--BEGIN
+	--	SET @hasQualificationIds = 1
 
-		INSERT INTO @allQualificationIds
-		SELECT [QualificationId] 
-		FROM @routeIds r
-		INNER JOIN [RouteQualification] rq
-		ON	rq.[RouteId] = r.[Id]
-		UNION
-		SELECT [Id]
-		FROM @qualificationIds
-	END;
+	--	INSERT INTO @allQualificationIds
+	--	SELECT [QualificationId] 
+	--	FROM @routeIds r
+	--	INNER JOIN [RouteQualification] rq
+	--	ON	rq.[RouteId] = r.[Id]
+	--	UNION
+	--	SELECT [Id]
+	--	FROM @qualificationIds
+	--END;
 		
 	WITH ProvidersCTE AS (
 		SELECT	p.[Id],
@@ -76,8 +84,11 @@ AS
 				ON		r.[Id] = rq.[RouteId]
 				  AND	r.[IsDeleted] = 0
 				WHERE	lq.[LocationId] = l.[Id]
-				  AND	(@hasQualificationIds = 0
-						 OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds)))
+				  AND	((NOT EXISTS(SELECT [Id] FROM @allQualificationIds WHERE [Id] <> 0)
+						   OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds))
+						))
+--				  AND	(@hasQualificationIds = 0
+--						 OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds)))
 		ORDER BY [Distance],
 				 p.[Name],
 				 l.[Name]
