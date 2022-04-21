@@ -1,12 +1,6 @@
 ﻿(function ($) {
     //Autocomplete for find provider search term
 
-    console.log('in function that creates autocomplete');
-    //let findProvidersApiUrl = "{{ settings.find_provider_api_uri }}";
-    //Next line is for use in local testing only
-    if ($('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-    if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
-
     const $keywordsInput = $('#tl-search-term');
     if ($keywordsInput.length > 0) {
         $keywordsInput.wrap('<div id="autocomplete-container" class="tl-autocomplete-wrap"></div>');
@@ -17,7 +11,6 @@
     function getSuggestions(query, populateResults) {
         if ((typeof isSearchInProgress !== 'undefined' && isSearchInProgress)
             || /\d/.test(query)) {
-            console.log('has number - could be a postcode');
             return;
         }
         var results = [];
@@ -35,18 +28,12 @@
     }
 
     function getLocationDisplayName(item) {
-        if (item.county) {
-            return item.name + ', ' + item.county;
-        } else if (item.la) {
-            return item.name + ', ' + item.la;
-        }
+        if (item.county) return item.name + ', ' + item.county;
+        else if (item.la) return item.name + ', ' + item.la;
         return item.name;
     }
 
     function onConfirm(confirmed) {
-        //    setTimeout(function () {
-        //        $("#tl-search-providers").click();
-        //    }, 200);
     }
 
     accessibleAutocomplete({
@@ -63,4 +50,3 @@
         autoselect: true
     });
 })(jQuery);
-
