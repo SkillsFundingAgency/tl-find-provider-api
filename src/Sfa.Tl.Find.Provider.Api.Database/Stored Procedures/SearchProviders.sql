@@ -98,7 +98,7 @@ AS
 		TownNamesCTE AS (
 			SELECT	[LocationId],
 					COALESCE(t.[Name], l.[Town]) AS [TownName]
-			FROM NearestLocationsCTE l		
+			FROM NearestLocationsCTE l
 			OUTER APPLY (SELECT Top(1) [Name] 
 						 FROM [dbo].[Town]
 						 WHERE [Name] = l.[Town]
@@ -115,7 +115,7 @@ AS
 				[LocationName],
 				[AddressLine1],
 				[AddressLine2],
-				t.[TownName],
+				t.[TownName] AS [Town],
 				[County],
 				[Email],
 				[Telephone],
