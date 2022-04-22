@@ -1,5 +1,9 @@
+using System;
 using System.Reflection;
 using AspNetCoreRateLimit;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -12,99 +16,120 @@ using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.Services;
 
-var builder = WebApplication.CreateBuilder(args);
-
-var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
-
-builder.Services.AddApplicationInsightsTelemetry();
-
-builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
-
-builder.Services.AddMemoryCache();
-
-builder.Services.AddApiVersioningPolicy();
-
-builder.Services.Configure<RouteOptions>(options =>
+try
 {
-    options.AppendTrailingSlash = true;
-    options.LowercaseUrls = true;
-    options.LowercaseQueryStrings = true;
-});
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+    var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
 
-builder.Services.AddSwagger("v2",
-    "T Levels Find a Provider Api",
-    "v2",
-    $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+    builder.Services.AddApplicationInsightsTelemetry();
 
-builder.Services
-    .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins)
-    .AddPolicyRegistry()
-    .AddDapperRetryPolicy();
+    builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
 
-builder.Services.AddHttpClients();
+    builder.Services.AddMemoryCache();
 
-builder.Services
-    .AddScoped<IDbContextWrapper, DbContextWrapper>()
-    .AddScoped<IDateTimeService, DateTimeService>()
-    .AddTransient<IProviderDataService, ProviderDataService>()
-    .AddTransient<ITownDataService, TownDataService>()
-    .AddTransient<IProviderRepository, ProviderRepository>()
-    .AddTransient<IQualificationRepository, QualificationRepository>()
-    .AddTransient<IRouteRepository, RouteRepository>()
-    .AddTransient<ITownRepository, TownRepository>();
+    builder.Services.AddApiVersioningPolicy();
 
-builder.Services.AddQuartzServices(
-    siteConfiguration.CourseDirectoryImportSchedule,
-    siteConfiguration.TownDataImportSchedule);
-
-builder.Services
-    .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
-    .AddRateLimitPolicy()
-    .Configure<ForwardedHeadersOptions>(options =>
+    builder.Services.Configure<RouteOptions>(options =>
     {
-        options.ForwardedHeaders =
-            ForwardedHeaders.XForwardedFor |
-            ForwardedHeaders.XForwardedProto;
-        options.ForwardLimit = 2;
-        options.RequireHeaderSymmetry = false;
-        options.KnownNetworks.Clear();
-        options.KnownProxies.Clear();
+        options.AppendTrailingSlash = true;
+        options.LowercaseUrls = true;
+        options.LowercaseQueryStrings = true;
     });
 
-var app = builder.Build();
+    builder.Services.AddControllers();
 
-app.UseForwardedHeaders();
+    builder.Services.AddSwagger("v2",
+        "T Levels Find a Provider Api",
+        "v2",
+        $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
-app.UseSecurityHeaders(
-    SecurityHeaderExtensions
-        .GetHeaderPolicyCollection(app.Environment.IsDevelopment()));
+    builder.Services
+        .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins)
+        .AddPolicyRegistry()
+        .AddDapperRetryPolicy();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
+    builder.Services.AddHttpClients();
 
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint(
-        "/swagger/v2/swagger.json",
-        "T Levels Find a Provider.Api v2"));
+    builder.Services
+        .AddScoped<IDbContextWrapper, DbContextWrapper>()
+        .AddScoped<IDateTimeService, DateTimeService>()
+        .AddTransient<IProviderDataService, ProviderDataService>()
+        .AddTransient<ITownDataService, TownDataService>()
+        .AddTransient<IProviderRepository, ProviderRepository>()
+        .AddTransient<IQualificationRepository, QualificationRepository>()
+        .AddTransient<IRouteRepository, RouteRepository>()
+        .AddTransient<ITownRepository, TownRepository>();
+
+    builder.Services.AddQuartzServices(
+        siteConfiguration.CourseDirectoryImportSchedule,
+        siteConfiguration.TownDataImportSchedule);
+
+    builder.Services
+        .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()
+        .AddRateLimitPolicy()
+        .Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedFor |
+                ForwardedHeaders.XForwardedProto;
+            options.ForwardLimit = 2;
+            options.RequireHeaderSymmetry = false;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
+    var app = builder.Build();
+
+    app.UseForwardedHeaders();
+
+    app.UseSecurityHeaders(
+        SecurityHeaderExtensions
+            .GetHeaderPolicyCollection(app.Environment.IsDevelopment()));
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint(
+            "/swagger/v2/swagger.json",
+            "T Levels Find a Provider.Api v2"));
+    }
+
+    if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
+    {
+        app.UseCors(Constants.CorsPolicyName);
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseIpRateLimiting();
+
+    app.UseRouting();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+
+    app.Run();
 }
-
-if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
+catch (Exception ex)
 {
-    app.UseCors(Constants.CorsPolicyName);
+    var message = $"Startup failed.\n{ex.Message}.\n{ex.StackTrace}";
+    Console.WriteLine(message);
+
+    var appInsightsInstrumentationKey = Environment
+        .GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
+
+    if (!string.IsNullOrEmpty(appInsightsInstrumentationKey))
+    {
+        var client = new TelemetryClient(TelemetryConfiguration.CreateDefault())
+        {
+            InstrumentationKey = appInsightsInstrumentationKey
+        };
+
+        client.TrackTrace(message, SeverityLevel.Critical);
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseIpRateLimiting();
-
-app.UseRouting();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
-app.Run();
