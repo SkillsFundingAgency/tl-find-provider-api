@@ -33,6 +33,16 @@ gulp.task('fapJs', () => {
         .pipe(gulp.dest(paths.dist.JS));
 });
 
+gulp.task('fapTileJs', () => {
+    return src([
+            'node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js',
+            'Frontend/src/fapJs/findProviderTile.js',
+            'Frontend/src/fapJs/locationAutocomplete.js'
+        ])
+        .pipe(concat('fapTile.js'))
+        .pipe(gulp.dest(paths.dist.JS));
+});
+
 //gulp.task('fapJs', () => {
 //    return src([
 //            'Frontend/src/fapJs/findProvider.js',

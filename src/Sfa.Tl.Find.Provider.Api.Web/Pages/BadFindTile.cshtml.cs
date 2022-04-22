@@ -2,17 +2,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Sfa.Tl.Find.Provider.Api.Web.Pages
 {
-    public class FindTileModel : PageModel
+    public class BadFindTileModel : PageModel
     {
-        private readonly ILogger<FindTileModel> _logger;
+        private readonly ILogger<BadFindTileModel> _logger;
         
-        public string SearchApiUrl { get; }
-
-        public FindTileModel(IConfiguration config, ILogger<FindTileModel> logger)
+        public BadFindTileModel(IConfiguration config, ILogger<BadFindTileModel> logger)
         {
             _logger = logger;
-
-            SearchApiUrl = config["SearchApiUrl"];
         }
 
         public void OnGet()
@@ -20,7 +16,7 @@ namespace Sfa.Tl.Find.Provider.Api.Web.Pages
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("Page model {name} GET called",
-                    nameof(FindTileModel));
+                    nameof(BadFindTileModel));
             }
         }
     }

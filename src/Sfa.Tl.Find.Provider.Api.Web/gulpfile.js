@@ -5,7 +5,7 @@ var gulp = require('gulp');
 require('./gulp/tasks/default');
 //require('./gulp/tasks/dev');
 
-gulp.task('default', gulp.series('assets', 'css', 'js', 'fapJs', 'favicon',
+gulp.task('default', gulp.series('assets', 'css', 'js', 'fapJs', 'fapTileJs', 'favicon',
     (done) => {
         done();
     }));
@@ -16,7 +16,7 @@ gulp.task('default', gulp.series('assets', 'css', 'js', 'fapJs', 'favicon',
 
 
 //gulp.task('dev', gulp.series('assets', 'dev.js', 'favicon',
-gulp.task('dev', gulp.series('assets', 'css', 'js', 'fapJs', 'favicon',
+gulp.task('dev', gulp.series('assets', 'css', 'js', 'fapJs', 'fapTileJs', 'favicon',
     (done) => {
         done();
     }));

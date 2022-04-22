@@ -1,5 +1,5 @@
 ﻿@page
-@model Sfa.Tl.Find.Provider.Api.Web.Pages.FindTileModel
+@model FindTileModel
 @{
     ViewData["Title"] = "Find tile";
 }
@@ -36,48 +36,28 @@
     @*    <script src="{{asset 'accessible-autocomplete.min.js'}}"></script>
     <script src="{{asset 'accessible-autocomplete.min.js'}}"></script>
 *@
-<script src="~/js/accessible-autocomplete.min.js" asp-append-version="true"></script>
-<script src="~/js/locationAutocomplete.js" asp-append-version="true"></script>
-<script src="~/js/findProviderTile.js" asp-append-version="true"></script>
-    @*<script src="{{asset 'locationAutocomplete.js'}}"></script>*@
-<script>
-        //Changes made:
+@*<script src="~/js/accessible-autocomplete.min.js" asp-append-version="true"></script>*@
+@*<script src="~/js/locationAutocomplete.js" asp-append-version="true"></script>*@
+    <script src="~/js/fapTile.js" 
+            data-findProviderRedirectUrl="/Index"
+            data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
+            asp-append-version="true">
+    </script>
+
+    @*<script src="{{asset 'fapTile.js'}}"></script>*@
+    <script >
+        //Need this to be global scope for autocomplete
+        //let findProvidersApiUrl = "{{ settings.find_provider_api_uri }}";
+        //Next line is for use in local razor page testing only
+        //if ($('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
+        //if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
+
+        //const findProviderRedirectUrl = '/hc/en-gb/articles/{{settings.article_id_find_provider}}';
+//        const findProviderRedirectUrl = '/Index';
+        
         //$(location).attr('href', '/hc/en-gb/articles/{{settings.article_id_find_provider}}?searchTerm=' + encodeURIComponent(searchTerm));
-        //to
-        //$(location).attr('href', '/Index?searchTerm=' + encodeURIComponent(searchTerm));
-    $(document).ready(function() {
-        $('#tl-search-term').val("");
 
-        $('#tl-search-term').keypress(function (e) {
-            if (e.which === 13) {
-                $("#tl-search-providers").click();
-                return false;
-            }
-        });
+        //Need to set the above as a global - can we use a module instead?
 
-        $("#tl-search-providers").click(function() {
-            const searchTerm = $("#tl-search-term").val().trim();
-
-            if (searchTerm === "") {
-                event.stopPropagation();
-                showSearchTermError("Enter a postcode or town");
-                return false;
-            }
-
-            //$(location).attr('href', '/hc/en-gb/articles/{{settings.article_id_find_provider}}?searchTerm=' + encodeURIComponent(searchTerm));
-            $(location).attr('href', '/Index?searchTerm=' + encodeURIComponent(searchTerm));
-
-            return true;
-        });
-
-        $(".tl-fap-search-providers-form").submit(function() {
-            event.preventDefault();
-        });
-
-        function showSearchTermError(message) {
-            $("#tl-search-term-error").text(message);
-            $('#tl-search-term-error').removeClass("tl-hidden");
-        }
-    });
-</script>
+    </script>
 }
