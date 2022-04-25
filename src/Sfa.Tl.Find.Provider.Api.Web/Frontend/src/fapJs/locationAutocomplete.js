@@ -9,7 +9,10 @@
         return;
     }
 
+    //TODO: Remove this - only for local testing
     if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
+    //
+
     if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
     console.log('findProvidersApiUrl in autocomplete = ' + findProvidersApiUrl);
 

@@ -1,31 +1,26 @@
 ﻿/* Find Provider Tile */
 
-//expects global variable findProviderRedirectUrl
-//const findProviderRedirectUrl = '/hc/en-gb/articles/{{settings.article_id_find_provider}}';
 $(document).ready(function () {
-    //const findProviderTileStuff = function (findProviderRedirectUrl) {
     const findProviderRedirectUrl =
         $('script[data-findProviderRedirectUrl][data-findProviderRedirectUrl!=null]').attr('data-findProviderRedirectUrl');
     let findProvidersApiUrl = 
         $('script[data-findProviderApiUri][data-findProviderApiUri!=null]').attr('data-findProviderApiUri');
     
-    console.log('findProviderRedirectUrl = ' + findProviderRedirectUrl);
-    console.log('findProvidersApiUrl = ' + findProvidersApiUrl);
-
-    if (typeof findProviderRedirectUrl === 'undefined' ||
-        typeof findProvidersApiUrl === 'undefined') {
+    if (typeof findProviderRedirectUrl === "undefined" ||
+        typeof findProvidersApiUrl === "undefined") {
         console.log('findProviderTile script requires data-findProviderApiUri and data-findProviderRedirectUrl to be passed via the script tag');
         return;
     }
 
-    //TODO: Remove this - only for local testing
-    if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-
+    //TODO: Remove - only for local testing
+    if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
+    if ((findProviderRedirectUrl === null || findProviderRedirectUrl.includes("{{")) && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_redirect_uri').val();
+    //
 
     if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
-    console.log('findProvidersApiUrl = ' + findProvidersApiUrl);
 
-
+    console.log("findProviderRedirectUrl = " + findProviderRedirectUrl);
+    console.log("findProvidersApiUrl = " + findProvidersApiUrl);
 
         $('#tl-search-term').val("");
 

@@ -30,6 +30,7 @@
 
 <div>
     <input type="hidden" id="find_provider_api_uri" value=@Model.SearchApiUrl>
+    <input type="hidden" id="find_provider_redirect_uri" value=@Model./Index>
 </div>
 
 @section Scripts {
@@ -39,13 +40,13 @@
 @*<script src="~/js/accessible-autocomplete.min.js" asp-append-version="true"></script>*@
 @*<script src="~/js/locationAutocomplete.js" asp-append-version="true"></script>*@
     <script src="~/js/fapTile.js" 
-            data-findProviderRedirectUrl="/Index"
+            data-findProviderRedirectUrl="/hc/en-gb/articles/{{settings.article_id_find_provider}}"
             data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
             asp-append-version="true">
     </script>
 
     @*<script src="{{asset 'fapTile.js'}}"></script>*@
-    <script >
+    <script>
         //Need this to be global scope for autocomplete
         //let findProvidersApiUrl = "{{ settings.find_provider_api_uri }}";
         //Next line is for use in local razor page testing only
