@@ -16,9 +16,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services;
 
 public class TownDataServiceTests
 {
-    private const string BaseUriString = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/IPN_GB_2016/FeatureServer/0/query?where=ctry15nm%20%3D%20'ENGLAND'%20AND%20popcnt%20%3E%3D%20500%20AND%20popcnt%20%3C%3D%2010000000&outFields=placeid,place15nm,ctry15nm,cty15nm,ctyltnm,lad15nm,laddescnm,lat,long,descnm&returnDistinctValues=true&outSR=4326&f=json";
-    private const string FirstPageUriString = $"{BaseUriString}&resultRecordCount=2000&resultOffSet=0";
-    private const string ThirdPageUriString = $"{BaseUriString}&resultRecordCount=999&resultOffSet=2";
+    private const string FirstPageUriString = $"{TownDataService.OfficeForNationalStatisticsLocationUrl}&resultRecordCount=2000&resultOffSet=0";
+    private const string ThirdPageUriString = $"{TownDataService.OfficeForNationalStatisticsLocationUrl}&resultRecordCount=999&resultOffSet=2";
 
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
@@ -65,6 +64,31 @@ public class TownDataServiceTests
     }
 
     [Fact]
+    public async Task ImportTowns_Creates_Expected_Number_Of_Towns()
+    {
+        var responses = new Dictionary<string, string>
+        {
+            { FirstPageUriString, NationalStatisticsJsonBuilder.BuildNationalStatisticsLocationsResponse() }
+        };
+
+        IList<Town> receivedTowns = null;
+
+        var townRepository = Substitute.For<ITownRepository>();
+        await townRepository
+            .Save(Arg.Do<IEnumerable<Town>>(
+                x => receivedTowns = x?.ToList()));
+
+        var service = new TownDataServiceBuilder()
+            .Build(responses,
+                townRepository);
+
+        await service.ImportTowns();
+
+        receivedTowns.Should().NotBeNull();
+        receivedTowns.Count.Should().Be(5);
+    }
+
+    [Fact]
     public async Task ImportTowns_Creates_Expected_Towns()
     {
         var responses = new Dictionary<string, string>
@@ -86,35 +110,91 @@ public class TownDataServiceTests
         await service.ImportTowns();
 
         receivedTowns.Should().NotBeNull();
-        receivedTowns.Count.Should().Be(4);
+        receivedTowns.Count.Should().Be(5);
 
         // ReSharper disable StringLiteralTypo
-        // ReSharper disable CommentTypo
-        ValidateTown(receivedTowns.SingleOrDefault(t => t.Id == 2),
-            2,
-            "Abbas and Templecombe",
-            "Somerset",
-            "Somerset",
-            //"South Somerset",
-            //"NMD",
-            51.002593M,
-            -2.411563M);
+        ValidateTown(receivedTowns
+                .SingleOrDefault(t => 
+                    t.Id == 302),
+            302,
+            "Abingdon",
+            "Oxfordshire",
+            "Oxfordshire",
+            51.674302M,
+            -1.282302M);
 
-        ValidateTown(receivedTowns.SingleOrDefault(t => t.Id == 4),
-            4,
-            "Abberley",
-            "Worcestershire",
-            "Worcestershire",
-            //"Malvern Hills",
-            //"NMD",
-            52.302702M,
-            -2.391708M);
+        ValidateTown(receivedTowns
+                .SingleOrDefault(t => 
+                    t.Id == 304),
+            304,
+            "Abingdon",
+            "Inner London",
+            "Greater London",
+            51.497681M,
+            -0.192782M);
+
+        ValidateTown(receivedTowns
+                .SingleOrDefault(t =>
+                    t.Id == 72832),
+            72832,
+            "West Bromwich",
+            "West Midlands",
+            "West Midlands",
+            52.530629M,
+            -2.005941M);
+
+        ValidateTown(receivedTowns
+                .SingleOrDefault(t =>
+                    t.Id == 72834),
+            72834,
+            "West Bromwich (East)",
+            "West Midlands",
+            "West Midlands",
+            52.540693M,
+            -1.942085M);
+
+        ValidateTown(receivedTowns
+                .SingleOrDefault(t =>
+                    t.Id == 72835),
+            72835,
+            "West Bromwich Central",
+            "West Midlands",
+            "West Midlands",
+            52.520416M,
+            -1.984158M);
         // ReSharper restore StringLiteralTypo
-        // ReSharper restore CommentTypo
     }
 
     [Fact]
-    public async Task ImportTowns_DeDuplicates_Towns()
+    public async Task ImportTowns_Filters_Out_Civil_Parishes()
+    {
+        var responses = new Dictionary<string, string>
+        {
+            { FirstPageUriString, NationalStatisticsJsonBuilder.BuildNationalStatisticsLocationsResponse() }
+        };
+
+        IList<Town> receivedTowns = null;
+
+        var townRepository = Substitute.For<ITownRepository>();
+        await townRepository
+            .Save(Arg.Do<IEnumerable<Town>>(
+                x => receivedTowns = x?.ToList()));
+
+        var service = new TownDataServiceBuilder()
+            .Build(responses,
+                townRepository);
+
+        await service.ImportTowns();
+
+        // ReSharper disable StringLiteralTypo
+        receivedTowns.Should().NotContain(t => 
+                t.Name == "Abbas and Templecombe" ||
+                t.Name == "Abberley");
+        // ReSharper restore StringLiteralTypo
+    }
+
+    [Fact]
+    public async Task ImportTowns_Deduplicates_Abingdon_Correctly()
     {
         var responses = new Dictionary<string, string>
         {
@@ -136,15 +216,16 @@ public class TownDataServiceTests
 
         receivedTowns.Should().NotBeNull();
 
-        var abingdon = receivedTowns.Where(t => t.Name == "Abingdon");
+        var abingdonInstances
+            = receivedTowns.Where(t => t.Name == "Abingdon");
         var abingdonInOxfordshire = receivedTowns
             .Where(t => t.Name == "Abingdon" && t.County == "Oxfordshire")
             .ToList();
 
-        abingdon.Count().Should().Be(2);
+        abingdonInstances.Count().Should().Be(2);
         abingdonInOxfordshire.Count.Should().Be(1);
 
-        ValidateTown(abingdonInOxfordshire.Single(), 
+        ValidateTown(abingdonInOxfordshire.Single(),
             302,
             "Abingdon",
             "Oxfordshire",
@@ -155,6 +236,46 @@ public class TownDataServiceTests
             -1.282302M);
     }
 
+    [Fact]
+    public async Task ImportTowns_Deduplicates_WestBromwich_Correctly()
+    {
+        var responses = new Dictionary<string, string>
+        {
+            { FirstPageUriString, NationalStatisticsJsonBuilder.BuildNationalStatisticsLocationsResponse() }
+        };
+
+        IList<Town> receivedTowns = null;
+
+        var townRepository = Substitute.For<ITownRepository>();
+        await townRepository
+            .Save(Arg.Do<IEnumerable<Town>>(
+                x => receivedTowns = x?.ToList()));
+
+        var service = new TownDataServiceBuilder()
+            .Build(responses,
+                townRepository);
+
+        await service.ImportTowns();
+
+        receivedTowns.Should().NotBeNull();
+
+        var westBromwich = receivedTowns
+            .Where(t => t.Name == "West Bromwich")
+            .ToList();
+
+        westBromwich.Count.Should().Be(1);
+
+        ValidateTown(westBromwich.Single(),
+            72832,
+            "West Bromwich",
+            "West Midlands",
+            "West Midlands",
+            //"Sandwell",
+            //"MD",
+            52.530629M,
+            -2.005941M);
+    }
+    
     [Fact]
     public async Task Search_Calls_Repository()
     {

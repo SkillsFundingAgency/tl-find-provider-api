@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Sfa.Tl.Find.Provider.Api.Models;
 
-[DebuggerDisplay(" {" + nameof(Name) + "}" +
+[DebuggerDisplay(" {" + nameof(Name) + ", nq}" +
                  " ({" + nameof(County) + ", nq})")]
 public class Town
 {
