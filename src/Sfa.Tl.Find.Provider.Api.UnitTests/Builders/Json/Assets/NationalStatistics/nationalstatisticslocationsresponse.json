@@ -164,6 +164,62 @@
         "long": -0.192782,
         "descnm": "WD"
       }
+    },
+    {
+      "attributes": {
+        "placeid": 72832,
+        "place15nm": "West Bromwich",
+        "ctry15nm": "England",
+        "cty15nm": "West Midlands",
+        "ctyltnm": "West Midlands",
+        "lad15nm": "Sandwell",
+        "laddescnm": "MD",
+        "lat": 52.530629,
+        "long": -2.005941,
+        "descnm": "BUASD"
+      }
+    },
+    {
+      "attributes": {
+        "placeid": 72832,
+        "place15nm": "West Bromwich",
+        "ctry15nm": "England",
+        "cty15nm": "West Midlands",
+        "ctyltnm": "West Midlands",
+        "lad15nm": "Walsall",
+        "laddescnm": "MD",
+        "lat": 52.56197,
+        "long": -1.959036,
+        "descnm": "BUASD"
+      }
+    },
+    {
+      "attributes": {
+        "placeid": 72834,
+        "place15nm": "West Bromwich (East)",
+        "ctry15nm": "England",
+        "cty15nm": "West Midlands",
+        "ctyltnm": "West Midlands",
+        "lad15nm": "Sandwell",
+        "laddescnm": "MD",
+        "lat": 52.540693,
+        "long": -1.942085,
+        "descnm": "BUASD"
+      }
+    },
+    {
+      "attributes": {
+        "placeid": 72835,
+        "place15nm": "West Bromwich Central",
+        "ctry15nm": "England",
+        "cty15nm": "West Midlands",
+        "ctyltnm": "West Midlands",
+        "lad15nm": "Sandwell",
+        "laddescnm": "MD",
+        "lat": 52.520416,
+        "long": -1.984158,
+        "descnm": "WD"
+      }
     }
   ],
   "exceededTransferLimit": false
