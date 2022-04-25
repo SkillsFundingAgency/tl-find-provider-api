@@ -20,7 +20,7 @@ public class ProviderSearchResult
     public string AddressLine1 { get; init; }
     [JsonIgnore]
     public string AddressLine2 { get; init; }
-    public string Town { get; set; }
+    public string Town { get; init; }
     [JsonIgnore]
     public string County { get; init; }
     public string Email { get; init; }
