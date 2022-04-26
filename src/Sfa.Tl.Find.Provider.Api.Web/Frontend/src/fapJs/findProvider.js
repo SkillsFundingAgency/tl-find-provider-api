@@ -22,19 +22,19 @@ $(document).ready(function () {
     }
 
     //TODO: Remove this - only for local testing
-    if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-    if ((findProvidersAppId === null || findProvidersAppId.startsWith("{{")) && $('#find_provider_app_id')) findProvidersAppId = $('#find_provider_api_app_id').val();
-    if ((findProvidersApiKey === null || findProvidersApiKey.startsWith("{{")) && $('#find_provider_api_key')) findProvidersApiKey = $('#find_provider_api_key').val();
+    if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUrl = $('#find_provider_api_uri').val();
+    if ((findProvidersAppId === null || findProvidersAppId.startsWith("{{")) && $('#find_provider_api_app_id').length) findProvidersAppId = $('#find_provider_api_app_id').val();
+    if ((findProvidersApiKey === null || findProvidersApiKey.startsWith("{{")) && $('#find_provider_api_key').length) findProvidersApiKey = $('#find_provider_api_key').val();
     //
     console.log('findProvidersApiUrl 2 = ' + findProvidersApiUrl);
 
-    if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-    console.log('findProvidersApiUrl 3 = ' + findProvidersApiUrl);
+    //if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
+    //if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
+    //console.log('findProvidersApiUrl 3 = ' + findProvidersApiUrl);
 
+    //if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
 
-    if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-
-    if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
+    if (findProvidersApiUrl !== null && findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
 
     console.log("findProvidersApiUrl = " + findProvidersApiUrl);
     console.log("findProvidersAppId = " + findProvidersAppId);
@@ -44,7 +44,8 @@ $(document).ready(function () {
     let currentSearchTerm = null;
     let currentSkillAreaIds = [];
 
-    loadRoutes();
+    if ($("#tl-skill-area-filter").length) loadRoutes();
+
     const qualificationArticleMap = loadQualificationMap();
 
     //Check for search term query parameter

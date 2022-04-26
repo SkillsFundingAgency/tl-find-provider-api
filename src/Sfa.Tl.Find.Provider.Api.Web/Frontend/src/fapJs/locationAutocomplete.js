@@ -1,5 +1,7 @@
 ﻿(function ($) {
     //Autocomplete for find provider search term
+    const $keywordsInput = $('#tl-search-term');
+    if (!$keywordsInput.length) return;
 
     let findProvidersApiUrl =
         $('script[data-findProviderApiUri][data-findProviderApiUri!=null]').attr('data-findProviderApiUri');
@@ -10,14 +12,10 @@
     }
 
     //TODO: Remove this - only for local testing
-    if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-    //
+    if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUrl = $('#find_provider_api_uri').val();
 
-    if (findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
+    if (findProvidersApiUrl !== null && findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
     console.log('findProvidersApiUrl in autocomplete = ' + findProvidersApiUrl);
-
-    const $keywordsInput = $('#tl-search-term');
-    if (!$keywordsInput.length) return;
 
     $keywordsInput.wrap('<div id="autocomplete-container" class="tl-autocomplete-wrap"></div>');
     const container = document.querySelector('#autocomplete-container');
