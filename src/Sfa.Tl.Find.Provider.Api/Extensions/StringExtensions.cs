@@ -116,10 +116,6 @@ public static class StringExtensions
         //Fix S after apostrophe, if it is before space or at end of string
         result = Regex.Replace(result, @"(['’])S(\s|$)", "$1s$2");
         
-        //Fix known town name patterns missed by code above
-        result = Regex.Replace(result, @"(-on-|-in-|-under-)", 
-            m => m.Value.ToLower(), RegexOptions.IgnoreCase);
-
         return result.Trim();
     }
 }

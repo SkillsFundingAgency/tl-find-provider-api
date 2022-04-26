@@ -21,17 +21,17 @@ public class TownDataImportJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.LogInformation($"{nameof(CourseDataImportJob)} job triggered. {context?.Trigger.JobKey.Name}");
+        _logger.LogInformation($"{nameof(TownDataImportJob)} job triggered. {context?.Trigger.JobKey.Name}");
 
         try
         {
             await _townDataService.ImportTowns();
 
-            _logger.LogInformation($"{nameof(CourseDataImportJob)} job completed successfully.");
+            _logger.LogInformation($"{nameof(TownDataImportJob)} job completed successfully.");
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{nameof(CourseDataImportJob)} job failed.");
+            _logger.LogError(e, $"{nameof(TownDataImportJob)} job failed.");
         }
     }
 }
