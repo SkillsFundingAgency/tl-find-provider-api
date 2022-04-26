@@ -1,11 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using Sfa.Tl.Find.Provider.Api.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddTransient<ILocationService, LocationService>();
-
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -33,10 +29,10 @@ app.MapRazorPages();
 //        string name) => await locationService.SayHello(name));
 
 //call with https://localhost:7026/api/locations/search?term=xxx
-app.MapGet("/api/locations/search/",
-    async ([FromServices] ILocationService locationService,
-        SearchTerms searchTerms) => 
-        await locationService.Search(searchTerms));
+//app.MapGet("/api/locations/search/",
+//    async ([FromServices] ILocationService locationService,
+//        SearchTerms searchTerms) => 
+//        await locationService.Search(searchTerms));
 
 app.Run();
 
