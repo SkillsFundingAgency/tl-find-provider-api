@@ -1,9 +1,7 @@
 ﻿/* Find Provider */
 console.log('in the find provider js file');
 
-//global variable shared with autocomplete
-//TODO: Rename to isFapSearchInProgress
-let isSearchInProgress = false;
+let isFapSearchInProgress = false;
 
 $(document).ready(function () {
 
@@ -26,13 +24,6 @@ $(document).ready(function () {
     if ((findProvidersAppId === null || findProvidersAppId.startsWith("{{")) && $('#find_provider_api_app_id').length) findProvidersAppId = $('#find_provider_api_app_id').val();
     if ((findProvidersApiKey === null || findProvidersApiKey.startsWith("{{")) && $('#find_provider_api_key').length) findProvidersApiKey = $('#find_provider_api_key').val();
     //
-    console.log('findProvidersApiUrl 2 = ' + findProvidersApiUrl);
-
-    //if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-    //if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
-    //console.log('findProvidersApiUrl 3 = ' + findProvidersApiUrl);
-
-    //if (findProvidersApiUrl.startsWith("{{") && $('#find_provider_api_uri')) findProvidersApiUrl = $('#find_provider_api_uri').val();
 
     if (findProvidersApiUrl !== null && findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
 
@@ -163,8 +154,8 @@ $(document).ready(function () {
     }
 
     function callProviderSearchApi(searchTerm, skillAreaIds, page, pageSize) {
-        if (isSearchInProgress) return false;
-        isSearchInProgress = true;
+        if (isFapSearchInProgress) return false;
+        isFapSearchInProgress = true;
 
         page = (page === undefined ? 0 : page);
         pageSize = (pageSize === undefined ? 5 : pageSize);
@@ -196,12 +187,12 @@ $(document).ready(function () {
                 populateProviderSearchResults(response);
             }
             setTimeout(function () {
-                //delay to avaoid autocomplete suggestions loading
-                isSearchInProgress = false;
+                //delay to avoid autocomplete suggestions loading
+                isFapSearchInProgress = false;
             }, 200);
         }).fail(function (jqxhr) {
             showError(jqxhr.status, jqxhr.responseText);
-            isSearchInProgress = false;
+            isFapSearchInProgress = false;
         });
 
         return true;

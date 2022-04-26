@@ -22,7 +22,7 @@
     $(container).empty();
 
     function getSuggestions(query, populateResults) {
-        if ((typeof isSearchInProgress !== 'undefined' && isSearchInProgress)
+        if ((typeof isFapSearchInProgress !== 'undefined' && isFapSearchInProgress)
             || /\d/.test(query)) {
             return;
         }
