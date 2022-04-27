@@ -30,16 +30,26 @@
                             <button class="govuk-button tl-button--blue tl-search--filter--button" id="tl-search-providers" data-module="govuk-button">
                                 Search
                             </button>
-                            <button class="govuk-button tl-button--green govuk-!-margin-left-1 govuk-!-margin-top-2" id="tl-register-interest" data-module="govuk-button">
-                                Register interest
-                            </button>
                         </div>
                     </div>
+                    
+                    <div class="tl-search--filter">
+                        <h3>provider basket</h3>
+                        <div class="tl-search--filter--content govuk-!-margin-top-2">
+                            <div class="govuk-form-group govuk-!-margin-bottom-2 tl-pane-expandable__content" style="background-color: white; padding: 10px">
+                                <div id="tl-provider-basket">
+                                </div>
+                            </div>
+                        </div>
+                        <button class="govuk-button tl-button--green govuk-!-margin-left-1 govuk-!-margin-top-2" id="tl-register-interest" data-module="govuk-button">
+                            Register interest
+                        </button>
+                        @*</div>*@
+                    </div>
+
                     <div class="tl-search--filter">
                         <h3>Filter by skill area</h3>
-
                         <div class="tl-search--filter--content">
-                            <!-- TODO: Add an example of styled checkboxes -->
                             <div class="govuk-form-group govuk-!-margin-bottom-2 tl-pane-expandable__content" style="background-color: white; padding: 10px">
                                 <div class="govuk-checkboxes govuk-checkboxes--small" id="tl-skill-area-filter">
                                 </div>
@@ -86,7 +96,7 @@
 
 @section Scripts {
     @*<script src="{{asset 'fap.js'}}"*@
-    <script src="~/js/fap.js" 
+    <script src="~/js/fap.js"
             data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
             data-findProviderAppId="{{ settings.find_provider_api_app_id }}"
             data-findProviderApiKey="{{ settings.find_provider_api_api_key }}"
@@ -110,73 +120,152 @@
     </script>
 
     <script type="text/javascript">
-    /* New code for Employer Registration */
-    $(document).ready(function() {
+        /* New code for Employer Registration */
+        $(document).ready(function() {
 
-        //See https://stackoverflow.com/questions/17604379/shopping-cart-cookies-only-holding-2-5-items
+        let findProvidersApiUri = $('#find_provider_api_uri').val();
+        console.log('set findProvidersApiUri = ' + findProvidersApiUri);
 
-        console.log('checking cookie');
-        const cookieSelectedProviders = readCookie('selected_provider_basket');
+        //let findProvidersAppId = $('#find_provider_api_app_id').val();
+        //let findProvidersApiKey = $('#find_provider_api_key').val();
 
-        if (cookieSelectedProviders) {
-            console.log('selected providers cookie found');
-            console.log(cookieSelectedProviders);
-            let selectedProviders = JSON.parse(cookieSelectedProviders);
-            console.log(selectedProviders);
-            $.each(JSON.parse(cookieSelectedProviders),
-                function(_, item) {
-                    console.log(item.ukPrn);
-                    console.log(item.name);
-                });
-        } else {
-            console.log('creating selected providers cookie');
-            const data = [
-                {
-                    ukPrn: 1,
-                    name: 'test 1'
-                },
-                {
-                    ukPrn: 1,
-                    name: 'test 2'
-                }
-            ];
 
-            console.log('writing cookie');
-            writeCookie('selected_provider_basket', JSON.stringify(data), 60);
-            console.log('wrote cookie');
-            //writeCookie('selected_provider_basket', data, 60);
-            $.each(data,
-                function(_, item) {
-                    console.log('item: ');
-                    console.log(item.ukPrn);
-                    console.log(item.name);
-                });
-        }
-    });
+            //See https://stackoverflow.com/questions/17604379/shopping-cart-cookies-only-holding-2-5-items
 
-    $("#tl-register-interest").click(function() {
+            console.log('checking cookie');
+            const cookieSelectedProviders = readCookie('selected_provider_basket');
+
+            if (cookieSelectedProviders) {
+                console.log('selected providers cookie found');
+                console.log(cookieSelectedProviders);
+                let selectedProviders = JSON.parse(cookieSelectedProviders);
+                console.log(selectedProviders);
+                $.each(JSON.parse(cookieSelectedProviders),
+                    function(_, item) {
+                        console.log(item.ukPrn);
+                        console.log(item.name);
+                    });
+            } else {
+                console.log('creating selected providers cookie');
+                const data = [
+                    {
+                        ukPrn: 1,
+                        name: 'test 1'
+                    },
+                    {
+                        ukPrn: 1,
+                        name: 'test 2'
+                    }
+                ];
+
+                console.log('writing cookie');
+                writeCookie('selected_provider_basket', JSON.stringify(data), 60);
+                console.log('wrote cookie');
+                //writeCookie('selected_provider_basket', data, 60);
+                $.each(data,
+                    function(_, item) {
+                        console.log('item: ');
+                        console.log(item.ukPrn);
+                        console.log(item.name);
+                    });
+            }
+        //});
+
+        $('#tl-fap--results').on('click', '.tl-register--link', function() {
+        //$(".tl-register--link").click(function() {
         event.stopPropagation();
         event.preventDefault();
+            console.log('register link clicked');
 
-        console.log("adding register interest button/checkbox/link");
-        
-        $('#tl-fap--results .tl-fap--result').each(
-            function (_, item) {
-                //skillAreaIds.push(item.value);
-                console.log(item);
-                console.log("inserting link..");
-                //const coursesElement = item.child
-                $('<a href="#">Register your interest</a>')
-                    .insertAfter(
-                        $(this).children(".tl-fap--courses")
-                        //item(".tl-fap--courses")
-                    //Probably better to build this link in 
-                    //  populateProviderSearchResults - include ukprn
-                    //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
-                );
+        const ukPrn = $(this).attr('data-ukPrn');
+        console.log(ukPrn);
+
+            return false;
+        });
+
+        $("#tl-register-interest").click(function() {
+            event.stopPropagation();
+            event.preventDefault();
+
+            console.log("adding register interest button/checkbox/link");
+
+            //$('#tl-fap--results .tl-fap--result').each(
+            //    function(_, item) {
+            //        //skillAreaIds.push(item.value);
+            //        console.log(item);
+            //        console.log("inserting link..");
+            //        //const coursesElement = item.child
+            //        //$('<a href="#">Register your interest</a>')
+            //        //    .insertAfter(
+            //        //        $(this).children(".tl-fap--courses")
+            //        //        //item(".tl-fap--courses")
+            //        //        //Probably better to build this link in 
+            //        //        //  populateProviderSearchResults - include ukprn
+            //        //        //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
+            //        //    );
+            //    });
+
+            sendEmployerRegistration();
+
+            return false;
+        });
+
+        function sendEmployerRegistration() {
+            
+            var sampleData = {
+                "employerName": "My Co",
+                "employerTelephone": "101 1234 9901",
+                "employerEmail": "mwild08@gmail.com",
+                "providers": [
+                    {
+                        "ukPrn": 12345678,
+                        "name": "Mike",
+                        "postcode": "OX2 9GX",
+                        "town": "Oxford",
+                        "Email": "mwild08@gmail.com"
+                    },
+                    {
+                        "ukPrn": 98765432,
+                        "name": "Bob",
+                        "postcode": "CV1 2WT",
+                        "town": "Coventry",
+                        "website": "https://test.tlevels.gov.uk"
+                    }
+                ]
+            };
+
+            //build data...
+            //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
+            $('#tl-provider-basket .tl-providers--item').each(
+                function(_, item) {
+                    //skillAreaIds.push(item.value);
+                    console.log(item);
+                });
+
+            console.log(sampleData);
+            console.log(JSON.stringify(sampleData));
+
+            let data = sampleData;
+
+            console.log(findProvidersApiUri);
+            const uri = findProvidersApiUri + "employerregistration/register";
+            $.ajax({
+                type: "POST",
+                url: uri,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+                //TODO: Implement hmc for this call
+                //        - might need to refactor out hmac code for reuse
+                //beforeSend: function(xhr) {
+                //    addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
+                //}
+            }).done(function(response) {
+                console.log('Successfully registered employer interest.');
+            }).fail(function(error) {
+                console.log('Call to register employer interest failed. ' + error);
             });
-        
-        return false;
-    });
+        }
+        });
+
     </script>
 }

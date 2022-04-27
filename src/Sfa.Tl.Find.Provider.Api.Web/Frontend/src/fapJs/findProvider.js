@@ -310,6 +310,16 @@ $(document).ready(function () {
                         searchResult += '</ul>';
                     });
 
+                //Employer registration
+                searchResult += '<a href="#" class="tl-register--link" ' +
+                    'data-ukPrn="' + providerLocation.ukPrn + '" ' +
+                    'data-providerName="' + providerLocation.providerName + '" ' +
+                    'data-town="' + providerLocation.town + '" ' +
+                    'data-providerName="' + providerLocation.telephone + '" ' +
+                    'data-email=telephone"' + providerLocation.email + '" ' +
+                    'data-providerName=website"' + providerLocation.website + '" ' +
+                    '>Register your interest</a>';
+
                 searchResult += '</div> \
                                     <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible"> \
                                   </div>';
