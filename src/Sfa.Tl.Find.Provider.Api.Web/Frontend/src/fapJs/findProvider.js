@@ -5,14 +5,14 @@ let isFapSearchInProgress = false;
 
 $(document).ready(function () {
 
-    let findProvidersApiUrl =
+    let findProvidersApiUri =
         $('script[data-findProviderApiUri][data-findProviderApiUri!=null]').attr('data-findProviderApiUri');
     let findProvidersAppId =
         $('script[data-findProviderAppId][data-findProviderAppId!=null]').attr('data-findProviderAppId');
     let findProvidersApiKey =
         $('script[data-findProviderApiKey][data-findProviderApiKey!=null]').attr('data-findProviderApiKey');
 
-    if (typeof findProvidersApiUrl === "undefined" ||
+    if (typeof findProvidersApiUri === "undefined" ||
         typeof findProvidersAppId === "undefined" ||
         typeof findProvidersApiKey === "undefined") {
         console.log('findProvider script requires data-findProviderApiUri, data-findProviderAppId and data-findProviderApiKey to be passed via the script tag');
@@ -20,20 +20,23 @@ $(document).ready(function () {
     }
 
     //TODO: Remove this - only for local testing
-    if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUrl = $('#find_provider_api_uri').val();
+    if ((findProvidersApiUri === null || findProvidersApiUri.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUri = $('#find_provider_api_uri').val();
     if ((findProvidersAppId === null || findProvidersAppId.startsWith("{{")) && $('#find_provider_api_app_id').length) findProvidersAppId = $('#find_provider_api_app_id').val();
     if ((findProvidersApiKey === null || findProvidersApiKey.startsWith("{{")) && $('#find_provider_api_key').length) findProvidersApiKey = $('#find_provider_api_key').val();
     //
 
-    if (findProvidersApiUrl !== null && findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
+    if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
 
-    console.log("findProvidersApiUrl = " + findProvidersApiUrl);
-    console.log("findProvidersAppId = " + findProvidersAppId);
-    console.log("findProvidersApiKey = " + findProvidersApiKey);
+    //console.log("findProvidersApiUri = " + findProvidersApiUri);
+    //console.log("findProvidersAppId = " + findProvidersAppId);
+    //console.log("findProvidersApiKey = " + findProvidersApiKey);
 
     let currentPage = 0;
     let currentSearchTerm = null;
     let currentSkillAreaIds = [];
+
+    //initialize autocomplete
+    new LocationAutocomplete(findProvidersApiUri);
 
     if ($("#tl-skill-area-filter").length) loadRoutes();
 
@@ -89,7 +92,7 @@ $(document).ready(function () {
     }
 
     function loadRoutes() {
-        const uri = findProvidersApiUrl + "routes";
+        const uri = findProvidersApiUri + "routes";
         $.ajax({
             type: "GET",
             url: uri,
@@ -161,7 +164,7 @@ $(document).ready(function () {
         pageSize = (pageSize === undefined ? 5 : pageSize);
 
         const encodedSearchTerm = encodeURIComponent(searchTerm).replace(/'/g, '%27');
-        let uri = findProvidersApiUrl + "providers?searchTerm=" + encodedSearchTerm + '&page=' + page + '&pageSize=' + pageSize;
+        let uri = findProvidersApiUri + "providers?searchTerm=" + encodedSearchTerm + '&page=' + page + '&pageSize=' + pageSize;
 
         if (skillAreaIds && skillAreaIds.length > 0) {
             skillAreaIds.forEach(function (skillAreaId) {
@@ -216,9 +219,6 @@ $(document).ready(function () {
         map[49] = $('script[data-qualificationMap_49][data-qualificationMap_49!=null]').attr('data-qualificationMap_49');
         map[50] = $('script[data-qualificationMap_50][data-qualificationMap_50!=null]').attr('data-qualificationMap_50');
         map[51] = $('script[data-qualificationMap_51][data-qualificationMap_51!=null]').attr('data-qualificationMap_51');
-        console.log("Qualification map:");
-        console.log(map);
-        console.log(JSON.stringify(map));
         return map;
     }
 

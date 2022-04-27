@@ -1,28 +1,51 @@
 ﻿/* Find Provider Tile */
-
 $(document).ready(function () {
-    if (!$('#tl-search-term').length) return;
+    const fapTimeContainer = $("#tl-fap-tile");
+    if (!fapTimeContainer.length) return;
+
+    fapTimeContainer.empty();
+    fapTimeContainer.append(
+        '<div class="govuk-grid-column-two-thirds"> \
+            <div class= "tl-card--grey"> \
+                <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Find a T Level school or college</h1> \
+                <p class="govuk-body">Offer a placement or find out more about their T Level programme.</p> \
+                <form role="search" class="tl-fap-search-providers-form"> \
+                    <span class="govuk-error-message tl-hidden" id="tl-search-term-error">You must enter a postcode or town</span> \
+                    <label class="govuk-visually-hidden" for="tl-search-term">Enter a postcode or town</label> \
+                    <input class="govuk-input govuk-input--width-10 tl-fap-home--input" id="tl-search-term" name="tl-search-term" type="text" placeholder="Enter a postcode or town"> \
+                    <button class="govuk-button tl-button--blue tl-fap-home--submit" id="tl-search-providers" data-module="govuk-button"> \
+                    Search \
+                    </button> \
+                </form> \
+            </div> \
+        </div> \
+        <div class="govuk-grid-column-one-third"> \
+            <span class="tl-fap-home--image"></span> \
+        </div>');
 
     let findProviderRedirectUrl =
         $('script[data-findProviderRedirectUrl][data-findProviderRedirectUrl!=null]').attr('data-findProviderRedirectUrl');
-    let findProvidersApiUrl = 
+    let findProvidersApiUri =
         $('script[data-findProviderApiUri][data-findProviderApiUri!=null]').attr('data-findProviderApiUri');
     
     if (typeof findProviderRedirectUrl === "undefined" ||
-        typeof findProvidersApiUrl === "undefined") {
+        typeof findProvidersApiUri === "undefined") {
         console.log('findProviderTile script requires data-findProviderApiUri and data-findProviderRedirectUrl to be passed via the script tag');
         return;
     }
 
     //TODO: Remove - only for local testing
-    if ((findProvidersApiUrl === null || findProvidersApiUrl.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUrl = $('#find_provider_api_uri').val();
+    if ((findProvidersApiUri === null || findProvidersApiUri.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUri = $('#find_provider_api_uri').val();
     if ((findProviderRedirectUrl === null || findProviderRedirectUrl.includes("{{")) && $('#find_provider_redirect_uri').length) findProviderRedirectUrl = $('#find_provider_redirect_uri').val();
     //
 
-    if (findProvidersApiUrl !== null && findProvidersApiUrl.substr(-1) !== '/') findProvidersApiUrl += '/';
+    if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
 
-    console.log("findProviderRedirectUrl = " + findProviderRedirectUrl);
-    console.log("findProvidersApiUrl = " + findProvidersApiUrl);
+    //console.log("findProviderRedirectUrl = " + findProviderRedirectUrl);
+    //console.log("findProvidersApiUri = " + findProvidersApiUri);
+
+    //initialize autocomplete
+    new LocationAutocomplete(findProvidersApiUri);
 
     $('#tl-search-term').val("");
 
