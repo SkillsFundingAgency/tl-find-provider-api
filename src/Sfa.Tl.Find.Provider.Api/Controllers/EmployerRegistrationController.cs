@@ -13,6 +13,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
 [ApiController]
 [ApiVersion("2.0")]
+//[HmacAuthorization]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class EmployerRegistrationController : ControllerBase
