@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Notify.Client;
+using Notify.Interfaces;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Jobs;
@@ -69,7 +71,13 @@ public static class ServiceCollectionExtensions
             .Configure<ConnectionStringSettings>(x =>
             {
                 x.SqlConnectionString = siteConfiguration.SqlConnectionString;
-            });
+            })
+            .Configure<EmployerRegistrationSettings>(x =>
+            {
+                x.EmployerInterestEmailTemplateId = siteConfiguration.EmployerRegistrationEmailTemplateId;
+                x.InboxAddress = siteConfiguration.EmployerRegistrationInboxAddress;
+            })
+            ;
 
         return services;
     }
@@ -157,6 +165,19 @@ public static class ServiceCollectionExtensions
                 }
             )
             .AddRetryPolicyHandler<TownDataService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddNotifyService(
+        this IServiceCollection services, 
+        string govNotifyApiKey)
+    {
+        if (!string.IsNullOrEmpty(govNotifyApiKey))
+        {
+            services.AddTransient<IAsyncNotificationClient, NotificationClient>(
+                _ => new NotificationClient(govNotifyApiKey));
+        }
 
         return services;
     }

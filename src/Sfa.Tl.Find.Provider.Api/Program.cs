@@ -54,12 +54,16 @@ try
     builder.Services
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddScoped<IDateTimeService, DateTimeService>()
+        .AddScoped<IEmailService, EmailService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IProviderRepository, ProviderRepository>()
         .AddTransient<IQualificationRepository, QualificationRepository>()
         .AddTransient<IRouteRepository, RouteRepository>()
         .AddTransient<ITownRepository, TownRepository>();
+
+    builder.Services.AddNotifyService(
+        siteConfiguration.GovNotifyApiKey);
 
     builder.Services.AddQuartzServices(
         siteConfiguration.CourseDirectoryImportSchedule,
