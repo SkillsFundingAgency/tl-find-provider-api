@@ -315,9 +315,10 @@ $(document).ready(function () {
                     'data-ukPrn="' + providerLocation.ukPrn + '" ' +
                     'data-providerName="' + providerLocation.providerName + '" ' +
                     'data-town="' + providerLocation.town + '" ' +
-                    'data-providerName="' + providerLocation.telephone + '" ' +
-                    'data-email=telephone"' + providerLocation.email + '" ' +
-                    'data-providerName=website"' + providerLocation.website + '" ' +
+                    'data-postcode="' + providerLocation.postcode + '" ' +
+                    'data-email="' + providerLocation.email + '" ' +
+                    'data-telephone="' + providerLocation.telephone + '" ' +
+                    'data-website="' + providerLocation.website + '" ' +
                     '>Register your interest</a>';
 
                 searchResult += '</div> \

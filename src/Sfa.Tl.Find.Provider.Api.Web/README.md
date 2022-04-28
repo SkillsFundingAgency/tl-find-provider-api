@@ -48,17 +48,9 @@ include the site in `"AllowedCorsOrigins"` as below:
 
 ## TODO
 
-- check the call below in zendesk - it shouldn't be passing the page and page size defaults
-```
-         $("#tl-search-providers").click(function() {
-            return providerSearch($("#tl-postcode").val().trim(), 0, 5);
-        });
-```
-
-- type in message in LoadAdditionalProviderData - check in marcoms as well
+- typo in message in LoadAdditionalProviderData - check in marcoms as well
 ```
      _logger.LogInformation("Saved {providerCount} providers from ", providers.Count);
 
 ```
 
-- search from current location uses closest postcode. Could also pass the lat-long to a new API method

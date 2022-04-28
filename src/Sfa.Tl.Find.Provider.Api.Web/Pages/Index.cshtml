@@ -11,8 +11,10 @@
         <!-- Search Box -->
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <h1 class="govuk-heading-xl govuk-!-margin-top-9 govuk-!-margin-bottom-7">{{article.title}}</h1>
-                <div class="tl-article--content">{{article.body}}</div>
+                @*<h1 class="govuk-heading-xl govuk-!-margin-top-9 govuk-!-margin-bottom-7">{{article.title}}</h1>*@
+                <h1 class="govuk-heading-xl govuk-!-margin-top-9 govuk-!-margin-bottom-7">Find T Level provider prototype</h1>
+                @*<div class="tl-article--content">{{article.body}}</div>*@
+                <div class="tl-article--content">Search for schools and colleges delivering T Levels.</div>
             </div>
         </div>
         <div class="govuk-grid-row">
@@ -33,18 +35,28 @@
                         </div>
                     </div>
                     
-                    <div class="tl-search--filter">
-                        <h3>provider basket</h3>
+                    <div class="tl-search--filter tl-hidden" id="tl-provider-basket">
+                        <h3>Provider basket</h3>
                         <div class="tl-search--filter--content govuk-!-margin-top-2">
                             <div class="govuk-form-group govuk-!-margin-bottom-2 tl-pane-expandable__content" style="background-color: white; padding: 10px">
-                                <div id="tl-provider-basket">
-                                </div>
+                                <ul id="tl-provider-opportunity-list" class="govuk-list govuk-list--bullet">
+                                </ul>
                             </div>
+
+                            <p class="govuk-body govuk-!-margin-bottom-2">Enter your details</p>
+                            <label class="govuk-visually-hidden" for="tl-employer-name">Enter your details</label>
+                            <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-employer-name" name="tl-employer-name" type="text" placeholder="Enter your name">
+
+                            <label class="govuk-visually-hidden" for="tl-employer-telephone">Enter your telephone</label>
+                            <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-employer-telephone" name="tl-employer-telephone" type="text" placeholder="Enter your telephone">
+
+                            <label class="govuk-visually-hidden" for="tl-employer-email">Enter your email</label>
+                            <input class="govuk-input govuk-input--width-10 govuk-body-s" id="tl-employer-email" name="tl-employer-email" type="text" placeholder="Enter your email">
+
+                            <button class="govuk-button tl-button--green govuk-!-margin-left-1 govuk-!-margin-top-2" id="tl-register-interest" data-module="govuk-button">
+                                Register interest
+                            </button>
                         </div>
-                        <button class="govuk-button tl-button--green govuk-!-margin-left-1 govuk-!-margin-top-2" id="tl-register-interest" data-module="govuk-button">
-                            Register interest
-                        </button>
-                        @*</div>*@
                     </div>
 
                     <div class="tl-search--filter">
@@ -123,11 +135,11 @@
         /* New code for Employer Registration */
         $(document).ready(function() {
 
-        let findProvidersApiUri = $('#find_provider_api_uri').val();
-        console.log('set findProvidersApiUri = ' + findProvidersApiUri);
+            let findProvidersApiUri = $('#find_provider_api_uri').val();
+            console.log('set findProvidersApiUri = ' + findProvidersApiUri);
 
-        //let findProvidersAppId = $('#find_provider_api_app_id').val();
-        //let findProvidersApiKey = $('#find_provider_api_key').val();
+            //let findProvidersAppId = $('#find_provider_api_app_id').val();
+            //let findProvidersApiKey = $('#find_provider_api_key').val();
 
 
             //See https://stackoverflow.com/questions/17604379/shopping-cart-cookies-only-holding-2-5-items
@@ -169,103 +181,156 @@
                         console.log(item.name);
                     });
             }
-        //});
+            //});
 
-        $('#tl-fap--results').on('click', '.tl-register--link', function() {
-        //$(".tl-register--link").click(function() {
-        event.stopPropagation();
-        event.preventDefault();
-            console.log('register link clicked');
+            $('#tl-fap--results').on('click',
+                '.tl-register--link',
+                function() {
+                    //$(".tl-register--link").click(function() {
+                    event.stopPropagation();
+                    event.preventDefault();
 
-        const ukPrn = $(this).attr('data-ukPrn');
-        console.log(ukPrn);
+                    const ukPrn = $(this).attr('data-ukPrn');
+                    const providerName = $(this).attr('data-providerName');
+                    const postcode = $(this).attr('data-postcode');
+                    const town = $(this).attr('data-town');
+                    const telephone = $(this).attr('data-telephone');
+                    const email = $(this).attr('data-email');
+                    const website = $(this).attr('data-website');
 
-            return false;
-        });
+                    console.log(`${ukPrn} ${providerName} ${postcode} ${town} ${telephone} ${email} ${website} `);
 
-        $("#tl-register-interest").click(function() {
-            event.stopPropagation();
-            event.preventDefault();
+                    console.log()
+                    $("#tl-provider-opportunity-list").append(
+                        '<li class="tl-providers--item" ' +
+                            'data-ukPrn="' + ukPrn + '" ' +
+                            'data-providerName="' + providerName + '" ' +
+                            'data-town="' + town + '" ' +
+                            'data-postcode="' + postcode + '" ' +
+                            'data-email="' + email + '" ' +
+                            'data-telephone="' + telephone + '" ' +
+                            'data-website="' + website + '" ' +
+                        '>' +
+                            providerName + " " + postcode +
+                        "</li>");
 
-            console.log("adding register interest button/checkbox/link");
+                    $('#tl-provider-basket').removeClass("tl-hidden");
 
-            //$('#tl-fap--results .tl-fap--result').each(
-            //    function(_, item) {
-            //        //skillAreaIds.push(item.value);
-            //        console.log(item);
-            //        console.log("inserting link..");
-            //        //const coursesElement = item.child
-            //        //$('<a href="#">Register your interest</a>')
-            //        //    .insertAfter(
-            //        //        $(this).children(".tl-fap--courses")
-            //        //        //item(".tl-fap--courses")
-            //        //        //Probably better to build this link in 
-            //        //        //  populateProviderSearchResults - include ukprn
-            //        //        //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
-            //        //    );
-            //    });
-
-            sendEmployerRegistration();
-
-            return false;
-        });
-
-        function sendEmployerRegistration() {
-            
-            var sampleData = {
-                "employerName": "My Co",
-                "employerTelephone": "101 1234 9901",
-                "employerEmail": "mwild08@gmail.com",
-                "providers": [
-                    {
-                        "ukPrn": 12345678,
-                        "name": "Mike",
-                        "postcode": "OX2 9GX",
-                        "town": "Oxford",
-                        "Email": "mwild08@gmail.com"
-                    },
-                    {
-                        "ukPrn": 98765432,
-                        "name": "Bob",
-                        "postcode": "CV1 2WT",
-                        "town": "Coventry",
-                        "website": "https://test.tlevels.gov.uk"
-                    }
-                ]
-            };
-
-            //build data...
-            //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
-            $('#tl-provider-basket .tl-providers--item').each(
-                function(_, item) {
-                    //skillAreaIds.push(item.value);
-                    console.log(item);
+                    return false;
                 });
 
-            console.log(sampleData);
-            console.log(JSON.stringify(sampleData));
+            $("#tl-register-interest").click(function() {
+                event.stopPropagation();
+                event.preventDefault();
 
-            let data = sampleData;
+                //$('#tl-fap--results .tl-fap--result').each(
+                //    function(_, item) {
+                //        //skillAreaIds.push(item.value);
+                //        console.log(item);
+                //        console.log("inserting link..");
+                //        //const coursesElement = item.child
+                //        //$('<a href="#">Register your interest</a>')
+                //        //    .insertAfter(
+                //        //        $(this).children(".tl-fap--courses")
+                //        //        //item(".tl-fap--courses")
+                //        //        //Probably better to build this link in 
+                //        //        //  populateProviderSearchResults - include ukprn
+                //        //        //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
+                //        //    );
+                //    });
 
-            console.log(findProvidersApiUri);
-            const uri = findProvidersApiUri + "employerregistration/register";
-            $.ajax({
-                type: "POST",
-                url: uri,
-                contentType: "application/json",
-                data: JSON.stringify(data)
-                //TODO: Implement hmc for this call
-                //        - might need to refactor out hmac code for reuse
-                //beforeSend: function(xhr) {
-                //    addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
-                //}
-            }).done(function(response) {
-                console.log('Successfully registered employer interest.');
-            }).fail(function(error) {
-                console.log('Call to register employer interest failed. ' + error);
+                sendEmployerRegistration();
+
+                return false;
             });
-        }
-        });
 
+            function sendEmployerRegistration() {
+
+                var sampleData = {
+                    "employerName": "My Co",
+                    "employerTelephone": "101 1234 9901",
+                    "employerEmail": "mwild08@gmail.com",
+                    "providers": [
+                        {
+                            "ukPrn": 12345678,
+                            "name": "Mike",
+                            "postcode": "OX2 9GX",
+                            "town": "Oxford",
+                            "Email": "mwild08@gmail.com"
+                        },
+                        {
+                            "ukPrn": 98765432,
+                            "name": "Bob",
+                            "postcode": "CV1 2WT",
+                            "town": "Coventry",
+                            "website": "https://test.tlevels.gov.uk"
+                        }
+                    ]
+                };
+
+                const employerName = $("#tl-employer-name").val();
+                const employerTelephone = $("#tl-employer-telephone").val();
+                const employerEmail = $("#tl-employer-email").val();
+                console.log(`${employerName} ${employerTelephone} ${employerEmail} `);
+
+                //build data...
+                var data =   {                   
+                    "employerName": employerName,
+                    "employerTelephone": employerTelephone,
+                    "employerEmail": employerEmail,
+                    "providers": [
+                    ]
+                };
+
+                //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
+                $('#tl-provider-basket .tl-providers--item').each(
+                    function(_, item) {
+                        //console.log(item);
+                        const ukPrn = $(item).attr('data-ukPrn');
+                        const providerName = $(item).attr('data-providerName');
+                        const postcode = $(item).attr('data-postcode');
+                        const town = $(item).attr('data-town');
+                        const telephone = $(item).attr('data-telephone');
+                        const email = $(item).attr('data-email');
+                        const website = $(item).attr('data-website');
+
+                        console.log(`${ukPrn} ${providerName} ${postcode} ${town} ${telephone} ${email} ${website} `);
+
+                        const c = data.providers.push({
+                            "ukPrn": ukPrn,
+                            "name": providerName,
+                            "postcode": postcode,
+                            "town": town,
+                            "telephone": telephone,
+                            "email": email,
+                            "website": website
+                        });
+                        console.log(`added item to providers ${c} ${providerName} ${postcode} `);
+
+                    });
+
+                console.log(data);
+                console.log(JSON.stringify(data));
+                //let data = sampleData;
+
+                console.log(findProvidersApiUri);
+                const uri = findProvidersApiUri + "employerregistration/register";
+                $.ajax({
+                    type: "POST",
+                    url: uri,
+                    contentType: "application/json",
+                    data: JSON.stringify(data)
+                    //TODO: Implement hmc for this call
+                    //        - might need to refactor out hmac code for reuse
+                    //beforeSend: function(xhr) {
+                    //    addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
+                    //}
+                }).done(function(response) {
+                    console.log('Successfully registered employer interest.');
+                }).fail(function(error) {
+                    console.log('Call to register employer interest failed. ' + error);
+                });
+            }
+        });
     </script>
 }
