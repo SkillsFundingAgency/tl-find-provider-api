@@ -2,19 +2,77 @@
   "openapi": "3.0.1",
   "info": {
     "title": "T Levels Find a Provider Api",
-    "version": "v1"
+    "version": "v2"
   },
   "paths": {
-    "/api/v{version}/findproviders/providers": {
+    "/api/v{version}/locations": {
       "get": {
         "tags": [
-          "FindProviders"
+          "Locations"
+        ],
+        "summary": "Search for locations by partial name.",
+        "operationId": "SearchLocations",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "in": "query",
+            "description": "Search string.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Town"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Town"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Town"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/providers": {
+      "get": {
+        "tags": [
+          "Providers"
         ],
         "summary": "Search for providers.",
         "operationId": "GetProviders",
         "parameters": [
           {
-            "name": "postcode",
+            "name": "searchTerm",
             "in": "query",
             "description": "Postcode that the search should start from.",
             "schema": {
@@ -22,12 +80,45 @@
             }
           },
           {
+            "name": "lat",
+            "in": "query",
+            "description": "Latitude that the search should start from.",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "description": "Longitude that the search should start from.",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "routeId",
+            "in": "query",
+            "description": "Route ids to filter by. Optional, nulls or zeroes will be ignored.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
             "name": "qualificationId",
             "in": "query",
-            "description": "Qualification id to filter by. Optional, defaults to null or zero.",
+            "description": "Qualification ids to filter by. Optional, nulls or zeroes will be ignored.",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
             }
           },
           {
@@ -90,10 +181,10 @@
         }
       }
     },
-    "/api/v{version}/findproviders/qualifications": {
+    "/api/v{version}/qualifications": {
       "get": {
         "tags": [
-          "FindProviders"
+          "Qualifications"
         ],
         "summary": "Returns a list of all qualifications.",
         "operationId": "GetQualifications",
@@ -132,6 +223,76 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/Qualification"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/routes": {
+      "get": {
+        "tags": [
+          "Routes"
+        ],
+        "summary": "Returns a list of all routes.",
+        "operationId": "GetRoutes",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Route"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Route"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Route"
                   }
                 }
               }
@@ -217,7 +378,7 @@
             "type": "string",
             "nullable": true
           },
-          "postcode": {
+          "searchTerm": {
             "type": "string",
             "nullable": true
           },
@@ -280,6 +441,50 @@
             "format": "int32"
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Route": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "numberOfQualifications": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numberOfQualificationsOffered": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Town": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "la": {
             "type": "string",
             "nullable": true
           }
