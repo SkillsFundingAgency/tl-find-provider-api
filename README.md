@@ -84,7 +84,7 @@ When running locally, assuming localhost with port 55961, you can either use the
 > - https://localhost:55961/swagger/index.html
 > 
 > **Generate API definition file**
-> - https://localhost:55961/swagger/v1/swagger.json
+> - https://localhost:55961/swagger/v2/swagger.json
 >   - This can be saved into `\api-definitions\findaproviderapi.json`
 > 
 > **Routes** *(Skill Areas)*
