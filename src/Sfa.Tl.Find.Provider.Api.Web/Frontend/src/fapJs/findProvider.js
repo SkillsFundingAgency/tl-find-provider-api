@@ -236,7 +236,10 @@ $(document).ready(function () {
             $("#tl-search-term").val(data.searchTerm);
         }
 
-        if (!data.searchResults || data.searchResults.length === 0) {
+console.log('currentPage is ' + currentPage);
+console.log("#tl-fap--results currently has " + $("#tl-fap--results").length);
+        if ((!data.searchResults || data.searchResults.length === 0) && currentPage === 0) {
+console.log('unhiding tl-fap--noresult');
             $('.tl-fap--noresult').removeClass("tl-hidden");
             return;
         }
