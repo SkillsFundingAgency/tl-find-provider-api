@@ -320,7 +320,8 @@ public class ProviderDataService : IProviderDataService
 
             await _providerRepository.Save(providers, true);
 
-            _logger.LogInformation("Saved {providerCount} providers from ", providers.Count);
+            _logger.LogInformation("Loaded {providerCount} providers from {jsonFile}.", 
+                providers.Count, jsonFile);
         }
         catch (Exception ex)
         {
