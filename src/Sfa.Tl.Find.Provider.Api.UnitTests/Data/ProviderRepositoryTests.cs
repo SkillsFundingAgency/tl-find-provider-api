@@ -232,7 +232,8 @@ public class ProviderRepositoryTests
 
         var searchResults = await repository.Search(fromGeoLocation, null, null, 0, 5, false);
 
-        var searchResultsList = searchResults?.ToList();
+        searchResults.Should().NotBeNull();
+        var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
 
@@ -258,7 +259,8 @@ public class ProviderRepositoryTests
                 5, 
                 true);
 
-        var searchResultsList = searchResults?.ToList();
+        searchResults.Should().NotBeNull();
+        var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
 
