@@ -543,7 +543,7 @@ public class ProviderDataServiceTests
         results.Error.Should().Be("The postcode was not found");
         results.SearchTerm.Should().BeNull();
         results.SearchResults.Should().BeNull();
-        results.AvailableSearchResultsCount.Should().Be(0);
+        results.AvailableSearchResultsCount.Should().BeNull();
 
         await postcodeLookupService
             .DidNotReceive()
