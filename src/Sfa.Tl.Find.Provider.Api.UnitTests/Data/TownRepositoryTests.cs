@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using FluentAssertions;
-using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
@@ -15,6 +13,8 @@ using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -78,20 +78,8 @@ public class TownRepositoryTests
             
         var receivedSqlArgs = new List<string>();
 
-        DynamicParameters dynamicParameters = null;
-        var dbParameters = Substitute.For<IDapperParameters>();
-        dbParameters
-            .When(x =>
-                x.CreateParmsWithTemplate(Arg.Any<object>()))
-            .Do(x =>
-            {
-                var p = x.Arg<object>();
-                dynamicParameters = new DynamicParameters(p);
-            });
-
-        dbParameters.DynamicParameters
-            .Returns(_ => dynamicParameters);
-
+        var dapperParameterWrapper = new SubstituteDynamicParameterWrapper();
+        
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
 
@@ -116,8 +104,8 @@ public class TownRepositoryTests
 
         var repository = new TownRepositoryBuilder()
             .Build(
-                dbContextWrapper, 
-                dbParameters,
+                dbContextWrapper,
+                dapperParameterWrapper.DapperParameters,
                 pollyPolicyRegistry, 
                 logger);
 
@@ -128,7 +116,7 @@ public class TownRepositoryTests
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                Arg.Is<object>(o => o == dynamicParameters),
+                Arg.Is<object>(o => o == dapperParameterWrapper.DynamicParameters),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
