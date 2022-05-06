@@ -331,13 +331,13 @@ console.log('unhiding tl-fap--noresult because there are no results');
                 $("#tl-fap--results").append(searchResult);
             });
 
-        console.log('Checking next page link for page  ' + page + ', size ' + pageSize + ', max visible ' + ((page + 1) * pageSize));
-        console.log('  availableSearchResultsCount = ' + data.availableSearchResultsCount);
+        console.log('Checking next results link for page  ' + page + ', size ' + pageSize + ', max visible ' + ((page + 1) * pageSize));
+        console.log('  totalResults = ' + data.totalResults);
 
-        if (typeof data.availableSearchResultsCount !== "undefined" &&
-            data.availableSearchResultsCount !== null &&
-            data.availableSearchResultsCount <= ((page + 1) * pageSize)) {
-            console.log('hiding more results');
+        if (typeof data.totalResults !== "undefined" &&
+            data.totalResults !== null &&
+            data.totalResults <= ((page + 1) * pageSize)) {
+            console.log('hiding next results link');
             $('#tl-next-results-link').addClass("tl-hidden");
         } else {
             $('#tl-next-results-link').removeClass("tl-hidden");
