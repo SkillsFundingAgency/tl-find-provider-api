@@ -187,7 +187,7 @@ $(document).ready(function () {
                 currentPage = page;
                 currentSearchTerm = searchTerm;
                 currentSkillAreaIds = skillAreaIds;
-                populateProviderSearchResults(response);
+                populateProviderSearchResults(response, page, pageSize);
             }
             setTimeout(function () {
                 //delay to avoid autocomplete suggestions loading
@@ -231,7 +231,7 @@ $(document).ready(function () {
         currentPage = 0;
     }
 
-    function populateProviderSearchResults(data) {
+    function populateProviderSearchResults(data, page, pageSize) {
         if (data.searchTerm && data.searchTerm !== $("#tl-search-term").val()) {
             $("#tl-search-term").val(data.searchTerm);
         }
@@ -239,7 +239,7 @@ $(document).ready(function () {
 console.log('currentPage is ' + currentPage);
 console.log("#tl-fap--results currently has " + $("#tl-fap--results").length);
         if ((!data.searchResults || data.searchResults.length === 0) && currentPage === 0) {
-console.log('unhiding tl-fap--noresult');
+console.log('unhiding tl-fap--noresult because there are no results');
             $('.tl-fap--noresult').removeClass("tl-hidden");
             return;
         }
@@ -331,7 +331,24 @@ console.log('unhiding tl-fap--noresult');
                 $("#tl-fap--results").append(searchResult);
             });
 
-        $('#tl-next-results-link').removeClass("tl-hidden");
+        let shouldShowNextResults = true;
+        const maxVisibleResults = (page + 1) * pageSize;
+        console.log("Checking next page link...");
+        console.log('  page is ' + page + ', size ' + pageSize);
+        console.log('  maxResults ' + maxVisibleResults);
+        console.log("  availableSearchResultsCount = " + data.availableSearchResultsCount);
+        if (typeof data.availableSearchResultsCount === "undefined")
+            console.log("    - not defined");
+        else if (typeof data.availableSearchResultsCount === null)
+            console.log("    - null");
+        else {
+            shouldShowNextResults = data.availableSearchResultsCount >= maxVisibleResults;
+        }
+        console.log("  shouldShowNextResults = " + shouldShowNextResults);
+
+        if (shouldShowNextResults)
+            $('#tl-next-results-link').removeClass("tl-hidden");
+        else $('#tl-next-results-link').addClass("tl-hidden");
     }
 
     function showError(status, errorText) {
