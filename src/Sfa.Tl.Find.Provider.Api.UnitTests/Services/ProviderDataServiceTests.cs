@@ -183,7 +183,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
-        results.AvailableSearchResultsCount.Should().Be(totalSearchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .Received(1)
@@ -234,7 +234,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().BeEquivalentTo(searchResults);
-        results.AvailableSearchResultsCount.Should().Be(totalSearchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .Received(1)
@@ -319,7 +319,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().BeEquivalentTo(searchResults);
-        results.AvailableSearchResultsCount.Should().Be(totalSearchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -364,7 +364,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St. Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
-        results.AvailableSearchResultsCount.Should().Be(totalSearchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -409,7 +409,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St. Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
-        results.AvailableSearchResultsCount.Should().Be(totalSearchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -456,7 +456,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St. Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
-        results.AvailableSearchResultsCount.Should().Be(totalSearchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -501,7 +501,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
-        results.AvailableSearchResultsCount.Should().Be(totalSearchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -543,7 +543,7 @@ public class ProviderDataServiceTests
         results.Error.Should().Be("The postcode was not found");
         results.SearchTerm.Should().BeNull();
         results.SearchResults.Should().BeNull();
-        results.AvailableSearchResultsCount.Should().BeNull();
+        results.TotalResults.Should().BeNull();
 
         await postcodeLookupService
             .DidNotReceive()
