@@ -204,7 +204,7 @@ public class ProvidersControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as ProviderSearchResponse;
-        results!.AvailableSearchResultsCount.Should().Be(availableResults);
+        results!.TotalResults.Should().Be(availableResults);
     }
 
     [Fact]

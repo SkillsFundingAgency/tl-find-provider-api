@@ -320,7 +320,7 @@ public class ProviderDataService : IProviderDataService
         {
             SearchTerm = geoLocation.Location,
             SearchResults = searchResults.ToList(),
-            AvailableSearchResultsCount = totalSearchResults
+            TotalResults = totalSearchResults
         };
     }
 }

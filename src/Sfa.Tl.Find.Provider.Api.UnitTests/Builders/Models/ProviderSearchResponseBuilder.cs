@@ -16,7 +16,7 @@ public class ProviderSearchResponseBuilder
         new()
         {
             SearchTerm = _searchOrigin != null ? _searchOrigin.Location : DefaultPostcode,
-            AvailableSearchResultsCount = _totalSearchResults ?? DefaultTotalSearchResults,
+            TotalResults = _totalSearchResults ?? DefaultTotalSearchResults,
             SearchResults = new List<ProviderSearchResult>
             {
                 new()
@@ -143,7 +143,7 @@ public class ProviderSearchResponseBuilder
                     }
                 }
             },
-            AvailableSearchResultsCount = 1
+            TotalResults = 1
         };
 
     public ProviderSearchResponse BuildErrorResponse(string errorMessage) =>
