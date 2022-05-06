@@ -13,7 +13,6 @@ using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
-using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
