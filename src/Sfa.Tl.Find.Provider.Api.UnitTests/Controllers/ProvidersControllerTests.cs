@@ -183,6 +183,31 @@ public class ProvidersControllerTests
     }
 
     [Fact]
+    public async Task GetProviders_Returns_Expected_Available_Results_Count()
+    {
+        const int availableResults = 20;
+        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.FindProviders(fromGeoLocation.Location)
+            .Returns(new ProviderSearchResponseBuilder()
+                .WithTotalSearchResults(availableResults)
+                .BuildWithMultipleSearchResults());
+
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService);
+
+        var result = await controller.GetProviders(fromGeoLocation.Location);
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var results = okResult.Value as ProviderSearchResponse;
+        results!.AvailableSearchResultsCount.Should().Be(availableResults);
+    }
+
+    [Fact]
     public async Task GetProviders_Returns_Expected_Value_For_One_Search_Result()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
