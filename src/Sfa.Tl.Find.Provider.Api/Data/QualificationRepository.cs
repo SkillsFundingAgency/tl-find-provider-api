@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -13,15 +14,18 @@ namespace Sfa.Tl.Find.Provider.Api.Data;
 public class QualificationRepository : IQualificationRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
+    private readonly IDapperParameters _dbParameters;
     private readonly ILogger<QualificationRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
     public QualificationRepository(
         IDbContextWrapper dbContextWrapper,
+        IDapperParameters dbParameters,
         IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<QualificationRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
+        _dbParameters = dbParameters ?? throw new ArgumentNullException(nameof(dbParameters));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -73,16 +77,18 @@ public class QualificationRepository : IQualificationRepository
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
 
+        _dbParameters.CreateParmsWithTemplate(new
+        {
+            data = qualifications.AsTableValuedParameter(
+                "dbo.QualificationDataTableType")
+        });
+
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
         var updateResult = await _dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(
                 connection,
                 "UpdateQualifications",
-                new
-                {
-                    data = qualifications.AsTableValuedParameter(
-                        "dbo.QualificationDataTableType")
-                },
+                _dbParameters.DynamicParameters,
                 transaction,
                 commandType: CommandType.StoredProcedure);
 

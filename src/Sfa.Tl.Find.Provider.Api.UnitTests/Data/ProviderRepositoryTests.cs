@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using FluentAssertions;
+using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
@@ -179,7 +181,8 @@ public class ProviderRepositoryTests
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                Arg.Is<object>(o => o != null),
+                //Arg.Is<object>(o => o != null),
+                Arg.Any<object>(),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
@@ -232,7 +235,8 @@ public class ProviderRepositoryTests
 
         var searchResults = await repository.Search(fromGeoLocation, null, null, 0, 5, false);
 
-        var searchResultsList = searchResults?.ToList();
+        searchResults.Should().NotBeNull();
+        var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
 
@@ -258,7 +262,8 @@ public class ProviderRepositoryTests
                 5, 
                 true);
 
-        var searchResultsList = searchResults?.ToList();
+        searchResults.Should().NotBeNull();
+        var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
 
@@ -306,7 +311,16 @@ public class ProviderRepositoryTests
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
 
-        return new ProviderRepositoryBuilder().Build(dbContextWrapper, dateTimeService);
+        var dbParameters = Substitute.For<IDapperParameters>();
+        var parameters = new DynamicParameters();
+        parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
+        dbParameters.DynamicParameters.Returns(parameters);
+
+        return new ProviderRepositoryBuilder()
+            .Build(
+                dbContextWrapper,
+                dbParameters: dbParameters,
+                dateTimeService: dateTimeService);
     }
 
     private static void ValidateProviderSearchResult(ProviderSearchResult result, ProviderSearchResult expected)
