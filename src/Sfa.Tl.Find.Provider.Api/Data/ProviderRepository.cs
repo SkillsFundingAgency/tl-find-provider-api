@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -149,19 +147,6 @@ public class ProviderRepository : IProviderRepository
 
         var providerSearchResults = new Dictionary<string, ProviderSearchResult>();
 
-        var parameters = new DynamicParameters(
-            new
-            {
-                fromLatitude = fromGeoLocation.Latitude,
-                fromLongitude = fromGeoLocation.Longitude,
-                routeIds = routeIds?.AsTableValuedParameter("dbo.IdListTableType"),
-                qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
-                page,
-                pageSize,
-                includeAdditionalData
-            });
-        parameters.Add("totalLocationsCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
         await _dbContextWrapper
             .QueryAsync<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>(
                 connection,
@@ -195,24 +180,18 @@ public class ProviderRepository : IProviderRepository
 
                     return searchResult;
                 },
-                parameters,
-                //new
-                //{
-                //    fromLatitude = fromGeoLocation.Latitude,
-                //    fromLongitude = fromGeoLocation.Longitude,
-                //    routeIds = routeIds?.AsTableValuedParameter("dbo.IdListTableType"),
-                //    qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
-                //    page,
-                //    pageSize,
-                //    includeAdditionalData,
-                //    totalLocationsCount
-                //},
+                new
+                {
+                    fromLatitude = fromGeoLocation.Latitude,
+                    fromLongitude = fromGeoLocation.Longitude,
+                    routeIds = routeIds?.AsTableValuedParameter("dbo.IdListTableType"),
+                    qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
+                    page,
+                    pageSize,
+                    includeAdditionalData
+                },
                 splitOn: "UkPrn, Postcode, Year, Id",
                 commandType: CommandType.StoredProcedure);
-
-        //TODO: Return as tuple with (searchResults, totalLocationsCount);
-        var totalLocationsCount = parameters.Get<int>("totalLocationsCount");
-        Debug.WriteLine($"Total number of results {totalLocationsCount}");
 
         return providerSearchResults
             .Values
