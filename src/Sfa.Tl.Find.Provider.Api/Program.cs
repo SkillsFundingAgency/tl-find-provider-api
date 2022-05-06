@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using AspNetCoreRateLimit;
+using Intertech.Facade.DapperParameters;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -52,8 +53,9 @@ try
     builder.Services.AddHttpClients();
 
     builder.Services
-        .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddScoped<IDateTimeService, DateTimeService>()
+        .AddScoped<IDbContextWrapper, DbContextWrapper>()
+        .AddTransient<IDapperParameters, DapperParameters>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IProviderRepository, ProviderRepository>()

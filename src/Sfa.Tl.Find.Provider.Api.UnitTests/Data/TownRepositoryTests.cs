@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using FluentAssertions;
+using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
@@ -76,6 +78,21 @@ public class TownRepositoryTests
             
         var receivedSqlArgs = new List<string>();
 
+        DynamicParameters dynamicParameters = null;
+        var dbParameters = Substitute.For<IDapperParameters>();
+        dbParameters
+            .When(x =>
+                x.CreateParmsWithTemplate(Arg.Any<object>()))
+            .Do(x =>
+            {
+                var p = x.Arg<object>();
+                dynamicParameters = new DynamicParameters(p);
+            });
+
+        dbParameters.DynamicParameters
+            .Returns(f =>
+                dynamicParameters);
+
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
 
@@ -99,7 +116,11 @@ public class TownRepositoryTests
         var logger = Substitute.For<ILogger<TownRepository>>();
 
         var repository = new TownRepositoryBuilder()
-            .Build(dbContextWrapper, pollyPolicyRegistry, logger);
+            .Build(
+                dbContextWrapper, 
+                dbParameters,
+                pollyPolicyRegistry, 
+                logger);
 
         await repository.Save(towns);
 
@@ -108,7 +129,7 @@ public class TownRepositoryTests
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                Arg.Is<object>(o => o != null),
+                Arg.Is<object>(o => o == dynamicParameters),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
