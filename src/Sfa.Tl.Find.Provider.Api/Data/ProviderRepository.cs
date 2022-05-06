@@ -124,7 +124,6 @@ public class ProviderRepository : IProviderRepository
 
         _logger.LogChangeResults(locationUpdateResult, nameof(ProviderRepository), "locations");
 
-        //dbParameters = _dbParameterFactory.CreateDapperParameters();
         _dbParameters.CreateParmsWithTemplate(new
         {
             data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType"),

@@ -118,8 +118,7 @@ public class QualificationRepositoryTests
         });
 
         dbParameters.DynamicParameters
-            .Returns(f =>
-                dynamicParameters);
+            .Returns(_ => dynamicParameters);
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();

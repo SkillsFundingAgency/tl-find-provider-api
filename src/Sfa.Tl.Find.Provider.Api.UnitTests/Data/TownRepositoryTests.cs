@@ -90,8 +90,7 @@ public class TownRepositoryTests
             });
 
         dbParameters.DynamicParameters
-            .Returns(f =>
-                dynamicParameters);
+            .Returns(_ => dynamicParameters);
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
