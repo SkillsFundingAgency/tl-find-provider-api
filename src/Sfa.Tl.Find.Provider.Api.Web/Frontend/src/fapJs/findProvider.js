@@ -331,24 +331,17 @@ console.log('unhiding tl-fap--noresult because there are no results');
                 $("#tl-fap--results").append(searchResult);
             });
 
-        let shouldShowNextResults = true;
-        const maxVisibleResults = (page + 1) * pageSize;
-        console.log("Checking next page link...");
-        console.log('  page is ' + page + ', size ' + pageSize);
-        console.log('  maxResults ' + maxVisibleResults);
-        console.log("  availableSearchResultsCount = " + data.availableSearchResultsCount);
-        if (typeof data.availableSearchResultsCount === "undefined")
-            console.log("    - not defined");
-        else if (typeof data.availableSearchResultsCount === null)
-            console.log("    - null");
-        else {
-            shouldShowNextResults = data.availableSearchResultsCount >= maxVisibleResults;
-        }
-        console.log("  shouldShowNextResults = " + shouldShowNextResults);
+        console.log('Checking next page link for page  ' + page + ', size ' + pageSize + ', max visible ' + ((page + 1) * pageSize));
+        console.log('  availableSearchResultsCount = ' + data.availableSearchResultsCount);
 
-        if (shouldShowNextResults)
+        if (typeof data.availableSearchResultsCount !== "undefined" &&
+            data.availableSearchResultsCount !== null &&
+            data.availableSearchResultsCount <= ((page + 1) * pageSize)) {
+            console.log('hiding more results');
+            $('#tl-next-results-link').addClass("tl-hidden");
+        } else {
             $('#tl-next-results-link').removeClass("tl-hidden");
-        else $('#tl-next-results-link').addClass("tl-hidden");
+        }
     }
 
     function showError(status, errorText) {
