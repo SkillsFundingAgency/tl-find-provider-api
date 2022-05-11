@@ -7,13 +7,16 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 public class ProviderSearchResponseBuilder
 {
     private GeoLocation _searchOrigin;
-        
+    private int? _totalSearchResults;
+
     private const string DefaultPostcode = "CV1 2WT";
-        
+    private const int DefaultTotalSearchResults = 10;
+
     public ProviderSearchResponse BuildWithMultipleSearchResults() =>
         new()
         {
             SearchTerm = _searchOrigin != null ? _searchOrigin.Location : DefaultPostcode,
+            TotalResults = _totalSearchResults ?? DefaultTotalSearchResults,
             SearchResults = new List<ProviderSearchResult>
             {
                 new()
@@ -139,7 +142,8 @@ public class ProviderSearchResponseBuilder
                         }
                     }
                 }
-            }
+            },
+            TotalResults = 1
         };
 
     public ProviderSearchResponse BuildErrorResponse(string errorMessage) =>
@@ -154,4 +158,12 @@ public class ProviderSearchResponseBuilder
 
         return this;
     }
+
+    public ProviderSearchResponseBuilder WithTotalSearchResults(int totalSearchResults)
+    {
+        _totalSearchResults = totalSearchResults;
+
+        return this;
+    }
+
 }

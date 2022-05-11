@@ -173,6 +173,7 @@ public class ProviderSearchResultBuilder
                 Name = "Test Qualification 31"
             }
         };
+
     public ProviderSearchResult BuildSingleSearchResultWithSearchOrigin(GeoLocation origin) =>
         WithSearchOrigin(origin)
             .BuildListWithSingleItem()

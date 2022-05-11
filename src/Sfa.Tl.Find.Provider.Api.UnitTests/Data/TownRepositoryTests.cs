@@ -13,6 +13,7 @@ using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -76,6 +77,8 @@ public class TownRepositoryTests
             
         var receivedSqlArgs = new List<string>();
 
+        var dapperParameterWrapper = new SubstituteDynamicParameterWrapper();
+        
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
 
@@ -99,7 +102,11 @@ public class TownRepositoryTests
         var logger = Substitute.For<ILogger<TownRepository>>();
 
         var repository = new TownRepositoryBuilder()
-            .Build(dbContextWrapper, pollyPolicyRegistry, logger);
+            .Build(
+                dbContextWrapper,
+                dapperParameterWrapper.DapperParameters,
+                pollyPolicyRegistry, 
+                logger);
 
         await repository.Save(towns);
 
@@ -108,7 +115,7 @@ public class TownRepositoryTests
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                Arg.Is<object>(o => o != null),
+                Arg.Is<object>(o => o == dapperParameterWrapper.DynamicParameters),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );

@@ -13,6 +13,7 @@ using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
+using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Xunit;
 
@@ -103,6 +104,8 @@ public class QualificationRepositoryTests
             .Build();
 
         var receivedSqlArgs = new List<string>();
+        
+        var dapperParameterWrapper = new SubstituteDynamicParameterWrapper();
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
@@ -110,7 +113,7 @@ public class QualificationRepositoryTests
         dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
                 "UpdateQualifications",
-                Arg.Any<object>(),
+                Arg.Any<object>(),//Is<object>(p => p == dynamicParameters),
                 Arg.Any<IDbTransaction>(),
                 commandType: CommandType.StoredProcedure
             )
@@ -127,16 +130,20 @@ public class QualificationRepositoryTests
         var logger = Substitute.For<ILogger<QualificationRepository>>();
 
         var repository = new QualificationRepositoryBuilder()
-            .Build(dbContextWrapper, pollyPolicyRegistry, logger);
+            .Build(
+                dbContextWrapper,
+                dapperParameterWrapper.DapperParameters,
+                pollyPolicyRegistry, 
+                logger);
 
         await repository.Save(qualifications);
-
+        
         await dbContextWrapper
             .Received(1)
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                Arg.Is<object>(o => o != null),
+                Arg.Is<object>(o => o == dapperParameterWrapper.DynamicParameters),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
