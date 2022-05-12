@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -14,17 +15,20 @@ namespace Sfa.Tl.Find.Provider.Api.Data;
 public class ProviderRepository : IProviderRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
+    private readonly IDapperParameters _dbParameters;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<ProviderRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
     public ProviderRepository(
         IDbContextWrapper dbContextWrapper,
+        IDapperParameters dbParameters,
         IDateTimeService dateTimeService,
         IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<ProviderRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
+        _dbParameters = dbParameters ?? throw new ArgumentNullException(nameof(dbParameters));
         _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -88,44 +92,49 @@ public class ProviderRepository : IProviderRepository
 
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
+        _dbParameters.CreateParmsWithTemplate(new
+        {
+            data = providers.AsTableValuedParameter("dbo.ProviderDataTableType"),
+            isAdditionalData
+        });
+
         var providerUpdateResult = await _dbContextWrapper
-            .QueryAsync<(string Change, int ChangeCount)>(
-                connection,
-                "UpdateProviders",
-                new
-                {
-                    data = providers.AsTableValuedParameter("dbo.ProviderDataTableType"),
-                    isAdditionalData
-                },
-                transaction,
-                commandType: CommandType.StoredProcedure);
+        .QueryAsync<(string Change, int ChangeCount)>(
+            connection,
+            "UpdateProviders",
+            _dbParameters.DynamicParameters,
+            transaction,
+            commandType: CommandType.StoredProcedure);
 
         _logger.LogChangeResults(providerUpdateResult, nameof(ProviderRepository), nameof(providers));
+
+        _dbParameters.CreateParmsWithTemplate(new
+        {
+            data = locationData.AsTableValuedParameter("dbo.LocationDataTableType"),
+            isAdditionalData
+        });
 
         var locationUpdateResult = await _dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(
                 connection,
                 "UpdateLocations",
-                new
-                {
-                    data = locationData.AsTableValuedParameter("dbo.LocationDataTableType"),
-                    isAdditionalData
-                },
+                _dbParameters.DynamicParameters,
                 transaction,
                 commandType: CommandType.StoredProcedure);
 
         _logger.LogChangeResults(locationUpdateResult, nameof(ProviderRepository), "locations");
 
+        _dbParameters.CreateParmsWithTemplate(new
+        {
+            data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType"),
+            isAdditionalData
+        });
+
         var locationQualificationUpdateResult = await _dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(
                 connection,
                 "UpdateLocationQualifications",
-                new
-                {
-                    data = locationQualificationData.AsTableValuedParameter(
-                        "dbo.LocationQualificationDataTableType"),
-                    isAdditionalData
-                },
+                _dbParameters.DynamicParameters,
                 transaction,
                 commandType: CommandType.StoredProcedure);
 
@@ -135,7 +144,7 @@ public class ProviderRepository : IProviderRepository
         transaction.Commit();
     }
 
-    public async Task<IEnumerable<ProviderSearchResult>> Search(
+    public async Task<(IEnumerable<ProviderSearchResult> SearchResults, int TotalResultsCount)> Search(
         GeoLocation fromGeoLocation,
         IList<int> routeIds,
         IList<int> qualificationIds,
@@ -147,57 +156,64 @@ public class ProviderRepository : IProviderRepository
 
         var providerSearchResults = new Dictionary<string, ProviderSearchResult>();
 
+        _dbParameters.CreateParmsWithTemplate(new
+        {
+            fromLatitude = fromGeoLocation.Latitude,
+            fromLongitude = fromGeoLocation.Longitude,
+            routeIds = routeIds?.AsTableValuedParameter("dbo.IdListTableType"),
+            qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
+            page,
+            pageSize,
+            includeAdditionalData
+        });
+        _dbParameters.AddOutputParameter("totalLocationsCount", DbType.Int32);
+
         await _dbContextWrapper
             .QueryAsync<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>(
                 connection,
-                "SearchProviders",
-                map: (p, ly, q) =>
+            "SearchProviders",
+            map: (p, ly, q) =>
+            {
+                var key = $"{p.UkPrn}_{p.Postcode}";
+                if (!providerSearchResults.TryGetValue(key, out var searchResult))
                 {
-                    var key = $"{p.UkPrn}_{p.Postcode}";
-                    if (!providerSearchResults.TryGetValue(key, out var searchResult))
-                    {
-                        providerSearchResults.Add(key, searchResult = p);
-                        searchResult.JourneyToLink = fromGeoLocation.CreateJourneyLink(searchResult.Postcode);
-                    }
+                    providerSearchResults.Add(key, searchResult = p);
+                    searchResult.JourneyToLink = fromGeoLocation.CreateJourneyLink(searchResult.Postcode);
+                }
 
-                    var deliveryYear = searchResult
-                        .DeliveryYears
-                        .FirstOrDefault(y => y.Year == ly.Year);
+                var deliveryYear = searchResult
+                    .DeliveryYears
+                    .FirstOrDefault(y => y.Year == ly.Year);
 
-                    if (deliveryYear == null)
-                    {
-                        deliveryYear = ly;
-
-                        deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
-
-                        searchResult.DeliveryYears.Add(deliveryYear);
-                    }
-
-                    if (deliveryYear.Qualifications.All(z => z.Id != q.Id))
-                    {
-                        deliveryYear.Qualifications.Add(q);
-                    }
-
-                    return searchResult;
-                },
-                new
+                if (deliveryYear == null)
                 {
-                    fromLatitude = fromGeoLocation.Latitude,
-                    fromLongitude = fromGeoLocation.Longitude,
-                    routeIds = routeIds?.AsTableValuedParameter("dbo.IdListTableType"),
-                    qualificationIds = qualificationIds?.AsTableValuedParameter("dbo.IdListTableType"),
-                    page,
-                    pageSize,
-                    includeAdditionalData
-                },
-                splitOn: "UkPrn, Postcode, Year, Id",
-                commandType: CommandType.StoredProcedure);
+                    deliveryYear = ly;
 
-        return providerSearchResults
+                    deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
+
+                    searchResult.DeliveryYears.Add(deliveryYear);
+                }
+
+                if (deliveryYear.Qualifications.All(z => z.Id != q.Id))
+                {
+                    deliveryYear.Qualifications.Add(q);
+                }
+
+                return searchResult;
+            },
+            _dbParameters.DynamicParameters,
+            splitOn: "UkPrn, Postcode, Year, Id",
+            commandType: CommandType.StoredProcedure);
+
+        var totalLocationsCount = _dbParameters.DynamicParameters.Get<int>("totalLocationsCount");
+
+        var searchResults = providerSearchResults
             .Values
             .OrderBy(s => s.Distance)
             .ThenBy(s => s.ProviderName)
             .ThenBy(s => s.LocationName)
             .ToList();
+
+        return (searchResults, totalLocationsCount);
     }
 }

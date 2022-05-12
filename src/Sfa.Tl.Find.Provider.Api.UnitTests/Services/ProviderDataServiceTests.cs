@@ -148,6 +148,7 @@ public class ProviderDataServiceTests
     public async Task FindProviders_Passes_All_Parameters()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        const int totalSearchResults = 10;
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
@@ -157,7 +158,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(new ProviderSearchResultBuilder().BuildList());
+            .Returns((new ProviderSearchResultBuilder().BuildList(), totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
         postcodeLookupService.GetPostcode(fromGeoLocation.Location)
@@ -182,6 +183,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().NotBeNullOrEmpty();
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .Received(1)
@@ -207,6 +209,7 @@ public class ProviderDataServiceTests
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
+        const int totalSearchResults = 10;
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
@@ -216,7 +219,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(searchResults);
+            .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
         postcodeLookupService.GetPostcode(fromGeoLocation.Location)
@@ -231,6 +234,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().BeEquivalentTo(searchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .Received(1)
@@ -242,6 +246,7 @@ public class ProviderDataServiceTests
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
+        const int totalSearchResults = 10;
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
@@ -251,7 +256,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(searchResults);
+            .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
@@ -289,6 +294,7 @@ public class ProviderDataServiceTests
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidOutwardPostcodeLocation();
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
+        const int totalSearchResults = 10;
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
@@ -298,7 +304,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(searchResults);
+            .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
         postcodeLookupService.GetOutcode(fromGeoLocation.Location)
@@ -313,6 +319,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be(fromGeoLocation.Location);
         results.SearchResults.Should().BeEquivalentTo(searchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -327,6 +334,7 @@ public class ProviderDataServiceTests
     {
         const string searchTerms = "St. Agnes, Cornwall";
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
+        const int totalSearchResults = 10;
         var towns = new TownBuilder().BuildListForStAgnes();
 
         var providerRepository = Substitute.For<IProviderRepository>();
@@ -337,7 +345,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(searchResults);
+            .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
@@ -356,6 +364,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St. Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -370,6 +379,7 @@ public class ProviderDataServiceTests
     {
         const string searchTerms = "St. Agnes";
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
+        const int totalSearchResults = 10;
         var towns = new TownBuilder().BuildListForStAgnes();
 
         var providerRepository = Substitute.For<IProviderRepository>();
@@ -380,7 +390,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(searchResults);
+            .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
@@ -399,6 +409,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St. Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -413,6 +424,7 @@ public class ProviderDataServiceTests
     {
         const string searchTerms = "st. agnes";
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
+        const int totalSearchResults = 10;
         var towns = new TownBuilder().BuildListForStAgnes();
 
         var providerRepository = Substitute.For<IProviderRepository>();
@@ -425,7 +437,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(searchResults);
+            .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
@@ -444,6 +456,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St. Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -458,6 +471,7 @@ public class ProviderDataServiceTests
     {
         const string searchTerms = "St Agnes, Cornwall";
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
+        const int totalSearchResults = 10;
         var towns = new TownBuilder().BuildListForStAgnes();
 
         var providerRepository = Substitute.For<IProviderRepository>();
@@ -468,7 +482,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(searchResults);
+            .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
@@ -487,6 +501,7 @@ public class ProviderDataServiceTests
         results.Error.Should().BeNull();
         results.SearchTerm.Should().Be("St Agnes, Cornwall");
         results.SearchResults.Should().BeEquivalentTo(searchResults);
+        results.TotalResults.Should().Be(totalSearchResults);
 
         await postcodeLookupService
             .DidNotReceive()
@@ -500,6 +515,7 @@ public class ProviderDataServiceTests
     public async Task FindProviders_Returns_Expected_Error_Details_For_Bad_Postcode()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildInvalidPostcodeLocation();
+        const int totalSearchResults = 10;
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
@@ -509,7 +525,7 @@ public class ProviderDataServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<bool>())
-            .Returns(new ProviderSearchResultBuilder().BuildList());
+            .Returns((new ProviderSearchResultBuilder().BuildList(), totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
 
@@ -527,6 +543,7 @@ public class ProviderDataServiceTests
         results.Error.Should().Be("The postcode was not found");
         results.SearchTerm.Should().BeNull();
         results.SearchResults.Should().BeNull();
+        results.TotalResults.Should().BeNull();
 
         await postcodeLookupService
             .DidNotReceive()

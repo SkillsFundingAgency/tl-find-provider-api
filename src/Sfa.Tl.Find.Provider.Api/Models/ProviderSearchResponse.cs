@@ -15,6 +15,9 @@ public class ProviderSearchResponse
     public string SearchTerm { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? TotalResults { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IEnumerable<ProviderSearchResult> SearchResults { get; init; }
 
     private string DebuggerDisplay()

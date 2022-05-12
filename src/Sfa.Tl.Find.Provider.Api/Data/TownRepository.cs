@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -13,15 +14,18 @@ namespace Sfa.Tl.Find.Provider.Api.Data;
 public class TownRepository : ITownRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
+    private readonly IDapperParameters _dbParameters;
     private readonly ILogger<TownRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
     public TownRepository(
         IDbContextWrapper dbContextWrapper,
+        IDapperParameters dbParameters,
         IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<TownRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
+        _dbParameters = dbParameters ?? throw new ArgumentNullException(nameof(dbParameters));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -43,6 +47,12 @@ public class TownRepository : ITownRepository
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
+        _dbParameters.CreateParmsWithTemplate(new
+        {
+            maxResults,
+            query = $"{searchTerms.ToSearchableString()}%"
+        });
+
         var results = await _dbContextWrapper.QueryAsync<Town>(
             connection,
             "SELECT TOP (@maxResults) " +
@@ -55,11 +65,7 @@ public class TownRepository : ITownRepository
             "FROM dbo.[TownSearchView] " +
             "WITH(NOEXPAND) " +
             "WHERE [Search] LIKE @query",
-            new
-            {
-                maxResults,
-                query = $"{searchTerms.ToSearchableString()}%"
-            });
+            _dbParameters.DynamicParameters);
 
         return results;
     }
@@ -87,16 +93,18 @@ public class TownRepository : ITownRepository
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
 
+        _dbParameters.CreateParmsWithTemplate(new
+        {
+            data = towns.AsTableValuedParameter(
+                "dbo.TownDataTableType")
+        });
+
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
         var updateResult = await _dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(
                 connection,
                 "UpdateTowns",
-                new
-                {
-                    data = towns.AsTableValuedParameter(
-                        "dbo.TownDataTableType")
-                },
+                _dbParameters.DynamicParameters,
                 transaction,
                 commandType: CommandType.StoredProcedure);
 
