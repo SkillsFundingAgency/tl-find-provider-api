@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Extensions;
@@ -15,20 +14,20 @@ namespace Sfa.Tl.Find.Provider.Api.Data;
 public class ProviderRepository : IProviderRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
-    private readonly IDapperParameters _dbParameters;
+    private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<ProviderRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
     public ProviderRepository(
         IDbContextWrapper dbContextWrapper,
-        IDapperParameters dbParameters,
+        IDynamicParametersWrapper dynamicParametersWrapper,
         IDateTimeService dateTimeService,
         IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<ProviderRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
-        _dbParameters = dbParameters ?? throw new ArgumentNullException(nameof(dbParameters));
+        _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
         _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -92,7 +91,7 @@ public class ProviderRepository : IProviderRepository
 
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
-        _dbParameters.CreateParmsWithTemplate(new
+        _dynamicParametersWrapper.CreateParameters(new
         {
             data = providers.AsTableValuedParameter("dbo.ProviderDataTableType"),
             isAdditionalData
@@ -102,13 +101,13 @@ public class ProviderRepository : IProviderRepository
         .QueryAsync<(string Change, int ChangeCount)>(
             connection,
             "UpdateProviders",
-            _dbParameters.DynamicParameters,
+            _dynamicParametersWrapper.DynamicParameters,
             transaction,
             commandType: CommandType.StoredProcedure);
 
         _logger.LogChangeResults(providerUpdateResult, nameof(ProviderRepository), nameof(providers));
 
-        _dbParameters.CreateParmsWithTemplate(new
+        _dynamicParametersWrapper.CreateParameters(new
         {
             data = locationData.AsTableValuedParameter("dbo.LocationDataTableType"),
             isAdditionalData
@@ -118,13 +117,13 @@ public class ProviderRepository : IProviderRepository
             .QueryAsync<(string Change, int ChangeCount)>(
                 connection,
                 "UpdateLocations",
-                _dbParameters.DynamicParameters,
+                _dynamicParametersWrapper.DynamicParameters,
                 transaction,
                 commandType: CommandType.StoredProcedure);
 
         _logger.LogChangeResults(locationUpdateResult, nameof(ProviderRepository), "locations");
 
-        _dbParameters.CreateParmsWithTemplate(new
+        _dynamicParametersWrapper.CreateParameters(new
         {
             data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType"),
             isAdditionalData
@@ -134,7 +133,7 @@ public class ProviderRepository : IProviderRepository
             .QueryAsync<(string Change, int ChangeCount)>(
                 connection,
                 "UpdateLocationQualifications",
-                _dbParameters.DynamicParameters,
+                _dynamicParametersWrapper.DynamicParameters,
                 transaction,
                 commandType: CommandType.StoredProcedure);
 
@@ -156,7 +155,7 @@ public class ProviderRepository : IProviderRepository
 
         var providerSearchResults = new Dictionary<string, ProviderSearchResult>();
 
-        _dbParameters.CreateParmsWithTemplate(new
+        _dynamicParametersWrapper.CreateParameters(new
         {
             fromLatitude = fromGeoLocation.Latitude,
             fromLongitude = fromGeoLocation.Longitude,
@@ -165,8 +164,7 @@ public class ProviderRepository : IProviderRepository
             page,
             pageSize,
             includeAdditionalData
-        });
-        _dbParameters.AddOutputParameter("totalLocationsCount", DbType.Int32);
+        }).AddOutputParameter("totalLocationsCount", DbType.Int32);
 
         await _dbContextWrapper
             .QueryAsync<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>(
@@ -201,11 +199,13 @@ public class ProviderRepository : IProviderRepository
 
                 return searchResult;
             },
-            _dbParameters.DynamicParameters,
+            _dynamicParametersWrapper.DynamicParameters,
             splitOn: "UkPrn, Postcode, Year, Id",
             commandType: CommandType.StoredProcedure);
 
-        var totalLocationsCount = _dbParameters.DynamicParameters.Get<int>("totalLocationsCount");
+        var totalLocationsCount = _dynamicParametersWrapper
+            .DynamicParameters
+            .Get<int>("totalLocationsCount");
 
         var searchResults = providerSearchResults
             .Values

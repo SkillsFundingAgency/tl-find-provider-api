@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using FluentAssertions;
-using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
@@ -311,15 +310,15 @@ public class ProviderRepositoryTests
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
 
-        var dbParameters = Substitute.For<IDapperParameters>();
+        var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
         var parameters = new DynamicParameters();
         parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
-        dbParameters.DynamicParameters.Returns(parameters);
+        dynamicParametersWrapper.DynamicParameters.Returns(parameters);
 
         return new ProviderRepositoryBuilder()
             .Build(
                 dbContextWrapper,
-                dbParameters: dbParameters,
+                dynamicParametersWrapper: dynamicParametersWrapper,
                 dateTimeService: dateTimeService);
     }
 
