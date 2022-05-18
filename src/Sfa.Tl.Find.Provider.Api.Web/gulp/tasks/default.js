@@ -39,7 +39,7 @@ gulp.task('fapTileJs', () => {
             'Frontend/src/fapJs/findProviderTile.js',
             'Frontend/src/fapJs/locationAutocomplete.js'
         ])
-        .pipe(concat('fapTile.js'))
+        .pipe(concat('findProviderTile.js'))
         .pipe(gulp.dest(paths.dist.JS));
 });
 

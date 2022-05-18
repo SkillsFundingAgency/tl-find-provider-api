@@ -1,36 +1,27 @@
-﻿/* Find Provider Tile */
-$(document).ready(function () {
+﻿function FindProviderTile(
+    findProviderRedirectUrl,
+    findProvidersApiUri
+) {
+    // Find Provider tile
     const fapTileContainer = $(".tl-fap-tile").first();
     if (!fapTileContainer.length) return;
 
-    let findProviderRedirectUrl =
-        $('script[data-findProviderRedirectUrl][data-findProviderRedirectUrl!=null]').attr('data-findProviderRedirectUrl');
-    let findProvidersApiUri =
-        $('script[data-findProviderApiUri][data-findProviderApiUri!=null]').attr('data-findProviderApiUri');
-    
     if (typeof findProviderRedirectUrl === "undefined" ||
         typeof findProvidersApiUri === "undefined") {
         console.log('findProviderTile script requires data-findProviderApiUri and data-findProviderRedirectUrl to be passed via the script tag');
         return;
     }
 
-    //TODO: Remove - only for local testing
-    if ((findProvidersApiUri === null || findProvidersApiUri.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUri = $('#find_provider_api_uri').val();
-    if ((findProviderRedirectUrl === null || findProviderRedirectUrl.includes("{{")) && $('#find_provider_redirect_uri').length) findProviderRedirectUrl = $('#find_provider_redirect_uri').val();
-    //
-
     if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
 
-    //console.log("findProviderRedirectUrl = " + findProviderRedirectUrl);
-    //console.log("findProvidersApiUri = " + findProvidersApiUri);
-
+    //Only works on first fap tile - we are assuming there is only one
     fapTileContainer.empty();
     fapTileContainer.append(
         '<div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container"> \
             <div class="govuk-grid-column-full"> \
                 <div class="tl-card--fap"> \
                     <div class="tl-card--fap--left"> \
-                        <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-4">Partner with a school or college</h1> \
+                        <h2 class="govuk-!-margin-top-2 govuk-!-margin-bottom-4">Partner with a school or college</h2> \
                         <p class="govuk-body">Offer a placement or find out more about their T Level programme.</p> \
                     </div> \
                     <div class="tl-card--fap--right"> \
@@ -52,19 +43,19 @@ $(document).ready(function () {
 
     $('#tl-search-term').val("");
 
-    $('#tl-search-term').keypress(function(e) {
+    $('#tl-search-term').keypress(function (e) {
         if (e.which === 13) {
             $("#tl-search-providers").click();
             return false;
         }
     });
 
-    $("#tl-search-providers").click(function() {
+    $("#tl-search-providers").click(function () {
         const searchTerm = $("#tl-search-term").val().trim();
 
         if (searchTerm === "") {
             event.stopPropagation();
-            showSearchTermError("Enter a postcode or town");
+            showSearchTermError("Enter postcode or town");
             return false;
         }
 
@@ -73,7 +64,7 @@ $(document).ready(function () {
         return true;
     });
 
-    $(".tl-fap-search-providers-form").submit(function() {
+    $(".tl-fap-search-providers-form").submit(function () {
         event.preventDefault();
     });
 
@@ -82,4 +73,4 @@ $(document).ready(function () {
         $("#tl-search-term-error").text(message);
         $('#tl-search-term-error').removeClass("tl-hidden");
     }
-});
+};
