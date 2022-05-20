@@ -1,16 +1,11 @@
 ﻿/* Find Provider */
-console.log('in the find provider js file');
-
 let isFapSearchInProgress = false;
 
-$(document).ready(function () {
-
-    let findProvidersApiUri =
-        $('script[data-findProviderApiUri][data-findProviderApiUri!=null]').attr('data-findProviderApiUri');
-    let findProvidersAppId =
-        $('script[data-findProviderAppId][data-findProviderAppId!=null]').attr('data-findProviderAppId');
-    let findProvidersApiKey =
-        $('script[data-findProviderApiKey][data-findProviderApiKey!=null]').attr('data-findProviderApiKey');
+function FindProvider(
+    findProvidersApiUri,
+    findProvidersAppId,
+    findProvidersApiKey,
+    qualificationArticleMap) {
 
     if (typeof findProvidersApiUri === "undefined" ||
         typeof findProvidersAppId === "undefined" ||
@@ -18,12 +13,6 @@ $(document).ready(function () {
         console.log('findProvider script requires data-findProviderApiUri, data-findProviderAppId and data-findProviderApiKey to be passed via the script tag');
         return;
     }
-
-    //TODO: Remove this - only for local testing
-    if ((findProvidersApiUri === null || findProvidersApiUri.startsWith("{{")) && $('#find_provider_api_uri').length) findProvidersApiUri = $('#find_provider_api_uri').val();
-    if ((findProvidersAppId === null || findProvidersAppId.startsWith("{{")) && $('#find_provider_api_app_id').length) findProvidersAppId = $('#find_provider_api_app_id').val();
-    if ((findProvidersApiKey === null || findProvidersApiKey.startsWith("{{")) && $('#find_provider_api_key').length) findProvidersApiKey = $('#find_provider_api_key').val();
-    //
 
     if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
 
@@ -40,7 +29,8 @@ $(document).ready(function () {
 
     if ($("#tl-skill-area-filter").length) loadRoutes();
 
-    const qualificationArticleMap = loadQualificationMap();
+    console.log("qual map: ");
+    console.log(JSON.stringify(qualificationArticleMap));
 
     //Check for search term query parameter
     let searchTerm = getUrlParameter("searchTerm");
@@ -201,27 +191,6 @@ $(document).ready(function () {
         return true;
     }
 
-    function loadQualificationMap() {
-        const map = {};
-        map[36] = $('script[data-qualificationMap_36][data-qualificationMap_36!=null]').attr('data-qualificationMap_36');
-        map[37] = $('script[data-qualificationMap_37][data-qualificationMap_37!=null]').attr('data-qualificationMap_37');
-        map[38] = $('script[data-qualificationMap_38][data-qualificationMap_38!=null]').attr('data-qualificationMap_38');
-        map[39] = $('script[data-qualificationMap_39][data-qualificationMap_39!=null]').attr('data-qualificationMap_39');
-        map[40] = $('script[data-qualificationMap_40][data-qualificationMap_40!=null]').attr('data-qualificationMap_40');
-        map[41] = $('script[data-qualificationMap_41][data-qualificationMap_41!=null]').attr('data-qualificationMap_41');
-        map[42] = $('script[data-qualificationMap_42][data-qualificationMap_42!=null]').attr('data-qualificationMap_42');
-        map[43] = $('script[data-qualificationMap_43][data-qualificationMap_43!=null]').attr('data-qualificationMap_43');
-        map[44] = $('script[data-qualificationMap_44][data-qualificationMap_44!=null]').attr('data-qualificationMap_44');
-        map[45] = $('script[data-qualificationMap_45][data-qualificationMap_45!=null]').attr('data-qualificationMap_45');
-        map[46] = $('script[data-qualificationMap_46][data-qualificationMap_46!=null]').attr('data-qualificationMap_46');
-        map[47] = $('script[data-qualificationMap_47][data-qualificationMap_47!=null]').attr('data-qualificationMap_47');
-        map[48] = $('script[data-qualificationMap_48][data-qualificationMap_48!=null]').attr('data-qualificationMap_48');
-        map[49] = $('script[data-qualificationMap_49][data-qualificationMap_49!=null]').attr('data-qualificationMap_49');
-        map[50] = $('script[data-qualificationMap_50][data-qualificationMap_50!=null]').attr('data-qualificationMap_50');
-        map[51] = $('script[data-qualificationMap_51][data-qualificationMap_51!=null]').attr('data-qualificationMap_51');
-        return map;
-    }
-
     function clearProviderSearchResults() {
         $('#tl-error').addClass("tl-hidden");
         $('#tl-search-term-error').addClass("tl-hidden");
@@ -302,7 +271,8 @@ console.log('unhiding tl-fap--noresult because there are no results');
 
                         $.each(deliveryYear.qualifications,
                             function (_, qualification) {
-                                const articleLink = qualificationArticleMap[qualification.id];
+                                const articleLink = typeof qualificationArticleMap !== "undefined" ?
+                                    qualificationArticleMap[qualification.id] : null;
                                 if (articleLink) {
                                     searchResult += '<li><a target="_blank" class="govuk-link tl-fap--result-course" href="' + articleLink + '">' + qualification.name + '</a></li>';
                                 } else {
@@ -401,5 +371,4 @@ console.log('unhiding tl-fap--noresult because there are no results');
 
         return null;
     }
-
-});
+};
