@@ -1,4 +1,7 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
@@ -16,30 +19,79 @@ public class DynamicParametersWrapperTests
             .ShouldNotAcceptNullConstructorArguments();
     }
 
+
     [Fact]
-    public void CreateConnection_Returns_Expected_Connection()
+    public void Constructor_Sets_Dynamic_Parameters_Property()
+    {
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
+
+        dynamicParametersWrapper.DynamicParameters.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void CreateParameters_From_Key_Value_Pairs_Creates_Expected_Parameters()
+    {
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
+
+        var kvp = new List<KeyValuePair<string, object>>()
+        {
+            new("id", 10),
+            new("name", "test")
+        };
+
+        dynamicParametersWrapper.CreateParameters(kvp);
+
+        dynamicParametersWrapper.DynamicParameters.ParameterNames.Should().NotBeNullOrEmpty();
+        dynamicParametersWrapper.DynamicParameters.ParameterNames
+            .Should().Contain(s => s == "id");
+        dynamicParametersWrapper.DynamicParameters.ParameterNames
+           .Should().Contain(s => s == "name");
+    }
+
+    [Fact]
+    public void CreateParameters_From_Anonymous_Template_Creates_Expected_Parameters()
     {
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
 
         var obj = new
         {
+            id = 10,
             name = "test"
         };
 
         dynamicParametersWrapper.CreateParameters(obj);
 
+        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
+            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+            .SingleOrDefault(p => p.Name == "templates");
+
+        fieldInfo.Should().NotBeNull();
+        var templates = fieldInfo.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        templates.Should().NotBeNullOrEmpty();
+        templates!.First().Should().Be(obj);
+    }
+
+    [Fact]
+    public void AddOutputParameter_Creates_Expected_Parameters()
+    {
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
+
         dynamicParametersWrapper.AddOutputParameter("bob", DbType.String);
-        dynamicParametersWrapper.DynamicParameters.Should().NotBeNull();
+
         dynamicParametersWrapper.DynamicParameters.ParameterNames.Should().NotBeNullOrEmpty();
         dynamicParametersWrapper.DynamicParameters.ParameterNames
             .Should().Contain(s => s == "bob");
+    }
 
-        //var b = dynamicParametersWrapper
-        //    .DynamicParameters
-        //    .Get<string>("Bob");
-        //dynamicParametersWrapper
-        //    .DynamicParameters
-        //    .Get<string>("Bob")
-        //    .Should().Be("test");
+    [Fact]
+    public void AddParameter_Creates_Expected_Parameters()
+    {
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
+
+        dynamicParametersWrapper.AddParameter("bob", DbType.String);
+
+        dynamicParametersWrapper.DynamicParameters.ParameterNames.Should().NotBeNullOrEmpty();
+        dynamicParametersWrapper.DynamicParameters.ParameterNames
+            .Should().Contain(s => s == "bob");
     }
 }

@@ -9,6 +9,7 @@ public interface IDynamicParametersWrapper
 
     IDynamicParametersWrapper CreateParameters(object template);
 
+    // ReSharper disable once UnusedMemberInSuper.Global
     IDynamicParametersWrapper AddParameter(
         string name,
         object value = null,
