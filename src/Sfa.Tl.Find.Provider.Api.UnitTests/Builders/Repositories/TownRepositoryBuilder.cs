@@ -1,5 +1,4 @@
-﻿using Intertech.Facade.DapperParameters;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Api.Data;
@@ -11,18 +10,18 @@ public class TownRepositoryBuilder
 {
     public TownRepository Build(
         IDbContextWrapper dbContextWrapper = null,
-        IDapperParameters dbParameters = null,
+        IDynamicParametersWrapper dynamicParametersWrapper = null,
         IReadOnlyPolicyRegistry<string> policyRegistry = null,
         ILogger<TownRepository> logger = null)
     {
         dbContextWrapper ??= Substitute.For<IDbContextWrapper>();
-        dbParameters ??= Substitute.For<IDapperParameters>();
+        dynamicParametersWrapper ??= Substitute.For<IDynamicParametersWrapper>();
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
         logger ??= Substitute.For<ILogger<TownRepository>>();
 
         return new TownRepository(
             dbContextWrapper,
-            dbParameters,
+            dynamicParametersWrapper,
             policyRegistry,
             logger);
     }

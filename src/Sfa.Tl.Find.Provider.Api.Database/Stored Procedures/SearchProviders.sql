@@ -1,18 +1,4 @@
-﻿/*
-1. Clustered index here seems to improve performance of INSERT INTO @allQualificationIds
-	--DROP TYPE [dbo].[IdListTableType_2]
-	CREATE TYPE [dbo].[IdListTableType_2] AS TABLE
-	(
-		[Id] INT NOT NULL,
-		Index IX_Id NONCLUSTERED (Id)
-		--Index IX_Id CLUSTERED (Id)
-	)
-
-2. Consider adding index to @allQualificationIds
-		, UNIQUE CLUSTERED (Id) 
-*/
-
-CREATE PROCEDURE [dbo].[SearchProviders]
+﻿CREATE PROCEDURE [dbo].[SearchProviders]
 	@fromLatitude DECIMAL(9, 6),
 	@fromLongitude DECIMAL(9, 6),
 	@routeIds [dbo].[IdListTableType] READONLY,
@@ -45,8 +31,8 @@ AS
 				)
 	
 	DECLARE @allQualificationIds TABLE (
-				[Id] INT
-				,UNIQUE CLUSTERED (Id)
+				[Id] INT,
+				UNIQUE CLUSTERED (Id)
 			)
 	DECLARE @hasRouteOrQualificationIds BIT = 0
 		

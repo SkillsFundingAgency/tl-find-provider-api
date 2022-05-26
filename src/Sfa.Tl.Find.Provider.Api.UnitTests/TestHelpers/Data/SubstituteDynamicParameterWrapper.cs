@@ -1,38 +1,37 @@
 ﻿using Dapper;
-using Intertech.Facade.DapperParameters;
 using NSubstitute;
+using Sfa.Tl.Find.Provider.Api.Interfaces;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data
+namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data;
+
+internal class SubstituteDynamicParameterWrapper
 {
-    internal class SubstituteDynamicParameterWrapper
+    public IDynamicParametersWrapper DapperParameterFactory
     {
-        public IDapperParameters DapperParameters
-        {
-            get;
-        }
+        get;
+    }
 
-        public DynamicParameters DynamicParameters
-        {
-            get; 
-            private set;
-        }
+    public DynamicParameters DynamicParameters
+    {
+        get; 
+        private set;
+    }
 
-        public SubstituteDynamicParameterWrapper()
-        {
-            var parameters = Substitute.For<IDapperParameters>();
-            parameters
-                .When(x =>
-                    x.CreateParmsWithTemplate(Arg.Any<object>()))
-                .Do(x =>
-                {
-                    var p = x.Arg<object>();
-                    DynamicParameters = new DynamicParameters(p);
-                });
+    public SubstituteDynamicParameterWrapper()
+    {
+        var parameters = Substitute.For<IDynamicParametersWrapper>();
+        parameters
+            .When(x =>
+                x.CreateParameters(Arg.Any<object>()))
+            .Do(x =>
+            {
+                var p = x.Arg<object>();
+                DynamicParameters = new DynamicParameters(p);
+            });
 
-            parameters.DynamicParameters
-                .Returns(_ => DynamicParameters);
+        parameters.DynamicParameters
+            .Returns(_ => DynamicParameters);
 
-            DapperParameters = parameters;
-        }
+        DapperParameterFactory = parameters;
     }
 }

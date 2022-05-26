@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
-using Intertech.Facade.DapperParameters;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
 
@@ -11,29 +11,62 @@ namespace Sfa.Tl.Find.Provider.Api.Data;
 public class RouteRepository : IRouteRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
-    private readonly IDapperParameters _dbParameters;
+    private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
 
     public RouteRepository(
         IDbContextWrapper dbContextWrapper,
-        IDapperParameters dbParameters)
+        IDynamicParametersWrapper dynamicParametersWrapper)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
-        _dbParameters = dbParameters ?? throw new ArgumentNullException(nameof(dbParameters));
+        _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
     }
 
     public async Task<IEnumerable<Route>> GetAll(bool includeAdditionalData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
-        _dbParameters.CreateParmsWithTemplate(new
+        _dynamicParametersWrapper.CreateParameters(new
         {
             includeAdditionalData
         });
 
-        return await _dbContextWrapper.QueryAsync<Route>(
+        var routes = new Dictionary<int, Route>();
+
+        await _dbContextWrapper.QueryAsync<RouteDto, QualificationDto, Route>(
             connection,
             "GetRoutes",
-            _dbParameters.DynamicParameters,
+            (r, q) =>
+            {
+                if (!routes.TryGetValue(r.RouteId, out var routeResult))
+                {
+                    routes.Add(r.RouteId, 
+                        routeResult = new Route
+                        {
+                            Id = r.RouteId, 
+                            Name = r.RouteName
+                        });
+                }
+                
+                if (q is not null)
+                {
+                    routeResult.Qualifications.Add(
+                        new Qualification
+                        {
+                            Id = q.QualificationId,
+                            Name = q.QualificationName,
+                        });
+                    routeResult.NumberOfQualificationsOffered += q.NumberOfQualificationsOffered;
+                }
+
+                return routeResult;
+            },
+            _dynamicParametersWrapper.DynamicParameters,
+            splitOn: "RouteId, QualificationId",
             commandType: CommandType.StoredProcedure);
+
+        return routes
+            .Values
+            .OrderBy(r => r.Name)
+            .ToList();
     }
 }
