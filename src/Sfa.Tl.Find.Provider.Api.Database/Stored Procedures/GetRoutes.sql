@@ -14,7 +14,7 @@ AS
 		  AND	(@includeAdditionalData = 1 OR (@includeAdditionalData = 0 AND p.[IsAdditionalData] = 0))),
 	LocationsCTE AS (
 		SELECT	rq.[RouteId] AS [RouteId],
-				rq.[Id] AS [QualificationId]
+				rq.[QualificationId] AS [QualificationId]
 		FROM	[ProvidersCTE] p
 		INNER JOIN	[dbo].[Location] l
 		ON		p.[Id] = l.[ProviderId]
@@ -31,20 +31,24 @@ AS
 		WHERE	l.[IsDeleted] = 0
 		--Only include the first row to make sure main data set takes priority
 		  AND	p.[ProviderRowNum] = 1
-	  ),
-	RouteQualificationsCTE AS (
-		SELECT	[RouteId],
-				COUNT([QualificationId]) AS [QualificationCount]
-		FROM LocationsCTE
-			GROUP BY [RouteId], 					 
-					 [QualificationId]
-	)
-	SELECT	r.[Id], 
-			r.[Name], 
-			COUNT(cte.[RouteId]) AS [NumberOfQualifications],
-			COALESCE(SUM(cte.[QualificationCount]), 0) AS [NumberOfQualificationsOffered]
+	  )
+	SELECT	r.[Id] AS [RouteId], 
+			r.[Name] AS [RouteName], 
+			q.[Id] AS [QualificationId], 
+			q.[Name] AS [QualificationName],
+			COUNT(q.[Id]) AS [NumberOfQualificationsOffered]
 	FROM [Route] r
-	LEFT JOIN RouteQualificationsCTE cte
-	ON r.Id = cte.[RouteId]
-	GROUP BY r.[Id], r.[Name]
-	ORDER BY r.[Name];
+	LEFT JOIN	[RouteQualification] rq
+	ON		r.[Id] = rq.[RouteId]
+	  AND	r.[IsDeleted] = 0
+	LEFT JOIN LocationsCTE cte
+	ON cte.RouteId = r.[Id]
+	LEFT JOIN [Qualification] q
+	ON q.Id = rq.[QualificationId]
+	  AND	r.[IsDeleted] = 0
+	GROUP BY q.[Id],
+			 q.[Name],
+			 r.[Id],
+			 r.[Name]
+	ORDER BY r.[Name],
+		     q.[Name];

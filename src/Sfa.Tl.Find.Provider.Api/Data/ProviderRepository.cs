@@ -170,7 +170,7 @@ public class ProviderRepository : IProviderRepository
             .QueryAsync<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>(
                 connection,
             "SearchProviders",
-            map: (p, ly, q) =>
+            (p, ly, q) =>
             {
                 var key = $"{p.UkPrn}_{p.Postcode}";
                 if (!providerSearchResults.TryGetValue(key, out var searchResult))

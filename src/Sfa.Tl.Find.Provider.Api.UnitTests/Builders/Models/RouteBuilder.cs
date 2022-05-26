@@ -5,82 +5,88 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 
 public class RouteBuilder
 {
-    public IEnumerable<Route> BuildList() =>
-        new List<Route>
+    public IEnumerable<Route> BuildList()
+    {
+        var qualificationBuilder = new QualificationBuilder();
+        return new List<Route>
         {
             new()
             {
                 Id = 1,
                 Name = "Agriculture, environment and animal care",
-                NumberOfQualifications = 1,
-                NumberOfQualificationsOffered = 11
+                NumberOfQualificationsOffered = 11,
+                Qualifications = qualificationBuilder.BuildList(1)
             },
             new()
             {
                 Id = 2,
                 Name = "Business and administration",
-                NumberOfQualifications = 2,
-                NumberOfQualificationsOffered = 21
+                NumberOfQualificationsOffered = 21,
+                Qualifications = qualificationBuilder.BuildList(2)
             },
-            new() {
+            new()
+            {
                 Id = 3,
                 Name = "Catering",
-                NumberOfQualifications = 3,
-                NumberOfQualificationsOffered = 31
+                NumberOfQualificationsOffered = 31,
+                Qualifications = qualificationBuilder.BuildList(3)
             },
-            new() {
+            new()
+            {
                 Id = 4,
                 Name = "Construction and the built environment",
-                NumberOfQualifications= 4,
-                NumberOfQualificationsOffered = 41
+                NumberOfQualificationsOffered = 41,
+                Qualifications = qualificationBuilder.BuildList(4)
             },
             new()
             {
                 Id = 5,
                 Name = "Creative and design",
-                NumberOfQualifications= 5,
-                NumberOfQualificationsOffered = 51
+                NumberOfQualificationsOffered = 51,
+                Qualifications = qualificationBuilder.BuildList(5)
             },
             new()
             {
                 Id = 6,
                 Name = "Digital and IT",
-                NumberOfQualifications= 6,
-                NumberOfQualificationsOffered = 61
+                NumberOfQualificationsOffered = 61,
+                Qualifications = qualificationBuilder.BuildList(6)
             },
             new()
             {
                 Id = 7,
                 Name = "Education and childcare",
-                NumberOfQualifications= 7,
-                NumberOfQualificationsOffered = 71
+                NumberOfQualificationsOffered = 71,
+                Qualifications = qualificationBuilder.BuildList(7)
             },
             new()
             {
                 Id = 8,
                 Name = "Engineering and manufacturing",
-                NumberOfQualifications= 8,
-                NumberOfQualificationsOffered = 81
+                NumberOfQualificationsOffered = 81,
+                Qualifications = qualificationBuilder.BuildList(8)
             },
             new()
             {
                 Id = 9,
                 Name = "Hair and beauty",
-                NumberOfQualifications= 9,
-                NumberOfQualificationsOffered = 91
+                NumberOfQualificationsOffered = 91,
+                Qualifications = qualificationBuilder.BuildList(9)
             },
             new()
             {
                 Id = 10,
                 Name = "Health and science",
-                NumberOfQualifications= 10,
-                NumberOfQualificationsOffered = 101
+                NumberOfQualificationsOffered = 101,
+                Qualifications = qualificationBuilder.BuildList(10)
             },
             new()
             {
                 Id = 11,
                 Name = "Legal, finance and accounting",
-                NumberOfQualifications= 11,
-                NumberOfQualificationsOffered = 111            }
+                NumberOfQualificationsOffered = 111,
+                Qualifications = qualificationBuilder.BuildList(11)
+            }
         };
+    }
 }
