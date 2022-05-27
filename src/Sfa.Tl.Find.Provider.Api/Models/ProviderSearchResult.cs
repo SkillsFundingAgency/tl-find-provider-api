@@ -30,5 +30,5 @@ public class ProviderSearchResult
     [JsonIgnore]
     public string JourneyToLink { get; set; }
 
-    public ICollection<DeliveryYear> DeliveryYears { get; init; } = new List<DeliveryYear>();
+    public ICollection<DeliveryYearSearchResult> DeliveryYears { get; init; } = new List<DeliveryYearSearchResult>();
 }
