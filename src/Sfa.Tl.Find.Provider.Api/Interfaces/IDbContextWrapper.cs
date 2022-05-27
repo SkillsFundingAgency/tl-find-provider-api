@@ -29,16 +29,6 @@ public interface IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null);
 
-    Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(
-        IDbConnection connection,
-        string sql,
-        Func<TFirst, TSecond, TThird, TReturn> map,
-        object param = null,
-        IDbTransaction transaction = null,
-        string splitOn = "Id",
-        int? commandTimeout = null,
-        CommandType? commandType = null);
-
     Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
         IDbConnection connection,
         string sql,

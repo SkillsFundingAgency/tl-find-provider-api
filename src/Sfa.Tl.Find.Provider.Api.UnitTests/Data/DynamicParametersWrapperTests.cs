@@ -66,7 +66,7 @@ public class DynamicParametersWrapperTests
             .SingleOrDefault(p => p.Name == "templates");
 
         fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
         templates.Should().NotBeNullOrEmpty();
         templates!.First().Should().Be(obj);
     }
