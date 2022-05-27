@@ -98,29 +98,16 @@ AS
 						WHERE	lq.[LocationId] = l.[Id]
 						  AND	(@hasRouteOrQualificationIds = 0
 								 OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds)))
-		--ORDER BY [Distance],
-		--		 p.[Name],
-		--		 l.[Name]
-		--OFFSET @page * @pageSize ROWS
-		--FETCH NEXT @pageSize ROWS ONLY
 		)
-INSERT INTO @locations
-SELECT *
---INTO #TEMP
-FROM NearestLocationsCTE_Inner
---ORDER BY [Distance],
---		 [ProviderName],
---		 [LocationName];
+	INSERT INTO @locations
+	SELECT *
+	FROM NearestLocationsCTE_Inner;
 
-SELECT @totalLocationsCount = COUNT(1) 
---from #TEMP;
-from @locations;
-
---Break here and insert everything into temp table	NearestLocationsCTE_Inner
+	SELECT @totalLocationsCount = COUNT(1) 
+	from @locations;
 
 	WITH NearestLocationsCTE AS (
 		SELECT * 
-		--FROM #TEMP 
 		FROM @locations
 		ORDER BY [Distance],
 				 [ProviderName],
@@ -142,9 +129,7 @@ from @locations;
 					 l.[Town],
 					 t.[Name])
 
-  --  SELECT @totalLocationsCount = COUNT(1) FROM NearestLocationsCTE_Inner;
---UNION ALL
-		--Step 2 - add in the qualifications (no filter for qualifications - return all for selected locations)
+		--Step 2 - add in the qualifications 
 		SELECT 	[UkPrn],
 				[ProviderName],
 				[Postcode],
@@ -162,12 +147,6 @@ from @locations;
 				lq.[DeliveryYear] AS [Year],
 				q.[Id] AS [Id],
 				q.[Name] AS [Name]
-
-		--		, (  
-  --  SELECT @totalLocationsCount = COUNT(1) FROM NearestLocationsCTE_Inner
-  --) AS MY_COUNT
-				--,@totalLocationsCount = 999 --(SELECT COUNT(1) FROM NearestLocationsCTE_Inner ) 
-
 		FROM NearestLocationsCTE l
 		INNER JOIN	[dbo].[LocationQualification] lq
 		ON		lq.[LocationId] = l.[LocationId]
@@ -181,6 +160,8 @@ from @locations;
 		INNER JOIN	[dbo].[Route] r
 		ON		r.[Id] = rq.[RouteId]
 		  AND	r.[IsDeleted] = 0
+		  AND	(@hasRouteOrQualificationIds = 0
+				 OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds))
 		ORDER BY [Distance],
 				 [ProviderName],
 				 [LocationName],
