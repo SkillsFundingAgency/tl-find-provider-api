@@ -213,11 +213,13 @@ function FindProvider(
                 let availableNow = null;
                 $.each(providerLocation.deliveryYears,
                     function (_, deliveryYear) {
+                        if (typeof deliveryYear.routes === "undefined") return;
+
                         if (deliveryYear.isAvailableNow) {
                             if (availableNow) {
-                                for (let i = 0; i < deliveryYear.qualifications.length; i++) {
-                                    if (availableNow.qualifications.filter(function (q) { return q.name === deliveryYear.qualifications[i].name; }).length === 0)
-                                        availableNow.qualifications.push(deliveryYear.qualifications[i]);
+                                for (let i = 0; i < deliveryYear.routes.length; i++) {
+                                    if (availableNow.routes.filter(function (r) { return r.name === deliveryYear.routes[i].name; }).length === 0)
+                                        availableNow.routes.push(deliveryYear.routes[i]);
                                 }
                             } else {
                                 availableNow = deliveryYear;
@@ -228,37 +230,44 @@ function FindProvider(
                         }
                     });
 
-                if (availableNow) {
-                    availableNow.qualifications.sort(function (x, y) { return (x.name < y.name) ? -1 : ((x.name > y.name) ? 1 : 0) });
+                if (availableNow && !typeof availableNow.routes !== "undefined") {
+                    availableNow.routes.sort(function (x, y) { return (x.name < y.name) ? -1 : ((x.name > y.name) ? 1 : 0) });
                 }
 
                 searchResult += '</p><div class="tl-fap--courses">';
                 
                 $.each(locationDeliveryYears,
                     function (_, deliveryYear) {
-                        const routeName = "GET ROUTE";
+                        if (!typeof deliveryYear.routes === "undefined") return;
+
                         if (deliveryYear.isAvailableNow) {
                             searchResult += '<div class="tl-fap--courses--box tl-fap--courses--box--now"> \
-                                <h4 class="govuk-body govuk-!-font-weight-bold">T Levels available now:</h4>';
+                                        <h4 class="govuk-body govuk-!-font-weight-bold">T Levels available now:</h4>';
                         } else {
                             searchResult += '<div class="tl-fap--courses--box"> \
-                                <h4 class="govuk-body govuk-!-font-weight-bold">T Levels starting September  ' + deliveryYear.year + '</h4>';
+                                        <h4 class="govuk-body govuk-!-font-weight-bold">T Levels starting September  ' + deliveryYear.year + '</h4>';
                         }
-                        searchResult += '<p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-1">' + routeName + '</p> \
-                            <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-1">';
 
-                        $.each(deliveryYear.qualifications,
-                            function (_, qualification) {
-                                const articleLink = typeof qualificationArticleMap !== "undefined" ?
-                                    qualificationArticleMap[qualification.id] : null;
-                                if (articleLink) {
-                                    searchResult += '<li><a target="_blank" class="govuk-link tl-fap--result-course" href="' + articleLink + '">' + qualification.name + '</a></li>';
-                                } else {
-                                    searchResult += '<li>' + qualification.name + '</li>';
-                                }
+                        $.each(deliveryYear.routes,
+                            function (_, route) {
+                                searchResult += '<p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-1">' + route.name + '</p> \
+                                <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-1">';
+                                
+                                $.each(route.qualifications,
+                                    function (_, qualification) {
+                                        const articleLink = typeof qualificationArticleMap !== "undefined" ?
+                                            qualificationArticleMap[qualification.id] : null;
+                                        if (articleLink) {
+                                            searchResult += '<li><a target="_blank" class="govuk-link tl-fap--result-course" href="' + articleLink + '">' + qualification.name + '</a></li>';
+                                        } else {
+                                            searchResult += '<li>' + qualification.name + '</li>';
+                                        }
+                                    });
+
+                                searchResult += '</ul>';
                             });
 
-                        searchResult += '</ul></div>';
+                        searchResult += '</div>';
                     });
                 searchResult += '</div>';
 
