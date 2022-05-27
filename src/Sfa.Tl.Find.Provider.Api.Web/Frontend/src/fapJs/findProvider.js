@@ -1,4 +1,4 @@
-﻿/* Find Provider */
+﻿// Find Provider 
 let isFapSearchInProgress = false;
 
 function FindProvider(
@@ -10,15 +10,11 @@ function FindProvider(
     if (typeof findProvidersApiUri === "undefined" ||
         typeof findProvidersAppId === "undefined" ||
         typeof findProvidersApiKey === "undefined") {
-        console.log('findProvider script requires data-findProviderApiUri, data-findProviderAppId and data-findProviderApiKey to be passed via the script tag');
+        console.log('findProvider script requires findProviderApiUri, findProviderAppId and findProviderApiKey parameters');
         return;
     }
 
     if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
-
-    //console.log("findProvidersApiUri = " + findProvidersApiUri);
-    //console.log("findProvidersAppId = " + findProvidersAppId);
-    //console.log("findProvidersApiKey = " + findProvidersApiKey);
 
     let currentPage = 0;
     let currentSearchTerm = null;
@@ -28,9 +24,6 @@ function FindProvider(
     new LocationAutocomplete(findProvidersApiUri);
 
     if ($("#tl-skill-area-filter").length) loadRoutes();
-
-    console.log("qual map: ");
-    console.log(JSON.stringify(qualificationArticleMap));
 
     //Check for search term query parameter
     let searchTerm = getUrlParameter("searchTerm");
@@ -127,11 +120,10 @@ function FindProvider(
 
     function providerSearch(searchTerm, skillAreaIds, page) {
         clearProviderSearchResults();
-
         searchTerm = searchTerm ? searchTerm.trim() : "";
         if (searchTerm === "") {
             if (event) event.stopPropagation();
-            showSearchTermError("Enter a postcode or town");
+            showSearchTermError("Enter postcode or town");
             return false;
         }
 
@@ -205,10 +197,7 @@ function FindProvider(
             $("#tl-search-term").val(data.searchTerm);
         }
 
-console.log('currentPage is ' + currentPage);
-console.log("#tl-fap--results currently has " + $("#tl-fap--results").length);
         if ((!data.searchResults || data.searchResults.length === 0) && currentPage === 0) {
-console.log('unhiding tl-fap--noresult because there are no results');
             $('.tl-fap--noresult').removeClass("tl-hidden");
             return;
         }
@@ -283,17 +272,6 @@ console.log('unhiding tl-fap--noresult because there are no results');
                         searchResult += '</ul>';
                     });
 
-                //Employer registration
-                searchResult += '<a href="#" class="tl-register--link" ' +
-                    'data-ukPrn="' + providerLocation.ukPrn + '" ' +
-                    'data-providerName="' + providerLocation.providerName + '" ' +
-                    'data-town="' + providerLocation.town + '" ' +
-                    'data-postcode="' + providerLocation.postcode + '" ' +
-                    'data-email="' + providerLocation.email + '" ' +
-                    'data-telephone="' + providerLocation.telephone + '" ' +
-                    'data-website="' + providerLocation.website + '" ' +
-                    '>Register your interest</a>';
-
                 searchResult += '</div> \
                                     <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible"> \
                                   </div>';
@@ -301,13 +279,9 @@ console.log('unhiding tl-fap--noresult because there are no results');
                 $("#tl-fap--results").append(searchResult);
             });
 
-        console.log('Checking next results link for page  ' + page + ', size ' + pageSize + ', max visible ' + ((page + 1) * pageSize));
-        console.log('  totalResults = ' + data.totalResults);
-
         if (typeof data.totalResults !== "undefined" &&
             data.totalResults !== null &&
             data.totalResults <= ((page + 1) * pageSize)) {
-            console.log('hiding next results link');
             $('#tl-next-results-link').addClass("tl-hidden");
         } else {
             $('#tl-next-results-link').removeClass("tl-hidden");
