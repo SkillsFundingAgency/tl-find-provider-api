@@ -100,37 +100,7 @@ public class DbContextWrapperTests
                 ctx[PolicyContextItems.Logger] == logger
             ));
     }
-
-    [Fact]
-    public async Task QueryAsync_TFirst_TSecond_TThird_Calls_Retry_Policy_With_Logger()
-    {
-        var logger = Substitute.For<ILogger<DbContextWrapper>>();
-
-        var (policy, policyRegistry) = PollyPolicyBuilder.BuildPolicyAndRegistry();
-
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .Build(policyRegistry: policyRegistry,
-                logger: logger);
-
-        const string sql = "SELECT * FROM Qualification";
-
-        var connection = Substitute.For<IDbConnection>();
-
-        var map = Substitute.For<Func<object, object, object, Qualification>>();
-
-        var _ = await dbContextWrapper.QueryAsync<Qualification>(
-            connection,
-            sql,
-            map);
-
-        await policy.Received(1).ExecuteAsync(
-            Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),
-            Arg.Is<Context>(ctx =>
-                ctx.ContainsKey(PolicyContextItems.Logger) &&
-                ctx[PolicyContextItems.Logger] == logger
-            ));
-    }
-
+    
     [Fact]
     public async Task QueryAsync_TFirst_TSecond_TThird_TFourth_Calls_Retry_Policy_With_Logger()
     {

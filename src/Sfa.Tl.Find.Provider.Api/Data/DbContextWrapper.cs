@@ -84,11 +84,11 @@ public class DbContextWrapper : IDbContextWrapper
                             commandType: commandType),
                 context);
     }
-
-    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(
+    
+    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
         IDbConnection connection,
         string sql,
-        Func<TFirst, TSecond, TThird, TReturn> map,
+        Func<TFirst, TSecond, TThird, TFourth, TReturn> map,
         object param = null,
         IDbTransaction transaction = null,
         string splitOn = "Id",
