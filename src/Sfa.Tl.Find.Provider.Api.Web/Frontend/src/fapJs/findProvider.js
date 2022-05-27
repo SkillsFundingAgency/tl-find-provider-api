@@ -206,23 +206,8 @@ function FindProvider(
             function (_, providerLocation) {
                 let searchResult =
                     '<div class="tl-fap--result"> \
-                             <h3 class="govuk-heading-m">' + providerLocation.providerName + ' <span class="tl-fap--distance">' + providerLocation.distance.toFixed(0) + ' miles</span></h3> \
+                             <h3 class="govuk-heading-m govuk-!-margin-bottom-1">' + providerLocation.providerName + ' <span class="tl-fap--distance">' + providerLocation.distance.toFixed(0) + ' miles</span></h3> \
                              <p class="govuk-body"><span>' + providerLocation.town + '</span> | ' + providerLocation.postcode + '</p>';
-
-                if (providerLocation.telephone || providerLocation.website || providerLocation.email) {
-                    let contactDetails = providerLocation.telephone
-                        ? 'Telephone: <strong>' + providerLocation.telephone + '</strong>'
-                        : "";
-                    if (providerLocation.website) {
-                        if (contactDetails) contactDetails += ' | ';
-                        contactDetails += '<a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
-                    }
-                    if (providerLocation.email) {
-                        if (contactDetails) contactDetails += ' | ';
-                        contactDetails += 'Email: <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
-                    }
-                    searchResult += '<p class="govuk-body">' + contactDetails + '</p>';
-                }
 
                 const locationDeliveryYears = [];
                 let availableNow = null;
@@ -248,15 +233,19 @@ function FindProvider(
                 }
 
                 searchResult += '</p><div class="tl-fap--courses">';
-
+                
                 $.each(locationDeliveryYears,
                     function (_, deliveryYear) {
-                        const availability = deliveryYear.isAvailableNow
-                            ? 'Available now'
-                            : 'From September ' + deliveryYear.year + ' onwards';
-
-                        searchResult += '<p class="govuk-body govuk-!-font-weight-bold">' + availability + ':</p> \
-                                    <ul class="govuk-list govuk-list--bullet">';
+                        const routeName = "GET ROUTE";
+                        if (deliveryYear.isAvailableNow) {
+                            searchResult += '<div class="tl-fap--courses--box tl-fap--courses--box--now"> \
+                                <h4 class="govuk-body govuk-!-font-weight-bold">T Levels available now:</h4>';
+                        } else {
+                            searchResult += '<div class="tl-fap--courses--box"> \
+                                <h4 class="govuk-body govuk-!-font-weight-bold">T Levels starting September  ' + deliveryYear.year + '</h4>';
+                        }
+                        searchResult += '<p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-1">' + routeName + '</p> \
+                            <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-1">';
 
                         $.each(deliveryYear.qualifications,
                             function (_, qualification) {
@@ -269,12 +258,26 @@ function FindProvider(
                                 }
                             });
 
-                        searchResult += '</ul>';
+                        searchResult += '</ul></div>';
                     });
+                searchResult += '</div>';
 
-                searchResult += '</div> \
-                                    <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible"> \
-                                  </div>';
+                if (providerLocation.telephone || providerLocation.website || providerLocation.email) {
+                    let contactDetails = providerLocation.telephone
+                        ? 'Telephone: <strong>' + providerLocation.telephone + '</strong>'
+                        : "";
+                    if (providerLocation.website) {
+                        if (contactDetails) contactDetails += ' | ';
+                        contactDetails += '<a target="_blank" href="' + providerLocation.website + '" class="govuk-link tl-fap--result-website">Visit <span class="govuk-visually-hidden">' + providerLocation.providerName + '</span> website</a>';
+                    }
+                    if (providerLocation.email) {
+                        if (contactDetails) contactDetails += ' | ';
+                        contactDetails += 'Email: <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
+                    }
+                    
+                    searchResult += '<h4 class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-5 govuk-!-margin-bottom-2">Get in touch</h4> \
+                        <p class="govuk-body">' + contactDetails + '</p>';
+                }
 
                 $("#tl-fap--results").append(searchResult);
             });
