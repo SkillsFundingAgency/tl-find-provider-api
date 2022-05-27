@@ -27,23 +27,31 @@ public class ProviderSearchResultBuilder
                 Website = "https://www.provider1.ac.uk",
                 Distance = 10.0,
                 JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation {Location = "AA1 1AA"}),
-                DeliveryYears = new List<DeliveryYear>
+                DeliveryYears = new List<DeliveryYearSearchResult>
                 {
                     new()
                     {
                         Year = 2021,
                         IsAvailableNow = true,
-                        Qualifications = new List<Qualification>()
+                        Routes = new List<Route>
                         {
                             new()
                             {
-                                Id = 31,
-                                Name = "Test Qualification 31"
-                            },
-                            new()
-                            {
-                                Id = 32,
-                                Name = "Test Qualification 32"
+                                Id = 1,
+                                Name = "Test Route 1",
+                                Qualifications = new List<Qualification>
+                                {
+                                    new()
+                                    {
+                                        Id = 31,
+                                        Name = "Test Qualification 31"
+                                    },
+                                    new()
+                                    {
+                                        Id = 32,
+                                        Name = "Test Qualification 32"
+                                    }
+                                }
                             }
                         }
                     }
@@ -64,18 +72,26 @@ public class ProviderSearchResultBuilder
                 Website = "https://www.provider2.ac.uk",
                 Distance = 12.0,
                 JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation {Location = "BB2 2BB"}),
-                DeliveryYears = new List<DeliveryYear>
+                DeliveryYears = new List<DeliveryYearSearchResult>
                 {
                     new()
                     {
                         Year = 2022,
                         IsAvailableNow = false,
-                        Qualifications = new List<Qualification>()
+                        Routes = new List<Route>
                         {
                             new()
                             {
-                                Id = 51,
-                                Name = "Test Qualification 51"
+                                Id = 1,
+                                Name = "Test Route 2",
+                                Qualifications = new List<Qualification>
+                                {
+                                    new()
+                                    {
+                                        Id = 51,
+                                        Name = "Test Qualification 51"
+                                    }
+                                }
                             }
                         }
                     },
@@ -83,12 +99,20 @@ public class ProviderSearchResultBuilder
                     {
                         Year = 2023,
                         IsAvailableNow = false,
-                        Qualifications = new List<Qualification>()
+                        Routes = new List<Route>
                         {
                             new()
                             {
-                                Id = 52,
-                                Name = "Test Qualification 52"
+                                Id = 1,
+                                Name = "Test Route 1",
+                                Qualifications = new List<Qualification>
+                                {
+                                    new()
+                                    {
+                                        Id = 52,
+                                        Name = "Test Qualification 52"
+                                    }
+                                }
                             }
                         }
                     }
@@ -114,18 +138,26 @@ public class ProviderSearchResultBuilder
                 Website = "https://www.provider1.ac.uk",
                 Distance = 10.0,
                 JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation {Location = "AA1 1AA"}),
-                DeliveryYears = new List<DeliveryYear>
+                DeliveryYears = new List<DeliveryYearSearchResult>
                 {
                     new()
                     {
                         Year = 2021,
                         IsAvailableNow = true,
-                        Qualifications = new List<Qualification>()
+                        Routes = new List<Route>
                         {
                             new()
                             {
-                                Id = 31,
-                                Name = "Test Qualification 31"
+                                Id = 1,
+                                Name = "Test Route 1",
+                                Qualifications = new List<Qualification>
+                                {
+                                    new()
+                                    {
+                                        Id = 31,
+                                        Name = "Test Qualification 31"
+                                    }
+                                }
                             }
                         }
                     }
@@ -154,8 +186,8 @@ public class ProviderSearchResultBuilder
             }
         };
 
-    public IEnumerable<DeliveryYear> BuildDeliveryYearsPartOfListWithSingleItem() =>
-        new List<DeliveryYear>
+    public IEnumerable<DeliveryYearSearchResult> BuildDeliveryYearsPartOfListWithSingleItem() =>
+        new List<DeliveryYearSearchResult>
         {
             new()
             {
@@ -164,15 +196,25 @@ public class ProviderSearchResultBuilder
             }
         };
 
-    public IEnumerable<Qualification> BuildQualificationsPartOfListWithSingleItem() =>
-        new List<Qualification>
+    public IEnumerable<RouteDto> BuildRoutesPartOfListWithSingleItem() =>
+        new List<RouteDto>
         {
             new()
             {
-                Id = 31,
-                Name = "Test Qualification 31"
+                RouteId = 1,
+                RouteName = "Test Route 1"
             }
         };
+
+    public IEnumerable<QualificationDto> BuildQualificationsPartOfListWithSingleItem() =>
+    new List<QualificationDto>
+    {
+            new()
+            {
+                QualificationId = 31,
+                QualificationName = "Test Qualification 31"
+            }
+    };
 
     public ProviderSearchResult BuildSingleSearchResultWithSearchOrigin(GeoLocation origin) =>
         WithSearchOrigin(origin)

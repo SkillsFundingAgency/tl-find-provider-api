@@ -30,7 +30,7 @@ public class LocationBuilder
                     new()
                     {
                         Year = 2021,
-                        Qualifications = new List<Qualification>()
+                        Qualifications = new List<Qualification>
                         {
                             new()
                             {
@@ -64,7 +64,7 @@ public class LocationBuilder
                     new()
                     {
                         Year = 2021,
-                        Qualifications = new List<Qualification>()
+                        Qualifications = new List<Qualification>
                         {
                             new()
                             {

@@ -39,7 +39,7 @@ public class ProviderBuilder
                             new()
                             {
                                 Year = 2021,
-                                Qualifications = new List<Qualification>()
+                                Qualifications = new List<Qualification>
                                 {
                                     new()
                                     {

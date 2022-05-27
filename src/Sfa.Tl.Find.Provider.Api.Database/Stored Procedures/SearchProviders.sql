@@ -142,11 +142,11 @@ AS
 				[Telephone],
 				[Website],
 				[Distance],
+				lq.[DeliveryYear] AS [Year],
 				rq.[RouteId],
 				r.[Name] AS [RouteName],
-				lq.[DeliveryYear] AS [Year],
-				q.[Id] AS [Id],
-				q.[Name] AS [Name]
+				q.[Id] AS [QualificationId],
+				q.[Name] AS [QualificationName]
 		FROM NearestLocationsCTE l
 		INNER JOIN	[dbo].[LocationQualification] lq
 		ON		lq.[LocationId] = l.[LocationId]
@@ -166,4 +166,5 @@ AS
 				 [ProviderName],
 				 [LocationName],
 				 lq.[DeliveryYear],
+				 r.[Name],
 				 q.[Name];

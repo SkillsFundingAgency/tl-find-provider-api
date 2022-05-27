@@ -33,7 +33,7 @@ public class DynamicParametersWrapperTests
     {
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
 
-        var kvp = new List<KeyValuePair<string, object>>()
+        var kvp = new List<KeyValuePair<string, object>>
         {
             new("id", 10),
             new("name", "test")
