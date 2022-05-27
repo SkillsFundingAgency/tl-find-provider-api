@@ -12,7 +12,6 @@ using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 namespace Sfa.Tl.Find.Provider.Api.Services;
 public class EmailService : IEmailService
 {
-    private readonly IConfiguration _configuration;
     private readonly ILogger<EmailService> _logger;
     private readonly IAsyncNotificationClient _notificationClient;
     private readonly EmployerRegistrationSettings _settings;
