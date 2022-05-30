@@ -11,7 +11,7 @@
     "default": "wwwroot",
     "CSS": "wwwroot/css",
     "JS": "wwwroot/js",
-    "Assets": "wwwroot/files",
+    "Assets": "wwwroot/assets",
     "Bootstrap": "wwwroot/bootstrap"
   }
 }

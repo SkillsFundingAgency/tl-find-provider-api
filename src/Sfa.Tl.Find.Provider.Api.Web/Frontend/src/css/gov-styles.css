@@ -10155,6 +10155,25 @@ ul.govuk-radios {
     cursor: pointer;
 }
 
+.tl-fap--filter--selected h5 {
+    margin-bottom: 5px;
+    margin-top: 15px;
+    font-weight: normal;
+    color: #626a6e;
+}
+
+@media (min-width: 40.0625em) {
+    .tl-fap--filter--selected h5 {
+        margin-bottom: 5px;
+    }
+}
+
+@media (min-width: 40.0625em) {
+    .tl-fap--filter--selected h5 {
+        margin-top: 15px;
+    }
+}
+
 .tl-fap--filter--content {
     padding: 0 15px;
 }

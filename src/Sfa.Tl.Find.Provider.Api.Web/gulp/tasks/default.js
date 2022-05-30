@@ -2,7 +2,8 @@
 
 var gulp = require('gulp'),
     concat = require('gulp-concat'),
-    minify = require('gulp-minify');
+    minify = require('gulp-minify'),
+    replace = require('gulp-replace');
 
 const paths = require('../paths.json');
 
@@ -43,24 +44,9 @@ gulp.task('fapTileJs', () => {
         .pipe(gulp.dest(paths.dist.JS));
 });
 
-//gulp.task('fapJs', () => {
-//    return src([
-//            'Frontend/src/fapJs/findProvider.js',
-//            'Frontend/src/fapJs/locationAutocomplete',
-//            'node_modules/crypto-js/core.js',
-//            'node_modules/crypto-js/enc-base64.js',
-//            'node_modules/crypto-js/sha256.js',
-//            'node_modules/crypto-js/hmac.js',
-//            'node_modules/crypto-js/hmac-sha256.js',
-//            'node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js'
-//            //(paths.src.fapJS)
-//        ])
-//        .pipe(concat('fap.js'))
-//        .pipe(gulp.dest(paths.dist.JS));
-//});
-
 gulp.task('css', () => {
-        return src(paths.src.CSS)
+    return src(paths.src.CSS)
+        .pipe(replace('$assets-arrowupdown-png', '/assets/arrowupdown.png'))
             .pipe(gulp.dest(paths.dist.CSS));
 });
 

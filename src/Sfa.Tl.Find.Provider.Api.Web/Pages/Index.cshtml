@@ -34,7 +34,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="tl-search--filter tl-hidden" id="tl-provider-basket">
                         <h3>Provider basket</h3>
                         <div class="tl-search--filter--content govuk-!-margin-top-2">
@@ -59,21 +59,62 @@
                         </div>
                     </div>
 
-                    <div class="tl-search--filter">
-                        <h3>Filter by skill area</h3>
-                        <div class="tl-search--filter--content">
-                            <div class="govuk-form-group govuk-!-margin-bottom-2 tl-pane-expandable__content" style="background-color: white; padding: 10px">
-                                <div class="govuk-checkboxes govuk-checkboxes--small" id="tl-skill-area-filter">
-                                </div>
+                    <div class="tl-fap--filter">
+                        <h3>
+                            Filter by skill area or T Level
+                            <div class="tl-fap--filter--selected">
                             </div>
+                        </h3>
+
+                        <div class="tl-fap--filter--content" id="tl-skill-area-filter-new">
+                            <p class="govuk-body-s tl-fap--filter--showall">Show all</p>
+                            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4 govuk-!-margin-top-2">
+
+                            <div class="tl-fap--filter--section">
+                                <h4 class="govuk-heading-s govuk-!-margin-top-2">
+                                    Business and Administration<br />
+                                    <span class="govuk-body-s tl-text--grey" id="tl-fap--filter--checkstatus"></span>
+                                </h4>
+                                <details class="tl-fap--filter--details">
+                                    <summary data-open="Hide T Levels" data-close="Show T Levels" class="govuk-!-margin-bottom-1"></summary>
+                                    <div>
+                                        <div class="govuk-checkboxes govuk-checkboxes--small">
+                                            <div class="govuk-checkboxes__item">
+                                                <input id="tl_subject_1" name="tl_subject_1" type="checkbox" value="1" class="tl-checkbox govuk-checkboxes__input">
+                                                <label for="tl_subject_1" class="govuk-body-s govuk-checkboxes__label">Management and Administration</label>
+                                            </div>
+                                            <div class="govuk-checkboxes__item">
+                                                <input id="tl_subject_2" name="tl_subject_2" type="checkbox" value="2" class="tl-checkbox govuk-checkboxes__input">
+                                                <label for="tl_subject_2" class="govuk-body-s govuk-checkboxes__label">Management and Administration 2</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </details>
+                                <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4 govuk-!-margin-top-2">
+                            </div>
+
+                            <div class="tl-fap--filter--section">
+                                <h4 class="govuk-heading-s govuk-!-margin-top-2">
+                                    Business and Administration 2<br />
+                                    <span class="govuk-body-s tl-text--grey" id="tl-fap--filter--checkstatus"></span>
+                                </h4>
+                                <details class="tl-fap--filter--details">
+                                    <summary data-open="Hide T Levels" data-close="Show T Levels" class="govuk-!-margin-bottom-1"></summary>
+                                    <div class="govuk-checkboxes govuk-checkboxes--small">
+                                        <div class="govuk-checkboxes__item">
+                                            <input id="tl_subject_3" name="tl_subject_3" type="checkbox" value="3" class="tl-checkbox govuk-checkboxes__input">
+                                            <label for="tl_subject_3" class="govuk-body-s govuk-checkboxes__label">Management and Administration 3</label>
+                                        </div>
+                                    </div>
+                                </details>
+                                <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4 govuk-!-margin-top-2">
+                            </div>
+
                         </div>
                     </div>
-                    <button class="govuk-button tl-button--green" id="tl-update-search-providers" data-module="govuk-button">
-                        Update results
-                    </button>
                 </div>
             </form>
-            
+
             <!-- Error -->
             <div class="govuk-grid-column-two-thirds tl-hidden govuk-!-margin-top-7" id="tl-error">
                 <h2 class="govuk-heading-l" id="tl-error-header"></h2>
@@ -210,15 +251,31 @@
                     console.log()
                     $("#tl-provider-opportunity-list").append(
                         '<li class="tl-providers--item" ' +
-                        'data-ukPrn="' + ukPrn + '" ' +
-                        'data-providerName="' + providerName + '" ' +
-                        'data-town="' + town + '" ' +
-                        'data-postcode="' + postcode + '" ' +
-                        'data-email="' + email + '" ' +
-                        'data-telephone="' + telephone + '" ' +
-                        'data-website="' + website + '" ' +
+                        'data-ukPrn="' +
+                        ukPrn +
+                        '" ' +
+                        'data-providerName="' +
+                        providerName +
+                        '" ' +
+                        'data-town="' +
+                        town +
+                        '" ' +
+                        'data-postcode="' +
+                        postcode +
+                        '" ' +
+                        'data-email="' +
+                        email +
+                        '" ' +
+                        'data-telephone="' +
+                        telephone +
+                        '" ' +
+                        'data-website="' +
+                        website +
+                        '" ' +
                         '>' +
-                        providerName + " " + postcode +
+                        providerName +
+                        " " +
+                        postcode +
                         "</li>");
 
                     $('#tl-provider-basket').removeClass("tl-hidden");
@@ -240,7 +297,7 @@
                 //        //    .insertAfter(
                 //        //        $(this).children(".tl-fap--courses")
                 //        //        //item(".tl-fap--courses")
-                //        //        //Probably better to build this link in 
+                //        //        //Probably better to build this link in
                 //        //        //  populateProviderSearchResults - include ukprn
                 //        //        //See https://stackoverflow.com/questions/6085354/pass-lots-of-data-from-a-single-anchor-tag
                 //        //    );
@@ -281,7 +338,7 @@
                 console.log(`${employerName} ${employerTelephone} ${employerEmail} `);
 
                 //build data...
-                var data =   {                   
+                var data = {
                     "employerName": employerName,
                     "employerTelephone": employerTelephone,
                     "employerEmail": employerEmail,
@@ -340,4 +397,92 @@
             }
         });
     </script>
+
+    <script>
+
+        function FindProvider_Filter(
+            findProvidersApiUri,
+            findProvidersAppId,
+            findProvidersApiKey) {
+
+            if (typeof findProvidersApiUri === "undefined" ||
+                typeof findProvidersAppId === "undefined" ||
+                typeof findProvidersApiKey === "undefined") {
+                console.log('findProvider script requires findProviderApiUri, findProviderAppId and findProviderApiKey parameters');
+                return;
+            }
+
+            if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
+            //Above here is the same as findProvider.js
+
+            /*
+            Added id tl-skill-area-filter-new
+                - original code has tl-skill-area-filter
+            */
+            if ($("#tl-skill-area-filter-new").length) loadRoutes();
+
+            function loadRoutes() {
+                const uri = findProvidersApiUri + "routes";
+                $.ajax({
+                    type: "GET",
+                    url: uri,
+                    contentType: "application/json",
+                    beforeSend: function(xhr) {
+                        addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
+                    }
+                }).done(function(response) {
+                    populateRoutes(response);
+                }).fail(function(error) {
+                    console.log('Call to get routes failed. ' + error);
+                });
+            }
+
+            function populateRoutes(data) {
+                const skillAreasList = $("#tl-skill-area-filter-new");
+                //skillAreasList.find(".tl-fap--filter--section").remove();
+
+                $.each(data,
+                    function(_, item) {
+                        if (!item.numberOfQualificationsOffered) return;
+
+                        let skillArea = '<div class="tl-fap--filter--section"> \
+                                            <h4 class="govuk-heading-s govuk-!-margin-top-2">' +
+                                                item.name + '<br /> \
+                                                <span class="govuk-body-s tl-text--grey" id="tl-fap--filter--checkstatus"></span> \
+                                            </h4> \
+                                            <details class="tl-fap--filter--details"> \
+                                            <summary data-open="Hide T Levels" data-close="Show T Levels" class="govuk-!-margin-bottom-1"></summary>';
+
+                        $.each(item.qualifications,
+                            function(_, qualification) {
+                                console.log(qualification);
+                                const qualificationId = 'tl_subject_' + qualification.id;
+                                skillArea += '<div class="govuk-checkboxes govuk-checkboxes--small"> \
+                                                    <div class="govuk-checkboxes__item"> \
+                                                        <input id="' + qualificationId + '" name="' + qualificationId + '" type="checkbox" value="' + qualification.id + '" class="tl-checkbox govuk-checkboxes__input"> \
+                                                        <label for="' + qualificationId + '" class="govuk-body-s govuk-checkboxes__label">' + qualification.name + '</label> \
+                                                    </div> \
+                                                </div>';
+                            });
+
+                        skillArea += '    </details> \
+                                            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4 govuk-!-margin-top-2"> \
+                                            </div> \
+                                            </div>';
+
+                        skillAreasList.append(skillArea);
+                    });
+            };
+        }
+
+    </script>
+
+    <script>
+        new FindProvider_Filter(
+            $('#find_provider_api_uri').val(),
+            $('#find_provider_api_app_id').val(),
+            $('#find_provider_api_key').val());
+
+    </script>
+
 }

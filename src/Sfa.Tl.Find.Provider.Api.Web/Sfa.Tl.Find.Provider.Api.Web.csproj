@@ -14,16 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Frontend\src\css\site.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Frontend\src\css\site.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Frontend\src\assets\" />
+    <Folder Include="Frontend\src\css\" />
     <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\css\" />
   </ItemGroup>
 
   <ItemGroup>
