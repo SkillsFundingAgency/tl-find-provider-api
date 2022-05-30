@@ -11,6 +11,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
 [ApiController]
 [ApiVersion("2.0")]
+[ApiVersion("3.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class LocationsController : ControllerBase

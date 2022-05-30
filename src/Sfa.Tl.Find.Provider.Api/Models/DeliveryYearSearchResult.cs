@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Dapper.Contrib.Extensions;
 
@@ -12,7 +13,11 @@ public class DeliveryYearSearchResult
     [Write(false)]
     public bool IsAvailableNow { get; set; }
 
-    public ICollection<Route> Routes { get; init; } = new List<Route>();
+    [Obsolete("Replaced with Routes in API v3")]
+    public ICollection<Qualification> Qualifications { get; set; }
+
+    //TODO: Change to init
+    public ICollection<Route> Routes { get; set; } = new List<Route>();
 
     private string DebuggerDisplay()
         => $"{Year} " +
