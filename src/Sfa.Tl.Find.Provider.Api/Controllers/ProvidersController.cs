@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Quartz.Util;
@@ -15,6 +16,7 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
 [ApiController]
 [ApiVersion("2.0")]
+[ApiVersion("3.0")]
 [HmacAuthorization]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
@@ -43,6 +45,100 @@ public class ProvidersController : ControllerBase
     /// <param name="pageSize">Number of items to return on a page.</param>
     /// <returns>Json with providers.</returns>
     [HttpGet]
+    [Obsolete("Use v3")]
+    [ApiVersion("2.0")]
+    [Route("", Name = "GetProviders_V2")]
+    [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetProviders_V2(
+        [FromQuery(Name = "searchTerm")]
+        string searchTerms = null,
+        [FromQuery(Name = "lat")]
+        double? latitude = null,
+        [FromQuery(Name = "lon")]
+        double? longitude = null,
+        [FromQuery(Name = "routeId")]
+        IList<int> routeIds = null,
+        [FromQuery(Name = "qualificationId")]
+        IList<int> qualificationIds = null,
+        [FromQuery,
+         Range(0, int.MaxValue, ErrorMessage = "The page field must be zero or greater.")]
+        int page = 0,
+        [FromQuery,
+         Range(1, int.MaxValue, ErrorMessage = "The pageSize field must be at least one.")]
+        int pageSize = Constants.DefaultPageSize)
+    {
+        try
+        {
+            if (!searchTerms.TryValidate(latitude, longitude, out var validationMessage))
+            {
+                return Ok(new ProviderSearchResponse
+                {
+                    Error = validationMessage
+                });
+            }
+
+            var providersSearchResponse =
+                searchTerms.IsNullOrWhiteSpace()
+                    ? await _providerDataService.FindProviders(
+                        latitude!.Value,
+                        longitude!.Value,
+                        routeIds,
+                        qualificationIds,
+                        page,
+                        pageSize)
+                    : await _providerDataService.FindProviders(
+                        searchTerms,
+                        routeIds,
+                        qualificationIds,
+                        page,
+                        pageSize);
+
+            if (providersSearchResponse.SearchResults is not null)
+            {
+                //Convert to v2 response
+                foreach (var r in providersSearchResponse.SearchResults)
+                {
+                    foreach (var d in r.DeliveryYears)
+                    {
+                        var qualifications = new List<Qualification>();
+                        foreach (var route in d.Routes)
+                        {
+                            foreach (var q in route.Qualifications)
+                            {
+                                qualifications.Add(q);
+                            }
+                        }
+
+                        d.Qualifications =
+                            qualifications.OrderBy(q => q.Name).ToList();
+                        d.Routes = null;
+                    }
+                }
+            }
+
+            return Ok(providersSearchResponse);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Search for providers.
+    /// </summary>
+    /// <param name="searchTerms">Postcode that the search should start from.</param>
+    /// <param name="latitude">Latitude that the search should start from.</param>
+    /// <param name="longitude">Longitude that the search should start from.</param>
+    /// <param name="qualificationIds">Qualification ids to filter by. Optional, nulls or zeroes will be ignored.</param>
+    /// <param name="routeIds">Route ids to filter by. Optional, nulls or zeroes will be ignored.</param>
+    /// <param name="page">Page to be displayed (zero-based).</param>
+    /// <param name="pageSize">Number of items to return on a page.</param>
+    /// <returns>Json with providers.</returns>
+    [HttpGet]
+    [ApiVersion("3.0")]
     [Route("", Name = "GetProviders")]
     [ProducesResponseType(typeof(ProviderSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
