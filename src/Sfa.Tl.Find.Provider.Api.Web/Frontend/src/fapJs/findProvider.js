@@ -100,7 +100,7 @@ function FindProvider(
 
                 let skillArea = '<div class="tl-fap--filter--section"> \
                                    <h4 class="govuk-heading-s govuk-!-margin-top-2">' +
-                                     item.name + 'BRO<br /> \
+                                     item.name + '<br /> \
                                      <span class="govuk-body-s tl-text--grey" id="tl-fap--filter--checkstatus"></span> \
                                     </h4> \
                                     <details class="tl-fap--filter--details"> \
