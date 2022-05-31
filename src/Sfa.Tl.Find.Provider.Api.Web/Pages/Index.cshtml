@@ -58,6 +58,24 @@
                             </button>
                         </div>
                     </div>
+                    
+                    <button class="tl-button tl-button--grey tl-width-100" id="tl-fap--filter--button">Show filter</button>
+                    <script>
+    //$(document).ready(function() {
+                        $("#tl-fap--filter--button").click(function () {
+                            if ($(this).is("[open]")) {
+                                $(this).removeAttr("open");
+                                $(".tl-fap--filter").removeAttr("open");
+                                $(this).text("Show filter");
+                            }
+                            else {
+                                $(this).attr('open', '');;
+                                $(".tl-fap--filter").attr('open', '');;
+                                $(this).text("Hide filter");
+                            }
+                        });
+                        //});
+                    </script>
 
                     <div class="tl-fap--filter">
                         <h3>
@@ -66,7 +84,7 @@
                             </div>
                         </h3>
 
-                        <div class="tl-fap--filter--content" id="tl-skill-area-filter-new">
+                        <div class="tl-fap--filter--content" id="tl-skill-area-filter">
                             <p class="govuk-body-s tl-fap--filter--showall">Show all</p>
                             <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4 govuk-!-margin-top-2">
                             <!-- Skill areas go here-->
@@ -130,8 +148,8 @@
             51: "{{ settings.qualification_article_51 }}"
         };
 
-        console.log($('#qualification_article_map').val());
-        console.log('----------');
+        //console.log($('#qualification_article_map').val());
+        //console.log('----------');
         qualificationArticleMap = JSON.parse($('#qualification_article_map').val());
         new FindProvider(
             $('#find_provider_api_uri').val(),
@@ -358,91 +376,5 @@
         });
     </script>
 
-    <script>
-
-        function FindProvider_Filter(
-            findProvidersApiUri,
-            findProvidersAppId,
-            findProvidersApiKey) {
-
-            if (typeof findProvidersApiUri === "undefined" ||
-                typeof findProvidersAppId === "undefined" ||
-                typeof findProvidersApiKey === "undefined") {
-                console.log('findProvider script requires findProviderApiUri, findProviderAppId and findProviderApiKey parameters');
-                return;
-            }
-
-            if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
-            //Above here is the same as findProvider.js
-
-            /*
-            Added id tl-skill-area-filter-new
-                - original code has tl-skill-area-filter
-            */
-            if ($("#tl-skill-area-filter-new").length) loadRoutes();
-
-            function loadRoutes() {
-                const uri = findProvidersApiUri + "routes";
-                $.ajax({
-                    type: "GET",
-                    url: uri,
-                    contentType: "application/json",
-                    beforeSend: function(xhr) {
-                        addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
-                    }
-                }).done(function(response) {
-                    populateRoutes(response);
-                }).fail(function(error) {
-                    console.log('Call to get routes failed. ' + error);
-                });
-            }
-
-            function populateRoutes(data) {
-                const skillAreasList = $("#tl-skill-area-filter-new");
-                skillAreasList.find(".tl-fap--filter--section").remove();
-
-                $.each(data,
-                    function(_, item) {
-                        if (!item.numberOfQualificationsOffered) return;
-
-                        let skillArea = '<div class="tl-fap--filter--section"> \
-                                            <h4 class="govuk-heading-s govuk-!-margin-top-2">' +
-                                                item.name + '<br /> \
-                                                <span class="govuk-body-s tl-text--grey" id="tl-fap--filter--checkstatus"></span> \
-                                            </h4> \
-                                            <details class="tl-fap--filter--details"> \
-                                            <summary data-open="Hide T Levels" data-close="Show T Levels" class="govuk-!-margin-bottom-1"></summary>';
-
-                        $.each(item.qualifications,
-                            function(_, qualification) {
-                                console.log(qualification);
-                                const qualificationId = 'tl_subject_' + qualification.id;
-                                skillArea += '<div class="govuk-checkboxes govuk-checkboxes--small"> \
-                                                    <div class="govuk-checkboxes__item"> \
-                                                        <input id="' + qualificationId + '" name="' + qualificationId + '" type="checkbox" value="' + qualification.id + '" class="tl-checkbox govuk-checkboxes__input"> \
-                                                        <label for="' + qualificationId + '" class="govuk-body-s govuk-checkboxes__label">' + qualification.name + '</label> \
-                                                    </div> \
-                                                </div>';
-                            });
-
-                        skillArea += '    </details> \
-                                            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4 govuk-!-margin-top-2"> \
-                                            </div> \
-                                            </div>';
-
-                        skillAreasList.append(skillArea);
-                    });
-            };
-        }
-
-    </script>
-
-    <script>
-        new FindProvider_Filter(
-            $('#find_provider_api_uri').val(),
-            $('#find_provider_api_app_id').val(),
-            $('#find_provider_api_key').val());
-
-    </script>
 
 }
