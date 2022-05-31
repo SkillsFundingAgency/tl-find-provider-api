@@ -47,7 +47,9 @@ gulp.task('fapTileJs', () => {
 gulp.task('css', () => {
     return src(paths.src.CSS)
         .pipe(replace('$assets-arrowupdown-png', '/assets/arrowupdown.png'))
-            .pipe(gulp.dest(paths.dist.CSS));
+        .pipe(replace(/\$assets-(.*)-woff2/g, '/assets/$1.woff2'))
+        .pipe(replace(/\$assets-(.*)-woff/g, '/assets/$1.woff'))
+        .pipe(gulp.dest(paths.dist.CSS));
 });
 
 gulp.task('favicon', () => {
