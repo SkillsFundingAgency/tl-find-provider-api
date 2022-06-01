@@ -132,7 +132,7 @@ public class QualificationRepositoryTests
         var repository = new QualificationRepositoryBuilder()
             .Build(
                 dbContextWrapper,
-                dapperParameterWrapper.DapperParameters,
+                dapperParameterWrapper.DapperParameterFactory,
                 pollyPolicyRegistry, 
                 logger);
 
