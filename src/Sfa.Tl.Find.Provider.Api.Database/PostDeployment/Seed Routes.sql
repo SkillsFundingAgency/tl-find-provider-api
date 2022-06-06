@@ -6,17 +6,17 @@ SET IDENTITY_INSERT [dbo].[Route] ON
 
 MERGE INTO [dbo].[Route] AS Target 
 USING (VALUES 
-  (1, N'Agriculture, environment and animal care', 0),
-  (2, N'Business and administration', 0),
+  (1, N'Agriculture, Environment and Animal Care', 0),
+  (2, N'Business and Administration', 0),
   (3, N'Catering', 0),
-  (4, N'Construction and the built environment', 0),
-  (5, N'Creative and design', 0),
+  (4, N'Construction and the Built Environment', 0),
+  (5, N'Creative and Design', 0),
   (6, N'Digital and IT', 0),
-  (7, N'Education and childcare', 0),
-  (8, N'Engineering and manufacturing', 0),
-  (9, N'Hair and beauty', 0),
-  (10, N'Health and science', 0),
-  (11, N'Legal, finance and accounting', 0)
+  (7, N'Education and Childcare', 0),
+  (8, N'Engineering and Manufacturing', 0),
+  (9, N'Hair and Beauty', 0),
+  (10, N'Health and Science', 0),
+  (11, N'Legal, Finance and Accounting', 0)
   )
   AS Source ([Id], [Name], [IsDeleted] ) 
 ON Target.[Id] = Source.[Id] 
