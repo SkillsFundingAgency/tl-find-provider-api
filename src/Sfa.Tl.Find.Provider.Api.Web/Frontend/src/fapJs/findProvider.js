@@ -19,6 +19,8 @@ function FindProvider(
     let currentPage = 0;
     let currentSearchTerm = null;
     let currentQualificationIds = [];
+    //https://www.tejusparikh.com/2017/showing-right-data-out-of-order-responses-javascript.html
+    let activeSearchQuery = null;
 
     //initialize autocomplete
     new LocationAutocomplete(findProvidersApiUri);
@@ -49,9 +51,15 @@ function FindProvider(
         return providerSearch($("#tl-search-term").val().trim(), getQualificationIds());
     });
 
-    $("#tl-update-search-providers").click(function () {
+    function qualificationSelectionChanged() {
+        if (!$("#tl-search-term").val().trim()) {
+            console.log('no search term selected - should not search on checkbox change');
+            return false;
+        }
+
+        console.log('checkboxes changed- calling search');
         return providerSearch($("#tl-search-term").val().trim(), getQualificationIds());
-    });
+    }
 
     $(".tl-fap-search-providers-form").submit(function () {
         event.preventDefault();
@@ -91,7 +99,7 @@ function FindProvider(
     }
 
     let details = null;
-    let showall = null;
+    let showAll = null;
 
     function populateRoutes(data) {
         const skillAreasList = $("#tl-skill-area-filter");
@@ -101,7 +109,7 @@ function FindProvider(
             function (_, item) {
                 if (!item.numberOfQualificationsOffered) return;
 
-                let skillArea = '<div class="tl-fap--filter--section"> \
+                let skillArea = '<div class="tl-fap--filter--section" data-name="' + item.name + '"> \
                                    <h4 class="govuk-heading-s govuk-!-margin-top-2">' +
                     item.name + '<br /> \
                                      <span class="govuk-body-s tl-text--grey" id="tl-fap--filter--checkstatus"></span> \
@@ -158,7 +166,10 @@ function FindProvider(
     }
 
     function callProviderSearchApi(searchTerm, qualificationIds, page, pageSize) {
-        if (isFapSearchInProgress) return false;
+        if (isFapSearchInProgress) {
+            console.log('fap search already in progress');
+            //return false;
+        }
         isFapSearchInProgress = true;
 
         page = (page === undefined ? 0 : page);
@@ -173,6 +184,9 @@ function FindProvider(
             });
         }
 
+        //var my_query = activeSearchQuery = uri;
+        activeSearchQuery = uri;
+        console.log('calling with ' + uri);
         $.ajax({
             type: "GET",
             url: uri,
@@ -181,10 +195,17 @@ function FindProvider(
                 addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
             }
         }).done(function (response) {
+            console.log(response);
             if (response.error) {
                 console.log("Invalid providers search response received - " + response.error);
                 showSearchTermError("Enter a valid postcode or town");
+            } else if (activeSearchQuery !== uri) {
+                console.log('ignoring results because current query does not match active query:');
+                console.log('uri = ' + uri);
+                console.log('active query = ' + activeSearchQuery);
+                return;
             } else {
+                console.log('search results ok for ' + uri);
                 currentPage = page;
                 currentSearchTerm = searchTerm;
                 currentQualificationIds = qualificationIds;
@@ -401,37 +422,61 @@ function FindProvider(
         return null;
     }
 
-
     //filter list javascript
-    function checkchange() {
-        console.log('in checkchange');
-        console.log(this);
+    function checkChange() {
+        //console.log('in checkChange');
+        //console.log(this);
 
-        var totalNumberOfChecked = $(this).parents('.tl-fap--filter--content').find('input[type=checkbox]:checked');
-        var numberOfChecked = $(this).parents('.tl-fap--filter--section').find('input[type=checkbox]:checked');
-        var totalCheckboxes = $(this).parents('.tl-fap--filter--section').find('input[type=checkbox]');
+        const totalNumberOfChecked = $(this).parents('.tl-fap--filter--content').find('input[type=checkbox]:checked');
+        const numberOfChecked = $(this).parents('.tl-fap--filter--section').find('input[type=checkbox]:checked');
+        const totalCheckboxes = $(this).parents('.tl-fap--filter--section').find('input[type=checkbox]');
 
-        console.log(`totalNumberOfChecked = ${totalNumberOfChecked}`);
-        console.log(`numberOfChecked = ${numberOfChecked}`);
-        console.log(`totalCheckboxes = ${totalCheckboxes}`);
+        //console.log(`totalNumberOfChecked = ${totalNumberOfChecked}`);
+        //console.log(`numberOfChecked = ${numberOfChecked}`);
+        //console.log(`totalCheckboxes = ${totalCheckboxes}`);
 
         /// Display number of checked items in each section
         $(this).parents('.tl-fap--filter--section').find('#tl-fap--filter--checkstatus').html("(" + numberOfChecked.length + " of " + totalCheckboxes.length + " selected)");
 
         /// Get checked items and display at top
-        var checkedSection = $(this).parents('.tl-fap--filter--content').find('input[type=checkbox]:checked').parents('.tl-fap--filter--section');
+        const checkedSection = $(this).parents('.tl-fap--filter--content').find('input[type=checkbox]:checked').parents('.tl-fap--filter--section');
+
+        //console.log('checkedSection:');
+        //console.log(checkedSection);
+
         if (totalNumberOfChecked.length !== 0) {
             $(".tl-fap--filter--selected").html('');
 
+            //////
+            //add data-sort-key then sort
+            console.log('sort by:');
+            checkedSection.each(function() {
+                //console.log('  ' + $(this).data("name"));// + $(this).text + ' [' + ']');
+                console.log('  ' + $(this).data("name") + ' [' + $(this).text() + ']');
+            });
+
+            checkedSection.sort(function(x, y) {
+                //return ($(x).data("name") < $(y).data("name")) ? -1 : (($(x).data("name") > $(y).data("name")) ? 1 : 0);
+                return ($(x).text() < $(y).text()) ? -1 : (($(x).text() > $(y).text()) ? 1 : 0);
+            });
+            console.log("after:");
             checkedSection.each(function () {
-                console.log('checkedSection');
-                var checkedSectionBoxes = $(this).find('input[type=checkbox]:checked');
+                console.log('  ' + $(this).data("name"));
+            });
+
+            //////
+
+            checkedSection.each(function () {
+                const checkedSectionBoxes = $(this).find('input[type=checkbox]:checked');
                 if (checkedSectionBoxes.length !== 0) {
-                    console.log('checkedSectionBoxes appending h5');
+
+                    //console.log('checkedSectionBoxes:');
+                    //console.log(checkedSectionBoxes);
+
                     $(".tl-fap--filter--selected").append('<h5>' + $(this).find("h4").clone().children().remove().end().text() + '</h5>');
 
                     checkedSectionBoxes.each(function () {
-                        var checkedSectionValue = $(this).attr("id");
+                        const checkedSectionValue = $(this).attr("id");
                         $(".tl-fap--filter--selected").append('<span tabindex="0" data-check="' + checkedSectionValue + '">' + $(this).next("label").text() + '</span>');
                     });
                 }
@@ -443,60 +488,61 @@ function FindProvider(
     };
 
     /// Allow checkboxes to be unchecked by clicking summary items at top
-    function checkremove() {
-        console.log('in checkremove');
-        var clickvalue = $(this).attr("data-check");
+    function checkRemove() {
+        console.log('in checkRemove');
+        const clickvalue = $(this).attr("data-check");
         $('.tl-fap--filter--section').find('input[id=' + clickvalue + ']:checked').trigger("click");
     };
-    $(document).on("click", ".tl-fap--filter--selected span", checkremove);
+    $(document).on("click", ".tl-fap--filter--selected span", checkRemove);
 
-    function checkdetailschange() {
-        console.log('in checkdetailschange');
+    function checkDetailsChange() {
+        //console.log('in checkDetailsChange');
         details.each(function () {
             if ($(this).is("[open]")) {
-                showallopen();
+                showAllOpen();
                 return false;
             } else {
-                showallclose();
+                showAllClose();
             }
         });
     };
 
-    function showallclose() {
-        showall.removeAttr("open");
-        showall.text("Show all");
+    function showAllClose() {
+        showAll.removeAttr("open");
+        showAll.text("Show all");
     }
 
-    function showallopen() {
-        showall.attr('open', '');
-        showall.text("Hide all");
+    function showAllOpen() {
+        showAll.attr('open', '');
+        showAll.text("Hide all");
     }
 
     function addCheckboxHandlers() {
         /// Run checkbox change function on page load and on checkbox change
-        $('.tl-fap--filter--content input[type=checkbox]').change(checkchange);
-        $(".tl-fap--filter--section .govuk-checkboxes").each(checkchange);
+        $('.tl-fap--filter--content input[type=checkbox]').change(checkChange);
+        $(".tl-fap--filter--section .govuk-checkboxes").each(checkChange);
+        $('.tl-fap--filter--content input[type=checkbox]').change(qualificationSelectionChanged);
 
         /// Show hide sections / all sections
         details = $(".tl-fap--filter--details");
-        showall = $(".tl-fap--filter--showall");
+        showAll = $(".tl-fap--filter--showall");
 
         details.on('toggle',
             function () {
-                checkdetailschange();
+                checkDetailsChange();
             });
 
-        showall.click(function () {
-            console.log('in showall click');
+        showAll.click(function () {
+            console.log('in showAll click');
             console.log(this);
             console.log(details);
 
             if ($(this).is("[open]")) {
                 details.removeAttr("open");
-                showallclose();
+                showAllClose();
             } else {
                 details.attr('open', '');
-                showallopen();
+                showAllOpen();
             }
         });
     }
@@ -513,5 +559,4 @@ function FindProvider(
             $(this).text("Hide filter");
         }
     });
-
 };

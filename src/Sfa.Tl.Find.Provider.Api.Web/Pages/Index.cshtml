@@ -110,6 +110,137 @@
 @section Scripts {
     @*<script src="{{asset 'findProvider.js'}}"*@
     <script src="~/js/findProvider.js" asp-append-version="true"></script>
+    
+    
+    <script>
+        function FindProvider_Filter(
+            findProvidersApiUri,
+            findProvidersAppId,
+            findProvidersApiKey) {
+            if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
+
+            //Set up...
+            setTimeout(function() {
+                    console.log("adding checkbox click change handlers");
+                    addCheckboxHandlers();
+                },
+                2000);
+
+            function addCheckboxHandlers() {
+                $('.tl-fap--filter--content input[type=checkbox]').change(qualificationSelectionChanged);
+            }
+
+            function qualificationSelectionChanged() {
+                console.log('in qualificationSelectionChanged');
+                console.log(this);
+                runCheckChangedSearch();
+            }
+
+            https://www.tejusparikh.com/2017/showing-right-data-out-of-order-responses-javascript.html
+            var active_query = null;
+            /*
+            $ctrl.isLoading = function() { return !!active_query;j };
+
+            function load() {
+                var my_query = active_query = Math.random().toString(36) // It really doesn't matter what this is
+                var params = $ctrl.filter_cmd.toMap();
+                User.team_index(params, function(response) {
+                    if(active_query == my_query) {
+                        $ctrl.active_query = null;
+                        $ctrl.result_list = response;
+                    }
+                });
+            }
+            */
+
+            function runCheckChangedSearch() {
+                let searchTerm = $("#tl-search-term").val().trim();
+                if (!searchTerm) searchTerm = "OX2";
+                const qualificationIds = getQualificationIds();
+
+                const encodedSearchTerm = encodeURIComponent(searchTerm).replace(/'/g, '%27');
+                let page = 0;
+                let pageSize = 1;
+                let uri = findProvidersApiUri + "providers?searchTerm=" + encodedSearchTerm + '&page=' + page + '&pageSize=' + pageSize;
+
+                if (qualificationIds && qualificationIds.length > 0) {
+                    qualificationIds.forEach(function(id) {
+                        uri += "&qualificationId=" + id;
+                    });
+                }
+
+                console.log(`will call search with ${uri}`);
+                
+                var my_query = active_query = uri;//Math.random().toString(36) // It really doesn't matter what this is
+
+                $.ajax({
+                    type: "GET",
+                    url: uri,
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
+                    }
+                }).done(function (response) {
+                    if (response.error) {
+                        console.log("Invalid providers search response received - " + response.error);
+                        //showSearchTermError("Enter a valid postcode or town");
+                    } else {
+                        //currentPage = page;
+                        //currentSearchTerm = searchTerm;
+                        //currentQualificationIds = qualificationIds;
+                        //populateProviderSearchResults(response, page, pageSize);
+                        if (active_query !== my_query) {
+                            console.log('query not correct');
+                            console.log(active_query);
+                            console.log(my_query);
+                            return;
+                        }
+                        
+                        console.log("have response");
+                        console.log(active_query);
+                        console.log(my_query);
+                        console.log(response);
+                        console.log(JSON.stringify(response));
+                    }
+                    //setTimeout(function () {
+                    //    //delay to avoid autocomplete suggestions loading
+                    //    isFapSearchInProgress = false;
+                    //}, 200);
+                }).fail(function (jqxhr) {
+                    showError(jqxhr.status, jqxhr.responseText);
+                    isFapSearchInProgress = false;
+                });
+            }
+
+            function getQualificationIds() {
+                const qualificationIds = [];
+                $('#tl-skill-area-filter .tl-checkbox:checked').each(
+                    function(_, item) {
+                        qualificationIds.push(item.value);
+                    });
+
+                return qualificationIds;
+            }
+
+            function addHmacAuthHeader(xhr, uri, appId, apiKey) {
+                const ts = Math.round((new Date()).getTime() / 1000);
+                const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                    function (c) {
+                        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
+                const nonce = CryptoJS.enc.Hex.parse(uuid);
+                const data = appId + "GET" + uri.toLowerCase() + ts + nonce;
+
+                const hash = CryptoJS.HmacSHA256(data, apiKey);
+                const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+
+                xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
+                console.log('set hmac' + "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
+            }
+        }
+    </script>
+    
     <script>
         let qualificationArticleMap = {
             36: "{{ settings.qualification_article_36 }}",
@@ -133,12 +264,18 @@
         //console.log($('#qualification_article_map').val());
         //console.log('----------');
         qualificationArticleMap = JSON.parse($('#qualification_article_map').val());
-        new FindProvider(
+        const findProvider = new FindProvider(
             $('#find_provider_api_uri').val(),
             $('#find_provider_api_app_id').val(),
             $('#find_provider_api_key').val(),
             qualificationArticleMap);
+
+        //new FindProvider_Filter(
+        //    $('#find_provider_api_uri').val(),
+        //    $('#find_provider_api_app_id').val(),
+        //    $('#find_provider_api_key').val());
     </script>
+
     <script type="text/javascript">
         /* New code for Employer Registration */
         $(document).ready(function() {
@@ -361,6 +498,5 @@
             }
         });
     </script>
-
-
+    
 }
