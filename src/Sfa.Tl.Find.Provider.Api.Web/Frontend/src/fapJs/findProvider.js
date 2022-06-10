@@ -1,5 +1,6 @@
 ﻿// Find Provider 
 let isFapSearchInProgress = false;
+let isClearFiltersInProgress = false;
 
 function FindProvider(
     findProvidersApiUri,
@@ -123,6 +124,7 @@ function FindProvider(
                                                         <label for="' + qualificationId +
                             '" class="govuk-body-s govuk-checkboxes__label">' + qualification.name + '</label> \
                                                     </div> \
+<a href="#qual-' + qualification.id + '">_</a> \
                                                 </div>';
                     });
 
@@ -400,8 +402,7 @@ function FindProvider(
 
         return null;
     }
-
-
+    
     //filter list javascript
     function checkchange() {
         console.log('in checkchange');
@@ -436,9 +437,11 @@ function FindProvider(
                     });
                 }
             });
+            $(".tl-fap--filter--clearall").removeClass("tl-hidden");
         }
         else {
             $(".tl-fap--filter--selected").html('<p class="govuk-body-s govuk-!-margin-bottom-1">No filters selected</p>');
+            $(".tl-fap--filter--clearall").addClass("tl-hidden");
         }
     };
 
@@ -470,6 +473,33 @@ function FindProvider(
     function showallopen() {
         showall.attr('open', '');
         showall.text("Hide all");
+
+        //https://superuser.com/questions/1471522/how-can-i-return-to-a-named-anchor-after-scrolling-in-chrome
+
+        const loc = location.hash.slice(1);
+        console.log('loc = ' + loc);
+        if (loc) {
+            //a[href =* qual - 50]: first
+            //const el = $('a[href=*' + loc + ']:first');
+            const el = $('a[href="#' + loc + '"]');
+            console.log(el);
+
+            if(el.length > 0) el[0].scrollIntoView();
+
+            //document.getElementsByName
+            //$("a[href*='#qual-50']:first'").scrollIntoView();
+            //$('a[href*=' + loc + ']:first').scrollIntoView();
+        }
+
+        //https://superuser.com/questions/1471522/how-can-i-return-to-a-named-anchor-after-scrolling-in-chrome
+
+
+        //document.getElementById(location.hash.slice(1)).scrollIntoView()
+        //document.getElementById(location.hash.slice(1)).scrollIntoView()
+        /*
+<a class="govuk-tabs__tab" 
+href="#digital-support" 
+id="tab_digital-support" role="tab" aria-controls="digital-support" aria-selected="false" tabindex="-1"> Digital Support </a>         */
     }
 
     function addCheckboxHandlers() {
@@ -512,6 +542,45 @@ function FindProvider(
             $(".tl-fap--filter").attr('open', '');;
             $(this).text("Hide filter");
         }
+        return false;
     });
 
+
+    //$(".tl-fap--filter--clearall").click(function () {
+    //    //$(".tl-fap--filter--clearall").addClass("tl-hidden");
+    //    //isClearFiltersInProgress = true;
+
+    //    //$(".tl-fap--filter--section .govuk-checkboxes")
+    //    //    .each(checkchange);
+
+    //    //$('.tl-fap--filter--section')
+    //    //    .find('input:checked').each("click");
+    //    //    //.find('input[id=' + clickvalue + ']:checked').trigger("click");
+
+    //    if ($('#tl-skill-area-filter .tl-checkbox:checked').length > 0) {
+    //        console.log('here we go');
+    //        $('#tl-skill-area-filter .tl-checkbox:checked')
+    //            .prop('checked', false);
+    //        checkchange();
+
+    //        if ($("#tl-search-term").val().trim()) {
+    //            console.log('searching');
+    //            return providerSearch($("#tl-search-term").val().trim(), getQualificationIds());
+    //        }
+    //    }
+    //    console.log('no dice');
+    //    return false;
+    //});
+
+    $(".tl-fap--filter--clearall").click(function () {
+        if ($('#tl-skill-area-filter .tl-checkbox:checked').length > 0) {
+            $('#tl-skill-area-filter .tl-checkbox:checked').prop('checked', false);
+            checkchange();
+
+            if ($("#tl-search-term").val().trim()) {
+                return providerSearch($("#tl-search-term").val().trim(), getQualificationIds());
+            }
+        }
+        return false;
+    });
 };
