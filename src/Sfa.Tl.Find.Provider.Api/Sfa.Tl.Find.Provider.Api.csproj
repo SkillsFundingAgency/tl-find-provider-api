@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Assets\ProviderData.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Assets\ProviderData.json" />
   </ItemGroup>
 

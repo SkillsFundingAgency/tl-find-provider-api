@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 using Sfa.Tl.Find.Provider.Api.Models;
@@ -29,10 +30,43 @@ public class RouteRepository : IRouteRepository
             includeAdditionalData
         });
 
-        return await _dbContextWrapper.QueryAsync<Route>(
+        var routes = new Dictionary<int, Route>();
+
+        await _dbContextWrapper.QueryAsync<RouteDto, QualificationDto, Route>(
             connection,
             "GetRoutes",
+            (r, q) =>
+            {
+                if (!routes.TryGetValue(r.RouteId, out var routeResult))
+                {
+                    routes.Add(r.RouteId, 
+                        routeResult = new Route
+                        {
+                            Id = r.RouteId, 
+                            Name = r.RouteName
+                        });
+                }
+                
+                if (q is not null)
+                {
+                    routeResult.Qualifications.Add(
+                        new Qualification
+                        {
+                            Id = q.QualificationId,
+                            Name = q.QualificationName,
+                        });
+                    routeResult.NumberOfQualificationsOffered += q.NumberOfQualificationsOffered;
+                }
+
+                return routeResult;
+            },
             _dynamicParametersWrapper.DynamicParameters,
+            splitOn: "RouteId, QualificationId",
             commandType: CommandType.StoredProcedure);
+
+        return routes
+            .Values
+            .OrderBy(r => r.Name)
+            .ToList();
     }
 }

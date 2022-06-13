@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -32,12 +33,39 @@ public class RouteRepositoryTests
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
-        dbContextWrapper
-            .QueryAsync<Route>(dbConnection, 
+        var routeDtoList =
+            routes.Select(r => new RouteDto
+            {
+                RouteId = r.Id,
+                RouteName = r.Name
+            }).ToList();
+
+        var qualificationDtoList =
+            routes.Select(r => new QualificationDto
+            {
+                QualificationId = r.Id,
+                QualificationName = r.Name,
+                NumberOfQualificationsOffered = r.Qualifications?.Count ?? 0
+            }).ToList();
+
+        var callIndex = 0;
+
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
                 "GetRoutes",
+                Arg.Do<Func<RouteDto, QualificationDto, Route>>(
+                    x =>
+                    {
+                        var r = routeDtoList[callIndex];
+                        var q = qualificationDtoList[callIndex];
+                        x.Invoke(r, q);
+
+                        callIndex++;
+                    }),
                 Arg.Any<object>(),
-                commandType: CommandType.StoredProcedure)
-            .Returns(routes);
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
 
         var repository = new RouteRepositoryBuilder().Build(dbContextWrapper);
 
@@ -45,14 +73,22 @@ public class RouteRepositoryTests
             .GetAll(true))
             .ToList();
 
-        results.Should().BeEquivalentTo(routes);
+        results.Should().NotBeNullOrEmpty();
+        results[0].Id.Should().Be(routeDtoList[0].RouteId);
+        results[0].Name.Should().Be(routeDtoList[0].RouteName);
+        results[0].NumberOfQualifications.Should().Be(1);
+        results[0].NumberOfQualificationsOffered.Should().Be(1);
+        results[0].Qualifications.Should().NotBeNullOrEmpty();
+        results[0].Qualifications[0].Id.Should().Be(qualificationDtoList[0].QualificationId);
+        results[0].Qualifications[0].Name.Should().Be(qualificationDtoList[0].QualificationName);
 
         await dbContextWrapper
             .Received(1)
-            .QueryAsync<Route>(dbConnection,
+            .QueryAsync(dbConnection,
                 "GetRoutes",
+                Arg.Any<Func<RouteDto, QualificationDto, Route>>(),
                 Arg.Any<object>(),
-                commandType: CommandType.StoredProcedure
-                );
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure);
     }
 }

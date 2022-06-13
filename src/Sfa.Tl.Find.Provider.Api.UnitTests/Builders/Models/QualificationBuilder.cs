@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Sfa.Tl.Find.Provider.Api.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
@@ -25,4 +26,7 @@ public class QualificationBuilder
             new() { Id = 50, Name = "Engineering, manufacturing, processing and control" },
             new() { Id = 51, Name = "Management and administration" }
         };
+
+    public IList<Qualification> BuildList(int numberToTake) =>
+        BuildList().Take(numberToTake).ToList();
 }

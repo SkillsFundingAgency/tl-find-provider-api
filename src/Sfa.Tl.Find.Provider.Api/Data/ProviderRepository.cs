@@ -167,10 +167,10 @@ public class ProviderRepository : IProviderRepository
         }).AddOutputParameter("totalLocationsCount", DbType.Int32);
 
         await _dbContextWrapper
-            .QueryAsync<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>(
+            .QueryAsync<ProviderSearchResult, DeliveryYearSearchResult, RouteDto, QualificationDto, ProviderSearchResult>(
                 connection,
             "SearchProviders",
-            map: (p, ly, q) =>
+            (p, ly, r, q) =>
             {
                 var key = $"{p.UkPrn}_{p.Postcode}";
                 if (!providerSearchResults.TryGetValue(key, out var searchResult))
@@ -192,15 +192,24 @@ public class ProviderRepository : IProviderRepository
                     searchResult.DeliveryYears.Add(deliveryYear);
                 }
 
-                if (deliveryYear.Qualifications.All(z => z.Id != q.Id))
+                if (deliveryYear.Routes.All(z => z.Id != r.RouteId))
                 {
-                    deliveryYear.Qualifications.Add(q);
+                    deliveryYear.Routes.Add(new Route { Id = r.RouteId, Name = r.RouteName});
+                }
+
+                var route = deliveryYear
+                    .Routes
+                    .FirstOrDefault(rt => rt.Id == r.RouteId);
+
+                if (route != null && route.Qualifications.All(z => z.Id != q.QualificationId))
+                {
+                    route.Qualifications.Add(new Qualification { Id = q.QualificationId, Name = q.QualificationName });
                 }
 
                 return searchResult;
             },
             _dynamicParametersWrapper.DynamicParameters,
-            splitOn: "UkPrn, Postcode, Year, Id",
+            splitOn: "UkPrn, Postcode, Year, RouteId, QualificationId",
             commandType: CommandType.StoredProcedure);
 
         var totalLocationsCount = _dynamicParametersWrapper

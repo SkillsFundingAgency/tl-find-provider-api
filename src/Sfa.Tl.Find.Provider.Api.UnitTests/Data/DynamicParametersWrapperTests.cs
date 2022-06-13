@@ -33,7 +33,7 @@ public class DynamicParametersWrapperTests
     {
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
 
-        var kvp = new List<KeyValuePair<string, object>>()
+        var kvp = new List<KeyValuePair<string, object>>
         {
             new("id", 10),
             new("name", "test")
@@ -66,7 +66,7 @@ public class DynamicParametersWrapperTests
             .SingleOrDefault(p => p.Name == "templates");
 
         fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
         templates.Should().NotBeNullOrEmpty();
         templates!.First().Should().Be(obj);
     }
