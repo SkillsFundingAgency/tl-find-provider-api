@@ -1,5 +1,4 @@
-﻿using Intertech.Facade.DapperParameters;
-using NSubstitute;
+﻿using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Data;
 using Sfa.Tl.Find.Provider.Api.Interfaces;
 
@@ -9,13 +8,13 @@ public class RouteRepositoryBuilder
 {
     public RouteRepository Build(
         IDbContextWrapper dbContextWrapper = null,
-        IDapperParameters dbParameters = null)
+        IDynamicParametersWrapper dynamicParametersWrapper = null)
     {
         dbContextWrapper ??= Substitute.For<IDbContextWrapper>();
-        dbParameters ??= Substitute.For<IDapperParameters>();
+        dynamicParametersWrapper ??= Substitute.For<IDynamicParametersWrapper>();
         
         return new RouteRepository(
             dbContextWrapper,
-            dbParameters);
+            dynamicParametersWrapper);
     }
 }

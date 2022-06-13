@@ -104,7 +104,7 @@ public class TownRepositoryTests
         var repository = new TownRepositoryBuilder()
             .Build(
                 dbContextWrapper,
-                dapperParameterWrapper.DapperParameters,
+                dapperParameterWrapper.DapperParameterFactory,
                 pollyPolicyRegistry, 
                 logger);
 

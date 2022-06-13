@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using FluentAssertions;
-using Intertech.Facade.DapperParameters;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
@@ -280,6 +279,10 @@ public class ProviderRepositoryTests
             .BuildDeliveryYearsPartOfListWithSingleItem()
             .Take(1)
             .ToList();
+        var routesPart = new ProviderSearchResultBuilder()
+            .BuildRoutesPartOfListWithSingleItem()
+            .Take(1)
+            .ToList();
         var qualificationsPart = new ProviderSearchResultBuilder()
             .BuildQualificationsPartOfListWithSingleItem()
             .Take(1)
@@ -293,13 +296,14 @@ public class ProviderRepositoryTests
         await dbContextWrapper
             .QueryAsync(dbConnection,
                 "SearchProviders",
-                Arg.Do<Func<ProviderSearchResult, DeliveryYear, Qualification, ProviderSearchResult>>(
+                Arg.Do<Func<ProviderSearchResult, DeliveryYearSearchResult, RouteDto, QualificationDto, ProviderSearchResult>>(
                     x =>
                     {
                         var p = providersPart[callIndex];
                         var d = deliveryYearsPart[callIndex];
+                        var r = routesPart[callIndex];
                         var q = qualificationsPart[callIndex];
-                        x.Invoke(p, d, q);
+                        x.Invoke(p, d, r, q);
 
                         callIndex++;
                     }),
@@ -311,15 +315,15 @@ public class ProviderRepositoryTests
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
 
-        var dbParameters = Substitute.For<IDapperParameters>();
+        var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
         var parameters = new DynamicParameters();
         parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
-        dbParameters.DynamicParameters.Returns(parameters);
+        dynamicParametersWrapper.DynamicParameters.Returns(parameters);
 
         return new ProviderRepositoryBuilder()
             .Build(
                 dbContextWrapper,
-                dbParameters: dbParameters,
+                dynamicParametersWrapper: dynamicParametersWrapper,
                 dateTimeService: dateTimeService);
     }
 
@@ -349,14 +353,26 @@ public class ProviderRepositoryTests
         }
     }
 
-    private static void ValidateDeliveryYear(DeliveryYear deliveryYear, DeliveryYear expected)
+    private static void ValidateDeliveryYear(DeliveryYearSearchResult deliveryYear, DeliveryYearSearchResult expected)
     {
         deliveryYear.Year.Should().Be(expected.Year);
         deliveryYear.IsAvailableNow.Should().Be(expected.IsAvailableNow);
-        deliveryYear.Qualifications.Should().NotBeNull();
-        deliveryYear.Qualifications.Count.Should().Be(expected.Qualifications.Count);
+        deliveryYear.Routes.Should().NotBeNull();
+        deliveryYear.Routes.Count.Should().Be(expected.Routes.Count);
 
-        foreach (var qualification in deliveryYear.Qualifications)
+        foreach (var route in deliveryYear.Routes)
+        {
+            var expectedRoute = expected.Routes.Single(r => r.Id == route.Id);
+            ValidateRoute(route, expectedRoute);
+        }
+    }
+
+    private static void ValidateRoute(Route route, Route expected)
+    {
+        route.Id.Should().Be(expected.Id);
+        route.Name.Should().Be(expected.Name);
+
+        foreach (var qualification in route.Qualifications)
         {
             var expectedQualification = expected.Qualifications.Single(q => q.Id == qualification.Id);
             ValidateQualification(qualification, expectedQualification);

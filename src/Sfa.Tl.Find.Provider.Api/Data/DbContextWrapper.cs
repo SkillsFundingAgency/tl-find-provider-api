@@ -59,10 +59,36 @@ public class DbContextWrapper : IDbContextWrapper
                 context);
     }
 
-    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(
+    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(
         IDbConnection connection,
         string sql,
-        Func<TFirst, TSecond, TThird, TReturn> map,
+        Func<TFirst, TSecond, TReturn> map,
+        object param = null,
+        IDbTransaction transaction = null,
+        string splitOn = "Id",
+        int? commandTimeout = null,
+        CommandType? commandType = null)
+    {
+        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+
+        return await retryPolicy
+            .ExecuteAsync(async _ =>
+                    await connection
+                        .QueryAsync(
+                            sql,
+                            map,
+                            param,
+                            transaction,
+                            splitOn: splitOn,
+                            commandTimeout: commandTimeout,
+                            commandType: commandType),
+                context);
+    }
+    
+    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
+        IDbConnection connection,
+        string sql,
+        Func<TFirst, TSecond, TThird, TFourth, TReturn> map,
         object param = null,
         IDbTransaction transaction = null,
         string splitOn = "Id",

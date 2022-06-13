@@ -1,18 +1,4 @@
-﻿/*
-1. Clustered index here seems to improve performance of INSERT INTO @allQualificationIds
-	--DROP TYPE [dbo].[IdListTableType_2]
-	CREATE TYPE [dbo].[IdListTableType_2] AS TABLE
-	(
-		[Id] INT NOT NULL,
-		Index IX_Id NONCLUSTERED (Id)
-		--Index IX_Id CLUSTERED (Id)
-	)
-
-2. Consider adding index to @allQualificationIds
-		, UNIQUE CLUSTERED (Id) 
-*/
-
-CREATE PROCEDURE [dbo].[SearchProviders]
+﻿CREATE PROCEDURE [dbo].[SearchProviders]
 	@fromLatitude DECIMAL(9, 6),
 	@fromLongitude DECIMAL(9, 6),
 	@routeIds [dbo].[IdListTableType] READONLY,
@@ -45,8 +31,8 @@ AS
 				)
 	
 	DECLARE @allQualificationIds TABLE (
-				[Id] INT
-				,UNIQUE CLUSTERED (Id)
+				[Id] INT,
+				UNIQUE CLUSTERED (Id)
 			)
 	DECLARE @hasRouteOrQualificationIds BIT = 0
 		
@@ -112,29 +98,16 @@ AS
 						WHERE	lq.[LocationId] = l.[Id]
 						  AND	(@hasRouteOrQualificationIds = 0
 								 OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds)))
-		--ORDER BY [Distance],
-		--		 p.[Name],
-		--		 l.[Name]
-		--OFFSET @page * @pageSize ROWS
-		--FETCH NEXT @pageSize ROWS ONLY
 		)
-INSERT INTO @locations
-SELECT *
---INTO #TEMP
-FROM NearestLocationsCTE_Inner
---ORDER BY [Distance],
---		 [ProviderName],
---		 [LocationName];
+	INSERT INTO @locations
+	SELECT *
+	FROM NearestLocationsCTE_Inner;
 
-SELECT @totalLocationsCount = COUNT(1) 
---from #TEMP;
-from @locations;
-
---Break here and insert everything into temp table	NearestLocationsCTE_Inner
+	SELECT @totalLocationsCount = COUNT(1) 
+	from @locations;
 
 	WITH NearestLocationsCTE AS (
 		SELECT * 
-		--FROM #TEMP 
 		FROM @locations
 		ORDER BY [Distance],
 				 [ProviderName],
@@ -156,9 +129,7 @@ from @locations;
 					 l.[Town],
 					 t.[Name])
 
-  --  SELECT @totalLocationsCount = COUNT(1) FROM NearestLocationsCTE_Inner;
---UNION ALL
-		--Step 2 - add in the qualifications (no filter for qualifications - return all for selected locations)
+		--Step 2 - add in the qualifications 
 		SELECT 	[UkPrn],
 				[ProviderName],
 				[Postcode],
@@ -171,17 +142,11 @@ from @locations;
 				[Telephone],
 				[Website],
 				[Distance],
+				lq.[DeliveryYear] AS [Year],
 				rq.[RouteId],
 				r.[Name] AS [RouteName],
-				lq.[DeliveryYear] AS [Year],
-				q.[Id] AS [Id],
-				q.[Name] AS [Name]
-
-		--		, (  
-  --  SELECT @totalLocationsCount = COUNT(1) FROM NearestLocationsCTE_Inner
-  --) AS MY_COUNT
-				--,@totalLocationsCount = 999 --(SELECT COUNT(1) FROM NearestLocationsCTE_Inner ) 
-
+				q.[Id] AS [QualificationId],
+				q.[Name] AS [QualificationName]
 		FROM NearestLocationsCTE l
 		INNER JOIN	[dbo].[LocationQualification] lq
 		ON		lq.[LocationId] = l.[LocationId]
@@ -195,8 +160,11 @@ from @locations;
 		INNER JOIN	[dbo].[Route] r
 		ON		r.[Id] = rq.[RouteId]
 		  AND	r.[IsDeleted] = 0
+		  AND	(@hasRouteOrQualificationIds = 0
+				 OR q.[Id] IN (SELECT [Id] FROM @allQualificationIds))
 		ORDER BY [Distance],
 				 [ProviderName],
 				 [LocationName],
 				 lq.[DeliveryYear],
+				 r.[Name],
 				 q.[Name];
