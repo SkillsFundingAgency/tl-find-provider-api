@@ -1,6 +1,5 @@
 ﻿// Find Provider 
 let isFapSearchInProgress = false;
-let isClearFiltersInProgress = false;
 
 function FindProvider(
     findProvidersApiUri,
@@ -17,11 +16,11 @@ function FindProvider(
 
     if (findProvidersApiUri !== null && findProvidersApiUri.substr(-1) !== '/') findProvidersApiUri += '/';
 
+    let activeSearchQuery = null;
     let currentPage = 0;
     let currentSearchTerm = null;
     let currentQualificationIds = [];
-    //https://www.tejusparikh.com/2017/showing-right-data-out-of-order-responses-javascript.html
-    let activeSearchQuery = null;
+    let isClearAllInProgress = false;
 
     //initialize autocomplete
     new LocationAutocomplete(findProvidersApiUri);
@@ -33,12 +32,13 @@ function FindProvider(
     if (searchTerm) {
         searchTerm = urlDecode(searchTerm);
         //Remove query string from url
-        const urlSplit = (window.location.href).split("?");
-        const obj = { Title: document.title, Url: urlSplit[0] };
-        history.pushState(obj, obj.Title, obj.Url);
+        //const urlSplit = (window.location.href).split("?");
+        //const obj = { Title: document.title, Url: urlSplit[0] };
+        //history.pushState(obj, obj.Title, obj.Url);
         providerSearch(searchTerm);
     } else {
         $('.tl-fap--noresult').removeClass("tl-hidden");
+        $('.tl-fap--result').addClass("tl-hidden");
     }
 
     $('#tl-search-term').keypress(function (e) {
@@ -53,12 +53,18 @@ function FindProvider(
     });
 
     function qualificationSelectionChanged() {
+        console.log('in qualificationSelectionChanged - "' + $("#tl-search-term").val() + '"');
         if (!$("#tl-search-term").val().trim()) {
-            console.log('no search term selected - should not search on checkbox change');
+            console.log('no search term');
             return false;
         }
 
-        console.log('checkboxes changed- calling search');
+        if (isClearAllInProgress) {
+            console.log('isClearAllInProgress = true');
+            return false;
+        }
+
+        console.log('qualificationSelectionChanged calling providerSearch');
         return providerSearch($("#tl-search-term").val().trim(), getQualificationIds());
     }
 
@@ -101,6 +107,7 @@ function FindProvider(
 
     let details = null;
     let showAll = null;
+    let clearAll = null;
 
     function populateRoutes(data) {
         const skillAreasList = $("#tl-skill-area-filter");
@@ -110,7 +117,7 @@ function FindProvider(
             function (_, item) {
                 if (!item.numberOfQualificationsOffered) return;
 
-                let skillArea = '<div class="tl-fap--filter--section" data-name="' + item.name + '"> \
+                let skillArea = '<div class="tl-fap--filter--section"> \
                                    <h4 class="govuk-heading-s govuk-!-margin-top-2">' +
                     item.name + '<br /> \
                                      <span class="govuk-body-s tl-text--grey" id="tl-fap--filter--checkstatus"></span> \
@@ -132,7 +139,6 @@ function FindProvider(
                                                         <label for="' + qualificationId +
                             '" class="govuk-body-s govuk-checkboxes__label">' + qualification.name + '</label> \
                                                     </div> \
-<a href="#qual-' + qualification.id + '">_</a> \
                                                 </div>';
                     });
 
@@ -168,10 +174,7 @@ function FindProvider(
     }
 
     function callProviderSearchApi(searchTerm, qualificationIds, page, pageSize) {
-        if (isFapSearchInProgress) {
-            console.log('fap search already in progress');
-            //return false;
-        }
+        //if (isFapSearchInProgress) return false;
         isFapSearchInProgress = true;
 
         page = (page === undefined ? 0 : page);
@@ -186,9 +189,9 @@ function FindProvider(
             });
         }
 
-        //var my_query = activeSearchQuery = uri;
+        //Assign uri to global level variable, then check when query returns to see if it's changed
         activeSearchQuery = uri;
-        console.log('calling with ' + uri);
+
         $.ajax({
             type: "GET",
             url: uri,
@@ -197,7 +200,6 @@ function FindProvider(
                 addHmacAuthHeader(xhr, uri, findProvidersAppId, findProvidersApiKey);
             }
         }).done(function (response) {
-            console.log(response);
             if (response.error) {
                 console.log("Invalid providers search response received - " + response.error);
                 showSearchTermError("Enter a valid postcode or town");
@@ -213,6 +215,7 @@ function FindProvider(
                 currentQualificationIds = qualificationIds;
                 populateProviderSearchResults(response, page, pageSize);
             }
+            removeUrlQueryString();
             setTimeout(function () {
                 //delay to avoid autocomplete suggestions loading
                 isFapSearchInProgress = false;
@@ -223,6 +226,16 @@ function FindProvider(
         });
 
         return true;
+    }
+
+    function removeUrlQueryString() {
+        const urlSplit = (window.location.href).split("?");
+        console.log(`urlSplit has ${urlSplit.length} pieces`);
+        if (urlSplit.length > 1) {
+            const obj = { Title: document.title, Url: urlSplit[0] };
+            console.log(`changing url from ${window.location.href} to ${obj.Url} [${obj.Title}]`);
+            history.pushState(obj, obj.Title, obj.Url);
+        }
     }
 
     function clearProviderSearchResults() {
@@ -241,6 +254,8 @@ function FindProvider(
 
         if ((!data.searchResults || data.searchResults.length === 0) && currentPage === 0) {
             $('.tl-fap--noresult').removeClass("tl-hidden");
+            $('.tl-fap--result').addClass("tl-hidden");
+
             return;
         }
 
@@ -290,7 +305,7 @@ function FindProvider(
                                         <h4 class="govuk-body govuk-!-font-weight-bold">T Levels available now:</h4>';
                         } else {
                             searchResult += '<div class="tl-fap--courses--box"> \
-                                        <h4 class="govuk-body govuk-!-font-weight-bold">T Levels starting September  ' + deliveryYear.year + '</h4>';
+                                        <h4 class="govuk-body govuk-!-font-weight-bold">T Levels available from September  ' + deliveryYear.year + ':</h4>';
                         }
 
                         //Obsolete v2 code
@@ -350,7 +365,7 @@ function FindProvider(
                         contactDetails += 'Email: <a href="mailto:' + providerLocation.email + '" class="govuk-link govuk-!-margin-right-4 tl-fap--result-email">' + providerLocation.email + '</a>';
                     }
 
-                    searchResult += '<h4 class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-5 govuk-!-margin-bottom-2">Get in touch</h4> \
+                    searchResult += '<h4 class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-5 govuk-!-margin-bottom-2">Get in touch:</h4> \
                         <p class="govuk-body">' + contactDetails + '</p>';
                 }
 
@@ -423,84 +438,54 @@ function FindProvider(
 
         return null;
     }
-    
+
     //filter list javascript
     function checkChange() {
-        //console.log('in checkChange');
-        //console.log(this);
-
         const totalNumberOfChecked = $(this).parents('.tl-fap--filter--content').find('input[type=checkbox]:checked');
         const numberOfChecked = $(this).parents('.tl-fap--filter--section').find('input[type=checkbox]:checked');
         const totalCheckboxes = $(this).parents('.tl-fap--filter--section').find('input[type=checkbox]');
-
-        //console.log(`totalNumberOfChecked = ${totalNumberOfChecked}`);
-        //console.log(`numberOfChecked = ${numberOfChecked}`);
-        //console.log(`totalCheckboxes = ${totalCheckboxes}`);
 
         /// Display number of checked items in each section
         $(this).parents('.tl-fap--filter--section').find('#tl-fap--filter--checkstatus').html("(" + numberOfChecked.length + " of " + totalCheckboxes.length + " selected)");
 
         /// Get checked items and display at top
         const checkedSection = $(this).parents('.tl-fap--filter--content').find('input[type=checkbox]:checked').parents('.tl-fap--filter--section');
-
-        //console.log('checkedSection:');
-        //console.log(checkedSection);
-
         if (totalNumberOfChecked.length !== 0) {
             $(".tl-fap--filter--selected").html('');
 
-            //////
-            //add data-sort-key then sort
-            console.log('sort by:');
-            checkedSection.each(function() {
-                //console.log('  ' + $(this).data("name"));// + $(this).text + ' [' + ']');
-                console.log('  ' + $(this).data("name") + ' [' + $(this).text() + ']');
-            });
-
-            checkedSection.sort(function(x, y) {
-                //return ($(x).data("name") < $(y).data("name")) ? -1 : (($(x).data("name") > $(y).data("name")) ? 1 : 0);
+            checkedSection.sort(function (x, y) {
                 return ($(x).text() < $(y).text()) ? -1 : (($(x).text() > $(y).text()) ? 1 : 0);
             });
-            console.log("after:");
-            checkedSection.each(function () {
-                console.log('  ' + $(this).data("name"));
-            });
-
-            //////
 
             checkedSection.each(function () {
-                const checkedSectionBoxes = $(this).find('input[type=checkbox]:checked');
+                var checkedSectionBoxes = $(this).find('input[type=checkbox]:checked');
                 if (checkedSectionBoxes.length !== 0) {
-
-                    //console.log('checkedSectionBoxes:');
-                    //console.log(checkedSectionBoxes);
-
                     $(".tl-fap--filter--selected").append('<h5>' + $(this).find("h4").clone().children().remove().end().text() + '</h5>');
 
                     checkedSectionBoxes.each(function () {
-                        const checkedSectionValue = $(this).attr("id");
+                        var checkedSectionValue = $(this).attr("id");
                         $(".tl-fap--filter--selected").append('<span tabindex="0" data-check="' + checkedSectionValue + '">' + $(this).next("label").text() + '</span>');
                     });
                 }
             });
             $(".tl-fap--filter--clearall").removeClass("tl-hidden");
+            $(".tl-fap--filter").attr("active", "true");
         }
         else {
             $(".tl-fap--filter--selected").html('<p class="govuk-body-s govuk-!-margin-bottom-1">No filters selected</p>');
             $(".tl-fap--filter--clearall").addClass("tl-hidden");
+            $(".tl-fap--filter").removeAttr("active");
         }
     };
 
     /// Allow checkboxes to be unchecked by clicking summary items at top
     function checkRemove() {
-        console.log('in checkRemove');
         const clickvalue = $(this).attr("data-check");
         $('.tl-fap--filter--section').find('input[id=' + clickvalue + ']:checked').trigger("click");
     };
     $(document).on("click", ".tl-fap--filter--selected span", checkRemove);
 
     function checkDetailsChange() {
-        //console.log('in checkDetailsChange');
         details.each(function () {
             if ($(this).is("[open]")) {
                 showAllOpen();
@@ -519,33 +504,6 @@ function FindProvider(
     function showAllOpen() {
         showAll.attr('open', '');
         showAll.text("Hide all");
-
-        //https://superuser.com/questions/1471522/how-can-i-return-to-a-named-anchor-after-scrolling-in-chrome
-
-        const loc = location.hash.slice(1);
-        console.log('loc = ' + loc);
-        if (loc) {
-            //a[href =* qual - 50]: first
-            //const el = $('a[href=*' + loc + ']:first');
-            const el = $('a[href="#' + loc + '"]');
-            console.log(el);
-
-            if(el.length > 0) el[0].scrollIntoView();
-
-            //document.getElementsByName
-            //$("a[href*='#qual-50']:first'").scrollIntoView();
-            //$('a[href*=' + loc + ']:first').scrollIntoView();
-        }
-
-        //https://superuser.com/questions/1471522/how-can-i-return-to-a-named-anchor-after-scrolling-in-chrome
-
-
-        //document.getElementById(location.hash.slice(1)).scrollIntoView()
-        //document.getElementById(location.hash.slice(1)).scrollIntoView()
-        /*
-<a class="govuk-tabs__tab" 
-href="#digital-support" 
-id="tab_digital-support" role="tab" aria-controls="digital-support" aria-selected="false" tabindex="-1"> Digital Support </a>         */
     }
 
     function addCheckboxHandlers() {
@@ -557,17 +515,23 @@ id="tab_digital-support" role="tab" aria-controls="digital-support" aria-selecte
         /// Show hide sections / all sections
         details = $(".tl-fap--filter--details");
         showAll = $(".tl-fap--filter--showall");
+        clearAll = $(".tl-fap--filter--clearall");
 
         details.on('toggle',
             function () {
                 checkDetailsChange();
             });
 
+        showAll.keypress(function (e) {
+            var key = e.which;
+            if (key === 13)  // the enter key code
+            {
+                showAll.click();
+                return false;
+            }
+        });
+        
         showAll.click(function () {
-            console.log('in showAll click');
-            console.log(this);
-            console.log(details);
-
             if ($(this).is("[open]")) {
                 details.removeAttr("open");
                 showAllClose();
@@ -576,6 +540,45 @@ id="tab_digital-support" role="tab" aria-controls="digital-support" aria-selecte
                 showAllOpen();
             }
         });
+
+        /// Clear all checkboxes
+        console.log('adding clearAll click');
+        console.log(clearAll);
+        clearAll.click(function () {
+            console.log('clearAll clicked');
+            //$('.tl-fap--filter').find('input[type=checkbox]:checked').each(function () {
+            //    $(this).trigger("click");
+            //});
+            clearCheckboxes();
+            return false;
+        });
+
+        console.log('adding clearAll keypress');
+        clearAll.keypress(function (e) {
+            console.log('clearAll keypress');
+            console.log(e.which);
+            if (e.which === 13) {
+                console.log('clearAll keypress enter');
+                clearCheckboxes();
+                return false;
+            }
+        });
+
+        function clearCheckboxes() {
+            console.log('clearing...');
+            const checkedBoxes = $('.tl-fap--filter').find('input[type=checkbox]:checked');
+            console.log('checkedBoxes = ' + checkedBoxes.length);
+            //$('.tl-fap--filter').find('input[type=checkbox]:checked').each(function () {
+            //checkedBoxes.each(function () {
+            //    $(this).trigger("click");
+            //});
+            isClearAllInProgress = true;
+            for (var i = 0; i < checkedBoxes.length - 1; i++) {
+                $(checkedBoxes[i]).trigger("click");
+            }
+            isClearAllInProgress = false;
+            $(checkedBoxes[checkedBoxes.length - 1]).trigger("click");
+        }
     }
 
     $("#tl-fap--filter--button").click(function () {
@@ -588,44 +591,6 @@ id="tab_digital-support" role="tab" aria-controls="digital-support" aria-selecte
             $(this).attr('open', '');;
             $(".tl-fap--filter").attr('open', '');;
             $(this).text("Hide filter");
-        }
-        return false;
-    });
-
-    //$(".tl-fap--filter--clearall").click(function () {
-    //    //$(".tl-fap--filter--clearall").addClass("tl-hidden");
-    //    //isClearFiltersInProgress = true;
-
-    //    //$(".tl-fap--filter--section .govuk-checkboxes")
-    //    //    .each(checkchange);
-
-    //    //$('.tl-fap--filter--section')
-    //    //    .find('input:checked').each("click");
-    //    //    //.find('input[id=' + clickvalue + ']:checked').trigger("click");
-
-    //    if ($('#tl-skill-area-filter .tl-checkbox:checked').length > 0) {
-    //        console.log('here we go');
-    //        $('#tl-skill-area-filter .tl-checkbox:checked')
-    //            .prop('checked', false);
-    //        checkchange();
-
-    //        if ($("#tl-search-term").val().trim()) {
-    //            console.log('searching');
-    //            return providerSearch($("#tl-search-term").val().trim(), getQualificationIds());
-    //        }
-    //    }
-    //    console.log('no dice');
-    //    return false;
-    //});
-
-    $(".tl-fap--filter--clearall").click(function () {
-        if ($('#tl-skill-area-filter .tl-checkbox:checked').length > 0) {
-            $('#tl-skill-area-filter .tl-checkbox:checked').prop('checked', false);
-            checkchange();
-
-            if ($("#tl-search-term").val().trim()) {
-                return providerSearch($("#tl-search-term").val().trim(), getQualificationIds());
-            }
         }
         return false;
     });
