@@ -53,14 +53,15 @@ function FindProvider(
     });
 
     function qualificationSelectionChanged() {
-        console.log('in qualificationSelectionChanged - "' + $("#tl-search-term").val() + '"');
-        if (!$("#tl-search-term").val().trim()) {
-            console.log('no search term');
-            return false;
-        }
+        //console.log('in qualificationSelectionChanged - "' + $("#tl-search-term").val() + '"');
 
         if (isClearAllInProgress) {
             console.log('isClearAllInProgress = true');
+            return false;
+        }
+
+        if (!$("#tl-search-term").val().trim()) {
+            console.log('no search term');
             return false;
         }
 
@@ -573,8 +574,9 @@ function FindProvider(
             //    $(this).trigger("click");
             //});
             isClearAllInProgress = true;
-            for (var i = 0; i < checkedBoxes.length - 1; i++) {
-                $(checkedBoxes[i]).trigger("click");
+            for (let i = 0; i < checkedBoxes.length - 1; i++) {
+                //$(checkedBoxes[i]).trigger("click");
+                $(checkedBoxes[i]).prop('checked', false);
             }
             isClearAllInProgress = false;
             $(checkedBoxes[checkedBoxes.length - 1]).trigger("click");
