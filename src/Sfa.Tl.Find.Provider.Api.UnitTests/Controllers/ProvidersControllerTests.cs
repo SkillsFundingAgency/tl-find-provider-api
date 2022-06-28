@@ -208,37 +208,6 @@ public class ProvidersControllerTests
     }
 
     [Fact]
-    public async Task GetProviders_V2_Returns_Expected_Value_For_One_Search_Result()
-    {
-        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
-
-        var providerSearchResponse = new ProviderSearchResponseBuilder()
-            .WithSearchOrigin(fromGeoLocation)
-            .BuildWithSingleSearchResult();
-
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService.FindProviders(fromGeoLocation.Location)
-            .Returns(providerSearchResponse);
-
-        var controller = new ProvidersControllerBuilder()
-            .Build(providerDataService);
-
-#pragma warning disable CS0618
-        var result = await controller.GetProviders_V2(fromGeoLocation.Location);
-#pragma warning restore CS0618
-
-        var results = (result as OkObjectResult)?.Value
-            as ProviderSearchResponse;
-
-        results.Should().NotBeNull();
-        results!.SearchTerm.Should().Be(fromGeoLocation.Location);
-        results.SearchResults.Should().NotBeNullOrEmpty();
-
-        results.SearchResults.Count().Should().Be(1);
-        results.SearchResults.Should().BeEquivalentTo(providerSearchResponse.SearchResults);
-    }
-
-    [Fact]
     public async Task GetProviders_Returns_Expected_Value_For_One_Search_Result()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();

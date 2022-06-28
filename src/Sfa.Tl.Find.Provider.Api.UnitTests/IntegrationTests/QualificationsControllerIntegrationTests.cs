@@ -19,7 +19,7 @@ public class QualificationsControllerIntegrationTests : IClassFixture<TestServer
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/qualifications");
+            .GetAsync("/api/v3/qualifications");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

@@ -20,7 +20,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=CV1+2WT&qualificationId=40&routeId=5&page=0&pageSize=5");
+            .GetAsync("/api/v3/providers?searchTerm=CV1+2WT&qualificationId=40&routeId=5&page=0&pageSize=5");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -30,27 +30,17 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=coventry&qualificationId=40&routeId=5&page=0&pageSize=5");
+            .GetAsync("/api/v3/providers?searchTerm=coventry&qualificationId=40&routeId=5&page=0&pageSize=5");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
-    public async Task GetProviders_V2_Returns_OK_Result_For_Valid_Postcode_Url()
+    public async Task GetProviders_Returns_OK_Result_For_Valid_Lat_Long_Url()
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=CV1+2WT&page=0&pageSize=5");
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    public async Task GetProviders_V2_Returns_OK_Result_For_Valid_Lat_Long_Url()
-    {
-        var response = await _fixture
-            .CreateClient()
-            .GetAsync("/api/v2/providers?lat=52.400997&lon=-1.508122&page=0&pageSize=5");
+            .GetAsync("/api/v3/providers?lat=52.400997&lon=-1.508122&page=0&pageSize=5");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -60,7 +50,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=L1");
+            .GetAsync("/api/v3/providers?searchTerm=L1");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
@@ -73,7 +63,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers");
+            .GetAsync("/api/v3/providers");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
@@ -86,7 +76,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=A");
+            .GetAsync("/api/v3/providers?searchTerm=A");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
@@ -99,7 +89,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=CV1+2WT&page=0&pageSize=0");
+            .GetAsync("/api/v3/providers?searchTerm=CV1+2WT&page=0&pageSize=0");
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await response.Content.ValidateProblemDetails(
@@ -111,7 +101,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=CV1+2WT£");
+            .GetAsync("/api/v3/providers?searchTerm=CV1+2WT£");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
@@ -124,7 +114,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=2V1+2WT");
+            .GetAsync("/api/v3/providers?searchTerm=2V1+2WT");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var searchResponse = await response.Content.DeserializeFromHttpContent();
@@ -137,7 +127,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?searchTerm=CV1+2WT&page=-1&pageSize=5");
+            .GetAsync("/api/v3/providers?searchTerm=CV1+2WT&page=-1&pageSize=5");
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await response.Content.ValidateProblemDetails(
@@ -149,7 +139,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/providers?qualificationId=40&page=-1&pageSize=0");
+            .GetAsync("/api/v3/providers?qualificationId=40&page=-1&pageSize=0");
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
