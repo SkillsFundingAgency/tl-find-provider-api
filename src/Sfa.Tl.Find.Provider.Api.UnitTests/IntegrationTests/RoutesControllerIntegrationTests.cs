@@ -19,17 +19,7 @@ public class RoutesControllerIntegrationTests : IClassFixture<TestServerFactory<
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/routes");
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    public async Task GetRoutes_V2_Returns_Ok_Result_For_Valid_Url()
-    {
-        var response = await _fixture
-            .CreateClient()
-            .GetAsync("/api/v2/routes/");
+            .GetAsync("/api/v3/routes");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

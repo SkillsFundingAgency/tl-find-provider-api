@@ -39,9 +39,9 @@ try
 
     builder.Services.AddControllers();
 
-    builder.Services.AddSwagger("v2",
+    builder.Services.AddSwagger("v3",
         "T Levels Find a Provider Api",
-        "v2",
+        "v3",
         $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
     builder.Services
@@ -94,8 +94,8 @@ try
 
         app.UseSwagger();
         app.UseSwaggerUI(c => c.SwaggerEndpoint(
-            "/swagger/v2/swagger.json",
-            "T Levels Find a Provider.Api v2"));
+            "/swagger/v3/swagger.json",
+            "T Levels Find a Provider.Api v3"));
     }
 
     if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))

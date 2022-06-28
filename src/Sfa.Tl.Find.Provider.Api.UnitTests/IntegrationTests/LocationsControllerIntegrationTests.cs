@@ -15,11 +15,11 @@ public class LocationsControllerIntegrationTests : IClassFixture<TestServerFacto
     }
     
     [Fact]
-    public async Task GetProviders_V2_Returns_OK_Result_For_Valid_Postcode_Url()
+    public async Task GetLocations_Returns_OK_Result_For_Valid_Search_Term()
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v2/locations?searchTerm=test");
+            .GetAsync("/api/v3/locations?searchTerm=test");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

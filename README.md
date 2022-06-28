@@ -84,27 +84,27 @@ When running locally, assuming localhost with port 55961, you can either use the
 > - https://localhost:55961/swagger/index.html
 > 
 > **Generate API definition file**
-> - https://localhost:55961/swagger/v2/swagger.json
+> - https://localhost:55961/swagger/v3/swagger.json
 >   - This can be saved into `\api-definitions\findaproviderapi.json`
 > 
 > **Routes** *(Skill Areas)*
-> - https://localhost:55961/api/v2/routes
+> - https://localhost:55961/api/v3/routes
 >  
 > **Qualifications**
-> - https://localhost:55961/api/v2/qualifications
+> - https://localhost:55961/api/v3/qualifications
 >  
 > **Locations**
-> - https://localhost:55961/api/v2/locations?searchTerm=Oxford
+> - https://localhost:55961/api/v3/locations?searchTerm=Oxford
 >
 > **Provider search**
 > 
 > *searchTerm used for postcode or town*
-> - https://localhost:55961/api/v2/providers?lat=51.742141&lon=-1.295653
-> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT
-> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&routeId=6
-> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37
-> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37&page=3
-> - https://localhost:55961/api/v2/providers?searchTerm=CV1%202WT&qualificationId=37&page=0&pageSize=10
+> - https://localhost:55961/api/v3/providers?lat=51.742141&lon=-1.295653
+> - https://localhost:55961/api/v3/providers?searchTerm=CV1%202WT
+> - https://localhost:55961/api/v3/providers?searchTerm=CV1%202WT&routeId=6
+> - https://localhost:55961/api/v3/providers?searchTerm=CV1%202WT&qualificationId=37
+> - https://localhost:55961/api/v3/providers?searchTerm=CV1%202WT&qualificationId=37&page=3
+> - https://localhost:55961/api/v3/providers?searchTerm=CV1%202WT&qualificationId=37&page=0&pageSize=10
 
 
 For provider search, the postcode at the end of the url is required. 

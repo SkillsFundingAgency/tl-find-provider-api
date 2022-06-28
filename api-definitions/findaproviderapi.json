@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "T Levels Find a Provider Api",
-    "version": "v2"
+    "version": "v3"
   },
   "paths": {
     "/api/v{version}/locations": {
@@ -324,7 +324,7 @@
   },
   "components": {
     "schemas": {
-      "DeliveryYear": {
+      "DeliveryYearSearchResult": {
         "type": "object",
         "properties": {
           "year": {
@@ -338,6 +338,14 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Qualification"
+            },
+            "nullable": true,
+            "deprecated": true
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Route"
             },
             "nullable": true
           }
@@ -380,6 +388,11 @@
           },
           "searchTerm": {
             "type": "string",
+            "nullable": true
+          },
+          "totalResults": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
           "searchResults": {
@@ -426,7 +439,7 @@
           "deliveryYears": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DeliveryYear"
+              "$ref": "#/components/schemas/DeliveryYearSearchResult"
             },
             "nullable": true
           }
@@ -460,11 +473,19 @@
           },
           "numberOfQualifications": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "readOnly": true
           },
           "numberOfQualificationsOffered": {
             "type": "integer",
             "format": "int32"
+          },
+          "qualifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Qualification"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
