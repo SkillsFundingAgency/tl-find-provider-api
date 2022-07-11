@@ -1,9 +1,9 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
+
 // ReSharper disable UnusedMember.Global
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class JsonExtensions
 {

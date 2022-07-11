@@ -7,9 +7,10 @@
 
 using System.ComponentModel;
 using Microsoft.Data.SqlClient;
+
 // ReSharper disable CommentTypo
 
-namespace Sfa.Tl.Find.Provider.Api.Data;
+namespace Sfa.Tl.Find.Provider.Application.Data;
 
 /// <summary>
 ///     Detects the exceptions caused by SQL Server transient failures.

@@ -1,7 +1,6 @@
 ﻿using Dapper;
-using System.Collections.Generic;
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class DapperExtensions
 {

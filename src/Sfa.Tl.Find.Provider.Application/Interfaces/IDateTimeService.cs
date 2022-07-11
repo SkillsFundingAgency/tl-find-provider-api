@@ -1,7 +1,8 @@
-﻿using System;
+﻿
+
 // ReSharper disable UnusedMember.Global
 
-namespace Sfa.Tl.Find.Provider.Api.Interfaces;
+namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface IDateTimeService
 {

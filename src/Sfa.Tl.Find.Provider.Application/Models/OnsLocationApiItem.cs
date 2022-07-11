@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
-using Sfa.Tl.Find.Provider.Api.Models.Enums;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
-namespace Sfa.Tl.Find.Provider.Api.Models;
+namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay(" {" + nameof(LocationName) + "}" +
                  " ({" + nameof(CountyName) + ", nq})")]

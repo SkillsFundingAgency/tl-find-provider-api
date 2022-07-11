@@ -1,4 +1,4 @@
-﻿using Sfa.Tl.Find.Provider.Api.Data;
+﻿using Sfa.Tl.Find.Provider.Application.Data;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
+﻿using System.Data;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
-using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.Data;
+namespace Sfa.Tl.Find.Provider.Application.Data;
 
 public class QualificationRepository : IQualificationRepository
 {

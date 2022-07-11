@@ -1,10 +1,9 @@
-﻿using System;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class CacheUtilities
 {

@@ -5,9 +5,9 @@ using System.Net.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Services;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Services;
 

@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-using Sfa.Tl.Find.Provider.Api.Models;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.Interfaces;
+namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface IPostcodeLookupService
 {

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Sfa.Tl.Find.Provider.Api.Models;
+namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay(" {" + nameof(Id) + "}" +
                  " {" + nameof(Name) + ", nq}")]

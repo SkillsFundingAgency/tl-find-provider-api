@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace Sfa.Tl.Find.Provider.Api.Models;
+namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("{" + nameof(Postcode) + "}" +
                  " {" + nameof(Distance) + ", nq}")]

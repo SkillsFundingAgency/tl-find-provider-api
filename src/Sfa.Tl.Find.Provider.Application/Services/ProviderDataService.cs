@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Models.Configuration;
-using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
+using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 
-namespace Sfa.Tl.Find.Provider.Api.Services;
+namespace Sfa.Tl.Find.Provider.Application.Services;
 
 public class ProviderDataService : IProviderDataService
 {

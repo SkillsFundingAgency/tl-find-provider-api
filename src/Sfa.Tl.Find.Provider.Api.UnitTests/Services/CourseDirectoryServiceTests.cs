@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Json;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Services;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services;
@@ -38,10 +38,10 @@ public class CourseDirectoryServiceTests
             { CourseDirectoryService.CourseDetailEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelsResponse() }
         };
 
-        IList<Models.Provider> receivedProviders = null;
+        IList<Application.Models.Provider> receivedProviders = null;
 
         var providerRepository = Substitute.For<IProviderRepository>();
-        await providerRepository.Save(Arg.Do<IList<Models.Provider>>(
+        await providerRepository.Save(Arg.Do<IList<Application.Models.Provider>>(
             x => receivedProviders = x?.ToList()));
 
         var service = new CourseDirectoryServiceBuilder()
@@ -168,7 +168,7 @@ public class CourseDirectoryServiceTests
             .Remove(CacheKeys.QualificationsKey);
     }
 
-    private static void ValidateProvider(Models.Provider provider, 
+    private static void ValidateProvider(Application.Models.Provider provider, 
         long ukPrn,
         string name,
         string addressLine1,

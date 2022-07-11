@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 

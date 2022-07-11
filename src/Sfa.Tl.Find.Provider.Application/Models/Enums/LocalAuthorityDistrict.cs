@@ -1,7 +1,7 @@
 ﻿// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-namespace Sfa.Tl.Find.Provider.Api.Models.Enums;
+namespace Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 public enum LocalAuthorityDistrict
 {

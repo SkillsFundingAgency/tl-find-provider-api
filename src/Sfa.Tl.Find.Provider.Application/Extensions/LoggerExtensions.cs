@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class LoggerExtensions
 {

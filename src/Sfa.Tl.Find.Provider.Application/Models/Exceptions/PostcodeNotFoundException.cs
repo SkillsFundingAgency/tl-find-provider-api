@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Sfa.Tl.Find.Provider.Api.Models.Exceptions;
+﻿namespace Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 
 public class PostcodeNotFoundException : Exception
 {

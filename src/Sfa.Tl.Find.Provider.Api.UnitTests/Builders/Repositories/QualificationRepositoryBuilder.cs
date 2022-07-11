@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly.Registry;
-using Sfa.Tl.Find.Provider.Api.Data;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Data;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
 

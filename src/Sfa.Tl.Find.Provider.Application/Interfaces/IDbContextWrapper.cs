@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
+﻿using System.Data;
 
-namespace Sfa.Tl.Find.Provider.Api.Interfaces;
+namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface IDbContextWrapper
 {

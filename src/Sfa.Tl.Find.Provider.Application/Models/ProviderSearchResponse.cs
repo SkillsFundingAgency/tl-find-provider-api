@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Text.Json.Serialization;
 
-namespace Sfa.Tl.Find.Provider.Api.Models;
+namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("{DebuggerDisplay(), nq}")]
 public class ProviderSearchResponse

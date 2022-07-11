@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using NSubstitute;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data;
 

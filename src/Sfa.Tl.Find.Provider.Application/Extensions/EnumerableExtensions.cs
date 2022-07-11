@@ -1,9 +1,8 @@
 ﻿using System.Data;
 using System.Reflection;
 using Dapper.Contrib.Extensions;
-using Sfa.Tl.Find.Provider.Application.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class EnumerableExtensions
 {
@@ -15,7 +14,7 @@ public static class EnumerableExtensions
         if (typeof(T).IsValueType)
         {
             dataTable.Columns.Add("NONAME", typeof(T));
-            foreach (T obj in data)
+            foreach (var obj in data)
             {
                 dataTable.Rows.Add(obj);
             }

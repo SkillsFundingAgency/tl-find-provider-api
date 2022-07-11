@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Api.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Services;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services;
@@ -603,7 +603,7 @@ public class ProviderDataServiceTests
 
         await providerRepository
             .Received(1)
-            .Save(Arg.Any<IList<Models.Provider>>(),
+            .Save(Arg.Any<IList<Application.Models.Provider>>(),
                 Arg.Is<bool>(b => b));
     }
 
@@ -612,10 +612,10 @@ public class ProviderDataServiceTests
     {
         var providerRepository = Substitute.For<IProviderRepository>();
 
-        IList<Models.Provider> receivedProviders = null;
+        IList<Application.Models.Provider> receivedProviders = null;
 
         await providerRepository
-            .Save(Arg.Do<IList<Models.Provider>>(
+            .Save(Arg.Do<IList<Application.Models.Provider>>(
                 x => receivedProviders = x),
                 Arg.Any<bool>());
 
@@ -641,10 +641,10 @@ public class ProviderDataServiceTests
     {
         var providerRepository = Substitute.For<IProviderRepository>();
 
-        IList<Models.Provider> receivedProviders = null;
+        IList<Application.Models.Provider> receivedProviders = null;
 
         await providerRepository
-            .Save(Arg.Do<IList<Models.Provider>>(
+            .Save(Arg.Do<IList<Application.Models.Provider>>(
                 x => receivedProviders = x),
                 Arg.Any<bool>());
 

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Api.Models.Configuration;
+using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.Filters;
 

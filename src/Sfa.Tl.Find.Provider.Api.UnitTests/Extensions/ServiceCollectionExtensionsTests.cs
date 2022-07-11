@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Api.Models.Configuration;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;

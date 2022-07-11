@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 

@@ -7,14 +7,14 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
-using Sfa.Tl.Find.Provider.Api.Data;
-using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Repositories;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Application.Data;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data;

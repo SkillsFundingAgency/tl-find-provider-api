@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Dapper.Contrib.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Api.Models;
+namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("UKPRN {" + nameof(UkPrn) + "}" +
                  " {" + nameof(Name) + ", nq}")]

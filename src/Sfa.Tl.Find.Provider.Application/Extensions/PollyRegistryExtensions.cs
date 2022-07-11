@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Registry;
-using Sfa.Tl.Find.Provider.Api.Data;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Data;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 // ReSharper disable UnusedMethodReturnValue.Global
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class PollyRegistryExtensions
 {

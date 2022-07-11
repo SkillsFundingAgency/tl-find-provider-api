@@ -1,8 +1,7 @@
-﻿using System;
-using System.Net;
-using Sfa.Tl.Find.Provider.Api.Models;
+﻿using System.Net;
+using Sfa.Tl.Find.Provider.Application.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class BusinessRuleExtensions
 {

@@ -1,4 +1,4 @@
-﻿namespace Sfa.Tl.Find.Provider.Api.Models;
+﻿namespace Sfa.Tl.Find.Provider.Application.Models;
 
 public static class Constants
 {

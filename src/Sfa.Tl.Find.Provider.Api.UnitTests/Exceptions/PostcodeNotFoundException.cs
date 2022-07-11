@@ -1,6 +1,6 @@
 ﻿using System;
 using FluentAssertions;
-using Sfa.Tl.Find.Provider.Api.Models.Exceptions;
+using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Exceptions;

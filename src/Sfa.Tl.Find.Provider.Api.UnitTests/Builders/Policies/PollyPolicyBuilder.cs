@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NSubstitute;
 using Polly;
 using Polly.Registry;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Policies;
 

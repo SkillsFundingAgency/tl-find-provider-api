@@ -4,8 +4,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
@@ -32,7 +32,7 @@ public class CacheUtilitiesTests
         const EvictionReason reason = EvictionReason.Removed;
         var value = new { x = "test " };
 
-        Action act = () => CacheUtilities.EvictionLoggingCallback(key, value, reason, null);
+        var act = () => CacheUtilities.EvictionLoggingCallback(key, value, reason, null);
         act
             .Should().NotThrow<ArgumentNullException>();
     }

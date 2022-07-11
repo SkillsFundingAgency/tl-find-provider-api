@@ -1,8 +1,8 @@
 ﻿using System.Data;
 using Dapper;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 
-namespace Sfa.Tl.Find.Provider.Api.Data;
+namespace Sfa.Tl.Find.Provider.Application.Data;
 
 public class DynamicParametersWrapper : IDynamicParametersWrapper
 {

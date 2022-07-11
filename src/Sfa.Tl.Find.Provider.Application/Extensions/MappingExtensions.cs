@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Sfa.Tl.Find.Provider.Api.Models;
+﻿using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
 public static class MappingExtensions
 {

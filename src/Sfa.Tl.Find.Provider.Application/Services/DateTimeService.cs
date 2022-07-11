@@ -1,7 +1,6 @@
-﻿using System;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
+﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 
-namespace Sfa.Tl.Find.Provider.Api.Services;
+namespace Sfa.Tl.Find.Provider.Application.Services;
 
 public class DateTimeService : IDateTimeService
 {
