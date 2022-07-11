@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Reflection;
 using Dapper.Contrib.Extensions;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
 

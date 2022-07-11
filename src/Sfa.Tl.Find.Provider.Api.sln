@@ -18,6 +18,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sfa.Tl.Find.Provider.Api.Da
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{D301F9D0-5D8C-432D-8C5A-1CB6FBC541F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Application", "Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj", "{1C0A3667-3C39-4CC5-A488-6FA664ADBFA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{14B1C5D7-E3CC-44F3-9B74-92BDFBD0A5CB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{14B1C5D7-E3CC-44F3-9B74-92BDFBD0A5CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14B1C5D7-E3CC-44F3-9B74-92BDFBD0A5CB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{1C0A3667-3C39-4CC5-A488-6FA664ADBFA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C0A3667-3C39-4CC5-A488-6FA664ADBFA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C0A3667-3C39-4CC5-A488-6FA664ADBFA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C0A3667-3C39-4CC5-A488-6FA664ADBFA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

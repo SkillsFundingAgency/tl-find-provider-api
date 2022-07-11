@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\ProviderData.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AspNetCoreRateLimit" Version="4.0.2" />
     <PackageReference Include="Azure.Data.Tables" Version="12.6.0" />
     <PackageReference Include="Dapper" Version="2.0.123" />
@@ -25,6 +21,10 @@
     <PackageReference Include="Quartz" Version="3.4.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
