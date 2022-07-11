@@ -229,6 +229,8 @@ public static class ServiceCollectionExtensions
             c.ResolveConflictingActions(apiDescriptions 
                 => apiDescriptions.First());
 
+            //c.EnableAnnotations(); //Needed with Swashbuckle.AspNetCore.Annotations
+
             if (xmlFile != null)
             {
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

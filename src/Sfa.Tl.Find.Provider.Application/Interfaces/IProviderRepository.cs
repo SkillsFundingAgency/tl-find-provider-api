@@ -8,6 +8,8 @@ public interface IProviderRepository
 
     Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);
 
+    Task<IEnumerable<ProviderSearchResult>> GetAllProviderResults();
+
     Task<(IEnumerable<ProviderSearchResult> SearchResults, int TotalResultsCount)> Search(
         GeoLocation fromGeoLocation,
         IList<int> routeIds,

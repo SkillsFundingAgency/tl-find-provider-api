@@ -100,6 +100,7 @@
     <Build Include="Views\TownSearchView.sql" />
     <Build Include="Functions\ReplaceAllFunction.sql" />
     <Build Include="Indexes\IX_TownSearchView_Search.sql" />
+    <Build Include="Stored Procedures\GetAllProviders.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

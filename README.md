@@ -197,3 +197,16 @@ results are cached to avoid duplicate calls.
 
 Provider and course details are read from the NCS Course directory API. This is called from a scheduled Quartz job.
 
+
+## Spike - prepare to implement website
+
+Separate application (and maybe data) code into a new project
+
+### TODO
+ - split unit test project to match new solution structure
+ - add <Nullable>enable</Nullable> to API project and fix nullable types 
+ - PropertyInfoExtensions needs tests
+ - new data methods need tests:
+    ProviderService.GetAllProviderResults
+    ProviderService.GetAllProviders
+    ProvidersController.GetAllProviderData

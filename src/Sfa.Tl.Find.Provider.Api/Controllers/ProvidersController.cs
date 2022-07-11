@@ -93,4 +93,20 @@ public class ProvidersController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
+
+    [HttpGet]
+    [Route("all", Name = "GetAllProviderData")]
+    [ProducesResponseType(typeof(IEnumerable<ProviderSearchResult>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetAllProviderData()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
+        }
+
+        var providers = await _providerDataService.GetAllProviders();
+
+        return Ok(providers);
+    }
 }

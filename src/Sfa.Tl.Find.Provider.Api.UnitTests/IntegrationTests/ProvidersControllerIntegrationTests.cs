@@ -147,4 +147,14 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
             ("pageSize", "The pageSize field must be at least one."),
             ("page", "The page field must be zero or greater."));
     }
+
+    [Fact]
+    public async Task GetAllProviderData_Returns_OK_Result()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v3/providers/all");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 }

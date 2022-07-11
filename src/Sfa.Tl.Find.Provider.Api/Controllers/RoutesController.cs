@@ -21,7 +21,7 @@ public class RoutesController : ControllerBase
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-   
+
     /// <summary>
     /// Returns a list of all routes.
     /// </summary>

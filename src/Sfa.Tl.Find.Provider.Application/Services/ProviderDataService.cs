@@ -181,6 +181,12 @@ public class ProviderDataService : IProviderDataService
         }
     }
 
+    public async Task<IEnumerable<ProviderSearchResult>> GetAllProviders()
+    {
+        return await _providerRepository
+                .GetAllProviderResults();
+    }
+
     public async Task<bool> HasQualifications()
     {
         return await _qualificationRepository.HasAny();
