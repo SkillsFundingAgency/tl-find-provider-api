@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Polly;
+﻿using Polly;
 using Polly.Extensions.Http;
 
 namespace Sfa.Tl.Find.Provider.Api.Extensions;
