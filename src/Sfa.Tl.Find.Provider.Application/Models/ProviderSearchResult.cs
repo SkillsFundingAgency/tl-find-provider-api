@@ -9,7 +9,6 @@ namespace Sfa.Tl.Find.Provider.Application.Models;
                  " {" + nameof(Distance) + ", nq}")]
 public class ProviderSearchResult
 {
-    [JsonIgnore]
     public long UkPrn { get; init; }
     public string ProviderName { get; init; }
     [JsonIgnore]
