@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 public class HttpClientBuilderExtensionsTests
 {
     [Fact]
-    public void AddSwagger_Should_AddService()
+    public void AddRetryPolicyHandler_Should_AddService()
     {
         var services = new ServiceCollection();
         var builder = Substitute.For<IHttpClientBuilder>();

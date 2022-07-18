@@ -1,6 +1,6 @@
 ﻿using NSubstitute;
-using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Services;
 

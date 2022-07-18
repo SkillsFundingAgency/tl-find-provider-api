@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 

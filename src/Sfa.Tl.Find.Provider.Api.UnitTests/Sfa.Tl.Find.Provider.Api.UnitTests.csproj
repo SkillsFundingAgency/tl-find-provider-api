@@ -55,6 +55,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Api\Sfa.Tl.Find.Provider.Api.csproj" />
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj" />
+    <ProjectReference Include="..\Sfa.Tl.Find.Provider.Tests.Common\Sfa.Tl.Find.Provider.Tests.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
