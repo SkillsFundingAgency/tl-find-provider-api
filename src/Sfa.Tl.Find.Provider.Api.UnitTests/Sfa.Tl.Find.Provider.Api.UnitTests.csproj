@@ -9,30 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Builders\Json\Assets\nationalstatisticslocationsresponse.json" />
-    <None Remove="Builders\Json\Assets\postcodenotfoundresponse.json" />
-    <None Remove="Builders\Json\Assets\Postcodes\nullpostcoderesponse.json" />
-    <None Remove="Builders\Json\Assets\terminatedpostcodewithnulllatlongresponse.json" />
-    <None Remove="Builders\Json\Assets\validoutcodewithnulllatlongresponse.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Builders\Json\Assets\NationalStatistics\nationalstatisticslocationsresponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\nullpostcoderesponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\postcodenotfoundresponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\nearestpostcoderesponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\invalidpostcoderesponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tlevels.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validoutcodewithnulllatlongresponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\terminatedpostcodewithnulllatlongresponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validpostcodewithnulllatlongresponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validoutcoderesponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validpostcoderesponse.json" />
-    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\terminatedpostcoderesponse.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.17.0" />
     <PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.17.0" />
     <PackageReference Include="AutoFixture.Idioms" Version="4.17.0" />
@@ -56,12 +32,6 @@
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Api\Sfa.Tl.Find.Provider.Api.csproj" />
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj" />
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Tests.Common\Sfa.Tl.Find.Provider.Tests.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Builders\Json\Assets\invalidpostcoderesponse.json" />
-    <Resource Include="Builders\Json\Assets\validpostcoderesponse.json" />
-    <Resource Include="Builders\Json\Assets\terminatedpostcoderesponse.json" />
   </ItemGroup>
 
 </Project>

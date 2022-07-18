@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Filters;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Filters;

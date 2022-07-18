@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Filters;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Attributes;

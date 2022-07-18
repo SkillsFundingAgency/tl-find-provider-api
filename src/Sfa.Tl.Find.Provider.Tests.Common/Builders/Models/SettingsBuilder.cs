@@ -3,10 +3,10 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Models;
+namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-internal class SettingsBuilder
+public class SettingsBuilder
 {
     private const string AppId = "2b1c1371f07a4add85a54b1812b2b0de";
     private const string ApiKey = "be1a8d303ea04e10810eed67f5cf174a";
@@ -16,7 +16,7 @@ internal class SettingsBuilder
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
 
-    internal ApiSettings BuildApiSettings(
+    public ApiSettings BuildApiSettings(
         string appId = AppId,
         string apiKey = ApiKey) => new()
         {
@@ -24,7 +24,7 @@ internal class SettingsBuilder
             ApiKey = apiKey
         };
 
-    internal CourseDirectoryApiSettings BuildCourseDirectoryApiSettings(
+    public CourseDirectoryApiSettings BuildCourseDirectoryApiSettings(
         string findCourseApiBaseUri = FindCourseApiBaseAbsoluteUri,
         string findCourseApiKey = FindCourseApiKey) => new()
         {
@@ -32,19 +32,19 @@ internal class SettingsBuilder
             ApiKey = findCourseApiKey
         };
 
-    internal PostcodeApiSettings BuildPostcodeApiSettings(
+    public PostcodeApiSettings BuildPostcodeApiSettings(
         string postcodeRetrieverUri = PostcodeRetrieverUri) => new()
         {
             BaseUri = postcodeRetrieverUri
         };
 
-    internal SearchSettings BuildSearchSettings(
+    public SearchSettings BuildSearchSettings(
         bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
         {
             MergeAdditionalProviderData = mergeAdditionalProviderData
         };
 
-    internal SiteConfiguration BuildConfigurationOptions(
+    public SiteConfiguration BuildConfigurationOptions(
         ApiSettings apiSettings = null,
         CourseDirectoryApiSettings courseDirectoryApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,

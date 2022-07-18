@@ -1,14 +1,14 @@
 ﻿using FluentAssertions;
 using NSubstitute;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Models;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
+using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Services;
+namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
 public class TownDataServiceTests
 {

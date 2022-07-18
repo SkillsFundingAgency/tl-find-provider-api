@@ -1,6 +1,6 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
 
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
+namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public static class GeoLocationBuilder
 {

@@ -1,11 +1,11 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
 
-namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Models;
+namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class ProviderSearchResultBuilder
 {
-    private GeoLocation _searchOrigin;
+    private GeoLocation? _searchOrigin;
 
     public IEnumerable<ProviderSearchResult> BuildList() =>
         new List<ProviderSearchResult>
@@ -24,7 +24,7 @@ public class ProviderSearchResultBuilder
                 Telephone = "011 111 1111",
                 Website = "https://www.provider1.ac.uk",
                 Distance = 10.0,
-                JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation {Location = "AA1 1AA"}),
+                JourneyToLink = _searchOrigin?.CreateJourneyLink(new GeoLocation {Location = "AA1 1AA"}),
                 DeliveryYears = new List<DeliveryYearSearchResult>
                 {
                     new()
@@ -69,7 +69,7 @@ public class ProviderSearchResultBuilder
                 Telephone = "022 222 2222",
                 Website = "https://www.provider2.ac.uk",
                 Distance = 12.0,
-                JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation {Location = "BB2 2BB"}),
+                JourneyToLink = _searchOrigin?.CreateJourneyLink(new GeoLocation {Location = "BB2 2BB"}),
                 DeliveryYears = new List<DeliveryYearSearchResult>
                 {
                     new()
@@ -135,7 +135,7 @@ public class ProviderSearchResultBuilder
                 Telephone = "011 111 1111",
                 Website = "https://www.provider1.ac.uk",
                 Distance = 10.0,
-                JourneyToLink = _searchOrigin.CreateJourneyLink(new GeoLocation {Location = "AA1 1AA"}),
+                JourneyToLink = _searchOrigin?.CreateJourneyLink(new GeoLocation {Location = "AA1 1AA"}),
                 DeliveryYears = new List<DeliveryYearSearchResult>
                 {
                     new()

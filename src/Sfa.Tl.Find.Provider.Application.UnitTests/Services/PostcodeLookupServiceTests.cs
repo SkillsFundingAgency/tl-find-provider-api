@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 

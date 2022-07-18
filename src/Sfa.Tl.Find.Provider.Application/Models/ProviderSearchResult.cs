@@ -26,7 +26,7 @@ public class ProviderSearchResult
     public string Website { get; init; }
     public double Distance { get; init; }
     [JsonIgnore]
-    public string JourneyToLink { get; set; }
+    public string? JourneyToLink { get; set; }
 
     public ICollection<DeliveryYearSearchResult> DeliveryYears { get; init; } = new List<DeliveryYearSearchResult>();
 }
