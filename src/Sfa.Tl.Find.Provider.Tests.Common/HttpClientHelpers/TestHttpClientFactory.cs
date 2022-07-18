@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 public class TestHttpClientFactory
 {
     public HttpClient CreateHttpClientWithBaseUri(
-        Uri? baseUri, 
+        Uri baseUri, 
         IDictionary<Uri, string> responseMessages, 
         string responseContentType = "application/json", 
         HttpStatusCode responseCode = HttpStatusCode.OK)

@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class ProviderSearchResponseBuilder
 {
-    private GeoLocation? _searchOrigin;
+    private GeoLocation _searchOrigin;
     private int? _totalSearchResults;
 
     private const string DefaultPostcode = "CV1 2WT";

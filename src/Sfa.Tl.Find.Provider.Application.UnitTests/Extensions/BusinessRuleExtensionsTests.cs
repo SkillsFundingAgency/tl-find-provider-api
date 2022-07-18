@@ -24,20 +24,20 @@ public class BusinessRuleExtensionsTests
         result.Should().Be(expectedResult);
     }
         
-    public static IEnumerable<object?[]> JourneyLinksForPostcodeLocations =>
-        new List<object?[]>
+    public static IEnumerable<object[]> JourneyLinksForPostcodeLocations =>
+        new List<object[]>
         {
-            new object?[] { null, null, null },
-            new object?[] { new GeoLocation { Location = "" }, new GeoLocation { Location = "" }, null },
-            new object?[] { new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 }, null, null },
-            new object?[] { null, new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 }, null },
-            new object?[]
+            new object[] { null, null, null },
+            new object[] { new GeoLocation { Location = "" }, new GeoLocation { Location = "" }, null },
+            new object[] { new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 }, null, null },
+            new object[] { null, new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 }, null },
+            new object[]
             {
                 new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },
                 new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
                 "https://www.google.com/maps/dir/?api=1&origin=CV1+2WT&destination=SW1A+2HE&travelmode=transit"
             },
-            new object?[]
+            new object[]
             {
                 new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
                 new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },

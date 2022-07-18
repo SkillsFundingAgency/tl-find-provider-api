@@ -14,11 +14,11 @@ public class CourseDirectoryServiceBuilder
 
     // ReSharper disable once MemberCanBePrivate.Global
     public CourseDirectoryService Build(
-        HttpClient? httpClient = null, 
-        IProviderRepository? providerRepository = null,
-        IQualificationRepository? qualificationRepository = null,
-        IMemoryCache? cache = null,
-        ILogger<CourseDirectoryService>? logger = null)
+        HttpClient httpClient = null, 
+        IProviderRepository providerRepository = null,
+        IQualificationRepository qualificationRepository = null,
+        IMemoryCache cache = null,
+        ILogger<CourseDirectoryService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
         providerRepository ??= Substitute.For<IProviderRepository>();
@@ -35,13 +35,13 @@ public class CourseDirectoryServiceBuilder
     }
         
     public CourseDirectoryService Build(
-        IDictionary<string, string>? responseMessages,
-        IProviderRepository? providerRepository = null,
-        IQualificationRepository? qualificationRepository = null,
-        IMemoryCache? cache = null,
-        ILogger<CourseDirectoryService>? logger = null)
+        IDictionary<string, string> responseMessages,
+        IProviderRepository providerRepository = null,
+        IQualificationRepository qualificationRepository = null,
+        IMemoryCache cache = null,
+        ILogger<CourseDirectoryService> logger = null)
     {
-        var responsesWithUri = responseMessages
+        var responsesWithUri = responseMessages?
             .ToDictionary(
                 item => new Uri(CourseDirectoryApiBaseUri, item.Key),
                 item => item.Value);

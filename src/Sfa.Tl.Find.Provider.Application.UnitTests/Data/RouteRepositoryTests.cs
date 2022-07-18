@@ -41,7 +41,7 @@ public class RouteRepositoryTests
             {
                 QualificationId = r.Id,
                 QualificationName = r.Name,
-                NumberOfQualificationsOffered = r.Qualifications?.Count ?? 0
+                NumberOfQualificationsOffered = r.Qualifications.Count
             }).ToList();
 
         var callIndex = 0;

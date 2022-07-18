@@ -100,7 +100,7 @@ public class ProviderDataService : IProviderDataService
                 _logger.LogDebug("Searching for postcode or town '{searchTerm}'", searchTerms);
             }
 
-            GeoLocation geoLocation = null;
+            GeoLocation geoLocation = null!;
 
             if (searchTerms.IsFullOrPartialPostcode())
             {

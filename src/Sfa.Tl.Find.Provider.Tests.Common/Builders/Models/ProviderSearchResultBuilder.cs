@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class ProviderSearchResultBuilder
 {
-    private GeoLocation? _searchOrigin;
+    private GeoLocation _searchOrigin;
 
     public IEnumerable<ProviderSearchResult> BuildList() =>
         new List<ProviderSearchResult>

@@ -9,9 +9,9 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 public class TownDataServiceBuilder
 {
     public TownDataService Build(
-        HttpClient? httpClient = null,
-        ITownRepository? townRepository = null,
-        ILogger<TownDataService>? logger = null)
+        HttpClient httpClient = null,
+        ITownRepository townRepository = null,
+        ILogger<TownDataService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
         townRepository ??= Substitute.For<ITownRepository>();
@@ -24,9 +24,9 @@ public class TownDataServiceBuilder
     }
 
     public TownDataService Build(
-        IDictionary<string, string>? responseMessages,
-        ITownRepository? townRepository = null,
-        ILogger<TownDataService>? logger = null)
+        IDictionary<string, string> responseMessages,
+        ITownRepository townRepository = null,
+        ILogger<TownDataService> logger = null)
     {
         var responsesWithUri = responseMessages
             .ToDictionary(
