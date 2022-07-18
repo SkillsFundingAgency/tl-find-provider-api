@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
+﻿namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 
 public class DataBaseChangeResultBuilder
 {

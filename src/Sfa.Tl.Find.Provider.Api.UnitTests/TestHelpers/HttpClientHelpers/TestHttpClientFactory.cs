@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
 

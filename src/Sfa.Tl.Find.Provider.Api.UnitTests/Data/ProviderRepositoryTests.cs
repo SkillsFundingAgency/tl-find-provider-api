@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Data;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -16,7 +12,6 @@ using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data;
 

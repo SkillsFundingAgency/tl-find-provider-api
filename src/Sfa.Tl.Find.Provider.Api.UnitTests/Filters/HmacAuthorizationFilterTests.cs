@@ -1,13 +1,10 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Filters;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Filters;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+﻿using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global

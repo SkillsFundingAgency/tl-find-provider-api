@@ -1,11 +1,9 @@
-﻿using System.Threading.Tasks;
-using NSubstitute;
+﻿using NSubstitute;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Jobs;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Jobs;
 

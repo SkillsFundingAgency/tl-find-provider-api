@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.HttpClientHelpers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;

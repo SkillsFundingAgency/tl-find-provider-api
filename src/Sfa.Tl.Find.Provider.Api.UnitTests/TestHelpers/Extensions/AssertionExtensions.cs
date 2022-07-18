@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 

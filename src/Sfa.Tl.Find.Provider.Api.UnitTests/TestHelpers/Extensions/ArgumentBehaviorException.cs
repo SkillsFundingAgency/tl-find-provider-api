@@ -1,5 +1,4 @@
-﻿using System;
-using AutoFixture.Idioms;
+﻿using AutoFixture.Idioms;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 

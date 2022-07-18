@@ -1,8 +1,6 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 

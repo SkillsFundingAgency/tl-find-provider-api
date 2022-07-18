@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using FluentAssertions;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 

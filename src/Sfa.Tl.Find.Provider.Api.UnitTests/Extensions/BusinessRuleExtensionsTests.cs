@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 

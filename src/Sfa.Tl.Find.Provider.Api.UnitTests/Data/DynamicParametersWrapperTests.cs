@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Reflection;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Sfa.Tl.Find.Provider.Application.Data;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Data;
 

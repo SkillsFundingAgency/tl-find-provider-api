@@ -2,7 +2,6 @@
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 

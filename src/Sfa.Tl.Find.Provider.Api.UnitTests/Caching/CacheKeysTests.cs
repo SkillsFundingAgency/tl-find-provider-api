@@ -1,7 +1,5 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Caching;
 
