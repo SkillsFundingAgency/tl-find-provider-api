@@ -26,7 +26,7 @@ public interface IProviderDataService
         int page = 0,
         int pageSize = Constants.DefaultPageSize);
 
-    Task<IEnumerable<ProviderSearchResult>> GetAllProviders();
+    Task<ProviderDetailResponse> GetAllProviders();
 
     Task LoadAdditionalProviderData();
 }

@@ -102,6 +102,12 @@ public class FakeStartup
                         SearchResults = new List<ProviderSearchResult>()
                     });
 
+                providerDataService.GetAllProviders()
+                    .Returns(new ProviderDetailResponse
+                    {
+                        Providers = new List<ProviderDetail>()
+                    });
+
                 return providerDataService;
             })
             .AddTransient(_ =>

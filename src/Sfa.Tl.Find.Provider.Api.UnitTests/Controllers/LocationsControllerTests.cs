@@ -48,6 +48,6 @@ public class LocationsControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as IEnumerable<Town>;
-        results.Should().NotBeNullOrEmpty();
+        results.Should().BeEquivalentTo(towns);
     }
 }

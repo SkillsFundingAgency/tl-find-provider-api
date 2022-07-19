@@ -46,7 +46,7 @@ public class RoutesControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as IEnumerable<Route>;
-        results.Should().NotBeNullOrEmpty();
+        results.Should().BeEquivalentTo(routes);
     }
 
     [Fact]

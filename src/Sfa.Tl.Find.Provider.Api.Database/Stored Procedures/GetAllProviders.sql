@@ -19,6 +19,9 @@ AS
 	NearestLocationsCTE AS (
 		SELECT	p.[UkPrn],
 				p.[Name] AS [ProviderName],
+				p.[Email] AS [ProviderEmail],
+				p.[Telephone] AS [ProviderTelephone],
+				p.[Website] AS [ProviderWebsite],
 				l.[Id] AS [LocationId],
 				l.[Postcode],
 				l.[Name] AS [LocationName],
@@ -29,6 +32,8 @@ AS
 				COALESCE(NULLIF(l.[Email], ''), p.[Email], '') AS [Email],
 				COALESCE(NULLIF(l.[Telephone], ''), p.[Telephone], '') AS [Telephone],
 				COALESCE(NULLIF(l.[Website], ''), p.[Website], '') AS [Website],
+				l.[Latitude],
+				l.[Longitude],
 				p.[IsAdditionalData]
 		FROM	[ProvidersCTE] p
 		INNER JOIN	[dbo].[Location] l
@@ -65,6 +70,9 @@ AS
 		--Step 2 - add in the qualifications 
 		SELECT 	[UkPrn],
 				[ProviderName],
+				[ProviderEmail],
+				[ProviderTelephone],
+				[ProviderWebsite],
 				[Postcode],
 				[LocationName],
 				[AddressLine1],
@@ -74,6 +82,8 @@ AS
 				[Email],
 				[Telephone],
 				[Website],
+				[Latitude],
+				[Longitude],
 				lq.[DeliveryYear] AS [Year],
 				rq.[RouteId],
 				r.[Name] AS [RouteName],

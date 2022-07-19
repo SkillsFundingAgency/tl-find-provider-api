@@ -42,7 +42,33 @@ public class ProvidersControllerTests
         typeof(ProvidersController)
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
-    
+
+    [Fact]
+    public async Task GetAllProviders_Returns_Expected_List()
+    {
+        var providerDataService = Substitute.For<IProviderDataService>();
+        var providers = new ProviderDetailBuilder().BuildList().ToList();
+
+        providerDataService.GetAllProviders()
+            .Returns(new ProviderDetailResponse
+            {
+                Providers = providers//new ProviderDetailBuilder().BuildList()
+            });
+
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService);
+
+        var result = await controller.GetAllProviderData();
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var results = okResult.Value as ProviderDetailResponse;
+        results.Should().NotBeNull();
+        results!.Providers.Should().BeEquivalentTo(providers);
+    }
+
     [Fact]
     public async Task GetProviders_Passes_Default_Parameters()
     {

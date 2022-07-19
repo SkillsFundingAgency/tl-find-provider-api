@@ -46,7 +46,7 @@ public class QualificationsControllerTests
         okResult!.StatusCode.Should().Be(200);
 
         var results = okResult.Value as IEnumerable<Qualification>;
-        results.Should().NotBeNullOrEmpty();
+        results.Should().BeEquivalentTo(qualifications);
     }
 
     [Fact]

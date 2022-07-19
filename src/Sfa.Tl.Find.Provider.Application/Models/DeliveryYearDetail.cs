@@ -3,13 +3,13 @@
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("{DebuggerDisplay(), nq}")]
-public class DeliveryYearSearchResult
+public class DeliveryYearDetail
 {
     public short Year { get; init; }
 
     public bool IsAvailableNow { get; set; }
 
-    public ICollection<Route> Routes { get; init; } = new List<Route>();
+    public ICollection<RouteDetail> Routes { get; init; } = new List<RouteDetail>();
 
     private string DebuggerDisplay()
         => $"{Year} " +

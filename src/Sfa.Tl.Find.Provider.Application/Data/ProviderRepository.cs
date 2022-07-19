@@ -30,6 +30,74 @@ public class ProviderRepository : IProviderRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public async Task<IEnumerable<ProviderDetail>> GetAll()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        var providerDetailResults = new Dictionary<string, ProviderDetail>();
+
+        await _dbContextWrapper
+            .QueryAsync<ProviderDetail, LocationDetail, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>(
+                connection,
+                "GetAllProviders",
+                (p, l, dy, r, q) =>
+                {
+                    var key = $"{p.UkPrn}";
+                    if (!providerDetailResults.TryGetValue(key, out var provider))
+                    {
+                        providerDetailResults.Add(key, provider = p);
+                    }
+
+                    var location = provider
+                        .Locations
+                        .FirstOrDefault(loc => loc.Postcode == l.Postcode);
+
+                    if (location == null)
+                    {
+                        location = l;
+                        provider.Locations.Add(location);
+                    }
+
+                    var deliveryYear = location
+                        .DeliveryYears
+                        .FirstOrDefault(y => y.Year == dy.Year);
+
+                    if (deliveryYear == null)
+                    {
+                        deliveryYear = dy;
+
+                        deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
+
+                        location.DeliveryYears.Add(deliveryYear);
+                    }
+
+                    if (deliveryYear.Routes.All(z => z.RouteId != r.RouteId))
+                    {
+                        deliveryYear.Routes.Add(new RouteDetail { RouteId = r.RouteId, RouteName = r.RouteName });
+                    }
+
+                    var route = deliveryYear
+                        .Routes
+                        .FirstOrDefault(rt => rt.RouteId == r.RouteId);
+
+                    if (route != null && route.Qualifications.All(z => z.QualificationId != q.QualificationId))
+                    {
+                        route.Qualifications.Add(new QualificationDetail { QualificationId = q.QualificationId, QualificationName = q.QualificationName });
+                    }
+
+                    return provider;
+                },
+            splitOn: "UkPrn, Postcode, Year, RouteId, QualificationId",
+            commandType: CommandType.StoredProcedure);
+
+        var results = providerDetailResults
+            .Values
+            .OrderBy(p => p.Name)
+            .ToList();
+
+        return results;
+    }
+
     public async Task<bool> HasAny(bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -138,67 +206,6 @@ public class ProviderRepository : IProviderRepository
             "location qualifications", includeUpdated: false);
 
         transaction.Commit();
-    }
-
-    public async Task<IEnumerable<ProviderSearchResult>> GetAllProviderResults()
-    {
-        using var connection = _dbContextWrapper.CreateConnection();
-
-        var providerSearchResults = new Dictionary<string, ProviderSearchResult>();
-
-        await _dbContextWrapper
-            .QueryAsync<ProviderSearchResult, DeliveryYearSearchResult, RouteDto, QualificationDto, ProviderSearchResult>(
-                connection,
-                "GetAllProviders",
-                (p, ly, r, q) =>
-            {
-                var key = $"{p.UkPrn}_{p.Postcode}";
-                if (!providerSearchResults.TryGetValue(key, out var searchResult))
-                {
-                    providerSearchResults.Add(key, searchResult = p);
-                    //searchResult.JourneyToLink = fromGeoLocation.CreateJourneyLink(searchResult.Postcode);
-                }
-
-                var deliveryYear = searchResult
-                    .DeliveryYears
-                    .FirstOrDefault(y => y.Year == ly.Year);
-
-                if (deliveryYear == null)
-                {
-                    deliveryYear = ly;
-
-                    deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
-
-                    searchResult.DeliveryYears.Add(deliveryYear);
-                }
-
-                if (deliveryYear.Routes.All(z => z.Id != r.RouteId))
-                {
-                    deliveryYear.Routes.Add(new Route { Id = r.RouteId, Name = r.RouteName });
-                }
-
-                var route = deliveryYear
-                    .Routes
-                    .FirstOrDefault(rt => rt.Id == r.RouteId);
-
-                if (route != null && route.Qualifications.All(z => z.Id != q.QualificationId))
-                {
-                    route.Qualifications.Add(new Qualification { Id = q.QualificationId, Name = q.QualificationName });
-                }
-
-                return searchResult;
-            },
-            splitOn: "UkPrn, Postcode, Year, RouteId, QualificationId",
-            commandType: CommandType.StoredProcedure);
-
-        var results = providerSearchResults
-            .Values
-            .OrderBy(s => s.Distance)
-            .ThenBy(s => s.ProviderName)
-            .ThenBy(s => s.LocationName)
-            .ToList();
-
-        return results;
     }
 
     public async Task<(IEnumerable<ProviderSearchResult> SearchResults, int TotalResultsCount)> Search(
