@@ -10,4 +10,3 @@ public static class PropertyInfoExtensions
         return property.GetCustomAttribute<TAttribute>() != null;
     }
 }
-
