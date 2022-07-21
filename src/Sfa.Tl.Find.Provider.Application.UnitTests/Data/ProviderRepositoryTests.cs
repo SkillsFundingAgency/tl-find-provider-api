@@ -518,26 +518,26 @@ public class ProviderRepositoryTests
 
         foreach (var route in deliveryYear.Routes)
         {
-            var expectedRoute = expected.Routes.Single(r => r.RouteId == route.RouteId);
+            var expectedRoute = expected.Routes.Single(r => r.Id == route.Id);
             ValidateRoute(route, expectedRoute);
         }
     }
 
     private static void ValidateRoute(RouteDetail route, RouteDetail expected)
     {
-        route.RouteId.Should().Be(expected.RouteId);
-        route.RouteName.Should().Be(expected.RouteName);
+        route.Id.Should().Be(expected.Id);
+        route.Name.Should().Be(expected.Name);
 
         foreach (var qualification in route.Qualifications)
         {
-            var expectedQualification = expected.Qualifications.Single(q => q.QualificationId == qualification.QualificationId);
+            var expectedQualification = expected.Qualifications.Single(q => q.Id == qualification.Id);
             ValidateQualification(qualification, expectedQualification);
         }
     }
 
     private static void ValidateQualification(QualificationDetail qualification, QualificationDetail expected)
     {
-        qualification.QualificationId.Should().Be(expected.QualificationId);
-        qualification.QualificationName.Should().Be(expected.QualificationName);
+        qualification.Id.Should().Be(expected.Id);
+        qualification.Name.Should().Be(expected.Name);
     }
 }

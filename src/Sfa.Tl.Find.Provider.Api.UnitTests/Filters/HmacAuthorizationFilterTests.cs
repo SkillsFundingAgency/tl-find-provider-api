@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Text;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Filters;
@@ -65,7 +66,8 @@ public class HmacAuthorizationFilterTests
         var apiSettings = new SettingsBuilder()
             .BuildApiSettings();
 
-        var filter = new HmacAuthorizationFilterBuilder().Build(apiSettings);
+        var filter = new HmacAuthorizationFilterBuilder()
+            .Build(apiSettings);
 
         var header = new HmacAuthorizationHeaderBuilder()
             .WithAppId(apiSettings.AppId)
@@ -77,6 +79,35 @@ public class HmacAuthorizationFilterTests
 
         var context = new AuthorizationFilterContextBuilder()
             .Build(TestUri, header);
+
+        await filter.OnAuthorizationAsync(context);
+
+        context.HttpContext.Request.Headers.Should().ContainKey("Authorization", "Invalid precondition");
+        context.Result.Should().BeNull();
+    }
+    
+    [Fact]
+    public async Task Hmac_Authorization_Filter_Should_Pass_When_Request_Is_Post_With_Body()
+    {
+        var apiSettings = new SettingsBuilder()
+            .BuildApiSettings();
+
+        var filter = new HmacAuthorizationFilterBuilder()
+            .Build(apiSettings);
+
+        var payload = "{ \"test\": 1 }";
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(payload));
+
+        var header = new HmacAuthorizationHeaderBuilder()
+            .WithAppId(apiSettings.AppId)
+            .WithApiKey(apiSettings.ApiKey)
+            .WithMethod(HttpMethod.Post)
+            .WithUri(TestUri)
+            .WithBody(stream)
+            .Build();
+
+        var context = new AuthorizationFilterContextBuilder()
+            .Build(TestUri, header, stream, HttpMethod.Post.ToString());
 
         await filter.OnAuthorizationAsync(context);
 

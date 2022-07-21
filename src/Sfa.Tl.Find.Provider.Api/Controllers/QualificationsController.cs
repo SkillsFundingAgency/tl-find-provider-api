@@ -43,4 +43,13 @@ public class QualificationsController : ControllerBase
             ? Ok(qualifications)
             : NotFound();
     }
+
+    [HttpPost]
+    public IActionResult PostQualification(Qualification qualification)
+    {
+        _logger.LogDebug($"{nameof(QualificationsController)} {nameof(PostQualification)} called " +
+                         " with {id} {name}", qualification.Id, qualification.Name);
+
+        return Ok();
+    }
 }

@@ -1,11 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
-[DebuggerDisplay(" {" + nameof(QualificationId) + "}" +
-                 " {" + nameof(QualificationName) + ", nq}")]
+[DebuggerDisplay(" {" + nameof(Id) + "}" +
+                 " {" + nameof(Name) + ", nq}")]
 public class QualificationDetail
 {
-    public int QualificationId { get; init; }
-    public string QualificationName { get; init; }
+    [Column("QualificationId")]
+    public int Id { get; init; }
+    [Column("QualificationName")]
+    public string Name { get; init; }
 }

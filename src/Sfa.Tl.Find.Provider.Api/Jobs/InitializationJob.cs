@@ -33,7 +33,7 @@ public class InitializationJob : IJob
                 !await _providerDataService.HasProviders())
             {
                 _logger.LogInformation($"{nameof(InitializationJob)} importing providers and qualifications because no data exists.");
-                await _courseDirectoryService.ImportQualifications();
+                //await _courseDirectoryService.ImportQualifications();
                 await _courseDirectoryService.ImportProviders();
             }
 

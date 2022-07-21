@@ -71,7 +71,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
             context.Result = new StatusCodeResult(500);
         }
     }
-        
+
     private async Task<bool> IsValidRequest(HttpRequest request, string appId, string incomingBase64Signature, string nonce, string requestTimeStamp)
     {
         if (!AllowedApps.ContainsKey(appId))
@@ -86,9 +86,9 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         }
 
         var requestContentBase64String = "";
-            
-        var hash = await ComputeHash(request.Body);
-        if (hash != null)
+
+        var hash = await ComputeHash(request);
+        if (hash != null && request.Method != "GET")
         {
             requestContentBase64String = Convert.ToBase64String(hash);
         }
@@ -103,7 +103,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         using var hmac = new HMACSHA256(secretKeyBytes);
         var signatureBytes = hmac.ComputeHash(signature);
         var base64Signature = Convert.ToBase64String(signatureBytes);
-            
+
         return incomingBase64Signature.Equals(base64Signature, StringComparison.Ordinal);
     }
 
@@ -120,7 +120,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
 
         var serverTotalSeconds = Convert.ToUInt64(currentTs.TotalSeconds);
         var requestTotalSeconds = Convert.ToUInt64(requestTimeStamp);
-            
+
         var difference = serverTotalSeconds > requestTotalSeconds
             ? serverTotalSeconds - requestTotalSeconds
             : requestTotalSeconds - serverTotalSeconds;
@@ -140,13 +140,37 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
 
         return false;
     }
-
-    private static async Task<byte[]> ComputeHash(Stream inputStream)
+    
+    private static async Task<byte[]> ComputeHash(HttpRequest request)
     {
         using var md5 = MD5.Create();
-        return inputStream.CanRead && inputStream.CanSeek && inputStream.Length != 0 ?
-            await md5.ComputeHashAsync(inputStream)
-            : null;
+
+        //request.Body.Seek(0, SeekOrigin.Begin);
+        //var rq = request;
+        //var b = request.BodyReader;
+        //var rdr = request.BodyReader;
+
+        //var r = await request.BodyReader.ReadAsync();
+        //{
+        var stream = request.BodyReader.AsStream(true);
+        //if (stream.Length > 0)
+        //if (request.Body.Length > 0)
+        {
+            var hash = await md5.ComputeHashAsync(stream);
+            request.Body.Seek(0, SeekOrigin.Begin);
+            return hash;
+        }
+
+        //if (request.Body.CanRead
+        //    && request.Body.CanSeek
+        //    && request.Body.Length != 0)
+        //{
+        //    request.Body.Seek(0, SeekOrigin.Begin);
+        //    var hash = await md5.ComputeHashAsync(request.Body);
+        //    request.Body.Seek(0, SeekOrigin.Begin);
+        //    return hash;
+        //}
+        return null;
     }
 
     private (string appId,
@@ -164,7 +188,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
                 credentialsArray[3]);
         }
 
-        _logger.LogWarning("Credentials array had unexpected length {credentialsArray.Length}", 
+        _logger.LogWarning("Credentials array had unexpected length {credentialsArray.Length}",
             credentialsArray.Length);
 
         return null;

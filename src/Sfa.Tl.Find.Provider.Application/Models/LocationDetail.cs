@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
@@ -6,9 +7,12 @@ namespace Sfa.Tl.Find.Provider.Application.Models;
                  " {" + nameof(Name) + ", nq}")]
 public class LocationDetail
 {
+    [Column("LocationName")]
     public string Name { get; init; }
     public string Postcode { get; init; }
+    [Column("LocationAddressLine1")]
     public string AddressLine1 { get; init; }
+    [Column("LocationAddressLine2")]
     public string AddressLine2 { get; init; }
     public string Town { get; init; }
     public string County { get; init; }

@@ -18,23 +18,23 @@ AS
 
 	NearestLocationsCTE AS (
 		SELECT	p.[UkPrn],
-				p.[Name] AS [ProviderName],
-				p.[Email] AS [ProviderEmail],
-				p.[Telephone] AS [ProviderTelephone],
-				p.[Website] AS [ProviderWebsite],
+				p.[Name],
+				p.[Email],
+				p.[Telephone],
+				p.[Website],
+				p.[IsAdditionalData],
 				l.[Id] AS [LocationId],
 				l.[Postcode],
 				l.[Name] AS [LocationName],
-				ISNULL([AddressLine1], '') AS [AddressLine1],
-				ISNULL([AddressLine2], '') AS [AddressLine2],
-				ISNULL(l.[Town], '') AS [Town],
-				ISNULL(l.[County], '') AS [County],
-				COALESCE(NULLIF(l.[Email], ''), p.[Email], '') AS [Email],
-				COALESCE(NULLIF(l.[Telephone], ''), p.[Telephone], '') AS [Telephone],
-				COALESCE(NULLIF(l.[Website], ''), p.[Website], '') AS [Website],
+				l.[AddressLine1] AS [LocationAddressLine1],
+				l.[AddressLine2] AS [LocationAddressLine2],
+				l.[Town] AS [Town],
+				l.[County] AS [County],
+				l.[Email] AS [LocationEmail],
+				l.[Telephone] AS [LocationTelephone],
+				l.[Website] AS [LocationWebsite],
 				l.[Latitude],
-				l.[Longitude],
-				p.[IsAdditionalData]
+				l.[Longitude]
 		FROM	[ProvidersCTE] p
 		INNER JOIN	[dbo].[Location] l
 		ON		p.[Id] = l.[ProviderId]
@@ -69,14 +69,14 @@ AS
 
 		--Step 2 - add in the qualifications 
 		SELECT 	[UkPrn],
-				[ProviderName],
-				[ProviderEmail],
-				[ProviderTelephone],
-				[ProviderWebsite],
+				l.[Name],
+				[Email],
+				[Telephone],
+				[Website],
 				[Postcode],
 				[LocationName],
-				[AddressLine1],
-				[AddressLine2],
+				[LocationAddressLine1],
+				[LocationAddressLine2],
 				t.[TownName] AS [Town],
 				[County],
 				[Email],
@@ -103,7 +103,7 @@ AS
 		INNER JOIN	[dbo].[Route] r
 		ON		r.[Id] = rq.[RouteId]
 			AND	r.[IsDeleted] = 0
-		ORDER BY [ProviderName],
+		ORDER BY	l.[Name],
 					[LocationName],
 					lq.[DeliveryYear],
 					r.[Name],

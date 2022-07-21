@@ -42,19 +42,19 @@ public class ProviderDetailBuilder
                                 {
                                     new()
                                     {
-                                        RouteId = 1,
-                                        RouteName = "Test Route 1",
+                                        Id = 1,
+                                        Name = "Test Route 1",
                                         Qualifications = new List<QualificationDetail>
                                         {
                                             new()
                                             {
-                                                QualificationId = 31,
-                                                QualificationName = "Test Qualification 31"
+                                                Id = 31,
+                                                Name = "Test Qualification 31"
                                             },
                                             new()
                                             {
-                                                QualificationId = 32,
-                                                QualificationName = "Test Qualification 32"
+                                                Id = 32,
+                                                Name = "Test Qualification 32"
                                             }
                                         }
                                     }
@@ -99,14 +99,14 @@ public class ProviderDetailBuilder
                                 {
                                     new()
                                     {
-                                        RouteId = 2,
-                                        RouteName = "Test Route 2",
+                                        Id = 2,
+                                        Name = "Test Route 2",
                                         Qualifications = new List<QualificationDetail>
                                         {
                                             new()
                                             {
-                                                QualificationId = 51,
-                                                QualificationName = "Test Qualification 51"
+                                                Id = 51,
+                                                Name = "Test Qualification 51"
                                             }
                                         }
                                     }
@@ -120,14 +120,14 @@ public class ProviderDetailBuilder
                                 {
                                     new()
                                     {
-                                        RouteId = 3,
-                                        RouteName = "Test Route 3",
+                                        Id = 3,
+                                        Name = "Test Route 3",
                                         Qualifications = new List<QualificationDetail>
                                         {
                                             new()
                                             {
-                                                QualificationId = 52,
-                                                QualificationName = "Test Qualification 52"
+                                                Id = 52,
+                                                Name = "Test Qualification 52"
                                             }
                                         }
                                     }
@@ -177,14 +177,14 @@ public class ProviderDetailBuilder
                                 {
                                         new()
                                         {
-                                            RouteId = 1,
-                                            RouteName = "Test Route 1",
+                                            Id = 1,
+                                            Name = "Test Route 1",
                                             Qualifications = new List<QualificationDetail>
                                             {
                                                 new()
                                                 {
-                                                    QualificationId = 31,
-                                                    QualificationName = "Test Qualification 31"
+                                                    Id = 31,
+                                                    Name = "Test Qualification 31"
                                                 }
                                             }
                                         }
@@ -246,8 +246,8 @@ public class ProviderDetailBuilder
         {
             new()
             {
-                RouteId = 1,
-                RouteName = "Test Route 1"
+                Id = 1,
+                Name = "Test Route 1"
             }
         };
 
@@ -256,8 +256,8 @@ public class ProviderDetailBuilder
         {
                 new()
                 {
-                    QualificationId = 31,
-                    QualificationName = "Test Qualification 31"
+                    Id = 31,
+                    Name = "Test Qualification 31"
                 }
         };
 }
