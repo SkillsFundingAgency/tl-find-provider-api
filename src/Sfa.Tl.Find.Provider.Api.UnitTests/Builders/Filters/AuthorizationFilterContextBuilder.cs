@@ -12,8 +12,8 @@ public class AuthorizationFilterContextBuilder
     public AuthorizationFilterContext Build(
         string requestUri,
         IHeaderDictionary requestHeaders = null,
-        Stream stream = null,
-        string method = "GET")
+        string method = "GET",
+        Stream stream = null)
     {
         if (requestUri == null) throw new ArgumentNullException(nameof(requestUri));
 

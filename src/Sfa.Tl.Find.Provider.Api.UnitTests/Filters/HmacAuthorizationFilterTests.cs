@@ -107,7 +107,7 @@ public class HmacAuthorizationFilterTests
             .Build();
 
         var context = new AuthorizationFilterContextBuilder()
-            .Build(TestUri, header, stream, HttpMethod.Post.ToString());
+            .Build(TestUri, header, HttpMethod.Post.ToString(), stream);
 
         await filter.OnAuthorizationAsync(context);
 
