@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.Filters;
@@ -88,7 +89,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         var requestContentBase64String = "";
 
         var hash = await ComputeHash(request);
-        if (hash != null && request.Method != "GET")
+        if (hash != null)
         {
             requestContentBase64String = Convert.ToBase64String(hash);
         }
@@ -145,32 +146,10 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
     {
         using var md5 = MD5.Create();
 
-        //request.Body.Seek(0, SeekOrigin.Begin);
-        //var rq = request;
-        //var b = request.BodyReader;
-        //var rdr = request.BodyReader;
-
-        //var r = await request.BodyReader.ReadAsync();
-        //{
-        var stream = request.BodyReader.AsStream(true);
-        //if (stream.Length > 0)
-        //if (request.Body.Length > 0)
-        {
-            var hash = await md5.ComputeHashAsync(stream);
-            request.Body.Seek(0, SeekOrigin.Begin);
-            return hash;
-        }
-
-        //if (request.Body.CanRead
-        //    && request.Body.CanSeek
-        //    && request.Body.Length != 0)
-        //{
-        //    request.Body.Seek(0, SeekOrigin.Begin);
-        //    var hash = await md5.ComputeHashAsync(request.Body);
-        //    request.Body.Seek(0, SeekOrigin.Begin);
-        //    return hash;
-        //}
-        return null;
+        var bodyBytes = await request.GetRawBodyBytesAsync();
+        return bodyBytes.Length > 0 
+            ? md5.ComputeHash(bodyBytes)
+            : null;
     }
 
     private (string appId,

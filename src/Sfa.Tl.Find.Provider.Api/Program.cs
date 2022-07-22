@@ -103,14 +103,7 @@ try
     app.UseIpRateLimiting();
 
     app.UseRouting();
-
-    app.Use(async (context, next) =>
-    {
-        //Need this to allow reading of body in HMAC authorization filter
-        context.Request.EnableBuffering();
-        await next.Invoke();
-    });
-
+    
     app.UseEndpoints(endpoints =>
     {
         endpoints.MapControllers();

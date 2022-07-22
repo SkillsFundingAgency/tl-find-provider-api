@@ -95,7 +95,7 @@ public class HmacAuthorizationFilterTests
         var filter = new HmacAuthorizationFilterBuilder()
             .Build(apiSettings);
 
-        var payload = "{ \"test\": 1 }";
+        const string payload = "{ \"test\": 1 }";
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(payload));
 
         var header = new HmacAuthorizationHeaderBuilder()
