@@ -34,10 +34,10 @@ public class CourseDirectoryServiceTests
             { CourseDirectoryService.CourseDetailEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelsResponse() }
         };
 
-        IList<Application.Models.Provider> receivedProviders = null;
+        IList<Models.Provider> receivedProviders = null;
 
         var providerRepository = Substitute.For<IProviderRepository>();
-        await providerRepository.Save(Arg.Do<IList<Application.Models.Provider>>(
+        await providerRepository.Save(Arg.Do<IList<Models.Provider>>(
             x => receivedProviders = x?.ToList()));
 
         var service = new CourseDirectoryServiceBuilder()
@@ -54,7 +54,7 @@ public class CourseDirectoryServiceTests
         targetProvider!.UkPrn.Should().Be(10000055);
         targetProvider.Name.Should().BeEquivalentTo("ABINGDON AND WITNEY COLLEGE");
 
-        ValidateProvider(targetProvider, 
+        targetProvider.Validate( 
             10000055,
             "ABINGDON AND WITNEY COLLEGE",
             "Wootton Road",
@@ -68,7 +68,7 @@ public class CourseDirectoryServiceTests
             2);
 
         var abingdonLocation = targetProvider.Locations.Single(l => l.Postcode == "OX14 1GG");
-        ValidateLocation(abingdonLocation,
+        abingdonLocation.Validate(
             "ABINGDON CAMPUS",
             "OX14 1GG",
             "Wootton Road",
@@ -81,11 +81,11 @@ public class CourseDirectoryServiceTests
             51.680637,
             -1.286943,
             1);
-            
-        ValidateDeliveryYear(abingdonLocation.DeliveryYears.First(), 2021, new[] { 37, 38, 41 });
+
+        abingdonLocation.DeliveryYears.First().Validate(2021, new[] { 37, 38, 41 });
         var witneyLocation = targetProvider.Locations.Single(l => l.Postcode == "OX28 6NE");
-            
-        ValidateLocation(witneyLocation,
+
+        witneyLocation.Validate(
             "WITNEY CAMPUS",
             "OX28 6NE",
             "Holloway Road",
@@ -99,7 +99,7 @@ public class CourseDirectoryServiceTests
             -1.487948,
             1);
 
-        ValidateDeliveryYear(witneyLocation.DeliveryYears.First(), 2021, new[] { 37, 38, 41 });
+        witneyLocation.DeliveryYears.First().Validate(2021, new[] { 37, 38, 41 });
     }
         
     [Fact]
@@ -162,78 +162,5 @@ public class CourseDirectoryServiceTests
         cache
             .Received(1)
             .Remove(CacheKeys.QualificationsKey);
-    }
-
-    private static void ValidateProvider(Application.Models.Provider provider, 
-        long ukPrn,
-        string name,
-        string addressLine1,
-        string addressLine2,
-        string town,
-        string county,
-        string postcode,
-        string email,
-        string telephone,
-        string website,
-        int locationCount = 0)
-    {
-        provider.UkPrn.Should().Be(ukPrn);
-        provider.Name.Should().Be(name);
-        provider.AddressLine1.Should().Be(addressLine1);
-        provider.AddressLine2.Should().Be(addressLine2);
-        provider.Town.Should().Be(town);
-        provider.County.Should().Be(county);
-        provider.Postcode.Should().Be(postcode);
-        provider.Email.Should().Be(email);
-        provider.Telephone.Should().Be(telephone);
-        provider.Website.Should().Be(website);
-
-        provider.Locations.Should().NotBeNull();
-        provider.Locations.Should().HaveCount(locationCount);
-    }
-
-    private static void ValidateLocation(Location location, 
-        string name,
-        string postcode,
-        string addressLine1,
-        string addressLine2,
-        string town,
-        string county,
-        string email,
-        string telephone,
-        string website,
-        double latitude, 
-        double longitude,
-        int deliveryYearCount = 0)
-    {
-        location.Name.Should().Be(name);
-
-        location.Postcode.Should().Be(postcode);
-        location.AddressLine1.Should().Be(addressLine1);
-        location.AddressLine2.Should().Be(addressLine2);
-        location.Town.Should().Be(town);
-        location.County.Should().Be(county);
-        location.Email.Should().Be(email);
-        location.Telephone.Should().Be(telephone);
-        location.Website.Should().Be(website);
-
-        location.Latitude.Should().Be(latitude);
-        location.Longitude.Should().Be(longitude);
-
-        location.DeliveryYears.Should().NotBeNull();
-        location.DeliveryYears.Should().HaveCount(deliveryYearCount);
-    }
-        
-    private static void ValidateDeliveryYear(DeliveryYear deliveryYear, short year, IReadOnlyCollection<int> qualificationIds)
-    {
-        deliveryYear.Year.Should().Be(year);
-
-        deliveryYear.Qualifications.Should().NotBeNull();
-        deliveryYear.Qualifications.Should().HaveCount(qualificationIds.Count);
-
-        foreach (var qualificationId in qualificationIds)
-        {
-            deliveryYear.Qualifications.Should().Contain(q => q.Id == qualificationId);
-        }
     }
 }

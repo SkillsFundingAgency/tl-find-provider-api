@@ -19,6 +19,7 @@ public class ProviderDetailBuilder
                 Email = "email.address@provider1.ac.uk",
                 Telephone = "011 111 1111",
                 Website = "https://www.provider1.ac.uk",
+                IsAdditionalData = true,
                 Locations = new List<LocationDetail>
                 {
                     new()
@@ -76,6 +77,7 @@ public class ProviderDetailBuilder
                 Email = "email.address@provider2.ac.uk",
                 Telephone = "022 222 2222",
                 Website = "https://www.provider2.ac.uk",
+                IsAdditionalData = false,
                 Locations = new List<LocationDetail>
                 {
                     new()
@@ -154,6 +156,7 @@ public class ProviderDetailBuilder
                 Email = "email.address@provider1.ac.uk",
                 Telephone = "011 111 1111",
                 Website = "https://www.provider1.ac.uk",
+                IsAdditionalData = true,
                 Locations = new List<LocationDetail>
                 {
                     new()
@@ -210,7 +213,8 @@ public class ProviderDetailBuilder
                 County = "Provider 1 County",
                 Email = "email.address@provider1.ac.uk",
                 Telephone = "011 111 1111",
-                Website = "https://www.provider1.ac.uk"
+                Website = "https://www.provider1.ac.uk",
+                IsAdditionalData = true
             }
         };
 

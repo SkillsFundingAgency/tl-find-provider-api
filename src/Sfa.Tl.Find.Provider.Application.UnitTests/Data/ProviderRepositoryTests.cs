@@ -1,11 +1,9 @@
 ﻿using System.Data;
-using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
@@ -23,7 +21,8 @@ public class ProviderRepositoryTests
         var expectedResult = new ProviderDetailBuilder()
             .BuildListWithSingleItem();
 
-        var repository = await BuildRepositoryWithDataToGetAllProviders();
+        var repository = await new ProviderRepositoryBuilder()
+            .BuildRepositoryWithDataToGetAllProviders();
 
         var results = (await repository
             .GetAll())
@@ -32,7 +31,7 @@ public class ProviderRepositoryTests
         results.Should().NotBeNull();
         results!.Count.Should().Be(1);
 
-        ValidateProvider(results.First(), expectedResult.First());
+        results.First().Validate(expectedResult.First());
     }
 
     [Fact]
@@ -243,7 +242,8 @@ public class ProviderRepositoryTests
         var expectedResult = new ProviderSearchResultBuilder()
             .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
-        var repository = await BuildRepositoryWithDataToSearchProviders();
+        var repository = await new ProviderRepositoryBuilder()
+            .BuildRepositoryWithDataToSearchProviders();
 
         var searchResults = await repository.Search(fromGeoLocation, null, null, 0, 5, false);
 
@@ -252,7 +252,7 @@ public class ProviderRepositoryTests
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
 
-        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
+        searchResultsList.First().Validate(expectedResult);
     }
 
     [Fact]
@@ -263,7 +263,8 @@ public class ProviderRepositoryTests
         var expectedResult = new ProviderSearchResultBuilder()
              .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
-        var repository = await BuildRepositoryWithDataToSearchProviders();
+        var repository = await new ProviderRepositoryBuilder()
+            .BuildRepositoryWithDataToSearchProviders();
 
         var searchResults = await repository
             .Search(
@@ -279,265 +280,6 @@ public class ProviderRepositoryTests
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
 
-        ValidateProviderSearchResult(searchResultsList.First(), expectedResult);
-    }
-
-    private static async Task<IProviderRepository> BuildRepositoryWithDataToSearchProviders()
-    {
-        var builder = new ProviderSearchResultBuilder();
-        var providersPart = builder
-            .BuildProvidersPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-        var deliveryYearsPart = builder
-            .BuildDeliveryYearsPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-        var routesPart = builder
-            .BuildRoutesPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-        var qualificationsPart = builder
-            .BuildQualificationsPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
-
-        var callIndex = 0;
-
-        await dbContextWrapper
-            .QueryAsync(dbConnection,
-                "SearchProviders",
-                Arg.Do<Func<ProviderSearchResult, DeliveryYearSearchResult, RouteDto, QualificationDto, ProviderSearchResult>>(
-                    x =>
-                    {
-                        var p = providersPart[callIndex];
-                        var d = deliveryYearsPart[callIndex];
-                        var r = routesPart[callIndex];
-                        var q = qualificationsPart[callIndex];
-                        x.Invoke(p, d, r, q);
-
-                        callIndex++;
-                    }),
-                Arg.Any<object>(),
-                splitOn: Arg.Any<string>(),
-                commandType: CommandType.StoredProcedure
-            );
-
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
-
-        var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
-        var parameters = new DynamicParameters();
-        parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
-        dynamicParametersWrapper.DynamicParameters.Returns(parameters);
-
-        return new ProviderRepositoryBuilder()
-            .Build(
-                dbContextWrapper,
-                dynamicParametersWrapper: dynamicParametersWrapper,
-                dateTimeService: dateTimeService);
-    }
-
-    private static async Task<IProviderRepository> BuildRepositoryWithDataToGetAllProviders()
-    {
-        var builder = new ProviderDetailBuilder();
-        var providersPart = builder
-            .BuildProvidersPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-        var locationsPart = builder
-            .BuildLocationsPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-        var deliveryYearsPart = builder
-            .BuildDeliveryYearsPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-        var routesPart = builder
-            .BuildRoutesPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-        var qualificationsPart = builder
-            .BuildQualificationsPartOfListWithSingleItem()
-            .Take(1)
-            .ToList();
-
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
-
-        var callIndex = 0;
-
-        await dbContextWrapper
-            .QueryAsync(dbConnection,
-                "GetAllProviders",
-                Arg.Do<Func<ProviderDetail, LocationDetail, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>>(
-                    x =>
-                    {
-                        var p = providersPart[callIndex];
-                        var l = locationsPart[callIndex];
-                        var d = deliveryYearsPart[callIndex];
-                        var r = routesPart[callIndex];
-                        var q = qualificationsPart[callIndex];
-                        x.Invoke(p, l, d, r, q);
-
-                        callIndex++;
-                    }),
-                Arg.Any<object>(),
-                splitOn: Arg.Any<string>(),
-                commandType: CommandType.StoredProcedure
-            );
-
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
-
-        var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
-        var parameters = new DynamicParameters();
-        parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
-        dynamicParametersWrapper.DynamicParameters.Returns(parameters);
-
-        return new ProviderRepositoryBuilder()
-            .Build(
-                dbContextWrapper,
-                dynamicParametersWrapper: dynamicParametersWrapper,
-                dateTimeService: dateTimeService);
-    }
-
-    private static void ValidateProviderSearchResult(ProviderSearchResult result, ProviderSearchResult expected)
-    {
-        result.UkPrn.Should().Be(expected.UkPrn);
-        result.ProviderName.Should().Be(expected.ProviderName);
-        result.Postcode.Should().Be(expected.Postcode);
-        result.LocationName.Should().Be(expected.LocationName);
-        result.AddressLine1.Should().Be(expected.AddressLine1);
-        result.AddressLine2.Should().Be(expected.AddressLine2);
-        result.Town.Should().Be(expected.Town);
-        result.County.Should().Be(expected.County);
-        result.Email.Should().Be(expected.Email);
-        result.Telephone.Should().Be(expected.Telephone);
-        result.Website.Should().Be(expected.Website);
-        result.Distance.Should().Be(expected.Distance);
-        result.JourneyToLink.Should().Be(expected.JourneyToLink);
-
-        result.DeliveryYears.Should().NotBeNull();
-        result.DeliveryYears.Count.Should().Be(expected.DeliveryYears.Count);
-
-        foreach (var deliveryYear in result.DeliveryYears)
-        {
-            var expectedDeliveryYear = expected.DeliveryYears.Single(dy => dy.Year == deliveryYear.Year);
-            ValidateDeliveryYear(deliveryYear, expectedDeliveryYear);
-        }
-    }
-
-    private static void ValidateDeliveryYear(DeliveryYearSearchResult deliveryYear, DeliveryYearSearchResult expected)
-    {
-        deliveryYear.Year.Should().Be(expected.Year);
-        deliveryYear.IsAvailableNow.Should().Be(expected.IsAvailableNow);
-        deliveryYear.Routes.Should().NotBeNull();
-        deliveryYear.Routes.Count.Should().Be(expected.Routes.Count);
-
-        foreach (var route in deliveryYear.Routes)
-        {
-            var expectedRoute = expected.Routes.Single(r => r.Id == route.Id);
-            ValidateRoute(route, expectedRoute);
-        }
-    }
-
-    private static void ValidateRoute(Route route, Route expected)
-    {
-        route.Id.Should().Be(expected.Id);
-        route.Name.Should().Be(expected.Name);
-
-        foreach (var qualification in route.Qualifications)
-        {
-            var expectedQualification = expected.Qualifications.Single(q => q.Id == qualification.Id);
-            ValidateQualification(qualification, expectedQualification);
-        }
-    }
-
-    private static void ValidateQualification(Qualification qualification, Qualification expected)
-    {
-        qualification.Id.Should().Be(expected.Id);
-        qualification.Name.Should().Be(expected.Name);
-    }
-
-    private static void ValidateProvider(ProviderDetail provider, ProviderDetail expected)
-    {
-        provider.UkPrn.Should().Be(expected.UkPrn);
-        provider.Name.Should().Be(expected.Name);
-        provider.Postcode.Should().Be(expected.Postcode);
-        provider.AddressLine1.Should().Be(expected.AddressLine1);
-        provider.AddressLine2.Should().Be(expected.AddressLine2);
-        provider.Town.Should().Be(expected.Town);
-        provider.County.Should().Be(expected.County);
-        provider.Email.Should().Be(expected.Email);
-        provider.Telephone.Should().Be(expected.Telephone);
-        provider.Website.Should().Be(expected.Website);
-
-        provider.Locations.Should().NotBeNull();
-        provider.Locations.Count.Should().Be(expected.Locations.Count);
-
-        foreach (var location in provider.Locations)
-        {
-            var expectedLocation = expected.Locations.Single(l => l.Postcode == location.Postcode);
-            ValidateLocation(location, expectedLocation);
-        }
-    }
-
-    private static void ValidateLocation(LocationDetail location, LocationDetail expected)
-    {
-        location.Postcode.Should().Be(expected.Postcode);
-        location.Name.Should().Be(expected.Name);
-        location.AddressLine1.Should().Be(expected.AddressLine1);
-        location.AddressLine2.Should().Be(expected.AddressLine2);
-        location.Town.Should().Be(expected.Town);
-        location.County.Should().Be(expected.County);
-        location.Email.Should().Be(expected.Email);
-        location.Telephone.Should().Be(expected.Telephone);
-        location.Website.Should().Be(expected.Website);
-        location.Latitude.Should().Be(expected.Latitude);
-        location.Longitude.Should().Be(expected.Longitude);
-
-        location.DeliveryYears.Should().NotBeNull();
-        location.DeliveryYears.Count.Should().Be(expected.DeliveryYears.Count);
-
-        foreach (var deliveryYear in location.DeliveryYears)
-        {
-            var expectedDeliveryYear = expected.DeliveryYears.Single(dy => dy.Year == deliveryYear.Year);
-            ValidateDeliveryYear(deliveryYear, expectedDeliveryYear);
-        }
-    }
-    private static void ValidateDeliveryYear(DeliveryYearDetail deliveryYear, DeliveryYearDetail expected)
-    {
-        deliveryYear.Year.Should().Be(expected.Year);
-        deliveryYear.IsAvailableNow.Should().Be(expected.IsAvailableNow);
-        deliveryYear.Routes.Should().NotBeNull();
-        deliveryYear.Routes.Count.Should().Be(expected.Routes.Count);
-
-        foreach (var route in deliveryYear.Routes)
-        {
-            var expectedRoute = expected.Routes.Single(r => r.Id == route.Id);
-            ValidateRoute(route, expectedRoute);
-        }
-    }
-
-    private static void ValidateRoute(RouteDetail route, RouteDetail expected)
-    {
-        route.Id.Should().Be(expected.Id);
-        route.Name.Should().Be(expected.Name);
-
-        foreach (var qualification in route.Qualifications)
-        {
-            var expectedQualification = expected.Qualifications.Single(q => q.Id == qualification.Id);
-            ValidateQualification(qualification, expectedQualification);
-        }
-    }
-
-    private static void ValidateQualification(QualificationDetail qualification, QualificationDetail expected)
-    {
-        qualification.Id.Should().Be(expected.Id);
-        qualification.Name.Should().Be(expected.Name);
+        searchResultsList.First().Validate(expectedResult);
     }
 }
