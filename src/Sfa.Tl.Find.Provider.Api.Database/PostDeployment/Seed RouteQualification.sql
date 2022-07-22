@@ -5,15 +5,11 @@ Qualifications that don't exist yet are commented ouyt.
 As new qualifications are created, the mapping can be set here.
 */
 
---TODO: Remove this delete when we have the final framework codes below
-DELETE FROM [dbo].[RouteQualification]
-WHERE [QualificationId] > 1000
-
 MERGE INTO [dbo].[RouteQualification] AS Target 
 USING (VALUES 
   -- Agriculture, environment and animal car
   (1, 1052), -- Agriculture, Land Management and Production
-  (1, 1053), -- Animal Care and Management
+  (1, 1053), -- Animal Care
 
   -- Business and administration
   (2, 51), -- Management and Administration
@@ -44,7 +40,7 @@ USING (VALUES
   (8, 50),  --Engineering, Manufacturing, Processing and Control
 
   -- Hair and beauty
-  (9, 1057),  -- Hair, Beauty and Aesthetics
+  (9, 1057),  -- Hairdressing, Barbering and Beauty Therapy
 
   -- Health and science
   (10, 41), -- Health

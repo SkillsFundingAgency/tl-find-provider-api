@@ -6,39 +6,53 @@ This is an insert-only script - the nightly import will manage any changes
 */
 
 --TODO: Remove this delete when we have the final framework codes below
-DELETE FROM [dbo].[Qualification]
-WHERE [Id] > 1000
+--DELETE FROM [dbo].[RouteQualification]
+--WHERE [QualificationId] > 1000
+--DELETE FROM [dbo].[Qualification]
+--WHERE [Id] > 1000
 
 MERGE INTO [dbo].[Qualification] AS Target 
 USING (VALUES 
-  (36, N'Design, Surveying and Planning for Construction'),
-  (37, N'Digital Production, Design and Development'),
-  (38, N'Education and Childcare'),
-  (39, N'Digital Business Services'),
-  (40, N'Digital Support Services'),
-  (41, N'Health'),
-  (42, N'Healthcare Science'),
-  (43, N'Science'),
-  (44, N'Onsite Construction'),
-  (45, N'Building Services Engineering for Construction'),
-  (46, N'Finance'),
-  (47, N'Accounting'),
-  (48, N'Design and Development for Engineering and Manufacturing'),
-  (49, N'Maintenance, Installation and Repair for Engineering and Manufacturing'),
-  (50, N'Engineering, Manufacturing, Processing and Control'),
-  (51, N'Management and Administration'),
+  (36, N'Design, Surveying and Planning for Construction', 0),
+  (37, N'Digital Production, Design and Development', 0),
+  (38, N'Education and Childcare', 0),
+  (39, N'Digital Business Services', 0),
+  (40, N'Digital Support Services', 0),
+  (41, N'Health', 0),
+  (42, N'Healthcare Science', 0),
+  (43, N'Science', 0),
+  (44, N'Onsite Construction', 0),
+  (45, N'Building Services Engineering for Construction', 0),
+  (46, N'Finance', 0),
+  (47, N'Accounting', 0),
+  (48, N'Design and Development for Engineering and Manufacturing', 0),
+  (49, N'Maintenance, Installation and Repair for Engineering and Manufacturing', 0),
+  (50, N'Engineering, Manufacturing, Processing and Control', 0),
+  (51, N'Management and Administration', 0),
   --TODO: Fix the framework codes and hard-delete > 1000
-  (1052, N'Agriculture, Land Management and Production'),
-  (1053, N'Animal Care and Management'),
-  (1054, N'Catering'),
-  (1055, N'Craft and Design'),
-  (1056, N'Media, Broadcast and Production'),
-  (1057, N'Hair, Beauty and Aesthetics'),
-  (1058, N'Legal Services')
+  (1052, N'Agriculture, Land Management and Production', 0),
+  (1053, N'Animal Care', 0),
+  (1054, N'Catering', 0),
+  (1055, N'Craft and Design', 0),
+  (1056, N'Media, Broadcast and Production', 0),
+  (1057, N'Hairdressing, Barbering and Beauty Therapy', 0),
+  (1058, N'Legal Services', 0)
   )
-  AS Source ([Id], [Name]) 
+  AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 
+WHEN MATCHED 
+	 AND (Target.[Name] <> Source.[Name] COLLATE Latin1_General_CS_AS
+	 OR Target.[IsDeleted] <> Source.[IsDeleted])
+THEN 
+UPDATE SET 
+	[Name] = Source.[Name],
+	[ModifiedOn] = GETDATE(),
+    [IsDeleted] = Source.[IsDeleted]
 WHEN NOT MATCHED BY TARGET THEN 
 	INSERT ([Id], [Name], [IsDeleted]) 
-	VALUES ([Id], [Name], 0) 
+	VALUES ([Id], [Name], [IsDeleted]) 
+WHEN NOT MATCHED BY SOURCE THEN 
+UPDATE SET 
+	[ModifiedOn] = GETDATE(),
+    [IsDeleted] = 1
 ;
