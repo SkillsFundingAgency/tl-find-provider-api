@@ -50,6 +50,7 @@ public class RouteRepository : IRouteRepository
                         {
                             Id = q.QualificationId,
                             Name = q.QualificationName,
+                            NumberOfQualificationsOffered = q.NumberOfQualificationsOffered
                         });
                     routeResult.NumberOfQualificationsOffered += q.NumberOfQualificationsOffered;
                 }
