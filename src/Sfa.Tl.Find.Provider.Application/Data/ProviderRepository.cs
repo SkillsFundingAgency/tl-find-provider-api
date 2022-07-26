@@ -71,14 +71,14 @@ public class ProviderRepository : IProviderRepository
                         location.DeliveryYears.Add(deliveryYear);
                     }
 
-                    if (deliveryYear.Routes.All(z => z.Id != r.Id))
+                    if (deliveryYear.Routes.All(z => z.RouteId != r.RouteId))
                     {
-                        deliveryYear.Routes.Add(new RouteDetail { Id = r.Id, Name = r.Name });
+                        deliveryYear.Routes.Add(new RouteDetail { RouteId = r.RouteId, RouteName = r.RouteName });
                     }
 
                     var route = deliveryYear
                         .Routes
-                        .FirstOrDefault(rt => rt.Id == r.Id);
+                        .FirstOrDefault(rt => rt.RouteId == r.RouteId);
 
                     if (route != null && route.Qualifications.All(z => z.Id != q.Id))
                     {

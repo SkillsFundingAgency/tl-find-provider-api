@@ -24,10 +24,10 @@ public class ProviderDetailBuilder
                 {
                     new()
                     {
-                        Name = "Location 1",
+                        LocationName = "Location 1",
                         Postcode = "AA1 1BB",
-                        AddressLine1 = "Location 1 Address Line 1",
-                        AddressLine2 = "Location 1 Address Line 2",
+                        LocationAddressLine1 = "Location 1 Address Line 1",
+                        LocationAddressLine2 = "Location 1 Address Line 2",
                         Town = "Location 1 Town",
                         County = "Location 1 County",
                         Email = "location1.email.address@provider1.ac.uk",
@@ -43,8 +43,8 @@ public class ProviderDetailBuilder
                                 {
                                     new()
                                     {
-                                        Id = 1,
-                                        Name = "Test Route 1",
+                                        RouteId = 1,
+                                        RouteName = "Test Route 1",
                                         Qualifications = new List<QualificationDetail>
                                         {
                                             new()
@@ -82,10 +82,10 @@ public class ProviderDetailBuilder
                 {
                     new()
                         {
-                        Name = "Location 2",
+                        LocationName = "Location 2",
                         Postcode = "AA1 1BB",
-                        AddressLine1 = "Location 2 Address Line 1",
-                        AddressLine2 = "Location 2 Address Line 2",
+                        LocationAddressLine1 = "Location 2 Address Line 1",
+                        LocationAddressLine2 = "Location 2 Address Line 2",
                         Town = "Location 2 Town",
                         County = "Location 2 County",
                         Email = "location2.email.address@provider2.ac.uk",
@@ -101,8 +101,8 @@ public class ProviderDetailBuilder
                                 {
                                     new()
                                     {
-                                        Id = 2,
-                                        Name = "Test Route 2",
+                                        RouteId = 2,
+                                        RouteName = "Test Route 2",
                                         Qualifications = new List<QualificationDetail>
                                         {
                                             new()
@@ -122,8 +122,8 @@ public class ProviderDetailBuilder
                                 {
                                     new()
                                     {
-                                        Id = 3,
-                                        Name = "Test Route 3",
+                                        RouteId = 3,
+                                        RouteName = "Test Route 3",
                                         Qualifications = new List<QualificationDetail>
                                         {
                                             new()
@@ -161,10 +161,10 @@ public class ProviderDetailBuilder
                 {
                     new()
                     {
-                        Name = "Location 1",
+                        LocationName = "Location 1",
                         Postcode = "AA1 1BB",
-                        AddressLine1 = "Location 1 Address Line 1",
-                        AddressLine2 = "Location 1 Address Line 2",
+                        LocationAddressLine1 = "Location 1 Address Line 1",
+                        LocationAddressLine2 = "Location 1 Address Line 2",
                         Town = "Location 1 Town",
                         County = "Location 1 County",
                         Email = "location1.email.address@provider1.ac.uk",
@@ -180,8 +180,8 @@ public class ProviderDetailBuilder
                                 {
                                         new()
                                         {
-                                            Id = 1,
-                                            Name = "Test Route 1",
+                                            RouteId = 1,
+                                            RouteName = "Test Route 1",
                                             Qualifications = new List<QualificationDetail>
                                             {
                                                 new()
@@ -223,10 +223,10 @@ public class ProviderDetailBuilder
         {
             new()
             {
-                Name = "Location 1",
+                LocationName = "Location 1",
                 Postcode = "AA1 1BB",
-                AddressLine1 = "Location 1 Address Line 1",
-                AddressLine2 = "Location 1 Address Line 2",
+                LocationAddressLine1 = "Location 1 Address Line 1",
+                LocationAddressLine2 = "Location 1 Address Line 2",
                 Town = "Location 1 Town",
                 County = "Location 1 County",
                 Email = "location1.email.address@provider1.ac.uk",
@@ -250,8 +250,8 @@ public class ProviderDetailBuilder
         {
             new()
             {
-                Id = 1,
-                Name = "Test Route 1"
+                RouteId = 1,
+                RouteName = "Test Route 1"
             }
         };
 

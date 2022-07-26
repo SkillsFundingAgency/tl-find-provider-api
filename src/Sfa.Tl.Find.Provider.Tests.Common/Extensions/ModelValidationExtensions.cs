@@ -118,9 +118,9 @@ public static class ModelValidationExtensions
     public static void Validate(this LocationDetail location, LocationDetail expected)
     {
         location.Postcode.Should().Be(expected.Postcode);
-        location.Name.Should().Be(expected.Name);
-        location.AddressLine1.Should().Be(expected.AddressLine1);
-        location.AddressLine2.Should().Be(expected.AddressLine2);
+        location.LocationName.Should().Be(expected.LocationName);
+        location.LocationAddressLine1.Should().Be(expected.LocationAddressLine1);
+        location.LocationAddressLine2.Should().Be(expected.LocationAddressLine2);
         location.Town.Should().Be(expected.Town);
         location.County.Should().Be(expected.County);
         location.Email.Should().Be(expected.Email);
@@ -175,7 +175,7 @@ public static class ModelValidationExtensions
 
         foreach (var route in deliveryYear.Routes)
         {
-            var expectedRoute = expected.Routes.Single(r => r.Id == route.Id);
+            var expectedRoute = expected.Routes.Single(r => r.RouteId == route.RouteId);
             route.Validate(expectedRoute);
         }
     }
@@ -194,8 +194,8 @@ public static class ModelValidationExtensions
 
     public static void Validate(this RouteDetail route, RouteDetail expected)
     {
-        route.Id.Should().Be(expected.Id);
-        route.Name.Should().Be(expected.Name);
+        route.RouteId.Should().Be(expected.RouteId);
+        route.RouteName.Should().Be(expected.RouteName);
 
         foreach (var qualification in route.Qualifications)
         {

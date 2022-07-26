@@ -1,16 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
-[DebuggerDisplay(" {" + nameof(Id) + "}" +
-                 " {" + nameof(Name) + ", nq})")]
+[DebuggerDisplay(" {" + nameof(RouteId) + "}" +
+                 " {" + nameof(RouteName) + ", nq})")]
 public class RouteDetail
 {
-    [Column("RouteId")]
-    public int Id { get; init; }
-    [Column("RouteName")]
-    public string Name { get; init; }
+    [JsonPropertyName("id")]
+    public int RouteId { get; init; }
+    [JsonPropertyName("name")]
+    public string RouteName { get; init; }
     public IList<QualificationDetail> Qualifications { get; init; } 
         = new List<QualificationDetail>();
 }

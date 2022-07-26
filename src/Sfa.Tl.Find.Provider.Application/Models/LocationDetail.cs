@@ -1,19 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("{" + nameof(Postcode) + "}" +
-                 " {" + nameof(Name) + ", nq}")]
+                 " {" + nameof(LocationName) + ", nq}")]
 public class LocationDetail
 {
-    [Column("LocationName")]
-    public string Name { get; init; }
+    [JsonPropertyName("name")]
+    public string LocationName { get; init; }
     public string Postcode { get; init; }
-    [Column("LocationAddressLine1")]
-    public string AddressLine1 { get; init; }
-    [Column("LocationAddressLine2")]
-    public string AddressLine2 { get; init; }
+    [JsonPropertyName("addressLine1")]
+    public string LocationAddressLine1 { get; init; }
+    [JsonPropertyName("addressLine2")]
+    public string LocationAddressLine2 { get; init; }
     public string Town { get; init; }
     public string County { get; init; }
     public string Email { get; init; }

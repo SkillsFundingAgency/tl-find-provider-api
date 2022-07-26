@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
@@ -7,8 +7,8 @@ namespace Sfa.Tl.Find.Provider.Application.Models;
                  " {" + nameof(Name) + ", nq}")]
 public class QualificationDetail
 {
-    [Column("QualificationId")]
+    [JsonPropertyName("id")]
     public int Id { get; init; }
-    [Column("QualificationName")]
+    [JsonPropertyName("name")]
     public string Name { get; init; }
 }
