@@ -48,11 +48,12 @@ AS
 	LEFT JOIN	[RouteQualification] rq
 	ON		r.[Id] = rq.[RouteId]
 	  AND	r.[IsDeleted] = 0
-	LEFT JOIN LocationsCTE cte
-	ON cte.RouteId = r.[Id]
 	LEFT JOIN [Qualification] q
 	ON q.Id = rq.[QualificationId]
-	  AND	r.[IsDeleted] = 0
+	  AND	q.[IsDeleted] = 0
+	LEFT JOIN LocationsCTE cte
+	ON cte.[RouteId] = r.[Id]
+	AND cte.[QualificationId] = q.[Id]
 	GROUP BY q.[Id],
 			 q.[Name],
 			 r.[Id],
