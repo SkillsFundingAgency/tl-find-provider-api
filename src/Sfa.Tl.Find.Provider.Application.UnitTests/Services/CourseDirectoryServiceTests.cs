@@ -34,10 +34,10 @@ public class CourseDirectoryServiceTests
             { CourseDirectoryService.CourseDetailEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelsResponse() }
         };
 
-        IList<Models.Provider> receivedProviders = null;
+        IList<Application.Models.Provider> receivedProviders = null;
 
         var providerRepository = Substitute.For<IProviderRepository>();
-        await providerRepository.Save(Arg.Do<IList<Models.Provider>>(
+        await providerRepository.Save(Arg.Do<IList<Application.Models.Provider>>(
             x => receivedProviders = x?.ToList()));
 
         var service = new CourseDirectoryServiceBuilder()

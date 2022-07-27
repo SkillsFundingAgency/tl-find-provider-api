@@ -52,7 +52,6 @@ public class RouteRepository : IRouteRepository
                             Name = q.QualificationName,
                             NumberOfQualificationsOffered = q.NumberOfQualificationsOffered
                         });
-                    routeResult.NumberOfQualificationsOffered += q.NumberOfQualificationsOffered;
                 }
 
                 return routeResult;
