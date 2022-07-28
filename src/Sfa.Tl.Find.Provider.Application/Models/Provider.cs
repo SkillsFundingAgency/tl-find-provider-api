@@ -19,5 +19,6 @@ public class Provider
     public string Website { get; init; }
     public bool IsAdditionalData { get; init; }
 
-    [Write(false)] public ICollection<Location> Locations { get; init; }
+    [Write(false)] 
+    public ICollection<Location> Locations { get; init; }
 }

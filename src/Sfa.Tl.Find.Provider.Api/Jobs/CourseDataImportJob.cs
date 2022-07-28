@@ -22,7 +22,7 @@ public class CourseDataImportJob : IJob
 
         try
         {
-            //await _courseDirectoryService.ImportQualifications();
+            await _courseDirectoryService.ImportQualifications();
             await _courseDirectoryService.ImportProviders();
 
             _logger.LogInformation($"{nameof(CourseDataImportJob)} job completed successfully.");
