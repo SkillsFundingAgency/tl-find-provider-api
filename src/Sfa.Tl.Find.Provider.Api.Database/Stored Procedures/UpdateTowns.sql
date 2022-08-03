@@ -55,7 +55,7 @@ AS
 
 	OUTPUT $action, 
 		INSERTED.[Id]
-	INTO @ChangeSummary	;
+	INTO @ChangeSummary;
 
 	SELECT	Change, 
 			COUNT(*) AS CountPerChange	 

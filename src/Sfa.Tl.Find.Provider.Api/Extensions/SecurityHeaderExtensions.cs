@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-
-namespace Sfa.Tl.Find.Provider.Api.Extensions;
+﻿namespace Sfa.Tl.Find.Provider.Api.Extensions;
 
 public static class SecurityHeaderExtensions
 {

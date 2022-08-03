@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -14,18 +11,24 @@ public class AuthorizationFilterContextBuilder
 {
     public AuthorizationFilterContext Build(
         string requestUri,
-        IHeaderDictionary requestHeaders = null)
+        IHeaderDictionary requestHeaders = null,
+        string method = "GET",
+        Stream stream = null)
     {
         if (requestUri == null) throw new ArgumentNullException(nameof(requestUri));
-            
+
         var uri = new Uri(requestUri);
-            
+
+        var bodyStream = stream ?? new MemoryStream();
+        bodyStream.Position = 0;
+
         var httpRequest = new HttpRequestFeature
         {
-            Method = "GET",
+            Method = method,
             Scheme = uri.Scheme,
             Path = uri.AbsolutePath,
             QueryString = uri.Query,
+            Body = bodyStream
         };
 
         if (requestHeaders != null && requestHeaders.Any())
@@ -42,7 +45,9 @@ public class AuthorizationFilterContextBuilder
             {
                 Host = uri.Port > 0 && !uri.IsDefaultPort
                     ? new HostString(uri.Host, uri.Port)
-                    : new HostString(uri.Host)
+                    : new HostString(uri.Host),
+                Body = bodyStream,
+                ContentLength = bodyStream.Length
             }
         };
 

@@ -1,12 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Attributes;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -47,5 +42,14 @@ public class QualificationsController : ControllerBase
         return qualifications != null
             ? Ok(qualifications)
             : NotFound();
+    }
+
+    [HttpPost]
+    public IActionResult PostQualification(Qualification qualification)
+    {
+        _logger.LogInformation($"{nameof(QualificationsController)} {nameof(PostQualification)} called " +
+                         " with {id} {name}", qualification.Id, qualification.Name);
+
+        return Ok();
     }
 }

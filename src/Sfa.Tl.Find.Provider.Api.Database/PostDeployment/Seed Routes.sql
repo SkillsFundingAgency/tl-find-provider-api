@@ -18,7 +18,7 @@ USING (VALUES
   (10, N'Health and Science', 0),
   (11, N'Legal, Finance and Accounting', 0)
   )
-  AS Source ([Id], [Name], [IsDeleted] ) 
+  AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 
 WHEN MATCHED 
 	 AND (Target.[Name] <> Source.[Name] COLLATE Latin1_General_CS_AS

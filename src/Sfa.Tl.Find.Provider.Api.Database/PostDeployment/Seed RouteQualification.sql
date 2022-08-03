@@ -8,14 +8,14 @@ As new qualifications are created, the mapping can be set here.
 MERGE INTO [dbo].[RouteQualification] AS Target 
 USING (VALUES 
   -- Agriculture, environment and animal car
-  --(1, ), -- Agriculture, Land Management and Production
-  --(1, ), -- Animal Care and Management
+  (1, 1052), -- Agriculture, Land Management and Production
+  (1, 1053), -- Animal Care
 
   -- Business and administration
   (2, 51), -- Management and Administration
 
   -- Catering
-  --(3, ),  -- Catering
+  (3, 1054),  -- Catering
 
   -- Construction and the built environment
   (4, 45),  -- Building Services Engineering for Construction
@@ -23,8 +23,8 @@ USING (VALUES
   (4, 44),  -- Onsite Construction
 
   -- Creative and design
-  --(5, ),  -- Craft and Design
-  --(5, ),  -- Media, Broadcast and Production
+  (5, 1055),  -- Craft and Design
+  (5, 1056),  -- Media, Broadcast and Production
 
   -- Digital and IT
   (6, 39),  -- Digital Business Services
@@ -40,7 +40,7 @@ USING (VALUES
   (8, 50),  --Engineering, Manufacturing, Processing and Control
 
   -- Hair and beauty
-  --(9, ),  -- Hair, Beauty and Aesthetics
+  (9, 1057),  -- Hairdressing, Barbering and Beauty Therapy
 
   -- Health and science
   (10, 41), -- Health
@@ -49,8 +49,8 @@ USING (VALUES
 
   --Legal, finance and accounting
   (11, 46), -- Finance
-  (11, 47) -- Accounting
-  --(11, ) -- Legal Services
+  (11, 47), -- Accounting
+  (11, 1058) -- Legal Services
   )
   AS Source ([RouteId], [QualificationId])
 ON Target.[RouteId] = Source.[RouteId] 

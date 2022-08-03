@@ -1,15 +1,10 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Quartz.Util;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -97,5 +92,21 @@ public class ProvidersController : ControllerBase
             _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
+    }
+
+    [HttpGet]
+    [Route("all", Name = "GetAllProviderData")]
+    [ProducesResponseType(typeof(ProviderDetailResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetAllProviderData()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
+        }
+
+        var providerDetailResponse = await _providerDataService.GetAllProviders();
+
+        return Ok(providerDetailResponse);
     }
 }

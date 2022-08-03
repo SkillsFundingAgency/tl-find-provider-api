@@ -1,8 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
-using Xunit;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 
@@ -146,5 +145,15 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
         await response.Content.ValidateProblemDetails(
             ("pageSize", "The pageSize field must be at least one."),
             ("page", "The page field must be zero or greater."));
+    }
+
+    [Fact]
+    public async Task GetAllProviderData_Returns_OK_Result()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v3/providers/all");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

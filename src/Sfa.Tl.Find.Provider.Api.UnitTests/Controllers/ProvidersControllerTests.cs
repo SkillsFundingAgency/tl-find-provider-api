@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
-using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Models;
-using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
-using Xunit;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 
@@ -47,7 +42,33 @@ public class ProvidersControllerTests
         typeof(ProvidersController)
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
-    
+
+    [Fact]
+    public async Task GetAllProviders_Returns_Expected_List()
+    {
+        var providerDataService = Substitute.For<IProviderDataService>();
+        var providers = new ProviderDetailBuilder().BuildList().ToList();
+
+        providerDataService.GetAllProviders()
+            .Returns(new ProviderDetailResponse
+            {
+                Providers = providers//new ProviderDetailBuilder().BuildList()
+            });
+
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService);
+
+        var result = await controller.GetAllProviderData();
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var results = okResult.Value as ProviderDetailResponse;
+        results.Should().NotBeNull();
+        results!.Providers.Should().BeEquivalentTo(providers);
+    }
+
     [Fact]
     public async Task GetProviders_Passes_Default_Parameters()
     {
