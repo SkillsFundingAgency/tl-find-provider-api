@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.Extensions;
-using Xunit;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 

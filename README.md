@@ -197,3 +197,11 @@ results are cached to avoid duplicate calls.
 
 Provider and course details are read from the NCS Course directory API. This is called from a scheduled Quartz job.
 
+
+## Notes
+
+While we wait for the final framework codes, temporary codes have been created in the database post deployment scripts.
+
+Until then, calls to `_courseDirectoryService.ImportQualifications()` 
+have been removed from `InitializationJob` and `CourseDataImportJob`
+When these lines are restored, two tests will need to be fixed because they now expect the mothod not to be called.

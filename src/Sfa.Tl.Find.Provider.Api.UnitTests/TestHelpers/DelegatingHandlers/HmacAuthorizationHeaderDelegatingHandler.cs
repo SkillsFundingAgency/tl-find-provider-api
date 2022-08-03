@@ -1,10 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Api.Models.Configuration;
+﻿using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.DelegatingHandlers;
 

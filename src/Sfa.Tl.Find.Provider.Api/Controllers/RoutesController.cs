@@ -1,12 +1,6 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Attributes;
-using Sfa.Tl.Find.Provider.Api.Interfaces;
-using Sfa.Tl.Find.Provider.Api.Models;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -27,14 +21,14 @@ public class RoutesController : ControllerBase
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-   
+
     /// <summary>
     /// Returns a list of all routes.
     /// </summary>
     /// <returns>Json with routes.</returns>
     [HttpGet]
     [Route("", Name = "GetRoutes")]
-    [ProducesResponseType(typeof(IEnumerable<Route>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<Application.Models.Route>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetRoutes()
     {
