@@ -69,6 +69,7 @@
     <None Include="Sfa.Tl.Find.Provider.Api.Database.publish.xml" />
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
     <Build Include="Types\IdListTableType.sql" />
+    <None Include="PostDeployment\Seed Email Templates.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
@@ -101,6 +102,7 @@
     <Build Include="Functions\ReplaceAllFunction.sql" />
     <Build Include="Indexes\IX_TownSearchView_Search.sql" />
     <Build Include="Stored Procedures\GetAllProviders.sql" />
+    <Build Include="Tables\EmailTemplate.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

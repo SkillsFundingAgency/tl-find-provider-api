@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{70EED7E5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C34F8FB5-19A4-4C56-97EE-C3F69B4F84CA}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
@@ -20,9 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{D3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Application", "Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj", "{1C0A3667-3C39-4CC5-A488-6FA664ADBFA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Application.UnitTests", "Sfa.Tl.Find.Provider.Application.UnitTests\Sfa.Tl.Find.Provider.Application.UnitTests.csproj", "{E16FF601-CF62-42CC-A7FC-5A596162A736}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Application.UnitTests", "Sfa.Tl.Find.Provider.Application.UnitTests\Sfa.Tl.Find.Provider.Application.UnitTests.csproj", "{E16FF601-CF62-42CC-A7FC-5A596162A736}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Tests.Common", "Sfa.Tl.Find.Provider.Tests.Common\Sfa.Tl.Find.Provider.Tests.Common.csproj", "{DE813CCA-8455-4960-810E-D7C6E522D3A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Tests.Common", "Sfa.Tl.Find.Provider.Tests.Common\Sfa.Tl.Find.Provider.Tests.Common.csproj", "{DE813CCA-8455-4960-810E-D7C6E522D3A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

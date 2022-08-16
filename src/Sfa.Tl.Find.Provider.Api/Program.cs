@@ -50,12 +50,17 @@ try
         .AddScoped<IDateTimeService, DateTimeService>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
+        .AddTransient<IEmailService, EmailService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
+        .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
         .AddTransient<IProviderRepository, ProviderRepository>()
         .AddTransient<IQualificationRepository, QualificationRepository>()
         .AddTransient<IRouteRepository, RouteRepository>()
         .AddTransient<ITownRepository, TownRepository>();
+
+    builder.Services.AddNotifyService(
+        siteConfiguration.EmailSettings.GovNotifyApiKey);
 
     builder.Services.AddQuartzServices(
         siteConfiguration.CourseDirectoryImportSchedule,
