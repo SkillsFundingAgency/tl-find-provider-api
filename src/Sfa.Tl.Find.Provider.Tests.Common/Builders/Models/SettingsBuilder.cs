@@ -1,6 +1,6 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
-
+// ReSharper disable UnusedMember.Global
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
