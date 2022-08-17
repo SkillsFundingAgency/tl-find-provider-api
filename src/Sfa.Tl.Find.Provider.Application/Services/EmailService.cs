@@ -23,20 +23,28 @@ public class EmailService : IEmailService
     public async Task<bool> SendEmail(
         string recipient,
         string templateName,
-        IDictionary<string, string> tokens)
+        IDictionary<string, string> tokens = null)
     {
         var dynamicTokens =
-            tokens?.Select(x => new {key = x.Key, val = (dynamic) x.Value})
+            tokens?.Select(x => new { key = x.Key, val = (dynamic)x.Value })
                 .ToDictionary(item => item.key, item => item.val);
 
         return await SendEmail(recipient, templateName, dynamicTokens);
     }
 
     public async Task<bool> SendEmail(
-        string recipient, 
+        string recipients,
         string templateName,
-        Dictionary<string, dynamic> tokens = null)
+        Dictionary<string, dynamic> tokens)
     {
+        var recipientList = recipients?.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        if (recipientList == null || !recipientList.Any())
+        {
+            _logger.LogWarning("There are no email recipients.");
+            return false;
+        }
+
         var emailTemplate = await _emailTemplateRepository.GetEmailTemplate(templateName);
         if (emailTemplate == null)
         {
@@ -44,87 +52,34 @@ public class EmailService : IEmailService
             return false;
         }
 
-        try
+        var allEmailsSent = true;
+        foreach (var recipient in recipientList)
         {
-            var emailResponse = await _notificationClient
-                .SendEmailAsync(
-                    recipient, 
-                    emailTemplate.TemplateId.ToString(), 
-                    tokens);
-
-            if (_logger.IsEnabled(LogLevel.Information))
-            {
-                _logger.LogInformation("Email sent - notification id '{id}', " +
-                                    "reference '{reference}, " +
-                                    "content '{content}'",
-                    emailResponse.id, emailResponse.reference, emailResponse.content);
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error sending email template {emailTemplateId} to {recipient}.",
-                emailTemplate.TemplateId, recipient);
-        }
-
-        return false;
-    }
-
-    /*
-public async Task<bool> SendEmployerContactEmail(
-            string fullName,
-            string organisationName,
-            string phone,
-            string email)
-        {
-            var toAddresses = _configuration.SupportEmailInboxAddress?.Split(';', StringSplitOptions.RemoveEmptyEntries);
-
-            if (toAddresses == null || !toAddresses.Any())
-            {
-                _logger.LogError("There are no support email addresses defined.");
-                return false;
-            }
-            
-            var tokens = new Dictionary<string, dynamic>
-            {
-                { "full_name", fullName },
-                { "organisation_name", organisationName },
-                { "organisation_phone_number", phone },
-                { "organisation_email_address", email }
-            };
-
-            var allEmailsSent = true;
-            foreach (var toAddress in toAddresses)
-            {
-                allEmailsSent &= await SendEmail(toAddress,
-                    _configuration.EmployerContactEmailTemplateId,
-                    tokens);
-            }
-
-            return allEmailsSent;
-        }
-        
-        private async Task<bool> SendEmail(string recipient, string emailTemplateId,
-            Dictionary<string, dynamic> personalisationTokens)
-        {
-            var emailSent = false;
-
             try
             {
-                var emailResponse = await _notificationClient.SendEmailAsync(recipient, emailTemplateId, personalisationTokens);
+                var emailResponse = await _notificationClient
+                    .SendEmailAsync(
+                        recipient,
+                        emailTemplate.TemplateId,
+                        tokens);
 
-                _logger.LogInformation($"Email sent - notification id '{emailResponse.id}', " +
-                                       $"reference '{emailResponse.reference}, " +
-                                       $"content '{emailResponse.content}'");
-                emailSent = true;
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("Email sent - notification id '{id}', " +
+                                        "reference '{reference}, " +
+                                        "content '{content}'",
+                        emailResponse.id, emailResponse.reference, emailResponse.content);
+                }
             }
             catch (Exception ex)
             {
-                var message = $"Error sending email template {emailTemplateId} to {recipient}. {ex.Message}";
-                _logger.LogError(ex, message);
-            }
+                allEmailsSent = false;
 
-            return emailSent;
-        }     */
+                _logger.LogError(ex, "Error sending email template {emailTemplateId} to {recipient}.",
+                emailTemplate.TemplateId, recipient);
+            }
+        }
+
+        return allEmailsSent;
+    }
 }

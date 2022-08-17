@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
 public class EmailServiceBuilder
 {
-    public EmailService Build(
+    public IEmailService Build(
         IEmailTemplateRepository emailTemplateRepository = null,
         IAsyncNotificationClient notificationClient = null,
         ILogger<EmailService> logger = null)

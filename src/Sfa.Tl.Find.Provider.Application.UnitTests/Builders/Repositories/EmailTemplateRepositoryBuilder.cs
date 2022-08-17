@@ -1,28 +1,37 @@
-﻿using Microsoft.Extensions.Logging;
-using NSubstitute;
-using Polly.Registry;
+﻿using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
 
 public class EmailTemplateRepositoryBuilder
 {
-    public EmailTemplateRepository Build(
+    public IEmailTemplateRepository Build(
         IDbContextWrapper dbContextWrapper = null,
-        IDynamicParametersWrapper dynamicParametersWrapper = null,
-        IReadOnlyPolicyRegistry<string> policyRegistry = null,
-        ILogger<EmailTemplateRepository> logger = null)
+        IDynamicParametersWrapper dynamicParametersWrapper = null)
     {
         dbContextWrapper ??= Substitute.For<IDbContextWrapper>();
         dynamicParametersWrapper ??= Substitute.For<IDynamicParametersWrapper>();
-        policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
-        logger ??= Substitute.For<ILogger<EmailTemplateRepository>>();
 
         return new EmailTemplateRepository(
             dbContextWrapper,
-            dynamicParametersWrapper,
-            policyRegistry,
-            logger);
+            dynamicParametersWrapper);
+    }
+
+    public IEmailTemplateRepository BuildSubstitute(string templateId, string templateName)
+    {
+        var emailTemplateRepository = Substitute.For<IEmailTemplateRepository>();
+        if (templateId != null && templateName != null)
+        {
+            emailTemplateRepository.GetEmailTemplate(templateName)
+                .Returns(new EmailTemplate
+                {
+                    TemplateId = templateId,
+                    Name = templateName
+                });
+        }
+
+        return emailTemplateRepository;
     }
 }
