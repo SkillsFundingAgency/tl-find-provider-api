@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
 public class TownDataServiceBuilder
 {
-    public TownDataService Build(
+    public ITownDataService Build(
         HttpClient httpClient = null,
         ITownRepository townRepository = null,
         ILogger<TownDataService> logger = null)
@@ -23,7 +23,7 @@ public class TownDataServiceBuilder
             logger);
     }
 
-    public TownDataService Build(
+    public ITownDataService Build(
         IDictionary<string, string> responseMessages,
         ITownRepository townRepository = null,
         ILogger<TownDataService> logger = null)

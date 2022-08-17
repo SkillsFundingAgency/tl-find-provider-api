@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
 
 public class RouteRepositoryBuilder
 {
-    public RouteRepository Build(
+    public IRouteRepository Build(
         IDbContextWrapper dbContextWrapper = null,
         IDynamicParametersWrapper dynamicParametersWrapper = null)
     {

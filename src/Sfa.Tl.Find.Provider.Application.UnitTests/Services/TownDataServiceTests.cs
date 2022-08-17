@@ -51,9 +51,7 @@ public class TownDataServiceTests
     [Fact]
     public void GetUri_Returns_Expected_Value()
     {
-        var service = new TownDataServiceBuilder()
-                .Build();
-        var uri = service.GetUri(2, 999);
+        var uri = TownDataService.GetUri(2, 999);
 
         uri.Should().NotBeNull();
         uri.AbsoluteUri.Should().Be(ThirdPageUriString);

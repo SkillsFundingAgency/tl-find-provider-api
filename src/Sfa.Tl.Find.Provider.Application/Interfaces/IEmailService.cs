@@ -6,7 +6,7 @@ public interface IEmailService
     Task<bool> SendEmail(
         string recipient,
         string templateName, 
-        IDictionary<string, string> tokens);
+        IDictionary<string, string> tokens = null);
 
     Task<bool> SendEmail(
         string recipient,

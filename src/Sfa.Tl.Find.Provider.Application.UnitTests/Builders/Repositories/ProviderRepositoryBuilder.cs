@@ -13,7 +13,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
 
 public class ProviderRepositoryBuilder
 {
-    public ProviderRepository Build(
+    public IProviderRepository Build(
         IDbContextWrapper dbContextWrapper = null,
         IDynamicParametersWrapper dynamicParametersWrapper = null,
         IDateTimeService dateTimeService = null,
