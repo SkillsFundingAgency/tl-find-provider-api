@@ -48,6 +48,20 @@
       ],
       "type": "object"
     },
+    "EmailSettings": {
+      "properties": {
+        "GovNotifyApiKey": {
+          "type": "string",
+          "environmentVariable": "EmailSettings_GovNotifyApiKey"
+        },
+        "SupportEmailAddress": {
+          "type": "string",
+          "environmentVariable": "EmailSettings_SupportEmailAddress"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "PostcodeApiSettings": {
       "properties": {
         "BaseUri": {
