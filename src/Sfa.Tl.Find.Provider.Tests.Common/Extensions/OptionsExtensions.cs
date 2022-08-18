@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 public static class OptionsExtensions
 {
-    public static IOptions<T> ToOptions<T>(this T? settings)
+    public static IOptions<T> ToOptions<T>(this T settings)
         where T : class =>
         new Func<IOptions<T>>(() =>
         {

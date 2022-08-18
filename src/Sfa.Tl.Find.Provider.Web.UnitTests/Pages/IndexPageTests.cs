@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Web.Pages;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -14,11 +15,23 @@ public class IndexPageTests
     }
 
     [Fact]
-    public void IndexModel_OnGet_Populates_Page_Properties()
+    public async Task IndexModel_OnGet_Populates_Page_Properties()
     {
-        var pageModel = new IndexModel(Substitute.For<ILogger<IndexModel>>());
+        var qualifications = new QualificationBuilder().BuildList();
+        var qualificationRepository = Substitute.For<IQualificationRepository>();
+        qualificationRepository.GetAll().Returns(qualifications);
 
-        pageModel.OnGet();
+        var emailOptions = new SettingsBuilder()
+            .BuildEmailSettings()
+            .ToOptions();
+
+        var pageModel = new IndexModel(
+            emailOptions,
+            Substitute.For<IEmailService>(),
+            qualificationRepository,
+            Substitute.For<ILogger<IndexModel>>());
+
+        await pageModel.OnGet();
 
         //TODO: Add tests
     }

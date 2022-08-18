@@ -1,5 +1,7 @@
+using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Security;
 
@@ -9,12 +11,7 @@ builder.Services
     .AddApplicationInsightsTelemetry();
 
 var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
-//TODO: Add config
-//builder.Services
-//    .Configure<LinkSettings>(x =>
-//    {
-//        x.ConfigureLinkSettings(siteConfiguration.LinkSettings);
-//    });
+builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -35,9 +32,30 @@ if (!builder.Environment.IsDevelopment())
         options.MaxAge = TimeSpan.FromDays(365);
     });
 }
+builder.Services
+    .AddPolicyRegistry()
+    .AddDapperRetryPolicy();
 
-var _webRootPath = builder.Environment.WebRootPath;
-var _contentRootPath = builder.Environment.ContentRootPath;
+builder.Services.AddHttpClients();
+
+builder.Services
+    .AddScoped<IDateTimeService, DateTimeService>()
+    .AddScoped<IDbContextWrapper, DbContextWrapper>()
+    .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
+    .AddTransient<IEmailService, EmailService>()
+    .AddTransient<IProviderDataService, ProviderDataService>()
+    .AddTransient<ITownDataService, TownDataService>()
+    .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
+    .AddTransient<IProviderRepository, ProviderRepository>()
+    .AddTransient<IQualificationRepository, QualificationRepository>()
+    .AddTransient<IRouteRepository, RouteRepository>()
+    .AddTransient<ITownRepository, TownRepository>();
+
+builder.Services.AddNotifyService(
+    siteConfiguration.EmailSettings.GovNotifyApiKey);
+
+var webRootPath = builder.Environment.WebRootPath;
+var contentRootPath = builder.Environment.ContentRootPath;
 
 var app = builder.Build();
 
@@ -53,37 +71,36 @@ app.UseReferrerPolicy(opts => opts.NoReferrer())
 
 app.UseWhen(
     ctx => IsNotImgFile(ctx.Request.Path),
-    //|| ctx..Response.Re.Result is ViewResult
-    app =>
-        app.UseXContentTypeOptions());
+    appBuilder =>
+        appBuilder.UseXContentTypeOptions());
 
 app.UseWhen(
-        ctx => IsNotCssOrImgOrFontFile(ctx.Request.Path)
-        //|| ctx..Response.Re.Result is ViewResult
-        ,
-   app =>
-    app//.UseXContentTypeOptions()
-        .UseCsp(options => options
-       .FrameAncestors(s => s.None())
-       .ObjectSources(s => s.None())
-       .ScriptSources(s => s
-           .CustomSources("https:",
-                "https://www.google-analytics.com/analytics.js",
-                "https://www.googletagmanager.com/",
-                "https://tagmanager.google.com/")
-           .UnsafeInline()
-       ))
-       .Use(async (context, next) =>
-{
-    context.Response.Headers.Add("Expect-CT", "max-age=0, enforce");
-    context.Response.Headers.Add("Permissions-Policy", SecurityPolicies.PermissionsList);
-    await next.Invoke();
-})
+        ctx => IsNotCssOrImgOrFontFile(ctx.Request.Path),
+        appBuilder =>
+            appBuilder
+                //.UseXContentTypeOptions()
+            .UseCsp(options => options
+                    .FrameAncestors(s => s.None())
+                    .ObjectSources(s => s.None())
+                    .ScriptSources(s => s
+                        .CustomSources("https:",
+                            "https://www.google-analytics.com/analytics.js",
+                            "https://www.googletagmanager.com/",
+                            "https://tagmanager.google.com/")
+                        .UnsafeInline()
+                    ))
+                .Use(async (context, next) =>
+                {
+                    context.Response.Headers.Add("Expect-CT", "max-age=0, enforce");
+                    context.Response.Headers.Add("Permissions-Policy", SecurityPolicies.PermissionsList);
+                    await next.Invoke();
+                })
     );
+
 
 //app.UseWhen(
 //    ctx => IsCssOrJsFile(ctx.Request.Path),
-//    app => app.UseXContentTypeOptions());
+//    appBuilder => appBuilder.UseXContentTypeOptions());
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -91,8 +108,8 @@ app.UseCookiePolicy();
 
 app.UseWhen(
     ctx => IsNotJsOrCssFile(ctx.Request.Path),
-    app =>
-        app.UseXXssProtection(opts => opts.EnabledWithBlockMode()));
+    appBuilder =>
+        appBuilder.UseXXssProtection(opts => opts.EnabledWithBlockMode()));
 
 app.UseRouting();
 
@@ -110,33 +127,33 @@ app.Run();
 //var _fp = new PhysicalFileProvider()//
 bool IsNotJsFile(string path)
 {
-    var starts = path.StartsWith(_webRootPath);
-    var starts2 = path.StartsWith(_contentRootPath);
+    if (string.IsNullOrEmpty(path)) return false;
+    var starts = !string.IsNullOrEmpty(webRootPath) && path.StartsWith(webRootPath);
+    var starts2 = !string.IsNullOrEmpty(webRootPath) && path.StartsWith(contentRootPath);
     return !path.EndsWith(".js");
 }
 
 bool IsNotImgFile(string path)
 {
-    var starts = path.StartsWith(_webRootPath);
-    var starts2 = path.StartsWith(_contentRootPath);
+    var starts = path.StartsWith(webRootPath);
+    var starts2 = path.StartsWith(contentRootPath);
     return !path.Contains("/assets/images/");
 }
 
 bool IsNotJsOrCssFile(string path)
 {
-    var starts = path.StartsWith(_webRootPath);
-    var starts2 = path.StartsWith(_contentRootPath);
+    var starts = path.StartsWith(webRootPath);
+    var starts2 = path.StartsWith(contentRootPath);
     return !path.EndsWith(".css") && !path.EndsWith(".js");
 }
 
 bool IsNotCssOrImgOrFontFile(string path)
 {
-    var starts = path.StartsWith(_webRootPath);
-    var starts2 = path.StartsWith(_contentRootPath);
+    var starts = path.StartsWith(webRootPath);
+    var starts2 = path.StartsWith(contentRootPath);
     return !path.Contains(".css") &&
            !path.Contains("/assets/fonts/") &&
            !path.Contains("/assets/images/");
 }
 
 public partial class Program { } //Required so tests can see this class
-
