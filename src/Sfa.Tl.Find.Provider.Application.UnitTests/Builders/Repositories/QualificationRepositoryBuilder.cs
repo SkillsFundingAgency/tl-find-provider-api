@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
 
 public class QualificationRepositoryBuilder
 {
-    public QualificationRepository Build(
+    public IQualificationRepository Build(
         IDbContextWrapper dbContextWrapper = null,
         IDynamicParametersWrapper dynamicParametersWrapper = null,
         IReadOnlyPolicyRegistry<string> policyRegistry = null,

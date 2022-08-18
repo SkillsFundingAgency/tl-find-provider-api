@@ -19,6 +19,9 @@ public class TownDataService : ITownDataService
     // 2021 - https://geoportal.statistics.gov.uk/datasets/index-of-place-names-in-great-britain-november-2021-user-guide/about
     public const string OfficeForNationalStatisticsLocationUrl = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/IPN_GB_2016/FeatureServer/0/query?where=ctry15nm%20%3D%20'ENGLAND'%20AND%20popcnt%20%3E%3D%20500%20AND%20popcnt%20%3C%3D%2010000000&outFields=placeid,place15nm,ctry15nm,cty15nm,ctyltnm,lad15nm,laddescnm,pcon15nm,lat,long,popcnt,descnm&returnDistinctValues=true&outSR=4326&f=json";
 
+    public static Uri GetUri(int offset, int recordSize) =>
+        new($"{OfficeForNationalStatisticsLocationUrl}&resultRecordCount={recordSize}&resultOffSet={offset}");
+
     public TownDataService(
         HttpClient httpClient,
         ITownRepository townRepository,
@@ -78,9 +81,6 @@ public class TownDataService : ITownDataService
 
         return await _townRepository.Search(searchTerm, maxResults);
     }
-
-    public Uri GetUri(int offset, int recordSize) =>
-        new($"{OfficeForNationalStatisticsLocationUrl}&resultRecordCount={recordSize}&resultOffSet={offset}");
 
     private async Task<IEnumerable<OnsLocationApiItem>> ReadOnsLocationData()
     {
