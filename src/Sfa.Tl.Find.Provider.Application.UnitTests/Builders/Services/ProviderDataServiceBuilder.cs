@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
@@ -30,13 +30,9 @@ public class ProviderDataServiceBuilder
         cache ??= Substitute.For<IMemoryCache>();
         logger ??= Substitute.For<ILogger<ProviderDataService>>();
 
-        searchSettings ??= new SettingsBuilder().BuildSearchSettings();
-        var searchOptions = new Func<IOptions<SearchSettings>>(() =>
-        {
-            var options = Substitute.For<IOptions<SearchSettings>>();
-            options.Value.Returns(searchSettings);
-            return options;
-        }).Invoke();
+        var searchOptions = new SettingsBuilder()
+            .BuildSearchSettings()
+            .ToOptions();
 
         return new ProviderDataService(
             dateTimeService,
