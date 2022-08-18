@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;

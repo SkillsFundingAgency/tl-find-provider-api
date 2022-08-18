@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Reflection;
-using FluentAssertions;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;

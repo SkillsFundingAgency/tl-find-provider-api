@@ -1,9 +1,7 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;

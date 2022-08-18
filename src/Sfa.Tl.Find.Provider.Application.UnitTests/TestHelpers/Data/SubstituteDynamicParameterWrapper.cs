@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;

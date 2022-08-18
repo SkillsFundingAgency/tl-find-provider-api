@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
+﻿using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Exceptions;
 

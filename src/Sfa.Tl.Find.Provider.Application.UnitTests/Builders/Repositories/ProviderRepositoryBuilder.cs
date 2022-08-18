@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Dapper;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;

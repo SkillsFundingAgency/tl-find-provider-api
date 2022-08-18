@@ -1,6 +1,4 @@
 ﻿using System.Data;
-using FluentAssertions;
-using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;

@@ -1,7 +1,5 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Services;
-using FluentAssertions;
 using Notify.Interfaces;
-using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;

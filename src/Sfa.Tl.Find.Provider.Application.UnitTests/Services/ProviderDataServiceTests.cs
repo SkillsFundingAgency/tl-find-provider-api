@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Caching.Memory;
-using NSubstitute;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
