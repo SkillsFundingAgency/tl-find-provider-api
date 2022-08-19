@@ -157,6 +157,23 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task GetCsv_Returns_Expected_List()
+    {
+        var providers = new ProviderDetailBuilder().BuildList().ToList();
+
+        var providerRepository = Substitute.For<IProviderRepository>();
+        providerRepository.GetAll()
+            .Returns(providers);
+
+        var service = new ProviderDataServiceBuilder().Build(
+            providerRepository: providerRepository);
+
+        var response = await service.GetCsv();
+        response.Should().NotBeNull();
+        response.Length.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
     public async Task FindProviders_Passes_All_Parameters()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Services;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 
@@ -11,13 +12,16 @@ public class ProvidersControllerBuilder
 {
     public ProvidersController Build(
         IProviderDataService providerDataService = null,
+        IDateTimeService dateTimeService = null,
         ILogger<ProvidersController> logger = null)
     {
         providerDataService ??= Substitute.For<IProviderDataService>();
+        dateTimeService ??= Substitute.For<IDateTimeService>();
         logger ??= Substitute.For<ILogger<ProvidersController>>();
 
         var controller = new ProvidersController(
-            providerDataService, 
+            providerDataService,
+            dateTimeService, 
             logger)
         {
             ControllerContext = new ControllerContext

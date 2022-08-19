@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
@@ -43,7 +44,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
-    
+
     [Fact]
     public async Task GetProviders_Returns_OK_Result_For_Short_Postcode_Url()
     {
@@ -52,7 +53,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
             .GetAsync("/api/v3/providers?searchTerm=L1");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var searchResponse = await response.Content.DeserializeFromHttpContent();
+        var searchResponse = await response.Content.DeserializeFromHttpContent<ProviderSearchResponse>();
         searchResponse.Should().NotBeNull();
         searchResponse!.Error.Should().BeNull();
     }
@@ -65,11 +66,11 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
             .GetAsync("/api/v3/providers");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var searchResponse = await response.Content.DeserializeFromHttpContent();
+        var searchResponse = await response.Content.DeserializeFromHttpContent<ProviderSearchResponse>();
         searchResponse.Should().NotBeNull();
         searchResponse!.Error.Should().Be("Either search term or both lat/long required.");
     }
-    
+
     [Fact]
     public async Task GetProviders_Returns_Error_Message_Result_For_Postcode_Too_Short()
     {
@@ -78,7 +79,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
             .GetAsync("/api/v3/providers?searchTerm=A");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var searchResponse = await response.Content.DeserializeFromHttpContent();
+        var searchResponse = await response.Content.DeserializeFromHttpContent<ProviderSearchResponse>();
         searchResponse.Should().NotBeNull();
         searchResponse!.Error.Should().Be("The search term must be at least 2 characters.");
     }
@@ -103,7 +104,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
             .GetAsync("/api/v3/providers?searchTerm=CV1+2WT£");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var searchResponse = await response.Content.DeserializeFromHttpContent();
+        var searchResponse = await response.Content.DeserializeFromHttpContent<ProviderSearchResponse>();
         searchResponse.Should().NotBeNull();
         searchResponse!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
@@ -116,7 +117,7 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
             .GetAsync("/api/v3/providers?searchTerm=2V1+2WT");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var searchResponse = await response.Content.DeserializeFromHttpContent();
+        var searchResponse = await response.Content.DeserializeFromHttpContent<ProviderSearchResponse>();
         searchResponse.Should().NotBeNull();
         searchResponse!.Error.Should().Be("The search term must start with a letter and contain only letters, numbers, and spaces.");
     }
@@ -155,5 +156,32 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
             .GetAsync("/api/v3/providers/all");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task GetProviderDataAsCsv_Returns_OK_Result()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v3/providers/download");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Content.ReadAsStringAsync();
+        result.Length.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public async Task GetProviderDataCsvFileSize_Returns_OK_Result()
+    {
+        var response = await _fixture
+            .CreateClient()
+            .GetAsync("/api/v3/providers/download/size");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var downloadInfo = await response.Content.DeserializeFromHttpContent<ProviderDataDownloadInfoResponse>();
+        downloadInfo.Should().NotBeNull();
+        downloadInfo.FileSize.Should().Be(4);
     }
 }

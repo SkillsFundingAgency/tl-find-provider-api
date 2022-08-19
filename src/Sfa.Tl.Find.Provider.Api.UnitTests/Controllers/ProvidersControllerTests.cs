@@ -46,13 +46,15 @@ public class ProvidersControllerTests
     [Fact]
     public async Task GetAllProviders_Returns_Expected_List()
     {
-        var providerDataService = Substitute.For<IProviderDataService>();
-        var providers = new ProviderDetailBuilder().BuildList().ToList();
+        var providers = new ProviderDetailBuilder()
+            .BuildList()
+            .ToList();
 
+        var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.GetAllProviders()
             .Returns(new ProviderDetailResponse
             {
-                Providers = providers//new ProviderDetailBuilder().BuildList()
+                Providers = providers
             });
 
         var controller = new ProvidersControllerBuilder()
@@ -518,5 +520,53 @@ public class ProvidersControllerTests
 
         var results = okResult.Value as ProviderSearchResponse;
         results!.Error.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetProviderDataAsCsv_Returns_Expected_Result()
+    {
+        var bytes = new byte[] { 104, 101, 108 , 108, 111 };
+
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+        const string expectedFileName = "T Level Providers 19 August 2022";
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetCsv()
+            .Returns(bytes);
+
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService, dateTimeService);
+
+        var result = await controller.GetProviderDataAsCsv();
+
+        var fileContentResult = result as FileContentResult;
+        fileContentResult.Should().NotBeNull();
+        fileContentResult!.ContentType.Should().Be("text/csv");
+        fileContentResult!.FileDownloadName.Should().Be(expectedFileName);
+        fileContentResult!.FileContents.Should().BeEquivalentTo(bytes);
+    }
+
+    [Fact]
+    public async Task GetProviderDataCsvFileInfo_Returns_Expected_Result()
+    {
+        var bytes = new byte[] { 104, 101, 108, 108, 111 };
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetCsv()
+            .Returns(bytes);
+
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService);
+
+        var result = await controller.GetProviderDataCsvFileInfo();
+        
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var info = okResult.Value as ProviderDataDownloadInfoResponse;
+        info.Should().NotBeNull();
+        info!.FileSize.Should().Be(bytes.Length);
     }
 }

@@ -1,7 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
+using CsvHelper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Application.ClassMaps;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -188,6 +191,23 @@ public class ProviderDataService : IProviderDataService
             Providers = await _providerRepository
                 .GetAll()
         };
+    }
+
+    public async Task<byte[]> GetCsv()
+    {
+        var providers = await _providerRepository
+            .GetAll();
+
+        await using var stream = new MemoryStream();
+        await using var streamWriter = new StreamWriter(stream);
+        await using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
+        {
+            csvWriter.Context.RegisterClassMap<ProviderDetailClassMap>();
+            //csvWriter.Context.RegisterClassMap<LocationClassMap>();
+            await csvWriter.WriteRecordsAsync(providers);
+        }
+
+        return stream.ToArray();
     }
 
     public async Task<bool> HasQualifications()

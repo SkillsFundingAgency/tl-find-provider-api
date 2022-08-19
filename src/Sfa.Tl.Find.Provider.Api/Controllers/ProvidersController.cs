@@ -16,13 +16,16 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class ProvidersController : ControllerBase
 {
     private readonly IProviderDataService _providerDataService;
+    private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<ProvidersController> _logger;
 
     public ProvidersController(
         IProviderDataService providerDataService,
+        IDateTimeService dateTimeService,
         ILogger<ProvidersController> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -106,7 +109,54 @@ public class ProvidersController : ControllerBase
         }
 
         var providerDetailResponse = await _providerDataService.GetAllProviders();
-
+        //throw new AbandonedMutexException();
         return Ok(providerDetailResponse);
+    }
+
+    [HttpGet]
+    [Route("download", Name = "GetProviderDataAsCsv")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetProviderDataAsCsv()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
+        }
+
+        var bytes = await _providerDataService.GetCsv();
+
+        //TODO: Confirm file name
+        var date = _dateTimeService.Today;
+        var filePath = $"T Level Providers {date:dd MMMM yyyy}"; 
+
+        return new FileContentResult(bytes, "text/csv")
+        {
+            FileDownloadName = filePath
+        };
+    }
+
+    [HttpGet]
+    [Route("download/size", Name = "GetProviderDataCsvFileSize")]
+    [ProducesResponseType(typeof(ProviderDataDownloadInfoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetProviderDataCsvFileInfo()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
+        }
+
+        var providerDetailResponse = await _providerDataService.GetAllProviders();
+        var bytes = await _providerDataService.GetCsv();
+
+        //TODO: Cache
+
+        var size = new ProviderDataDownloadInfoResponse
+        {
+            FileSize = bytes.Length
+        };
+
+        return Ok(size);
     }
 }
