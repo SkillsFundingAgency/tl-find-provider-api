@@ -141,13 +141,13 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
 
         return false;
     }
-    
+
     private static async Task<byte[]> ComputeHash(HttpRequest request)
     {
         using var md5 = MD5.Create();
 
         var bodyBytes = await request.GetRawBodyBytesAsync();
-        return bodyBytes.Length > 0 
+        return bodyBytes.Length > 0
             ? md5.ComputeHash(bodyBytes)
             : null;
     }

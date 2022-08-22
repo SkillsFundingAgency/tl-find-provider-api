@@ -98,6 +98,19 @@ public class ProviderRepository : IProviderRepository
         return results;
     }
 
+    public async Task<IEnumerable<ProviderDetailFlat>> GetAllFlattened()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        var providerDetailResults = new Dictionary<string, ProviderDetail>();
+
+        return await _dbContextWrapper
+            .QueryAsync<ProviderDetailFlat>(
+                connection,
+                "GetAllProviderDetails",
+                commandType: CommandType.StoredProcedure);
+    }
+
     public async Task<bool> HasAny(bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();

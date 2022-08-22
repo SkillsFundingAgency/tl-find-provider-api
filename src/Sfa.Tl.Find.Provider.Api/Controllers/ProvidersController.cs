@@ -126,10 +126,10 @@ public class ProvidersController : ControllerBase
 
         var bytes = await _providerDataService.GetCsv();
 
-        //TODO: Confirm file name
-        var date = _dateTimeService.Today;
-        var filePath = $"T Level Providers {date:dd MMMM yyyy}"; 
+        var filePath = $"All T Level providers {_dateTimeService.Today:MMMM yyyy}.csv";
 
+        //https://stackoverflow.com/questions/56279818/custom-http-headers-in-razor-pages
+        HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
         return new FileContentResult(bytes, "text/csv")
         {
             FileDownloadName = filePath
@@ -147,7 +147,6 @@ public class ProvidersController : ControllerBase
             _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
         }
 
-        var providerDetailResponse = await _providerDataService.GetAllProviders();
         var bytes = await _providerDataService.GetCsv();
 
         //TODO: Cache

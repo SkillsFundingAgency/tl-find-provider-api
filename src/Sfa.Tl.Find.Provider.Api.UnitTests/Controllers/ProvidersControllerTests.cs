@@ -529,7 +529,7 @@ public class ProvidersControllerTests
 
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
-        const string expectedFileName = "T Level Providers 19 August 2022";
+        const string expectedFileName = "All T Level providers August 2022.csv";
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.GetCsv()

@@ -196,14 +196,13 @@ public class ProviderDataService : IProviderDataService
     public async Task<byte[]> GetCsv()
     {
         var providers = await _providerRepository
-            .GetAll();
+            .GetAllFlattened();
 
         await using var stream = new MemoryStream();
         await using var streamWriter = new StreamWriter(stream);
         await using (var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture))
         {
-            csvWriter.Context.RegisterClassMap<ProviderDetailClassMap>();
-            //csvWriter.Context.RegisterClassMap<LocationClassMap>();
+            csvWriter.Context.RegisterClassMap<ProviderDetailFlatClassMap>();
             await csvWriter.WriteRecordsAsync(providers);
         }
 
