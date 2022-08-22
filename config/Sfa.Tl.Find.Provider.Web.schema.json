@@ -3,6 +3,32 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
+    "DfeSignInSettings": {
+      "properties": {
+        "MetadataEndpoint": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignInMetadataAddress"
+        },
+        "ClientId": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignInClientId"
+        },
+        "ClientSecret": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignInClientSecret"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "MetadataEndpoint",
+        "ClientId",
+        "ClientSecret"
+      ],
+      "type": "object"
+    },
     "EmailSettings": {
       "properties": {
         "GovNotifyApiKey": {

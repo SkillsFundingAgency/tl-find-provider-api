@@ -18,6 +18,10 @@ public class SettingsBuilder
     private const bool MergeAdditionalProviderData = true;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
 
+    private const string SignInMetadataEndpoint = "https://oidc.test.com";
+    private const string SignInClientId = "testclient";
+    private const string SignInClientSecret = "secretsecret";
+
     public ApiSettings BuildApiSettings(
         string appId = AppId,
         string apiKey = ApiKey) => new()
@@ -40,9 +44,20 @@ public class SettingsBuilder
             ApiKey = findCourseApiKey
         };
 
+
+    public DfeSignInSettings BuildDfeSignInSettings(
+        string metadataEndpoint = SignInMetadataEndpoint,
+        string clientId = SignInClientId,
+        string clientSecret = SignInClientSecret) => new()
+    {
+        MetadataEndpoint = metadataEndpoint,
+        ClientId = clientId,
+        ClientSecret = clientSecret,
+    };
+
     public EmailSettings BuildEmailSettings(
-    string govNotifyApiKey = GovNotifyApiKey,
-    string supportEmailAddress = SupportEmailAddress) => new()
+        string govNotifyApiKey = GovNotifyApiKey,
+        string supportEmailAddress = SupportEmailAddress) => new()
     {
         GovNotifyApiKey = govNotifyApiKey,
         SupportEmailAddress = supportEmailAddress
