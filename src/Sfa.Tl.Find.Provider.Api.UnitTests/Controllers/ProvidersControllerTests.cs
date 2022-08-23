@@ -561,7 +561,8 @@ public class ProvidersControllerTests
             .Returns(bytes);
 
         var controller = new ProvidersControllerBuilder()
-            .Build(providerDataService);
+            .Build(providerDataService,
+                dateTimeService);
 
         var result = await controller.GetProviderDataCsvFileInfo();
         
