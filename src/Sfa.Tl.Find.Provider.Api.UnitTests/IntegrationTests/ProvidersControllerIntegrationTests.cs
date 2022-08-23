@@ -176,12 +176,13 @@ public class ProvidersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         var response = await _fixture
             .CreateClient()
-            .GetAsync("/api/v3/providers/download/size");
+            .GetAsync("/api/v3/providers/download/info");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var downloadInfo = await response.Content.DeserializeFromHttpContent<ProviderDataDownloadInfoResponse>();
         downloadInfo.Should().NotBeNull();
         downloadInfo.FileSize.Should().Be(4);
+        downloadInfo.FormattedFileDate.Should().NotBeNullOrEmpty();
     }
 }

@@ -552,6 +552,10 @@ public class ProvidersControllerTests
     {
         var bytes = new byte[] { 104, 101, 108, 108, 111 };
 
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+        const string expectedFormattedFileDate = "August 2022";
+
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.GetCsv()
             .Returns(bytes);
@@ -568,5 +572,6 @@ public class ProvidersControllerTests
         var info = okResult.Value as ProviderDataDownloadInfoResponse;
         info.Should().NotBeNull();
         info!.FileSize.Should().Be(bytes.Length);
+        info!.FormattedFileDate.Should().Be(expectedFormattedFileDate);
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Services;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 

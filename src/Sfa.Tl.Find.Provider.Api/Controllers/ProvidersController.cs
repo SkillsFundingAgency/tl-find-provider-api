@@ -109,7 +109,6 @@ public class ProvidersController : ControllerBase
         }
 
         var providerDetailResponse = await _providerDataService.GetAllProviders();
-        //throw new AbandonedMutexException();
         return Ok(providerDetailResponse);
     }
 
@@ -124,20 +123,19 @@ public class ProvidersController : ControllerBase
             _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
         }
 
+        //TODO: Consider getting file name in service - (string FileName, bytes Bytes)
         var bytes = await _providerDataService.GetCsv();
-
-        var filePath = $"All T Level providers {_dateTimeService.Today:MMMM yyyy}.csv";
 
         //https://stackoverflow.com/questions/56279818/custom-http-headers-in-razor-pages
         HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
         return new FileContentResult(bytes, "text/csv")
         {
-            FileDownloadName = filePath
+            FileDownloadName = $"All T Level providers {_dateTimeService.Today:MMMM yyyy}.csv"
         };
     }
 
     [HttpGet]
-    [Route("download/size", Name = "GetProviderDataCsvFileSize")]
+    [Route("download/info", Name = "GetProviderDataCsvFileInfo")]
     [ProducesResponseType(typeof(ProviderDataDownloadInfoResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProviderDataCsvFileInfo()
@@ -149,10 +147,11 @@ public class ProvidersController : ControllerBase
 
         var bytes = await _providerDataService.GetCsv();
 
-        //TODO: Cache
-
+        //TODO: Move this code into service? 
+        //TODO: Cache the response
         var size = new ProviderDataDownloadInfoResponse
         {
+            FormattedFileDate = $"{_dateTimeService.Today:MMMM yyyy}",
             FileSize = bytes.Length
         };
 
