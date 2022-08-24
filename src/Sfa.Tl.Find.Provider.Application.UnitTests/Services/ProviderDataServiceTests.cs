@@ -157,7 +157,7 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task GetCsv_Returns_Expected_List()
+    public async Task GetCsv_Returns_Expected_Data()
     {
         var providers = new ProviderDetailBuilder().BuildList().ToList();
 

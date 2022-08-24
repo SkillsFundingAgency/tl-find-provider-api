@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using Quartz.Util;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Extensions;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -17,15 +19,18 @@ public class ProvidersController : ControllerBase
 {
     private readonly IProviderDataService _providerDataService;
     private readonly IDateTimeService _dateTimeService;
+    private readonly IMemoryCache _cache;
     private readonly ILogger<ProvidersController> _logger;
 
     public ProvidersController(
         IProviderDataService providerDataService,
         IDateTimeService dateTimeService,
+        IMemoryCache cache,
         ILogger<ProvidersController> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -120,7 +125,7 @@ public class ProvidersController : ControllerBase
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
+            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetProviderDataAsCsv)} called.");
         }
 
         //TODO: Consider getting file name in service - (string FileName, bytes Bytes)
@@ -140,21 +145,24 @@ public class ProvidersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProviderDataCsvFileInfo()
     {
-        if (_logger.IsEnabled(LogLevel.Debug))
+        const string key = CacheKeys.ProviderDataDownloadInfoKey;
+        if (!_cache.TryGetValue(key, out ProviderDataDownloadInfoResponse info))
         {
-            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetAllProviderData)} called.");
+            var bytes = await _providerDataService.GetCsv();
+
+            info = new ProviderDataDownloadInfoResponse
+            {
+                FormattedFileDate = $"{_dateTimeService.Today:MMMM yyyy}",
+                FileSize = bytes.Length
+            };
+
+            _cache.Set(key, info,
+                CacheUtilities.DefaultMemoryCacheEntryOptions(
+                    _dateTimeService,
+                    _logger));
+
         }
 
-        var bytes = await _providerDataService.GetCsv();
-
-        //TODO: Move this code into service? 
-        //TODO: Cache the response
-        var size = new ProviderDataDownloadInfoResponse
-        {
-            FormattedFileDate = $"{_dateTimeService.Today:MMMM yyyy}",
-            FileSize = bytes.Length
-        };
-
-        return Ok(size);
+        return Ok(info);
     }
 }

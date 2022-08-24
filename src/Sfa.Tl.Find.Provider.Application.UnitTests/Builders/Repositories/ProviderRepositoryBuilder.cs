@@ -145,14 +145,28 @@ public class ProviderRepositoryBuilder
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
 
-        var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
-        var parameters = new DynamicParameters();
-        parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
-        dynamicParametersWrapper.DynamicParameters.Returns(parameters);
-
         return Build(
             dbContextWrapper,
-            dynamicParametersWrapper: dynamicParametersWrapper,
             dateTimeService: dateTimeService);
+    }
+
+    public IProviderRepository BuildRepositoryWithDataToGetAllFlattenedProviders()
+    {
+        var builder = new ProviderDetailFlatBuilder();
+        var providerList = builder
+            .BuildList()
+            .Take(1)
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<ProviderDetailFlat>(dbConnection,
+                "GetAllProviderDetails",
+                commandType: CommandType.StoredProcedure)
+            .Returns(providerList);
+
+        return Build(dbContextWrapper);
     }
 }

@@ -102,8 +102,6 @@ public class ProviderRepository : IProviderRepository
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
-        var providerDetailResults = new Dictionary<string, ProviderDetail>();
-
         return await _dbContextWrapper
             .QueryAsync<ProviderDetailFlat>(
                 connection,

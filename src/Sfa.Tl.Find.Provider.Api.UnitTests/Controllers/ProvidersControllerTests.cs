@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
@@ -574,5 +575,60 @@ public class ProvidersControllerTests
         info.Should().NotBeNull();
         info!.FileSize.Should().Be(bytes.Length);
         info!.FormattedFileDate.Should().Be(expectedFormattedFileDate);
+    }
+
+    [Fact]
+    public async Task GetProviderDataCsvFileInfo_Returns_Expected_Result_From_Cache()
+    {
+        const string formattedDate = "August 2022";
+        const int fileSize = 10101;
+
+        //var bytes = new byte[] { 104, 101, 108, 108, 111 };
+        var cachedInfo = new ProviderDataDownloadInfoResponse
+            {
+                FormattedFileDate = formattedDate,
+                FileSize = fileSize
+            };
+
+        var cache = Substitute.For<IMemoryCache>();
+        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
+            .Returns(x =>
+            {
+                if ((string)x[0] == CacheKeys.ProviderDataDownloadInfoKey)
+                {
+                    x[1] = cachedInfo;
+                    return true;
+                }
+
+                return false;
+            });
+
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+ 
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService,
+                dateTimeService,
+                cache);
+
+        var result = await controller.GetProviderDataCsvFileInfo();
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var info = okResult.Value as ProviderDataDownloadInfoResponse;
+        info.Should().NotBeNull();
+        info!.FileSize.Should().Be(fileSize);
+        info!.FormattedFileDate.Should().Be(formattedDate);
+
+        info.Should().Be(cachedInfo);
+        info.Should().BeEquivalentTo(cachedInfo);
+
+        await providerDataService
+            .DidNotReceive()
+            .GetCsv();
     }
 }
