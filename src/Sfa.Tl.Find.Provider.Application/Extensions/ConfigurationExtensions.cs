@@ -41,4 +41,9 @@ public static class ConfigurationExtensions
             throw new InvalidOperationException("Configuration could not be loaded. Please check your configuration files or see the inner exception for details", ex);
         }
     }
+
+    public static bool IsLocal(this IConfiguration configuration)
+    {
+        return configuration[Constants.EnvironmentNameConfigKey].StartsWith("LOCAL", StringComparison.CurrentCultureIgnoreCase);
+    }
 }

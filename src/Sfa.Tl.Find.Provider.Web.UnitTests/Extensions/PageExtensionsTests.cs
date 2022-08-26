@@ -2,7 +2,7 @@
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Extensions;
 
-public class PageExtensionsDataTests
+public class PageExtensionsTests
 {
     private const string DefaultServiceName = "T Levels Provider Data Service Home";
 

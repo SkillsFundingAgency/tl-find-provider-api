@@ -18,7 +18,7 @@ public class SettingsBuilder
     private const bool MergeAdditionalProviderData = true;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
 
-    private const string SignInMetadataEndpoint = "https://oidc.test.com";
+    private const string SignInAuthority = "https://oidc.test.com";
     private const string SignInClientId = "testclient";
     private const string SignInClientSecret = "secretsecret";
 
@@ -46,11 +46,11 @@ public class SettingsBuilder
 
 
     public DfeSignInSettings BuildDfeSignInSettings(
-        string metadataEndpoint = SignInMetadataEndpoint,
+        string authority = SignInAuthority,
         string clientId = SignInClientId,
         string clientSecret = SignInClientSecret) => new()
     {
-        MetadataEndpoint = metadataEndpoint,
+        Authority = authority,
         ClientId = clientId,
         ClientSecret = clientSecret,
     };

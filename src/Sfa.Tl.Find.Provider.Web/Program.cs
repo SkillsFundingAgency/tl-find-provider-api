@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Security;
 
@@ -12,6 +14,21 @@ builder.Services
 
 var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
 builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
+
+builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
+builder.Services.AddAuthorizationServicePolicies();
+
+if(bool.TryParse(builder.Configuration["StubProviderAuth"], out var isStubProviderAuth) && isStubProviderAuth)
+{
+    builder.Services.AddProviderStubAuthentication();
+}
+else
+{
+    //var providerConfig = builder.Configuration
+    //    .GetSection(nameof(ProviderIdams))
+    //    .Get<ProviderIdams>();
+    //builder.Services.AddAndConfigureProviderAuthentication(providerConfig);
+}
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -113,6 +130,7 @@ app.UseWhen(
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapFallback("{*path}",
