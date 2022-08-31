@@ -24,10 +24,7 @@ if(bool.TryParse(builder.Configuration["StubProviderAuth"], out var isStubProvid
 }
 else
 {
-    //var providerConfig = builder.Configuration
-    //    .GetSection(nameof(ProviderIdams))
-    //    .Get<ProviderIdams>();
-    //builder.Services.AddAndConfigureProviderAuthentication(providerConfig);
+    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings);
 }
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -40,7 +37,11 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 builder.Services.AddResponseCaching();
 
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizePage("/Index");
+    //options.Conventions.AuthorizeFolder("/Private");
+});
 
 if (!builder.Environment.IsDevelopment())
 {

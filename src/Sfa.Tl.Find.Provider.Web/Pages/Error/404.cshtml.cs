@@ -9,7 +9,7 @@ public class Error404Model : PageModel
 
     public Error404Model(ILogger<Error404Model> logger)
     {
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public void OnGet()

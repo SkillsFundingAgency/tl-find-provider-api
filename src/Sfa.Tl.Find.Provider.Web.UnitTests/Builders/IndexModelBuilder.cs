@@ -17,7 +17,7 @@ public class IndexModelBuilder
             PageContext? pageContext = null)
     {
         pageContext ??= new PageContextBuilder()
-            .BuildPageContext();
+            .Build();
 
         emailOptions ??= new SettingsBuilder()
             .BuildEmailSettings()
@@ -26,7 +26,6 @@ public class IndexModelBuilder
         emailService ??= Substitute.For<IEmailService>();
         logger ??= Substitute.For<ILogger<IndexModel>>();
 
-        //TODO: Add IndexModelBuilder
         var pageModel = new IndexModel(
             emailOptions,
             emailService,

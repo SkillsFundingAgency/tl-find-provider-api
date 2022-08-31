@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class PageContextBuilder
@@ -15,7 +17,10 @@ public class PageContextBuilder
     public const string DefaultDisplayName = "AED User";
     public const string DefaultService = "DAA";
 
-    public PageContext BuildPageContext()
+    private PageContext? _pageContext;
+    private CompiledPageActionDescriptor? _actionDescriptor;
+
+    public PageContext Build()
     {
         var claims = new List<Claim>
         {
@@ -42,12 +47,29 @@ public class PageContextBuilder
             modelState);
         var modelMetadataProvider = new EmptyModelMetadataProvider();
         var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
-        
-        var pageContext = new PageContext(actionContext)
-        {
-            ViewData = viewData
-        };
 
-        return pageContext;
+        _pageContext = new PageContext(actionContext)
+            {
+                ViewData = viewData
+            };
+
+        if (_actionDescriptor != null)
+        {
+            _pageContext.ActionDescriptor = _actionDescriptor;
+        }
+
+        return _pageContext;
+    }
+
+    public PageContextBuilder WithViewEnginePath(string path)
+    {
+        _actionDescriptor ??= new CompiledPageActionDescriptor();
+        _actionDescriptor.ViewEnginePath = path;
+
+        if (_pageContext is not null)
+        {
+            _pageContext.ActionDescriptor = _actionDescriptor;
+        }
+        return this;
     }
 }

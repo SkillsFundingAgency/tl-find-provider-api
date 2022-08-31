@@ -18,9 +18,11 @@ public class SettingsBuilder
     private const bool MergeAdditionalProviderData = true;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
 
-    private const string SignInAuthority = "https://oidc.test.com";
+    private const string SignInAudience = "signin.oidc.com";
+    private const string SignInAuthority = "https://test.signin.oidc.com";
     private const string SignInClientId = "testclient";
     private const string SignInClientSecret = "secretsecret";
+    private const string SignInMetadataAddress = "https://test.signin.oidc.com/metadata";
 
     public ApiSettings BuildApiSettings(
         string appId = AppId,
@@ -46,13 +48,17 @@ public class SettingsBuilder
 
 
     public DfeSignInSettings BuildDfeSignInSettings(
+        string audience = SignInAudience,
         string authority = SignInAuthority,
         string clientId = SignInClientId,
-        string clientSecret = SignInClientSecret) => new()
+        string clientSecret = SignInClientSecret,
+        string metadataAddress = SignInMetadataAddress) => new()
     {
+        Audience = audience,
         Authority = authority,
         ClientId = clientId,
         ClientSecret = clientSecret,
+        MetadataAddress = metadataAddress,
     };
 
     public EmailSettings BuildEmailSettings(

@@ -8,7 +8,7 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">@PageExtensions.GetServiceName()</h1>
         <h2 class="govuk-heading-m">Provider summary</h2>
-        
+
         <dl class="govuk-summary-list govuk-!-margin-bottom-9" id="tl-placement-table">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -17,10 +17,7 @@
                 <dd class="govuk-summary-list__value">
                     @Model.UkPrn
                 </dd>
-@*                <dd class="govuk-summary-list__actions">
-                    <a href="#" class="govuk-link" id="tl-change-link">Change<span class="govuk-visually-hidden"> the ?</span></a>
-                </dd>
-*@            </div>
+            </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
                     Display Name
@@ -28,9 +25,9 @@
                 <dd class="govuk-summary-list__value">
                     @Model.DisplayName
                 </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a href="#" class="govuk-link" id="tl-change-link">Change<span class="govuk-visually-hidden"> the ?</span></a>
-                </dd>
+                @*                <dd class="govuk-summary-list__actions">
+                <a href="#" class="govuk-link" id="tl-change-link">Change<span class="govuk-visually-hidden"> the ?</span></a>
+                </dd>*@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
@@ -38,9 +35,6 @@
                 </dt>
                 <dd class="govuk-summary-list__value">
                     @Model.Service
-                </dd>
-                <dd class="govuk-summary-list__actions">
-                    <a href="#" class="govuk-link" id="tl-change-link">Change<span class="govuk-visually-hidden"> the ?</span></a>
                 </dd>
             </div>
         </dl>

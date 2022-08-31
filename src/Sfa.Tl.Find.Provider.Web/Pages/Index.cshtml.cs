@@ -29,6 +29,8 @@ public class IndexModel : PageModel
 
     public async Task OnGet()
     {
+        var isAuthenticated = User.Identity.IsAuthenticated;
+
         UkPrn = HttpContext.User.GetClaim(ProviderClaims.ProviderUkprn);
         DisplayName = HttpContext.User.GetClaim(ProviderClaims.DisplayName);
         Service = HttpContext.User.GetClaim(ProviderClaims.Service);
