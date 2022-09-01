@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using Quartz.Util;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Extensions;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -16,13 +18,19 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class ProvidersController : ControllerBase
 {
     private readonly IProviderDataService _providerDataService;
+    private readonly IDateTimeService _dateTimeService;
+    private readonly IMemoryCache _cache;
     private readonly ILogger<ProvidersController> _logger;
 
     public ProvidersController(
         IProviderDataService providerDataService,
+        IDateTimeService dateTimeService,
+        IMemoryCache cache,
         ILogger<ProvidersController> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -106,7 +114,55 @@ public class ProvidersController : ControllerBase
         }
 
         var providerDetailResponse = await _providerDataService.GetAllProviders();
-
         return Ok(providerDetailResponse);
+    }
+
+    [HttpGet]
+    [Route("download", Name = "GetProviderDataAsCsv")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetProviderDataAsCsv()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(ProvidersController)} {nameof(GetProviderDataAsCsv)} called.");
+        }
+
+        //TODO: Consider getting file name in service - (string FileName, bytes Bytes)
+        var bytes = await _providerDataService.GetCsv();
+
+        //https://stackoverflow.com/questions/56279818/custom-http-headers-in-razor-pages
+        HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
+        return new FileContentResult(bytes, "text/csv")
+        {
+            FileDownloadName = $"All T Level providers {_dateTimeService.Today:MMMM yyyy}.csv"
+        };
+    }
+
+    [HttpGet]
+    [Route("download/info", Name = "GetProviderDataCsvFileInfo")]
+    [ProducesResponseType(typeof(ProviderDataDownloadInfoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetProviderDataCsvFileInfo()
+    {
+        const string key = CacheKeys.ProviderDataDownloadInfoKey;
+        if (!_cache.TryGetValue(key, out ProviderDataDownloadInfoResponse info))
+        {
+            var bytes = await _providerDataService.GetCsv();
+
+            info = new ProviderDataDownloadInfoResponse
+            {
+                FormattedFileDate = $"{_dateTimeService.Today:MMMM yyyy}",
+                FileSize = bytes.Length
+            };
+
+            _cache.Set(key, info,
+                CacheUtilities.DefaultMemoryCacheEntryOptions(
+                    _dateTimeService,
+                    _logger));
+
+        }
+
+        return Ok(info);
     }
 }

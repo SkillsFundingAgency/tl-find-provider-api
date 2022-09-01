@@ -103,6 +103,7 @@
     <Build Include="Indexes\IX_TownSearchView_Search.sql" />
     <Build Include="Stored Procedures\GetAllProviders.sql" />
     <Build Include="Tables\EmailTemplate.sql" />
+    <Build Include="Stored Procedures\GetAllProviderDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

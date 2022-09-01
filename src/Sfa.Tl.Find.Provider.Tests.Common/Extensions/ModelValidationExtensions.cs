@@ -83,6 +83,26 @@ public static class ModelValidationExtensions
         }
     }
 
+    public static void Validate(this ProviderDetailFlat provider, ProviderDetailFlat expected)
+    {
+        provider.UkPrn.Should().Be(expected.UkPrn);
+        provider.ProviderName.Should().Be(expected.ProviderName);
+        provider.Postcode.Should().Be(expected.Postcode);
+        provider.LocationName.Should().Be(expected.LocationName);
+        provider.AddressLine1.Should().Be(expected.AddressLine1);
+        provider.AddressLine2.Should().Be(expected.AddressLine2);
+        provider.Town.Should().Be(expected.Town);
+        provider.County.Should().Be(expected.County);
+        provider.Email.Should().Be(expected.Email);
+        provider.Telephone.Should().Be(expected.Telephone);
+        provider.Website.Should().Be(expected.Website);
+        provider.Year.Should().Be(expected.Year);
+        provider.RouteId.Should().Be(expected.RouteId);
+        provider.RouteName.Should().Be(expected.RouteName);
+        provider.QualificationId.Should().Be(expected.QualificationId);
+        provider.QualificationName.Should().Be(expected.QualificationName);
+    }
+
     public static void Validate(this Location location,
         string name,
         string postcode,

@@ -7,6 +7,7 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -154,6 +155,121 @@ public class ProviderDataServiceTests
         var response = await service.GetAllProviders();
         response.Should().NotBeNull();
         response.Providers.Should().BeEquivalentTo(providers);
+    }
+
+    [Fact]
+    public async Task GetCsv_Returns_Non_Empty_Data()
+    {
+        var providers = new ProviderDetailFlatBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerRepository = Substitute.For<IProviderRepository>();
+        providerRepository.GetAllFlattened()
+            .Returns(providers);
+
+        var service = new ProviderDataServiceBuilder().Build(
+            providerRepository: providerRepository);
+
+        var response = await service.GetCsv();
+        response.Should().NotBeNullOrEmpty();
+    }
+
+    [Fact]
+    public async Task GetCsv_Returns_Expected_Row_Header()
+    {
+        var providers = new ProviderDetailFlatBuilder().BuildList().ToList();
+
+        var providerRepository = Substitute.For<IProviderRepository>();
+        providerRepository.GetAllFlattened()
+            .Returns(providers);
+
+        var service = new ProviderDataServiceBuilder().Build(
+            providerRepository: providerRepository);
+
+        var response = await service.GetCsv();
+
+        using var stream = new MemoryStream(response);
+        using var parser = new TextFieldParser(stream)
+        {
+            TextFieldType = FieldType.Delimited,
+            Delimiters = new[] { "," }
+        };
+
+        parser.EndOfData.Should().BeFalse();
+        var headerRow = parser.ReadFields();
+        headerRow.Should().NotBeNull();
+
+        headerRow.Should().BeEquivalentTo(
+            "UKPRN",
+            "Provider Name",
+            "Postcode",
+            "Location Name",
+            "Address Line 1",
+            "Address Line 2",
+            "Town",
+            "County",
+            "Email",
+            "Telephone",
+            "Website",
+            "Year of Delivery",
+            "Route Name",
+            "Qualification Name"
+        );
+    }
+
+    [Fact]
+    public async Task GetCsv_Returns_Expected_Provider_Data()
+    {
+        var providers = new ProviderDetailFlatBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerRepository = Substitute.For<IProviderRepository>();
+        providerRepository.GetAllFlattened()
+            .Returns(providers);
+
+        var service = new ProviderDataServiceBuilder().Build(
+            providerRepository: providerRepository);
+
+        var response = await service.GetCsv();
+
+        using var stream = new MemoryStream(response);
+        using var parser = new TextFieldParser(stream)
+        {
+            TextFieldType = FieldType.Delimited,
+            Delimiters = new[] { "," }
+        };
+
+        parser.EndOfData.Should().BeFalse();
+        parser.ReadFields(); //Skip header
+        parser.EndOfData.Should().BeFalse();
+
+        var index = 0;
+        while (!parser.EndOfData)
+        {
+            var dataRow = parser.ReadFields();
+            dataRow.Should().BeEquivalentTo(new[]
+            {
+                providers[index].UkPrn.ToString(),
+                providers[index].ProviderName,
+                providers[index].Postcode,
+                providers[index].LocationName,
+                providers[index].AddressLine1,
+                providers[index].AddressLine2,
+                providers[index].Town,
+                providers[index].County,
+                providers[index].Email,
+                providers[index].Telephone,
+                providers[index].Website,
+                providers[index].Year.ToString(),
+                providers[index].RouteName,
+                providers[index].QualificationName
+            }, $"data on providers row {index} should match output");
+            index++;
+        }
+
+        index.Should().Be(providers.Count);
     }
 
     [Fact]
@@ -430,7 +546,7 @@ public class ProviderDataServiceTests
             .Received(1)
             .Search(searchTerms);
     }
-    
+
     [Fact]
     public async Task FindProviders_Returns_Expected_Error_Details_For_Valid_Town_With_Dot_And_Partial_Search_Term_Lower_Case()
     {
@@ -441,7 +557,7 @@ public class ProviderDataServiceTests
 
         var providerRepository = Substitute.For<IProviderRepository>();
         providerRepository.Search(
-                Arg.Is<GeoLocation>(p => 
+                Arg.Is<GeoLocation>(p =>
                     p.Location
                         .StartsWith(searchTerms, StringComparison.CurrentCultureIgnoreCase)),
                 Arg.Any<List<int>>(),
@@ -544,7 +660,7 @@ public class ProviderDataServiceTests
         var townDataService = Substitute.For<ITownDataService>();
         townDataService.Search(Arg.Any<string>())
             .Returns(new List<Town>());
-        
+
         var service = new ProviderDataServiceBuilder().Build(
             postcodeLookupService: postcodeLookupService,
             providerRepository: providerRepository,
