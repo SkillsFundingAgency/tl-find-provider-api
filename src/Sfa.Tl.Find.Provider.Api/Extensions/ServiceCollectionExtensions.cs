@@ -4,6 +4,8 @@ using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Notify.Client;
+using Notify.Interfaces;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -51,6 +53,11 @@ public static class ServiceCollectionExtensions
             {
                 x.BaseUri = siteConfiguration.CourseDirectoryApiSettings.BaseUri;
                 x.ApiKey = siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+            })
+            .Configure<EmailSettings>(x =>
+            {
+                x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
+                x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
             })
             .Configure<PostcodeApiSettings>(x =>
             {
@@ -151,6 +158,20 @@ public static class ServiceCollectionExtensions
                 }
             )
             .AddRetryPolicyHandler<TownDataService>();
+
+        return services;
+    }
+
+
+    public static IServiceCollection AddNotifyService(
+        this IServiceCollection services,
+        string govNotifyApiKey)
+    {
+        if (!string.IsNullOrEmpty(govNotifyApiKey))
+        {
+            services.AddTransient<IAsyncNotificationClient, NotificationClient>(
+                _ => new NotificationClient(govNotifyApiKey));
+        }
 
         return services;
     }

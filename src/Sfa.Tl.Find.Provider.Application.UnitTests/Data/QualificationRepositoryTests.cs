@@ -34,7 +34,8 @@ public class QualificationRepositoryTests
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .QueryAsync<Qualification>(dbConnection, Arg.Any<string>())
+            .QueryAsync<Qualification>(dbConnection, 
+                Arg.Any<string>())
             .Returns(qualifications);
 
         const string expectedSql =

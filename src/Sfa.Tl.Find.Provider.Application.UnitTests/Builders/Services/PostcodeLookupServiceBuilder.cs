@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 
@@ -9,8 +10,7 @@ public class PostcodeLookupServiceBuilder
     private const string PostcodeRetrieverApiBaseAbsoluteUri = "https://test.api.postcodes.io/";
     private static readonly Uri PostcodeRetrieverApiBaseUri = new(PostcodeRetrieverApiBaseAbsoluteUri);
 
-    // ReSharper disable once MemberCanBePrivate.Global
-    public PostcodeLookupService Build(
+    public IPostcodeLookupService Build(
         HttpClient httpClient = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
@@ -18,7 +18,7 @@ public class PostcodeLookupServiceBuilder
         return new PostcodeLookupService(httpClient);
     }
 
-    public PostcodeLookupService Build(
+    public IPostcodeLookupService Build(
         IDictionary<string, HttpResponseMessage> responseMessages)
     {
         var responsesWithUri = responseMessages
@@ -32,7 +32,7 @@ public class PostcodeLookupServiceBuilder
         return Build(httpClient);
     }
 
-    public PostcodeLookupService Build(
+    public IPostcodeLookupService Build(
         IDictionary<string, string> responseMessages)
     {
         var responsesWithUri = responseMessages

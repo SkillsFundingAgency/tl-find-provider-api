@@ -11,7 +11,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
 public class ProviderDataServiceBuilder
 {
-    public ProviderDataService Build(
+    public IProviderDataService Build(
         IDateTimeService dateTimeService = null,
         IPostcodeLookupService postcodeLookupService = null,
         IProviderRepository providerRepository = null,

@@ -101,11 +101,15 @@ public class FakeStartup
                         SearchTerm = "CV1 2WT",
                         SearchResults = new List<ProviderSearchResult>()
                     });
-
                 providerDataService.GetAllProviders()
                     .Returns(new ProviderDetailResponse
                     {
                         Providers = new List<ProviderDetail>()
+                    });
+                providerDataService.GetCsv()
+                    .Returns(new byte[]
+                    {
+                        084, 101, 115, 116
                     });
 
                 return providerDataService;

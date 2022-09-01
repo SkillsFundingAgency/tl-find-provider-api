@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
@@ -46,13 +47,15 @@ public class ProvidersControllerTests
     [Fact]
     public async Task GetAllProviders_Returns_Expected_List()
     {
-        var providerDataService = Substitute.For<IProviderDataService>();
-        var providers = new ProviderDetailBuilder().BuildList().ToList();
+        var providers = new ProviderDetailBuilder()
+            .BuildList()
+            .ToList();
 
+        var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.GetAllProviders()
             .Returns(new ProviderDetailResponse
             {
-                Providers = providers//new ProviderDetailBuilder().BuildList()
+                Providers = providers
             });
 
         var controller = new ProvidersControllerBuilder()
@@ -518,5 +521,114 @@ public class ProvidersControllerTests
 
         var results = okResult.Value as ProviderSearchResponse;
         results!.Error.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetProviderDataAsCsv_Returns_Expected_Result()
+    {
+        var bytes = new byte[] { 104, 101, 108 , 108, 111 };
+
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+        const string expectedFileName = "All T Level providers August 2022.csv";
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetCsv()
+            .Returns(bytes);
+
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService, dateTimeService);
+
+        var result = await controller.GetProviderDataAsCsv();
+
+        var fileContentResult = result as FileContentResult;
+        fileContentResult.Should().NotBeNull();
+        fileContentResult!.ContentType.Should().Be("text/csv");
+        fileContentResult!.FileDownloadName.Should().Be(expectedFileName);
+        fileContentResult!.FileContents.Should().BeEquivalentTo(bytes);
+    }
+
+    [Fact]
+    public async Task GetProviderDataCsvFileInfo_Returns_Expected_Result()
+    {
+        var bytes = new byte[] { 104, 101, 108, 108, 111 };
+
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+        const string expectedFormattedFileDate = "August 2022";
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetCsv()
+            .Returns(bytes);
+
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService,
+                dateTimeService);
+
+        var result = await controller.GetProviderDataCsvFileInfo();
+        
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var info = okResult.Value as ProviderDataDownloadInfoResponse;
+        info.Should().NotBeNull();
+        info!.FileSize.Should().Be(bytes.Length);
+        info!.FormattedFileDate.Should().Be(expectedFormattedFileDate);
+    }
+
+    [Fact]
+    public async Task GetProviderDataCsvFileInfo_Returns_Expected_Result_From_Cache()
+    {
+        const string formattedDate = "August 2022";
+        const int fileSize = 10101;
+
+        //var bytes = new byte[] { 104, 101, 108, 108, 111 };
+        var cachedInfo = new ProviderDataDownloadInfoResponse
+            {
+                FormattedFileDate = formattedDate,
+                FileSize = fileSize
+            };
+
+        var cache = Substitute.For<IMemoryCache>();
+        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
+            .Returns(x =>
+            {
+                if ((string)x[0] == CacheKeys.ProviderDataDownloadInfoKey)
+                {
+                    x[1] = cachedInfo;
+                    return true;
+                }
+
+                return false;
+            });
+
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+ 
+        var controller = new ProvidersControllerBuilder()
+            .Build(providerDataService,
+                dateTimeService,
+                cache);
+
+        var result = await controller.GetProviderDataCsvFileInfo();
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        var info = okResult.Value as ProviderDataDownloadInfoResponse;
+        info.Should().NotBeNull();
+        info!.FileSize.Should().Be(fileSize);
+        info!.FormattedFileDate.Should().Be(formattedDate);
+
+        info.Should().Be(cachedInfo);
+        info.Should().BeEquivalentTo(cachedInfo);
+
+        await providerDataService
+            .DidNotReceive()
+            .GetCsv();
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
@@ -13,8 +12,10 @@ public class SettingsBuilder
     private const string FindCourseApiKey = "0f608e5d437f4baabc04a0bc2dabbc1b";
     private const string FindCourseApiBaseAbsoluteUri = "https://test.com/findacourse/api";
     public static readonly Uri FindCourseApiBaseUri = new(FindCourseApiBaseAbsoluteUri);
+    private const string GovNotifyApiKey = "1fff7b5b-bf64-4af9-9857-1797d0d525a3";
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
+    private const string SupportEmailAddress = "support@test-email.gov.uk";
 
     public ApiSettings BuildApiSettings(
         string appId = AppId,
@@ -32,6 +33,14 @@ public class SettingsBuilder
             ApiKey = findCourseApiKey
         };
 
+    public EmailSettings BuildEmailSettings(
+    string govNotifyApiKey = GovNotifyApiKey,
+    string supportEmailAddress = SupportEmailAddress) => new()
+    {
+        GovNotifyApiKey = govNotifyApiKey,
+        SupportEmailAddress = supportEmailAddress
+    };
+
     public PostcodeApiSettings BuildPostcodeApiSettings(
         string postcodeRetrieverUri = PostcodeRetrieverUri) => new()
         {
@@ -47,6 +56,7 @@ public class SettingsBuilder
     public SiteConfiguration BuildConfigurationOptions(
         ApiSettings apiSettings = null,
         CourseDirectoryApiSettings courseDirectoryApiSettings = null,
+        EmailSettings emailSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
         SearchSettings searchSettings = null,
         string sqlConnectionString = "TestConnection",
@@ -55,6 +65,7 @@ public class SettingsBuilder
         {
             ApiSettings = apiSettings ?? BuildApiSettings(),
             CourseDirectoryApiSettings = courseDirectoryApiSettings ?? BuildCourseDirectoryApiSettings(),
+            EmailSettings = emailSettings ?? BuildEmailSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             SqlConnectionString = sqlConnectionString,

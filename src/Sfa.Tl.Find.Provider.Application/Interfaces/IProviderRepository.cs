@@ -6,6 +6,8 @@ public interface IProviderRepository
 {
     Task<IEnumerable<ProviderDetail>> GetAll();
 
+    Task<IEnumerable<ProviderDetailFlat>> GetAllFlattened();
+
     Task<bool> HasAny(bool isAdditionalData = false);
 
     Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);

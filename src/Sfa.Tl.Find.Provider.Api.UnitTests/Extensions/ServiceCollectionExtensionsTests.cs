@@ -140,6 +140,18 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddNotifyServices_Should_AddService()
+    {
+        var services = new ServiceCollection();
+
+        var emailSettings = new SettingsBuilder().BuildEmailSettings();
+
+        services.AddNotifyService(emailSettings.GovNotifyApiKey);
+
+        services.Should().Contain(t => t.ServiceType.Name == "IAsyncNotificationClient");
+    }
+
+    [Fact]
     public void AddQuartzServices_With_Cron_Schedule_Should_AddService()
     {
         var services = new ServiceCollection();

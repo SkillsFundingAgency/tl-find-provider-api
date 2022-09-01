@@ -12,8 +12,7 @@ public class CourseDirectoryServiceBuilder
     private const string CourseDirectoryApiBaseAbsoluteUri = "https://https://test.com/findacourse/api/";
     private static readonly Uri CourseDirectoryApiBaseUri = new(CourseDirectoryApiBaseAbsoluteUri);
 
-    // ReSharper disable once MemberCanBePrivate.Global
-    public CourseDirectoryService Build(
+    public ICourseDirectoryService Build(
         HttpClient httpClient = null, 
         IProviderRepository providerRepository = null,
         IQualificationRepository qualificationRepository = null,
@@ -34,7 +33,7 @@ public class CourseDirectoryServiceBuilder
             logger);
     }
         
-    public CourseDirectoryService Build(
+    public ICourseDirectoryService Build(
         IDictionary<string, string> responseMessages,
         IProviderRepository providerRepository = null,
         IQualificationRepository qualificationRepository = null,

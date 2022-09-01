@@ -98,6 +98,17 @@ public class ProviderRepository : IProviderRepository
         return results;
     }
 
+    public async Task<IEnumerable<ProviderDetailFlat>> GetAllFlattened()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        return await _dbContextWrapper
+            .QueryAsync<ProviderDetailFlat>(
+                connection,
+                "GetAllProviderDetails",
+                commandType: CommandType.StoredProcedure);
+    }
+
     public async Task<bool> HasAny(bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -163,12 +174,12 @@ public class ProviderRepository : IProviderRepository
         });
 
         var providerUpdateResult = await _dbContextWrapper
-        .QueryAsync<(string Change, int ChangeCount)>(
-            connection,
-            "UpdateProviders",
-            _dynamicParametersWrapper.DynamicParameters,
-            transaction,
-            commandType: CommandType.StoredProcedure);
+            .QueryAsync<(string Change, int ChangeCount)>(
+                connection,
+                "UpdateProviders",
+                _dynamicParametersWrapper.DynamicParameters,
+                transaction,
+                commandType: CommandType.StoredProcedure);
 
         _logger.LogChangeResults(providerUpdateResult, nameof(ProviderRepository), nameof(providers));
 
@@ -259,7 +270,7 @@ public class ProviderRepository : IProviderRepository
 
                 if (deliveryYear.Routes.All(z => z.Id != r.RouteId))
                 {
-                    deliveryYear.Routes.Add(new Route { Id = r.RouteId, Name = r.RouteName});
+                    deliveryYear.Routes.Add(new Route { Id = r.RouteId, Name = r.RouteName });
                 }
 
                 var route = deliveryYear
