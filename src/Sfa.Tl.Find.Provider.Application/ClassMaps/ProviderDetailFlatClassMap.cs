@@ -12,7 +12,7 @@ public sealed class ProviderDetailFlatClassMap : ClassMap<ProviderDetailFlat>
         Map(p => p.Postcode).Name("Postcode");
         Map(p => p.LocationName).Name("Location Name");
         Map(p => p.AddressLine1).Name("Address Line 1");
-        Map(p => p.AddressLine2).Name(".Address Line 2");
+        Map(p => p.AddressLine2).Name("Address Line 2");
         Map(p => p.Town).Name("Town");
         Map(p => p.County).Name("County");
         Map(p => p.Email).Name("Email");
