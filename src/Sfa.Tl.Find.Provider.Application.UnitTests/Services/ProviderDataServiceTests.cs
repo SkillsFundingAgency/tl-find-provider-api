@@ -217,6 +217,7 @@ public class ProviderDataServiceTests
             "Qualification Name"
         );
     }
+
     [Fact]
     public async Task GetCsv_Returns_Expected_Provider_Data()
     {
@@ -264,12 +265,11 @@ public class ProviderDataServiceTests
                 providers[index].Year.ToString(),
                 providers[index].RouteName,
                 providers[index].QualificationName
-            }, 
-                $"data on row index {index} should match output");
+            }, $"data on providers row {index} should match output");
             index++;
         }
 
-        index.Should().Be(providers.Count );
+        index.Should().Be(providers.Count);
     }
 
     [Fact]
