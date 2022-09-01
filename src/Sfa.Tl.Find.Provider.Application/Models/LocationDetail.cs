@@ -7,7 +7,7 @@ namespace Sfa.Tl.Find.Provider.Application.Models;
                  " {" + nameof(LocationName) + ", nq}")]
 public class LocationDetail
 {
-    [JsonPropertyName("name")]
+    [JsonPropertyName("locationName")]
     public string LocationName { get; init; }
     public string Postcode { get; init; }
     [JsonPropertyName("addressLine1")]

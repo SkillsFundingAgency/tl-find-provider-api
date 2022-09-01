@@ -29,4 +29,6 @@ public interface IProviderDataService
     Task<ProviderDetailResponse> GetAllProviders();
 
     Task LoadAdditionalProviderData();
+    
+    Task<byte[]> GetCsv();
 }

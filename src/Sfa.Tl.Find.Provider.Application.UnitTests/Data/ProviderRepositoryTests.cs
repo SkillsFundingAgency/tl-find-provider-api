@@ -33,6 +33,25 @@ public class ProviderRepositoryTests
     }
 
     [Fact]
+    public async Task GetAllFlattened_Returns_Expected_List_For_Single_Result_Row()
+    {
+        var expectedResult = new ProviderDetailFlatBuilder()
+            .BuildListWithSingleItem();
+
+        var repository = new ProviderRepositoryBuilder()
+            .BuildRepositoryWithDataToGetAllFlattenedProviders();
+
+        var results = (await repository
+                .GetAllFlattened())
+            ?.ToList();
+
+        results.Should().NotBeNull();
+        results!.Count.Should().Be(1);
+
+        results.First().Validate(expectedResult.First());
+    }
+
+    [Fact]
     public void Constructor_Guards_Against_NullParameters()
     {
         typeof(ProviderRepository)
