@@ -43,7 +43,31 @@ public class TestController : ControllerBase
         var tokens = new Dictionary<string, string>();
 
         var result = await _emailService.SendEmail(recipients, template, tokens);
-        
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("sendemployermail")]
+    public async Task<IActionResult> GetSendEmployerEmail(
+        [FromQuery(Name = "to")] string recipients)
+    {
+        var template = "EmployerInterest";
+
+        var tokens = new Dictionary<string, string>()
+        {
+            {"employer_name", "Test Employer"},
+            {"employer_phone_number", "+44 012 345 6789"},
+            {"employer_email_address", "@test.co.uk"},
+            {
+                "providers_list",
+                "* Provider in location 1\r\n" +
+                "* Another provider in location 2"
+            }
+        };
+
+        var result = await _emailService.SendEmail(recipients, template, tokens);
+
         return Ok(result);
     }
 }
