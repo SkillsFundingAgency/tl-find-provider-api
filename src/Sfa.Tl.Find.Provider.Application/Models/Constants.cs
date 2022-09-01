@@ -34,4 +34,8 @@ public static class Constants
     public const int WebsiteMaxLength = 150;
 
     public const int TownSearchDefaultMaxResults = 50;
+
+    public const string CssPathPattern = @"^\/css\/.*\.css$";
+    public const string FontsPathPattern = @"^\/assets\/fonts\/.*\.woff\d?$";
+    public const string JsPathPattern = @"^\/js\/.*\.js$";
 }

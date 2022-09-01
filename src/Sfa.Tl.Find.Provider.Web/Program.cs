@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
@@ -40,7 +41,7 @@ builder.Services.AddResponseCaching();
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizePage("/Index");
-    //options.Conventions.AuthorizeFolder("/Private");
+    options.Conventions.AuthorizeFolder("/Error");
 });
 
 if (!builder.Environment.IsDevelopment())
@@ -72,9 +73,6 @@ builder.Services
 builder.Services.AddNotifyService(
     siteConfiguration.EmailSettings.GovNotifyApiKey);
 
-var webRootPath = builder.Environment.WebRootPath;
-var contentRootPath = builder.Environment.ContentRootPath;
-
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -83,20 +81,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseReferrerPolicy(opts => opts.NoReferrer())
-    //.UseXXssProtection(opts => opts.EnabledWithBlockMode());
+app.UseXContentTypeOptions()
+    .UseReferrerPolicy(opts => opts.NoReferrer())
     ;
 
-app.UseWhen(
-    ctx => IsNotImgFile(ctx.Request.Path),
-    appBuilder =>
-        appBuilder.UseXContentTypeOptions());
-
-app.UseWhen(
-        ctx => IsNotCssOrImgOrFontFile(ctx.Request.Path),
+app.UseWhen(ctx => 
+        ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern, Constants.FontsPathPattern),
         appBuilder =>
             appBuilder
-                //.UseXContentTypeOptions()
             .UseCsp(options => options
                     .FrameAncestors(s => s.None())
                     .ObjectSources(s => s.None())
@@ -115,17 +107,12 @@ app.UseWhen(
                 })
     );
 
-
-//app.UseWhen(
-//    ctx => IsCssOrJsFile(ctx.Request.Path),
-//    appBuilder => appBuilder.UseXContentTypeOptions());
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCookiePolicy();
 
-app.UseWhen(
-    ctx => IsNotJsOrCssFile(ctx.Request.Path),
+app.UseWhen(ctx => 
+        ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern),
     appBuilder =>
         appBuilder.UseXXssProtection(opts => opts.EnabledWithBlockMode()));
 
@@ -143,36 +130,5 @@ app.UseResponseCaching();
 
 app.Run();
 
-//var _fp = new PhysicalFileProvider()//
-bool IsNotJsFile(string path)
-{
-    if (string.IsNullOrEmpty(path)) return false;
-    var starts = !string.IsNullOrEmpty(webRootPath) && path.StartsWith(webRootPath);
-    var starts2 = !string.IsNullOrEmpty(webRootPath) && path.StartsWith(contentRootPath);
-    return !path.EndsWith(".js");
-}
-
-bool IsNotImgFile(string path)
-{
-    var starts = path.StartsWith(webRootPath);
-    var starts2 = path.StartsWith(contentRootPath);
-    return !path.Contains("/assets/images/");
-}
-
-bool IsNotJsOrCssFile(string path)
-{
-    var starts = path.StartsWith(webRootPath);
-    var starts2 = path.StartsWith(contentRootPath);
-    return !path.EndsWith(".css") && !path.EndsWith(".js");
-}
-
-bool IsNotCssOrImgOrFontFile(string path)
-{
-    var starts = path.StartsWith(webRootPath);
-    var starts2 = path.StartsWith(contentRootPath);
-    return !path.Contains(".css") &&
-           !path.Contains("/assets/fonts/") &&
-           !path.Contains("/assets/images/");
-}
-
-public partial class Program { } //Required so tests can see this class
+// ReSharper disable once UnusedMember.Global - Required so tests can see this class
+public partial class Program { } 
