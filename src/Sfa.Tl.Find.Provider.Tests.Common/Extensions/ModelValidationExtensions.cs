@@ -16,7 +16,9 @@ public static class ModelValidationExtensions
         string email,
         string telephone,
         string website,
-        int locationCount = 0)
+        int locationCount = 0,
+        bool isAdditionalData = false
+        )
     {
         provider.UkPrn.Should().Be(ukPrn);
         provider.Name.Should().Be(name);
@@ -28,7 +30,8 @@ public static class ModelValidationExtensions
         provider.Email.Should().Be(email);
         provider.Telephone.Should().Be(telephone);
         provider.Website.Should().Be(website);
-
+        provider.IsAdditionalData.Should().Be(isAdditionalData);
+        
         provider.Locations.Should().NotBeNull();
         provider.Locations.Should().HaveCount(locationCount);
     }

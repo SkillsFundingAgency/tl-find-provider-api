@@ -8,6 +8,7 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Microsoft.VisualBasic.FileIO;
+using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -789,37 +790,71 @@ public class ProviderDataServiceTests
         provider.Should().NotBeNull();
 
         // ReSharper disable once StringLiteralTypo
-        provider!.Name.Should().Be("BURNTWOOD SCHOOL");
-        provider.Postcode.Should().Be("SW17 0AQ");
-        provider.Website.Should().Be("https://www.burntwoodschool.com/");
-        provider.Email.Should().Be("info@burntwoodschool.com");
-        provider.Telephone.Should().Be("020 8946 6201");
-        provider.Town.Should().Be("London");
+        provider.Validate(
+            10042223,
+        "BURNTWOOD SCHOOL",
+            null,
+            null,
+            "London",
+            null,
+            "SW17 0AQ",
+        "info@burntwoodschool.com",
+        "020 8946 6201",
+            "https://www.burntwoodschool.com/",
+            1,
+            true);
 
-        provider.IsAdditionalData.Should().BeTrue();
+        var location = provider!.Locations.First();
 
-        provider.Locations.Should().NotBeNull();
-        provider.Locations.Count.Should().Be(1);
-
-        var location = provider.Locations.First();
-
-        location.Postcode.Should().Be("SW17 0AQ");
-        location.Town.Should().Be("London");
-        location.Latitude.Should().Be(51.438125);
-        location.Longitude.Should().Be(-0.180083);
-        location.Website.Should().Be("https://www.burntwoodschool.com/");
-        location.Email.Should().Be("info@burntwoodschool.com");
-        location.Telephone.Should().Be("020 8946 6201");
-        location.DeliveryYears.Should().NotBeNull();
-        location.DeliveryYears.Count.Should().Be(1);
-
+        // ReSharper disable once StringLiteralTypo
+        location.Validate(
+            "BURNTWOOD SCHOOL",
+            "SW17 0AQ",
+            null,
+            null,
+            "London",
+            null,
+            "info@burntwoodschool.com",
+            "020 8946 6201",
+            "https://www.burntwoodschool.com/",
+            51.438125,
+            -0.180083,
+            1);
         var deliveryYear = location.DeliveryYears.First();
 
-        deliveryYear.Year.Should().Be(2022);
-        deliveryYear.Qualifications.Should().NotBeNull();
-        deliveryYear.Qualifications.Count.Should().Be(1);
+        deliveryYear.Validate(2022, 
+            new []{ 38 });
+    }
 
-        var qualification = deliveryYear.Qualifications.First();
-        qualification.Id.Should().Be(38);
+    [Fact]
+    public async Task ImportProviderContacts_Works_As_Expected()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await using var stream = ProviderContactsCsvBuilder
+            .BuildProviderContactsCsvAsStream();
+
+        await service.ImportProviderContacts(stream);
+
+        //TODO: Test that providers were saved to repository
+    }
+
+    [Fact]
+    public async Task ImportProviderContacts_With_Bytes_Works_As_Expected()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        var bytes = ProviderContactsCsvBuilder
+            .BuildProviderContactsCsvAsBytes();
+
+        await service.ImportProviderContacts(bytes);
+
+        //TODO: Test that providers were saved to repository
     }
 }

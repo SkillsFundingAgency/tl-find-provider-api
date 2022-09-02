@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text.Json;
 using CsvHelper;
 using Microsoft.Extensions.Caching.Memory;
@@ -207,6 +208,19 @@ public class ProviderDataService : IProviderDataService
         }
 
         return stream.ToArray();
+    }
+
+    public async Task ImportProviderContacts(byte[] bytes)
+    {
+        using var ms = new MemoryStream(bytes);
+        await ImportProviderContacts(ms);
+    }
+
+    public async Task ImportProviderContacts(Stream stream)
+    {
+        using var reader = new StreamReader(stream);
+        var contentString = await reader.ReadToEndAsync();
+        Debug.WriteLine(contentString);
     }
 
     public async Task<bool> HasQualifications()
