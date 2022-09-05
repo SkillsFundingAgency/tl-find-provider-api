@@ -14,14 +14,14 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 public class PostcodeLookupServiceTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(PostcodeLookupService)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(PostcodeLookupService)
             .ShouldNotAcceptNullOrBadConstructorArguments();

@@ -13,14 +13,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 public class QualificationsControllerTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(QualificationsController)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(QualificationsController)
             .ShouldNotAcceptNullOrBadConstructorArguments();

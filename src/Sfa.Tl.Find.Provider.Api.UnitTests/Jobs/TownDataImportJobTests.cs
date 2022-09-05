@@ -10,14 +10,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Jobs;
 public class TownDataImportJobTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(TownDataImportJob)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(TownDataImportJob)
             .ShouldNotAcceptNullOrBadConstructorArguments();

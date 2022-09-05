@@ -13,14 +13,14 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 public class CourseDirectoryServiceTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(CourseDirectoryService)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(CourseDirectoryService)
             .ShouldNotAcceptNullOrBadConstructorArguments();
