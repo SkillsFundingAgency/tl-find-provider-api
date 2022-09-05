@@ -11,14 +11,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 public class DataImportControllerTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(DataImportController)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(DataImportController)
             .ShouldNotAcceptNullOrBadConstructorArguments();
@@ -32,7 +32,7 @@ public class DataImportControllerTests
         var controller = new DataImportControllerBuilder()
             .Build(providerDataService);
 
-        await using var stream = await GetFileStream();
+        await using var stream = await BuildTestCsvFileStream();
         IFormFile file = new FormFile(stream, 0, stream.Length, "test_form_file", "test.csv");
 
         var result = await controller.UploadProviderContacts(file);
@@ -54,7 +54,7 @@ public class DataImportControllerTests
         var controller = new DataImportControllerBuilder()
             .Build(providerDataService);
 
-        await using var stream = await GetFileStream();
+        await using var stream = await BuildTestCsvFileStream();
         IFormFile file = new FormFile(stream, 0, stream.Length, "test_form_file", "test.csv");
 
         var result = await controller.GetUploadProviderContacts(file);
@@ -69,19 +69,34 @@ public class DataImportControllerTests
     }
 
     [Fact]
-    public async Task UploadProviderContacts_For_Bad_File_Returns_Error_Result()
+    public async Task UploadProviderContacts_For_Missing_File_Returns_Error_Result()
     {
         var controller = new DataImportControllerBuilder()
             .Build();
 
         var result = await controller.UploadProviderContacts(null);
 
-        var statusCodeResult = result as StatusCodeResult;
+        var statusCodeResult = result as BadRequestObjectResult;
         statusCodeResult.Should().NotBeNull();
-        statusCodeResult!.StatusCode.Should().Be(500);
+        statusCodeResult!.StatusCode.Should().Be(400);
+        statusCodeResult!.Value.Should().Be("File is required.");
     }
 
-    private static async Task<Stream> GetFileStream(
+    [Fact]
+    public async Task UploadProviderContacts_For_Missing_File_Returns_Error_Result_With_Get_Method()
+    {
+        var controller = new DataImportControllerBuilder()
+            .Build();
+
+        var result = await controller.GetUploadProviderContacts(null);
+
+        var statusCodeResult = result as BadRequestObjectResult;
+        statusCodeResult.Should().NotBeNull();
+        statusCodeResult!.StatusCode.Should().Be(400);
+        statusCodeResult!.Value.Should().Be("File is required.");
+    }
+
+    private static async Task<Stream> BuildTestCsvFileStream(
         string content = "col1, col2\r\n123,Test")
     {
         var stream = new MemoryStream();

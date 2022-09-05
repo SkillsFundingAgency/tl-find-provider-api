@@ -35,13 +35,15 @@ public class DataImportController : ControllerBase
                 _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadProviderContacts)} called.");
             }
 
-            //using var ms = new MemoryStream();
-            //await file.CopyToAsync(ms);
+            if (file is null)
+            {
+                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderContacts)} has no file.");
+                return BadRequest("File is required.");
+            }
 
-            using (var reader = new StreamReader(file.OpenReadStream()))
-
-                await _providerDataService.ImportProviderContacts(
-                    file.OpenReadStream());
+            using var reader = new StreamReader(file.OpenReadStream());
+            await _providerDataService.ImportProviderContacts(
+                file.OpenReadStream());
 
             return Accepted();
         }
@@ -64,6 +66,12 @@ public class DataImportController : ControllerBase
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug($"{nameof(DataImportController)} {nameof(GetUploadProviderContacts)} called.");
+            }
+
+            if (file is null)
+            {
+                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderContacts)} has no file.");
+                return BadRequest("File is required.");
             }
 
             using var ms = new MemoryStream();

@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -154,7 +156,7 @@ public class ProviderDataService : IProviderDataService
             };
         }
     }
-    
+
     public async Task<ProviderSearchResponse> FindProviders(
         double latitude,
         double longitude,
@@ -219,8 +221,38 @@ public class ProviderDataService : IProviderDataService
     public async Task ImportProviderContacts(Stream stream)
     {
         using var reader = new StreamReader(stream);
-        var contentString = await reader.ReadToEndAsync();
-        Debug.WriteLine(contentString);
+       
+        using var csvReader = new CsvReader(
+            reader,
+            new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                PrepareHeaderForMatch = args =>
+                {
+                    Debug.WriteLine($"PrepareHeaderForMatch - {args.Header}");
+                    if (args.Header == "UKPRN") return "UkPrn";
+
+                    return args.Header
+                            .Replace(" ", "")
+                        //.Replace("UKPRN", "UkPrn")
+                        ;
+                },
+                MissingFieldFound = args =>
+                {
+                    Debug.WriteLine($"Missing arg {args.Index} at reader index {args.Context.Reader.CurrentIndex}");
+                }
+            });
+
+        var contacts = csvReader
+            .GetRecords<ProviderContactDto>()
+            .ToList();
+
+        Debug.WriteLine(new string('=', 50));
+        Debug.WriteLine($"Provider contacts ({contacts.Count()})");
+        foreach (var c in contacts)
+        {
+            Debug.WriteLine($"{c.UkPrn} {c.Name} - {c.EmployerContactEmail}, {c.EmployerContactPhone}, {c.EmployerContactWebsite}, {c.StudentContactEmail}, {c.StudentContactPhone}, {c.StudentContactWebsite}");
+        }
+        Debug.WriteLine(new string('=', 50));
     }
 
     public async Task<bool> HasQualifications()
@@ -342,7 +374,7 @@ public class ProviderDataService : IProviderDataService
 
         return geoLocation;
     }
-    
+
     private async Task<ProviderSearchResponse> Search(IList<int> routeIds, IList<int> qualificationIds, int page, int pageSize, GeoLocation geoLocation)
     {
         var (searchResults, totalSearchResults) =
