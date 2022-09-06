@@ -31,16 +31,16 @@ jobs:
       artifactName: 'appdrop'
       downloadPath: '$(System.ArtifactsDirectory)'
 
-   - task: AzureWebApp@1
-     inputs:
-       azureSubscription: ${{ parameters.serviceConnection }}
-       appType: 'webApp'
-       appName: '$(uiAppName)'
-       deployToSlotOrASE: true
-       resourceGroupName: '$(ResourceGroupName)'
-       slotName: 'staging'
-       package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
-       deploymentMethod: 'auto'
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      appType: 'webApp'
+      appName: '$(uiAppName)'
+      deployToSlotOrASE: true
+      resourceGroupName: '$(ResourceGroupName)'
+      slotName: 'staging'
+      package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
+      deploymentMethod: 'auto'
   
   - task: AzureRmWebAppDeployment@3
     displayName: 'Azure App Service Deploy: $(uiAppName)'
