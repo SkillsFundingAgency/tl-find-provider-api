@@ -314,26 +314,13 @@ public class ProviderRepository : IProviderRepository
                 connection,
                 "UPDATE dbo.Provider " +
                 "SET EmployerContactEmail = @EmployerContactEmail, " +
-                "   EmployerContactEmail = @EmployerContactEmail, " +
-                "   EmployerContactPhone = @EmployerContactPhone " +
-                "   EmployerContactWebsite = @EmployerContactWebsite " +
-                "   StudentContactEmail = @StudentContactEmail " +
-                "   StudentContactPhone = @StudentContactPhone " +
-                "   StudentContactWebsite = @StudentContactWebsite " +
+                "    EmployerContactTelephone = @EmployerContactTelephone, " +
+                "    EmployerContactWebsite = @EmployerContactWebsite, " +
+                "    StudentContactEmail = @StudentContactEmail, " +
+                "    StudentContactTelephone = @StudentContactTelephone, " +
+                "    StudentContactWebsite = @StudentContactWebsite " +
                 "WHERE UkPrn = @UkPrn",
-                contact
-                //new
-                //{
-                //    contact.UkPrn,
-                //    contact.Name,
-                //    contact.EmployerContactEmail ,
-                //    contact.EmployerContactPhone,
-                //    contact.EmployerContactWebsite,
-                //    contact.StudentContactEmail,  
-                //    contact.StudentContactPhone , 
-                //    contact.StudentContactWebsite
-                //}
-                );
+                contact);
         }
 
         return resultCount;

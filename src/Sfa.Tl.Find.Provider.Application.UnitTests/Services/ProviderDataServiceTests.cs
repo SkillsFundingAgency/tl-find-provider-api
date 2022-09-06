@@ -839,7 +839,10 @@ public class ProviderDataServiceTests
 
         await service.ImportProviderContacts(stream);
 
-        //TODO: Test that providers were saved to repository
+        await providerRepository
+            .Received(1)
+            .UpdateProviderContacts(Arg.Is<IEnumerable<ProviderContactDto>>(
+                p => p.Any()));
     }
 
     [Fact]
@@ -855,6 +858,9 @@ public class ProviderDataServiceTests
 
         await service.ImportProviderContacts(bytes);
 
-        //TODO: Test that providers were saved to repository
+        await providerRepository
+            .Received(1)
+            .UpdateProviderContacts(Arg.Is<IEnumerable<ProviderContactDto>>(
+                p => p.Any()));
     }
 }

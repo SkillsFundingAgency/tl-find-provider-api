@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -220,38 +219,34 @@ public class ProviderDataService : IProviderDataService
     public async Task ImportProviderContacts(Stream stream)
     {
         using var reader = new StreamReader(stream);
-       
-        using var csvReader = new CsvReader(
-            reader,
+        using var csvReader = new CsvReader(reader,
             new CsvConfiguration(CultureInfo.CurrentCulture)
             {
                 PrepareHeaderForMatch = args =>
                 {
-                    Debug.WriteLine($"PrepareHeaderForMatch - {args.Header}");
-                    if (args.Header == "UKPRN") return "UkPrn";
+                    if (string.Compare(args.Header, "UKPRN", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    {
+                        return "UkPrn";
+                    }
 
                     return args.Header
-                            .Replace(" ", "")
-                        //.Replace("UKPRN", "UkPrn")
-                        ;
+                            .Replace(" ", "");
                 },
-                MissingFieldFound = args =>
-                {
-                    Debug.WriteLine($"Missing arg {args.Index} at reader index {args.Context.Reader.CurrentIndex}");
-                }
+                MissingFieldFound = _ => { /* ignore empty column values */ }
             });
+
+        csvReader.Context.TypeConverterOptionsCache.GetOptions<string>()
+            .NullValues
+            .AddRange(new[] { "", "NULL", "NA", "N/A" });
 
         var contacts = csvReader
             .GetRecords<ProviderContactDto>()
             .ToList();
 
-        Debug.WriteLine(new string('=', 50));
-        Debug.WriteLine($"Provider contacts ({contacts.Count})");
-        foreach (var c in contacts)
-        {
-            Debug.WriteLine($"{c.UkPrn} {c.Name} - {c.EmployerContactEmail}, {c.EmployerContactPhone}, {c.EmployerContactWebsite}, {c.StudentContactEmail}, {c.StudentContactPhone}, {c.StudentContactWebsite}");
-        }
-        Debug.WriteLine(new string('=', 50));
+        var resultCount = await _providerRepository.UpdateProviderContacts(contacts);
+
+        _logger.LogInformation("Updated contacts for {resultCount} providers from {contactsCount}.",
+            resultCount, contacts.Count);
     }
 
     public async Task<bool> HasQualifications()
