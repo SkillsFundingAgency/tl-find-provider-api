@@ -25,6 +25,7 @@ public class DataImportController : ControllerBase
     [HttpPost]
     [Route("provider/contacts")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UploadProviderContacts(IFormFile file)
     {
@@ -40,6 +41,10 @@ public class DataImportController : ControllerBase
                 _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderContacts)} has no file.");
                 return BadRequest("File is required.");
             }
+
+            //using var ms = new MemoryStream();
+            //await file.CopyToAsync(ms);
+            //await _providerDataService.ImportProviderContacts(ms.ToArray());
 
             using var reader = new StreamReader(file.OpenReadStream());
             await _providerDataService.ImportProviderContacts(
@@ -57,43 +62,24 @@ public class DataImportController : ControllerBase
     [HttpGet]
     [Route("provider/contacts")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUploadProviderContacts(
         [FromForm] IFormFile file)
     {
-        try
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug($"{nameof(DataImportController)} {nameof(GetUploadProviderContacts)} called.");
-            }
-
-            if (file is null)
-            {
-                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderContacts)} has no file.");
-                return BadRequest("File is required.");
-            }
-
-            using var ms = new MemoryStream();
-            await file.CopyToAsync(ms);
-            var bytes = ms.ToArray();
-
-            await _providerDataService.ImportProviderContacts(
-                bytes);
-
-            return Accepted();
+            _logger.LogDebug($"{nameof(DataImportController)} {nameof(GetUploadProviderContacts)} called.");
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+
+        return await UploadProviderContacts(file);
     }
 
     //TODO: Document this change - extra optional bit on amx header
     //TODO: Retest all from postman and Zendesk
+    // ReSharper disable CommentTypo
     /*
-    const skipBodyEncoding = true; //Set this to true if body encoking should be skipped
+    const skipBodyEncoding = true; //Set this to true if body encoding should be skipped
 
     const appId = "TODO";
     const apiKey = "TODO";
@@ -127,4 +113,5 @@ public class DataImportController : ControllerBase
     if(skipBodyEncoding) amxHeader += ":true";
     postman.setEnvironmentVariable("hmac",  amxHeader);
     */
+    // ReSharper restore CommentTypo
 }

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Caching.Memory;
@@ -247,7 +246,7 @@ public class ProviderDataService : IProviderDataService
             .ToList();
 
         Debug.WriteLine(new string('=', 50));
-        Debug.WriteLine($"Provider contacts ({contacts.Count()})");
+        Debug.WriteLine($"Provider contacts ({contacts.Count})");
         foreach (var c in contacts)
         {
             Debug.WriteLine($"{c.UkPrn} {c.Name} - {c.EmployerContactEmail}, {c.EmployerContactPhone}, {c.EmployerContactWebsite}, {c.StudentContactEmail}, {c.StudentContactPhone}, {c.StudentContactWebsite}");

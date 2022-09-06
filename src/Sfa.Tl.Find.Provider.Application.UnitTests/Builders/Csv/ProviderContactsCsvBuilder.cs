@@ -5,12 +5,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
 public static class ProviderContactsCsvBuilder
 {
     private const string AssetFolderPath = "Assets";
-
-    public static string BuildProviderContactsCsv() =>
-        typeof(ProviderContactsCsvBuilder)
-            .ReadManifestResourceStreamAsString(
-                $"{AssetFolderPath}.ProviderContacts.csv");
-
+    
     public static Stream BuildProviderContactsCsvAsStream() =>
         typeof(ProviderContactsCsvBuilder)
             .ReadManifestResourceStream(

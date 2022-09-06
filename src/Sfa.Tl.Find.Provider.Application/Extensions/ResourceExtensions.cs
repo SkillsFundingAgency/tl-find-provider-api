@@ -29,11 +29,6 @@ public static class ResourceExtensions
         return assembly.ReadManifestResourceStreamAsString($"{assembly.GetName().Name}.{relativeResourcePath}");
     }
 
-    public static Stream GetManifestResourceStream(this Type type, string resourcePath)
-    {
-        return type.Assembly.GetManifestResourceStream(resourcePath);
-    }
-
     public static string ReadManifestResourceStreamAsString(this Assembly assembly, string resourcePath)
     {
         using var stream = assembly.GetManifestResourceStream(resourcePath);

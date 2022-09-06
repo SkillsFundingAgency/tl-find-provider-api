@@ -65,7 +65,7 @@ public class DataImportControllerTests
 
         await providerDataService
             .Received(1)
-            .ImportProviderContacts(Arg.Any<byte[]>());
+            .ImportProviderContacts(Arg.Any<Stream>());
     }
 
     [Fact]
