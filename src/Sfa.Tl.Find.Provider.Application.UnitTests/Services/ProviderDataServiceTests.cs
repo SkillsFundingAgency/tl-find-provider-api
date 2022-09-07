@@ -801,8 +801,8 @@ public class ProviderDataServiceTests
         "info@burntwoodschool.com",
         "020 8946 6201",
             "https://www.burntwoodschool.com/",
-            1,
-            true);
+            locationCount: 1,
+            isAdditionalData: true);
 
         var location = provider!.Locations.First();
 

@@ -25,7 +25,7 @@ public class CourseDirectoryServiceTests
         typeof(CourseDirectoryService)
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
-        
+
     [Fact]
     public async Task ImportProviders_Creates_Expected_Providers()
     {
@@ -54,7 +54,7 @@ public class CourseDirectoryServiceTests
         targetProvider!.UkPrn.Should().Be(10000055);
         targetProvider.Name.Should().BeEquivalentTo("ABINGDON AND WITNEY COLLEGE");
 
-        targetProvider.Validate( 
+        targetProvider.Validate(
             10000055,
             "ABINGDON AND WITNEY COLLEGE",
             "Wootton Road",
@@ -65,7 +65,7 @@ public class CourseDirectoryServiceTests
             "test.user@abingdon-witney.ac.uk",
             "01234 555555",
             "http://www.abingdon-witney.ac.uk",
-            2);
+            locationCount: 2);
 
         var abingdonLocation = targetProvider.Locations.Single(l => l.Postcode == "OX14 1GG");
         abingdonLocation.Validate(
@@ -101,7 +101,7 @@ public class CourseDirectoryServiceTests
 
         witneyLocation.DeliveryYears.First().Validate(2021, new[] { 37, 38, 41 });
     }
-        
+
     [Fact]
     public async Task ImportQualifications_Creates_Expected_Qualifications()
     {

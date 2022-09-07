@@ -16,6 +16,12 @@ public static class ModelValidationExtensions
         string email,
         string telephone,
         string website,
+        string employerContactEmail = null,
+        string employerContactTelephone = null,
+        string employerContactWebsite = null,
+        string studentContactEmail = null,
+        string studentContactTelephone = null,
+        string studentContactWebsite = null,
         int locationCount = 0,
         bool isAdditionalData = false
         )
@@ -30,6 +36,14 @@ public static class ModelValidationExtensions
         provider.Email.Should().Be(email);
         provider.Telephone.Should().Be(telephone);
         provider.Website.Should().Be(website);
+
+        provider.EmployerContactEmail.Should().Be(employerContactEmail);
+        provider.EmployerContactTelephone.Should().Be(employerContactTelephone);
+        provider.EmployerContactWebsite.Should().Be(employerContactWebsite);
+        provider.StudentContactEmail.Should().Be(studentContactEmail);
+        provider.StudentContactTelephone.Should().Be(studentContactTelephone);
+        provider.StudentContactWebsite.Should().Be(studentContactWebsite);
+        
         provider.IsAdditionalData.Should().Be(isAdditionalData);
         
         provider.Locations.Should().NotBeNull();
