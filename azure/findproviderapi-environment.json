@@ -159,7 +159,7 @@
                         },
                         {
                           "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.ConnectionString.value]"
+                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).ConnectionString]"
                         }
                       ]
                     },
