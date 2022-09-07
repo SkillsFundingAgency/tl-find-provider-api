@@ -159,7 +159,7 @@
                         },
                         {
                           "name": "AppInsightsConnectionString",
-                          "value": "[reference(concat('microsoft.insights/components/', 'app-insights','-',parameters('environmentNameAbbreviation')), '2020-02-02').ConnectionString]"
+                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation')), '2020-02-02').ConnectionString]"
                         }
                       ]
                     },
