@@ -73,7 +73,7 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2021-04-01",
             "name": "[concat('app-insights','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
