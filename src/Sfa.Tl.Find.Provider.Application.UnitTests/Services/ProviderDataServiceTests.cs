@@ -822,14 +822,20 @@ public class ProviderDataServiceTests
             1);
         var deliveryYear = location.DeliveryYears.First();
 
-        deliveryYear.Validate(2022, 
-            new []{ 38 });
+        deliveryYear.Validate(2022,
+            new[] { 38 });
     }
 
     [Fact]
     public async Task ImportProviderContacts_Works_As_Expected()
     {
+        var receivedProviders = new List<ProviderContactDto>();
+
         var providerRepository = Substitute.For<IProviderRepository>();
+        await providerRepository
+            .UpdateProviderContacts(Arg.Do<IEnumerable<ProviderContactDto>>(
+                p =>
+                    receivedProviders.AddRange(p)));
 
         var service = new ProviderDataServiceBuilder()
             .Build(providerRepository: providerRepository);
@@ -843,24 +849,24 @@ public class ProviderDataServiceTests
             .Received(1)
             .UpdateProviderContacts(Arg.Is<IEnumerable<ProviderContactDto>>(
                 p => p.Any()));
-    }
 
-    [Fact]
-    public async Task ImportProviderContacts_With_Bytes_Works_As_Expected()
-    {
-        var providerRepository = Substitute.For<IProviderRepository>();
+        var providerContacts = receivedProviders.SingleOrDefault(p => p.UkPrn == 10000055);
 
-        var service = new ProviderDataServiceBuilder()
-            .Build(providerRepository: providerRepository);
+        var expectedContacts = new ProviderContactDtoBuilder().Build();
+        providerContacts.Validate(
+            new ProviderContactDto
+            {
+                UkPrn = 10000055,
+                Name = "ABINGDON AND WITNEY COLLEGE",
+                EmployerContactEmail = "employer.guidance@abingdon-witney.ac.uk",
+                EmployerContactTelephone = "01235 789010",
+                EmployerContactWebsite = "http://www.abingdon-witney.ac.uk/employers",
+                StudentContactEmail = "student.counseller@abingdon-witney.ac.uk",
+                StudentContactTelephone = "01235 789010",
+                StudentContactWebsite = "http://www.abingdon-witney.ac.uk/students"
+            });
 
-        var bytes = ProviderContactsCsvBuilder
-            .BuildProviderContactsCsvAsBytes();
+        providerContacts.Validate(expectedContacts);
 
-        await service.ImportProviderContacts(bytes);
-
-        await providerRepository
-            .Received(1)
-            .UpdateProviderContacts(Arg.Is<IEnumerable<ProviderContactDto>>(
-                p => p.Any()));
     }
 }

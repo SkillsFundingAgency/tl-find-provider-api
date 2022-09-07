@@ -10,9 +10,4 @@ public static class ProviderContactsCsvBuilder
         typeof(ProviderContactsCsvBuilder)
             .ReadManifestResourceStream(
                 $"{AssetFolderPath}.ProviderContacts.csv");
-
-    public static byte[] BuildProviderContactsCsvAsBytes() =>
-        typeof(ProviderContactsCsvBuilder)
-            .ReadManifestResourceStreamAsBytes(
-                $"{AssetFolderPath}.ProviderContacts.csv");
 }

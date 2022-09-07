@@ -119,6 +119,20 @@ public static class ModelValidationExtensions
         provider.QualificationId.Should().Be(expected.QualificationId);
         provider.QualificationName.Should().Be(expected.QualificationName);
     }
+    
+    public static void Validate(this ProviderContactDto provider,
+        ProviderContactDto expected)
+    {
+        provider.Should().NotBeNull();
+        provider.UkPrn.Should().Be(expected.UkPrn);
+        provider.Name.Should().Be(expected.Name);
+        provider.EmployerContactEmail.Should().Be(expected.EmployerContactEmail);
+        provider.EmployerContactTelephone.Should().Be(expected.EmployerContactTelephone);
+        provider.EmployerContactWebsite.Should().Be(expected.EmployerContactWebsite);
+        provider.StudentContactEmail.Should().Be(expected.StudentContactEmail);
+        provider.StudentContactTelephone.Should().Be(expected.StudentContactTelephone);
+        provider.StudentContactWebsite.Should().Be(expected.StudentContactWebsite);
+    }
 
     public static void Validate(this Location location,
         string name,

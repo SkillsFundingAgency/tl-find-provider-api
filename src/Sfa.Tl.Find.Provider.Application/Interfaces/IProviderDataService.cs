@@ -33,6 +33,4 @@ public interface IProviderDataService
     Task<byte[]> GetCsv();
 
     Task ImportProviderContacts(Stream ms);
-
-    Task ImportProviderContacts(byte[] bytes);
 }

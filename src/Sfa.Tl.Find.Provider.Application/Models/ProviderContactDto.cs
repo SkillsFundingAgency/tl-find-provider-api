@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Application.Models;
                  " {" + nameof(Name) + ", nq}")]
 public class ProviderContactDto
 {
-    public string UkPrn { get; init; }
+    public long UkPrn { get; init; }
     public string Name { get; init; }
     public string EmployerContactEmail { get; init; }
     public string EmployerContactTelephone { get; init; }

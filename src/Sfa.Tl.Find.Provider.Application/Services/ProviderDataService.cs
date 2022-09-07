@@ -209,13 +209,7 @@ public class ProviderDataService : IProviderDataService
 
         return stream.ToArray();
     }
-
-    public async Task ImportProviderContacts(byte[] bytes)
-    {
-        using var ms = new MemoryStream(bytes);
-        await ImportProviderContacts(ms);
-    }
-
+    
     public async Task ImportProviderContacts(Stream stream)
     {
         using var reader = new StreamReader(stream);
