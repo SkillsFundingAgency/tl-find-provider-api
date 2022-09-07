@@ -123,8 +123,18 @@ catch (Exception ex)
 
     var appInsightsInstrumentationKey = Environment
         .GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
-
+    var appInsightsConnectionString = Environment
+        .GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
     if (!string.IsNullOrEmpty(appInsightsInstrumentationKey))
+    {
+        var client = new TelemetryClient(new TelemetryConfiguration
+        {
+            ConnectionString = appInsightsConnectionString
+        });
+        client.TrackTrace(message, SeverityLevel.Critical);
+    }
+    //TODO: Get rid of this branch once the above is working
+    else if (!string.IsNullOrEmpty(appInsightsInstrumentationKey))
     {
         var client = new TelemetryClient(TelemetryConfiguration.CreateDefault())
         {
