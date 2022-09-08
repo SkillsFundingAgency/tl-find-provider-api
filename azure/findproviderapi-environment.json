@@ -73,7 +73,7 @@
             }
         },
         {
-            "apiVersion": "2021-04-01",
+            "apiVersion": "2017-05-10",
             "name": "[concat('app-insights','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -156,11 +156,11 @@
                         {
                           "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                           "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
-                        },
-                        {
-                          "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation')), '2021-04-01').outputs.ConnectionString]"
                         }
+                        //{
+                        //  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                        //  "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation')), '2021-04-01').outputs.ConnectionString]"
+                        //}
                       ]
                     },
                     "customHostName": {
