@@ -14,7 +14,7 @@ parameters:
 
 stages:
 - stage: Deploy_${{parameters.environmentId}}
-  dependsOn: 
+  dependsOn:
     - '${{ each dependency in parameters.dependencies }}':
       - '${{dependency}}'
   variables:
@@ -30,17 +30,17 @@ stages:
       value: ${{ parameters.environmentName }}
     - name: environmentTagName
       value: ${{parameters.environmentTagName}}
-      
-      
+
+
   displayName: '${{parameters.environmentName}} [${{parameters.environmentId}}] deployment'
-  jobs:  
+  jobs:
   - template: ../jobs/findproviderapi-infrastructure-job.yml
     parameters:
       BaseName: $(BaseName)
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
       environmentName: ${{parameters.environmentName}}
-  
+
   - template: ../jobs/findproviderapi-publish-dacpac-job.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
@@ -51,29 +51,30 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
 
+  # This is actually the job for the API
   - template: ../jobs/findproviderapi-publish-site-job.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: 'uiAppName'
+      appName: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName'] ]
       name: 'Website'
       dependencies:
         - DeployInfrastructure
         - GenerateConfigs
       package: 'Sfa.Tl.Find.Provider.Api.zip'
 
-  # - template: ../jobs/findproviderapi-publish-site-job.yml
-  #   parameters:
-  #     serviceConnection: ${{ parameters.serviceConnection }}
-  #     sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-  #     appName: 'ApiAppName'
-  #     name: 'FindProviderAPI'
-  #     dependencies:
-  #       - Publish_Website
-  #       - DeployInfrastructure
-  #       - GenerateConfigs
-  #     package: 'Sfa.Tl.Find.Provider.Api.zip'
-  
+  # This is actually the job for the UI
+  - template: ../jobs/findproviderapi-publish-site-job.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
+      appName: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName'] ]
+      name: 'FindProviderUI'
+      dependencies:
+        - DeployInfrastructure
+        - GenerateConfigs
+      package: 'Sfa.Tl.Find.Provider.Web.zip'
+
   # - template: ../jobs/findproviderapi-publish-function-job.yml
   #   parameters:
   #     serviceConnection: ${{ parameters.serviceConnection }}

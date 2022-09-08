@@ -20,7 +20,7 @@ jobs:
   pool:
     name: 'Azure Pipelines'
     vmImage: 'windows-2019'
-  dependsOn: 
+  dependsOn:
     - DeployfindproviderapiInfrastructure
     - GenerateConfigs
   steps:
@@ -31,22 +31,22 @@ jobs:
       artifactName: 'appdrop'
       downloadPath: '$(System.ArtifactsDirectory)'
 
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: ${{ parameters.serviceConnection }}
-      appType: 'webApp'
-      appName: '$(uiAppName)'
-      deployToSlotOrASE: true
-      resourceGroupName: '$(ResourceGroupName)'
-      slotName: 'staging'
-      package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
-      deploymentMethod: 'auto'
-  
+  # - task: AzureWebApp@1
+  #   inputs:
+  #     azureSubscription: ${{ parameters.serviceConnection }}
+  #     appType: 'webApp'
+  #     appName: '${{ parameters.appName }}'
+  #     deployToSlotOrASE: true
+  #     resourceGroupName: '$(ResourceGroupName)'
+  #     slotName: 'staging'
+  #     package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
+  #     deploymentMethod: 'auto'
+
   - task: AzureRmWebAppDeployment@3
-    displayName: 'Azure App Service Deploy: $(uiAppName)'
+    displayName: 'Azure App Service Deploy: ${{ parameters.appName }}'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '$(uiAppName)'
+      WebAppName: '${{ parameters.appName }}'
       DeployToSlotFlag: true
       ResourceGroupName: '$(ResourceGroupName)'
       SlotName: 'staging'
@@ -55,29 +55,29 @@ jobs:
       RemoveAdditionalFilesFlag: true
 
   - task: AzureAppServiceManage@0
-    displayName: 'Start staging Slot: $(uiAppName)'
+    displayName: 'Start staging Slot: ${{ parameters.appName }}'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Start Azure App Service'
-      WebAppName: '$(uiAppName)'
+      WebAppName: '${{ parameters.appName }}'
       SpecifySlotOrASE: true
       ResourceGroupName: '$(ResourceGroupName)'
       Slot: 'staging'
-  
+
   - task: AzureAppServiceManage@0
-    displayName: 'Swap Slots: $(uiAppName)'
+    displayName: 'Swap Slots: ${{ parameters.appName }}'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '$(uiAppName)'
+      WebAppName: '${{ parameters.appName }}'
       ResourceGroupName: '$(ResourceGroupName)'
       SourceSlot: staging
-  
+
   - task: AzureAppServiceManage@0
-    displayName: 'Stop staging Slot: $(uiAppName)'
+    displayName: 'Stop staging Slot: ${{ parameters.appName }}'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Stop Azure App Service'
-      WebAppName: '$(uiAppName)'
+      WebAppName: '${{ parameters.appName }}'
       ResourceGroupName: '$(ResourceGroupName)'
       SpecifySlotOrASE: true
       Slot: 'staging'
