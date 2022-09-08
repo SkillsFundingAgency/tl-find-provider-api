@@ -159,7 +159,7 @@
                         },
                         {
                           "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation')), '2021-04-01').ConnectionString]"
+                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation')), '2021-04-01').outputs.ConnectionString]"
                         }
                       ]
                     },
