@@ -30,6 +30,10 @@ stages:
       value: ${{ parameters.environmentName }}
     - name: environmentTagName
       value: ${{parameters.environmentTagName}}
+    - name: uiAppName
+      value: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName'] ]
+    - name: apiAppName
+      value: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName'] ]
 
 
   displayName: '${{parameters.environmentName}} [${{parameters.environmentId}}] deployment'
@@ -56,7 +60,7 @@ stages:
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName']
+      appName: $(uiAppName)
       name: 'Website'
       dependencies:
         - DeployInfrastructure
@@ -68,7 +72,7 @@ stages:
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName']
+      appName: $(apiAppName)
       name: 'FindProviderUI'
       dependencies:
         - DeployInfrastructure
