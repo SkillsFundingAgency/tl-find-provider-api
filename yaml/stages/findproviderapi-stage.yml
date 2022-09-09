@@ -14,7 +14,7 @@ parameters:
 
 stages:
 - stage: Deploy_${{parameters.environmentId}}
-  dependsOn: 
+  dependsOn:
     - '${{ each dependency in parameters.dependencies }}':
       - '${{dependency}}'
   variables:
@@ -30,17 +30,17 @@ stages:
       value: ${{ parameters.environmentName }}
     - name: environmentTagName
       value: ${{parameters.environmentTagName}}
-      
-      
+
+
   displayName: '${{parameters.environmentName}} [${{parameters.environmentId}}] deployment'
-  jobs:  
+  jobs:
   - template: ../jobs/findproviderapi-infrastructure-job.yml
     parameters:
       BaseName: $(BaseName)
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
       environmentName: ${{parameters.environmentName}}
-  
+
   - template: ../jobs/findproviderapi-publish-dacpac-job.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
@@ -55,25 +55,24 @@ stages:
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: 'uiAppName'
-      name: 'Website'
+      appName: 'ui'
+      name: 'API'
       dependencies:
         - DeployInfrastructure
         - GenerateConfigs
       package: 'Sfa.Tl.Find.Provider.Api.zip'
 
-  # - template: ../jobs/findproviderapi-publish-site-job.yml
-  #   parameters:
-  #     serviceConnection: ${{ parameters.serviceConnection }}
-  #     sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-  #     appName: 'ApiAppName'
-  #     name: 'FindProviderAPI'
-  #     dependencies:
-  #       - Publish_Website
-  #       - DeployInfrastructure
-  #       - GenerateConfigs
-  #     package: 'Sfa.Tl.Find.Provider.Api.zip'
-  
+  - template: ../jobs/findproviderapi-publish-site-job.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
+      appName: 'api'
+      name: 'API'
+      dependencies:
+        - DeployInfrastructure
+        - GenerateConfigs
+      package: 'Sfa.Tl.Find.Provider.Api.zip'
+
   # - template: ../jobs/findproviderapi-publish-function-job.yml
   #   parameters:
   #     serviceConnection: ${{ parameters.serviceConnection }}
