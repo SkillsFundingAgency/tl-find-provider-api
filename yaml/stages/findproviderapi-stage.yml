@@ -55,7 +55,7 @@ stages:
       name: 'Azure Pipelines'
       vmImage: 'windows-2019'
     dependsOn:
-      - DeployInfrastructure
+      - DeployfindproviderapiInfrastructure
       - GenerateConfigs
     steps:
     - task: PowerShell@2
