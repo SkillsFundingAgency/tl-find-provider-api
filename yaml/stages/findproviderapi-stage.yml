@@ -50,24 +50,24 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
 
-  # This is actually the job for the API
+  # This is actually the job for the API despite the appName being ui
   - template: ../jobs/findproviderapi-publish-site-job.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: $(armOutput.uiAppName)
+      appName: 'ui'
       name: 'Website'
       dependencies:
         - DeployInfrastructure
         - GenerateConfigs
       package: 'Sfa.Tl.Find.Provider.Api.zip'
 
-  # This is actually the job for the UI
+  # This is actually the job for the UI despite the appName being api
   - template: ../jobs/findproviderapi-publish-site-job.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: $(armOutput.apiAppName)
+      appName: 'api'
       name: 'FindProviderUI'
       dependencies:
         - DeployInfrastructure
