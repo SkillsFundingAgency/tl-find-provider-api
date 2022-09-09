@@ -14,12 +14,13 @@ parameters:
 jobs:
 - job: PublishSite_${{ parameters.appName }}
   variables:
-    ConfigStorageAccountName: $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName'] ]
-    name: appName
+  - name: ConfigStorageAccountName
+    value: $[stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName']]
+  - name: appName
     ${{ if eq( parameters['appName'], 'ui' )}}:
-      value: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName'] ]
+      value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName']]
     ${{ elseif eq( parameters['appName'], 'api' )}}:
-      value: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName'] ]
+      value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName']]
 
   pool:
     name: 'Azure Pipelines'

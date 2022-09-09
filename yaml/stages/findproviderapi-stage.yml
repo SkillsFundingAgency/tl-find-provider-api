@@ -51,6 +51,12 @@ stages:
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
 
   - job: Print_vars
+    pool:
+      name: 'Azure Pipelines'
+      vmImage: 'windows-2019'
+    dependencies:
+      - DeployInfrastructure
+      - GenerateConfigs
     steps:
     - task: PowerShell@2
       inputs:
