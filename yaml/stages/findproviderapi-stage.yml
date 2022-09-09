@@ -69,7 +69,7 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
       appName: 'ui'
-      name: 'Website'
+      name: 'API'
       dependencies:
         - DeployInfrastructure
         - GenerateConfigs
@@ -81,7 +81,7 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
       appName: 'api'
-      name: 'FindProviderUI'
+      name: 'UI'
       dependencies:
         - DeployInfrastructure
         - GenerateConfigs
