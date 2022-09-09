@@ -23,11 +23,11 @@
                 @PageExtensions.GetServiceName()
             </a>
             <button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
-            <ul id="navigation" class="govuk-header__navigation">
+            <ul id="navigation" class="govuk-header__navigation tl-float-right">
                 <li class="govuk-header__navigation-item">
                     @if (Context!.User!.Identity!.IsAuthenticated)
                     {
-                        <a class="govuk-header__link" asp-area="" asp-controller="Account" asp-action="SignOut">Sign out</a>
+                        <a class="govuk-header__link" asp-controller="Account" asp-action="SignOut">Sign out</a>
                     }
                     else
                     {
@@ -36,6 +36,5 @@
                 </li>
             </ul>
         </div>
-
     </div>
 </header>

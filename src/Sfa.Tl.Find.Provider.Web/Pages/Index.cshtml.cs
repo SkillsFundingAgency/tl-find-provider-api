@@ -16,16 +16,16 @@ public class IndexModel : PageModel
     {
         if (User.Identity.IsAuthenticated)
         {
-            const string authenticatedUserStartUrl = "/dashboard";
+            const string authenticatedUserStartPage = "/dashboard";
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("User is already signed in at {currentPage}. Redirecting to  {redirectUrl}.",
                     nameof(IndexModel),
-                    authenticatedUserStartUrl);
+                    authenticatedUserStartPage);
             }
 
-            return RedirectToPage(authenticatedUserStartUrl);
+            return RedirectToPage(authenticatedUserStartPage);
         }
 
         return Page();

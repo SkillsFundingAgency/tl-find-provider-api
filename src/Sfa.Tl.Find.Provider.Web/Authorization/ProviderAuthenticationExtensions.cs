@@ -16,6 +16,8 @@ namespace Sfa.Tl.Find.Provider.Web.Authorization;
 
 public static class ProviderAuthenticationExtensions
 {
+    public const string AuthenticationCookieName = "tl-provider-auth-cookie";
+
     public static void AddProviderAuthentication(this IServiceCollection services, DfeSignInSettings signInSettings)
     {
         var cookieSecurePolicy = CookieSecurePolicy.Always;
@@ -44,7 +46,7 @@ public static class ProviderAuthenticationExtensions
 .AddCookie(options =>
 {
     //TODO: List auth cookie on cookies page?
-    options.Cookie.Name = "tl-provider-auth-cookie";
+    options.Cookie.Name = AuthenticationCookieName;
     options.Cookie.SecurePolicy = cookieSecurePolicy;
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = overallSessionTimeout;

@@ -1,4 +1,6 @@
-﻿using Sfa.Tl.Find.Provider.Web.Pages;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Sfa.Tl.Find.Provider.Web.Pages;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
@@ -13,10 +15,32 @@ public class IndexPageTests
     }
 
     [Fact]
-    public async Task IndexModel_OnGet_Populates_Page_Properties()
+    public void IndexModel_OnGet_Returns_PageResult_When_User_Is_Not_Authenticated()
     {
         var indexModel = new IndexModelBuilder().Build();
 
-        await indexModel.OnGet();
+        var result = indexModel.OnGet();
+
+        result.Should().NotBeNull();
+
+        var pageResult = result as PageResult;
+        pageResult.Should().NotBeNull();
+        indexModel.HttpContext!.User!.Identity!.IsAuthenticated.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IndexModel_OnGet_Returns_RedirectResult_When_User_Is_Authenticated()
+    {
+        var indexModel = new IndexModelBuilder().Build();
+
+        var result = indexModel.OnGet();
+        
+        result.Should().NotBeNull();
+
+        //TODO: How to pass in an authenticated user?
+
+        var redirectResult = result as RedirectToPageResult;
+        //redirectResult.Should().NotBeNull();
+        //indexModel.HttpContext!.User!.Identity!.IsAuthenticated.Should().BeTrue();
     }
 }

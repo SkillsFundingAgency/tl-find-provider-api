@@ -43,6 +43,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizePage("/Index");
     options.Conventions.AuthorizeFolder("/Error");
 });
+builder.Services.AddControllers();
 
 if (!builder.Environment.IsDevelopment())
 {
@@ -125,6 +126,7 @@ app.MapFallback("{*path}",
     () => Results.Redirect("/Error/404"));
 
 app.MapRazorPages();
+app.MapControllers();
 
 app.UseResponseCaching();
 
