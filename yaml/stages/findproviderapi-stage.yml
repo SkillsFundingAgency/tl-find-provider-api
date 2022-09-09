@@ -52,10 +52,10 @@ stages:
 
   - job: Print_vars
     steps:
-    - task: Bash@3
+    - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'env | sort'
+        script: 'Get-ChildItem -Path Env:\ | Format-List'
 
   # This is actually the job for the API despite the appName being ui
   - template: ../jobs/findproviderapi-publish-site-job.yml

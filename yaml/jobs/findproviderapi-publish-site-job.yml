@@ -39,7 +39,7 @@ jobs:
     displayName: 'Azure App Service Deploy: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '$(appName)'
+      WebAppName: $(appName)
       DeployToSlotFlag: true
       ResourceGroupName: '$(ResourceGroupName)'
       SlotName: 'staging'
@@ -52,7 +52,7 @@ jobs:
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Start Azure App Service'
-      WebAppName: '$(appName)'
+      WebAppName: $(appName)
       SpecifySlotOrASE: true
       ResourceGroupName: '$(ResourceGroupName)'
       Slot: 'staging'
@@ -61,7 +61,7 @@ jobs:
     displayName: 'Swap Slots: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '$(appName)'
+      WebAppName: $(appName)
       ResourceGroupName: '$(ResourceGroupName)'
       SourceSlot: staging
 
@@ -70,7 +70,7 @@ jobs:
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Stop Azure App Service'
-      WebAppName: '$(appName)'
+      WebAppName: $(appName)
       ResourceGroupName: '$(ResourceGroupName)'
       SpecifySlotOrASE: true
       Slot: 'staging'
