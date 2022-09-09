@@ -15,7 +15,11 @@ jobs:
 - job: PublishSite_${{ parameters.appName }}
   variables:
     ConfigStorageAccountName: $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName'] ]
-    uiAppName: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName'] ]
+    name: appName
+    ${{ if eq( parameters['appName'], 'ui' )}}:
+      value: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName'] ]
+    ${{ elseif eq( parameters['appName'], 'api' )}}:
+      value: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName'] ]
 
   pool:
     name: 'Azure Pipelines'
@@ -30,17 +34,6 @@ jobs:
       downloadType: 'single'
       artifactName: 'appdrop'
       downloadPath: '$(System.ArtifactsDirectory)'
-
-  # - task: AzureWebApp@1
-  #   inputs:
-  #     azureSubscription: ${{ parameters.serviceConnection }}
-  #     appType: 'webApp'
-  #     appName: '${{ parameters.appName }}'
-  #     deployToSlotOrASE: true
-  #     resourceGroupName: '$(ResourceGroupName)'
-  #     slotName: 'staging'
-  #     package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
-  #     deploymentMethod: 'auto'
 
   - task: AzureRmWebAppDeployment@3
     displayName: 'Azure App Service Deploy: ${{ parameters.appName }}'
