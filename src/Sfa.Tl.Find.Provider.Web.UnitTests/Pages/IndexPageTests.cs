@@ -18,9 +18,5 @@ public class IndexPageTests
         var indexModel = new IndexModelBuilder().Build();
 
         await indexModel.OnGet();
-
-        indexModel.DisplayName.Should().Be(PageContextBuilder.DefaultDisplayName);
-        indexModel.Service.Should().Be(PageContextBuilder.DefaultService);
-        indexModel.UkPrn.Should().Be(PageContextBuilder.DefaultUkPrn);
     }
 }

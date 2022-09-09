@@ -1,0 +1,52 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">@PageExtensions.GetServiceName()</h1>
+        <h2 class="govuk-heading-m">Provider summary</h2>
+
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9" id="tl-placement-table">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    UKPRN
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.UkPrn
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Display Name
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.DisplayName
+                </dd>
+                @*                <dd class="govuk-summary-list__actions">
+                <a href="#" class="govuk-link" id="tl-change-link">Change<span class="govuk-visually-hidden"> the ?</span></a>
+                </dd>*@
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Service
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.Service
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <form method="POST">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-form-group" sfa-validation-for="File" sfa-validationerror-class="govuk-form-group--error">
+                <button type="submit" class="govuk-button" id="tl-send-email">Send test email</button>
+            </div>
+        </div>
+    </form>
+</div>

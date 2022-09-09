@@ -25,9 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Applic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Tests.Common", "Sfa.Tl.Find.Provider.Tests.Common\Sfa.Tl.Find.Provider.Tests.Common.csproj", "{DE813CCA-8455-4960-810E-D7C6E522D3A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Web", "Sfa.Tl.Find.Provider.Web\Sfa.Tl.Find.Provider.Web.csproj", "{46C2C1EA-22D0-45F2-BE90-BAD071C03EA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web", "Sfa.Tl.Find.Provider.Web\Sfa.Tl.Find.Provider.Web.csproj", "{46C2C1EA-22D0-45F2-BE90-BAD071C03EA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Web.UnitTests", "Sfa.Tl.Find.Provider.Web.UnitTests\Sfa.Tl.Find.Provider.Web.UnitTests.csproj", "{3EDFE0B8-5E1B-4CF6-A6AF-4D5C25A366C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web.UnitTests", "Sfa.Tl.Find.Provider.Web.UnitTests\Sfa.Tl.Find.Provider.Web.UnitTests.csproj", "{3EDFE0B8-5E1B-4CF6-A6AF-4D5C25A366C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

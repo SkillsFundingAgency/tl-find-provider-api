@@ -17,7 +17,7 @@ var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
 builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
 
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
-builder.Services.AddAuthorizationServicePolicies();
+//builder.Services.AddAuthorizationServicePolicies();
 
 if(bool.TryParse(builder.Configuration["StubProviderAuth"], out var isStubProviderAuth) && isStubProviderAuth)
 {
