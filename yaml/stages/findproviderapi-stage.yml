@@ -52,10 +52,10 @@ stages:
 
   - job: Print_vars
     steps:
-      – task: Bash@3
-        inputs:
-          targetType: 'inline'
-          script: 'env | sort'
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: 'env | sort'
 
   # This is actually the job for the API despite the appName being ui
   - template: ../jobs/findproviderapi-publish-site-job.yml
