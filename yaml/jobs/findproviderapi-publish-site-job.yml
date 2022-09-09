@@ -36,10 +36,10 @@ jobs:
       downloadPath: '$(System.ArtifactsDirectory)'
 
   - task: AzureRmWebAppDeployment@3
-    displayName: 'Azure App Service Deploy: ${{ parameters.appName }}'
+    displayName: 'Azure App Service Deploy: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '${{ parameters.appName }}'
+      WebAppName: '$(appName)'
       DeployToSlotFlag: true
       ResourceGroupName: '$(ResourceGroupName)'
       SlotName: 'staging'
@@ -48,29 +48,29 @@ jobs:
       RemoveAdditionalFilesFlag: true
 
   - task: AzureAppServiceManage@0
-    displayName: 'Start staging Slot: ${{ parameters.appName }}'
+    displayName: 'Start staging Slot: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Start Azure App Service'
-      WebAppName: '${{ parameters.appName }}'
+      WebAppName: '$(appName)'
       SpecifySlotOrASE: true
       ResourceGroupName: '$(ResourceGroupName)'
       Slot: 'staging'
 
   - task: AzureAppServiceManage@0
-    displayName: 'Swap Slots: ${{ parameters.appName }}'
+    displayName: 'Swap Slots: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '${{ parameters.appName }}'
+      WebAppName: '$(appName)'
       ResourceGroupName: '$(ResourceGroupName)'
       SourceSlot: staging
 
   - task: AzureAppServiceManage@0
-    displayName: 'Stop staging Slot: ${{ parameters.appName }}'
+    displayName: 'Stop staging Slot: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Stop Azure App Service'
-      WebAppName: '${{ parameters.appName }}'
+      WebAppName: '$(appName)'
       ResourceGroupName: '$(ResourceGroupName)'
       SpecifySlotOrASE: true
       Slot: 'staging'
