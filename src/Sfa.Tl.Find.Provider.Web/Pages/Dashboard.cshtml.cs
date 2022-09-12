@@ -36,6 +36,7 @@ public class DashboardModel : PageModel
         DisplayName = HttpContext.User.GetClaim(ProviderClaims.DisplayName);
         Service = HttpContext.User.GetClaim(ProviderClaims.Service);
     }
+
     public async Task OnPost()
     {
         const string template = "TestWithoutPersonalisation";

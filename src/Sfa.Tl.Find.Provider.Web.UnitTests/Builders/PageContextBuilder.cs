@@ -18,24 +18,25 @@ public class PageContextBuilder
     private PageContext? _pageContext;
     private CompiledPageActionDescriptor? _actionDescriptor;
 
-    public PageContext Build()
+    public PageContext Build(
+        bool userIsAuthenticated = true)
     {
-        var claims = new List<Claim>
+        var httpContext = new DefaultHttpContext();
+
+        if (userIsAuthenticated)
         {
-            new(ProviderClaims.ProviderUkprn, DefaultUkPrn),
-            new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
-            new(ProviderClaims.DisplayName, DefaultDisplayName),
-            new(ProviderClaims.Service, DefaultService)
-        };
+            var claims = new List<Claim>
+            {
+                new(ProviderClaims.ProviderUkprn, DefaultUkPrn),
+                new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
+                new(ProviderClaims.DisplayName, DefaultDisplayName),
+                new(ProviderClaims.Service, DefaultService)
+            };
 
-        var identity = new ClaimsIdentity(claims);
-
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-
-        var httpContext = new DefaultHttpContext
-        {
-            User = claimsPrincipal
-        };
+            httpContext.User = new ClaimsPrincipal(
+                new ClaimsIdentity(claims,
+                    ProviderAuthenticationExtensions.AuthenticationTypeName));
+        }
 
         var modelState = new ModelStateDictionary();
         var actionContext = new ActionContext(
@@ -47,9 +48,9 @@ public class PageContextBuilder
         var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
 
         _pageContext = new PageContext(actionContext)
-            {
-                ViewData = viewData
-            };
+        {
+            ViewData = viewData
+        };
 
         if (_actionDescriptor != null)
         {

@@ -17,7 +17,8 @@ public class IndexPageTests
     [Fact]
     public void IndexModel_OnGet_Returns_PageResult_When_User_Is_Not_Authenticated()
     {
-        var indexModel = new IndexModelBuilder().Build();
+        var indexModel = new IndexModelBuilder()
+            .Build(userIsAuthenticated: false);
 
         var result = indexModel.OnGet();
 
@@ -37,10 +38,8 @@ public class IndexPageTests
         
         result.Should().NotBeNull();
 
-        //TODO: How to pass in an authenticated user?
-
         var redirectResult = result as RedirectToPageResult;
-        //redirectResult.Should().NotBeNull();
-        //indexModel.HttpContext!.User!.Identity!.IsAuthenticated.Should().BeTrue();
+        redirectResult.Should().NotBeNull();
+        indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeTrue();
     }
 }

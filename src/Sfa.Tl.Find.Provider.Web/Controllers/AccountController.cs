@@ -3,34 +3,51 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
+using System.Security.Claims;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
 public class AccountController : Controller
 {
+    private readonly IConfiguration _configuration;
     private readonly DfeSignInSettings _signInSettings;
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
+        IConfiguration configuration,
         IOptions<DfeSignInSettings> signInOptions,
         ILogger<AccountController> logger)
     {
-        if (signInOptions is null) throw new ArgumentNullException(nameof(signInOptions));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        if (signInOptions is null) throw new ArgumentNullException(nameof(signInOptions));
 
         _signInSettings = signInOptions.Value;
     }
 
     [AllowAnonymous]
-    [HttpGet]//("/signin")]
-    //[Route("signin", Name = "SignIn")]
+    [HttpGet]
+    [ActionName("SignIn")]
+    [Route("signin")]
     public async Task SignIn()
     {
-        var returnUrl = "/dashboard";
-        //var returnUrl = Url.Action(nameof(AccountController.PostSignIn), nameof(AccountController));
-        await HttpContext.ChallengeAsync(new AuthenticationProperties { RedirectUri = returnUrl });
+        if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
+            isStubProviderAuth)
+        {
+            _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
+            Response.Redirect("/dashboard");
+        }
+        else
+        {
+            await HttpContext.ChallengeAsync(
+                new AuthenticationProperties
+                {
+                    RedirectUri = "/dashboard"
+                });
+        }
     }
 
     [HttpGet]
@@ -46,20 +63,28 @@ public class AccountController : Controller
         return RedirectToPage("/");
     }
 
-    [HttpGet]//("/signout")]
-    [Route("signout", Name = "SignOut")]
-    //public async Task SignOut()
-    //{
-    //    await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-    //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    //}
-
-    //[HttpGet("sign-out")]
+    [HttpGet]
     [ActionName("SignOut")]
-    public IActionResult ProcessSignOut()
+    [Route("signout")]
+    public new async Task<IActionResult> SignOut()
     {
-        //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        //return Redirect(_signInSettings.SignOutRedirectUri);
+        if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
+        {
+            _logger.LogInformation("DfE Sign-in was not used. Signing out of fake authentication.");
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(ProviderAuthenticationExtensions.AuthenticationCookieName);
+            return RedirectToPage("/signedout");
+
+            //return SignOut(
+            //    new AuthenticationProperties
+            //    {
+            //        RedirectUri = "/signedout",
+            //        //AllowRefresh = true
+            //    },
+            //    ProviderAuthenticationExtensions.AuthenticationCookieName,
+            //    CookieAuthenticationDefaults.AuthenticationScheme);
+        }
 
         return SignOut(
             CookieAuthenticationDefaults.AuthenticationScheme,

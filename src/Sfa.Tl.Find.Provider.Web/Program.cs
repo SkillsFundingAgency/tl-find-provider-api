@@ -19,7 +19,7 @@ builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguratio
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
 //builder.Services.AddAuthorizationServicePolicies();
 
-if(bool.TryParse(builder.Configuration["StubProviderAuth"], out var isStubProviderAuth) && isStubProviderAuth)
+if(bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
 {
     builder.Services.AddProviderStubAuthentication();
 }

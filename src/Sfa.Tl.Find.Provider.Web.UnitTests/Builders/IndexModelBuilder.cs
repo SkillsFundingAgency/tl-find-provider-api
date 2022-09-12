@@ -7,10 +7,11 @@ public class IndexModelBuilder
 {
     public IndexModel Build(
             ILogger<IndexModel>? logger = null,
-            PageContext? pageContext = null)
+            PageContext? pageContext = null,
+            bool userIsAuthenticated = true)
     {
         pageContext ??= new PageContextBuilder()
-            .Build();
+            .Build(userIsAuthenticated);
 
         logger ??= Substitute.For<ILogger<IndexModel>>();
 

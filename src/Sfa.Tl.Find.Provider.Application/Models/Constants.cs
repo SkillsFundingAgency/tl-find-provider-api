@@ -32,6 +32,7 @@ public static class Constants
     public const string SqlConnectionStringConfigKey = "SqlConnectionString";
     public const string SearchSettingsConfigKey = "SearchSettings";
     public const string TownDataImportScheduleConfigKey = "TownDataImportSchedule";
+    public const string SkipProviderAuthenticationConfigKey = "StubProviderAuth";
 
     public const int ProviderNameMaxLength = 400;
     public const int LocationNameMaxLength = 400;
