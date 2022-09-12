@@ -1,13 +1,7 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json.Linq;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
@@ -182,6 +176,7 @@ public static class ProviderAuthenticationExtensions
         }
     };
 });
+        // ReSharper disable CommentTypo
         /*
         services
             .AddAuthentication(sharedOptions =>
@@ -206,6 +201,7 @@ public static class ProviderAuthenticationExtensions
             //.AddCookie(cookieOptions)
             ;
         */
+        // ReSharper restore CommentTypo
 
     }
 

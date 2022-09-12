@@ -69,7 +69,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddNotifyService(
         this IServiceCollection services,
-        string govNotifyApiKey)
+        string? govNotifyApiKey)
     {
         if (!string.IsNullOrEmpty(govNotifyApiKey))
         {

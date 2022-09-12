@@ -48,6 +48,7 @@ public class TestController : ControllerBase
     }
 
     [HttpGet]
+    // ReSharper disable once StringLiteralTypo
     [Route("sendemployermail")]
     public async Task<IActionResult> GetSendEmployerEmail(
         [FromQuery(Name = "to")] string recipients)

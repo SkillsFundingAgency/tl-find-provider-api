@@ -72,7 +72,7 @@ builder.Services
     .AddTransient<ITownRepository, TownRepository>();
 
 builder.Services.AddNotifyService(
-    siteConfiguration.EmailSettings.GovNotifyApiKey);
+    siteConfiguration.EmailSettings?.GovNotifyApiKey);
 
 var app = builder.Build();
 

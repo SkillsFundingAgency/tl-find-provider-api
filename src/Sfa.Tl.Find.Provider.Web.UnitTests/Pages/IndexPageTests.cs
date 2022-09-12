@@ -25,7 +25,7 @@ public class IndexPageTests
 
         var pageResult = result as PageResult;
         pageResult.Should().NotBeNull();
-        indexModel.HttpContext!.User!.Identity!.IsAuthenticated.Should().BeFalse();
+        indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeFalse();
     }
 
     [Fact]

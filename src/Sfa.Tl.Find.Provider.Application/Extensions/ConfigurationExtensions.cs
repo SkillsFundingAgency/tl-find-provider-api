@@ -16,8 +16,9 @@ public static class ConfigurationExtensions
             var storageConnectionString = configuration[Constants.ConfigurationStorageConnectionStringConfigKey];
             var version = configuration[Constants.VersionConfigKey];
             var serviceName = configuration[Constants.ServiceNameConfigKey];
-                
-            var tableClient = new TableClient(storageConnectionString, "Configuration");
+
+            var tableClient = GetTableClient(storageConnectionString, environment); 
+
             var tableEntity = tableClient
                 .Query<TableEntity>(
                     filter: $"PartitionKey eq '{environment}' and RowKey eq '{serviceName}_{version}'");
@@ -36,14 +37,51 @@ public static class ConfigurationExtensions
                     AllowTrailingCommas = true
                 });
         }
+        catch (AggregateException aex)
+        {
+            if (configuration[Constants.EnvironmentNameConfigKey] is "LOCAL" 
+                && aex.InnerException is TaskCanceledException)
+            {
+                //Workaround to allow front-end developers to load config from app settings
+                return configuration.LoadConfigurationOptionsFromAppSettings();
+            }
+
+            throw;
+        }
         catch (Exception ex)
         {
             throw new InvalidOperationException("Configuration could not be loaded. Please check your configuration files or see the inner exception for details", ex);
         }
     }
 
-    public static bool IsLocal(this IConfiguration configuration)
-    {
-        return configuration[Constants.EnvironmentNameConfigKey].StartsWith("LOCAL", StringComparison.CurrentCultureIgnoreCase);
-    }
+    public static SiteConfiguration LoadConfigurationOptionsFromAppSettings(this IConfiguration configuration) =>
+        new()
+        {
+            AllowedCorsOrigins = configuration[Constants.AllowedCorsOriginsConfigKey],
+            ApiSettings = configuration.GetSection(Constants.ApiSettingsConfigKey).Get<ApiSettings>(),
+            CourseDirectoryApiSettings = configuration.GetSection(Constants.CourseDirectoryApiSettingsConfigKey).Get<CourseDirectoryApiSettings>(),
+            DfeSignInSettings = configuration.GetSection(Constants.DfeSignInSettingsConfigKey).Get<DfeSignInSettings>(),
+            EmailSettings = configuration.GetSection(Constants.EmailSettingsConfigKey).Get<EmailSettings>(),
+            PostcodeApiSettings = configuration.GetSection(Constants.PostcodeApiSettingsConfigKey).Get<PostcodeApiSettings>(),
+            SearchSettings = configuration.GetSection(Constants.SearchSettingsConfigKey).Get<SearchSettings>(),
+            SqlConnectionString = configuration[Constants.SqlConnectionStringConfigKey],
+            CourseDirectoryImportSchedule = configuration[Constants.CourseDirectoryImportScheduleConfigKey],
+            TownDataImportSchedule = configuration[Constants.TownDataImportScheduleConfigKey]
+        };
+
+    private static TableClient GetTableClient(string storageConnectionString, string environment) =>
+        new(storageConnectionString, "Configuration",
+            environment == "LOCAL"
+                ? new TableClientOptions //Options to allow development running without azure emulator
+                {
+                    Retry =
+                    {
+                        NetworkTimeout = TimeSpan.FromMilliseconds(500),
+                        MaxRetries = 1
+                    }
+                }
+                : default);
+
+    public static bool IsLocal(this IConfiguration configuration) => 
+        configuration[Constants.EnvironmentNameConfigKey].StartsWith("LOCAL", StringComparison.CurrentCultureIgnoreCase);
 }

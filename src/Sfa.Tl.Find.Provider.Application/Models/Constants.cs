@@ -22,6 +22,17 @@ public static class Constants
     public const string VersionConfigKey = "Version";
     public const string ServiceNameConfigKey = "ServiceName";
 
+    public const string AllowedCorsOriginsConfigKey = "AllowedCorsOrigins";
+    public const string ApiSettingsConfigKey = "ApiSettings";
+    public const string CourseDirectoryApiSettingsConfigKey = "CourseDirectoryApiSettings";
+    public const string CourseDirectoryImportScheduleConfigKey = "CourseDirectoryImportSchedule";
+    public const string DfeSignInSettingsConfigKey = "DfeSignInSettings";
+    public const string EmailSettingsConfigKey = "EmailSettings";
+    public const string PostcodeApiSettingsConfigKey = "PostcodeApiSettings";
+    public const string SqlConnectionStringConfigKey = "SqlConnectionString";
+    public const string SearchSettingsConfigKey = "SearchSettings";
+    public const string TownDataImportScheduleConfigKey = "TownDataImportSchedule";
+
     public const int ProviderNameMaxLength = 400;
     public const int LocationNameMaxLength = 400;
     public const int QualificationNameMaxLength = 400;
