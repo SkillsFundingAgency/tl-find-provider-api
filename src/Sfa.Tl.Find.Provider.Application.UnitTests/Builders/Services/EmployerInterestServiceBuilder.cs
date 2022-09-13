@@ -12,7 +12,7 @@ public class EmployerInterestServiceBuilder
 {
     public IEmployerInterestService Build(
         IDateTimeService dateTimeService = null,
-        IEmployerInterestRepository? employerInterestRepository = null,
+        IEmployerInterestRepository employerInterestRepository = null,
         EmployerInterestSettings employerInterestSettings = null,
         ILogger<EmployerInterestService> logger = null)
     {

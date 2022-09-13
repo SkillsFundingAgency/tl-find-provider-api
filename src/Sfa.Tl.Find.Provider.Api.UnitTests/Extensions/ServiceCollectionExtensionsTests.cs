@@ -152,7 +152,7 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public async Task AddQuartzServices_With_Cron_Schedule_Should_AddService()
+    public void AddQuartzServices_With_Cron_Schedule_Should_AddService()
     {
         var services = new ServiceCollection();
 
