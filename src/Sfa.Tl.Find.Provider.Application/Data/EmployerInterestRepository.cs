@@ -9,7 +9,7 @@ namespace Sfa.Tl.Find.Provider.Application.Data;
 public class EmployerInterestRepository : IEmployerInterestRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
-    private readonly IDynamicParametersWrapper _dynamicParametersWrapper; 
+    private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
     private readonly ILogger<EmployerInterestRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
@@ -24,26 +24,27 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     public async Task<int> DeleteBefore(DateTime date)
     {
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            date
+        });
+
+        using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+        var result = await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "DELETE dbo.EmployerInterest " +
+            "WHERE CreatedOn < @date",
+            _dynamicParametersWrapper.DynamicParameters);
         
-        //using var transaction = _dbContextWrapper.BeginTransaction(connection);
-        //var updateResult = await _dbContextWrapper
-        //    .QueryAsync<(string Change, int ChangeCount)>(
-        //        connection,
-        //        "UpdateTowns",
-        //        _dynamicParametersWrapper.DynamicParameters,
-        //        transaction,
-        //        commandType: CommandType.StoredProcedure);
+        transaction.Commit();
 
-        //_logger.LogChangeResults(updateResult, nameof(EmployerInterestRepository),
-        //    nameof(towns));
-
-        //transaction.Commit();
-
-        return 0;
+        return result;
     }
 }

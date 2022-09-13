@@ -26,16 +26,15 @@ public class EmployerInterestRepositoryTests
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .ExecuteScalarAsync<int>(dbConnection,
-                Arg.Is<string>(s => s.Contains("dbo.Town")))
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s => s.Contains("DELETE dbo.EmployerInterest")))
             .Returns(count);
 
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
 
         var result = await repository.DeleteBefore(date);
 
-        result.Should().Be(0);
-        //result.Should().Be(count);
+        result.Should().Be(count);
     }
 
 }

@@ -214,7 +214,7 @@ public static class ServiceCollectionExtensions
             
             if (!string.IsNullOrEmpty(townDataImportCronSchedule))
             {
-                var townImportJobKey = new JobKey("Import Town Data");
+                var townImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
                 q.AddJob<TownDataImportJob>(opts => 
                         opts.WithIdentity(townImportJobKey))
                     .AddTrigger(opts => opts
@@ -226,7 +226,7 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
             {
-                var employerInterestCleanupJobKey = new JobKey("Employer Interest Cleanup");
+                var employerInterestCleanupJobKey = new JobKey(Constants.EmployerInterestCleanupJobKeyName);
                 q.AddJob<EmployerInterestCleanupJob>(opts => 
                         opts.WithIdentity(employerInterestCleanupJobKey))
                     .AddTrigger(opts => opts
