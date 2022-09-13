@@ -1,7 +1,5 @@
-﻿using System.Data;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Polly.Registry;
-using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Data;
@@ -41,7 +39,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             connection,
             "DELETE dbo.EmployerInterest " +
             "WHERE CreatedOn < @date",
-            _dynamicParametersWrapper.DynamicParameters);
+            _dynamicParametersWrapper.DynamicParameters,
+            transaction);
         
         transaction.Commit();
 
