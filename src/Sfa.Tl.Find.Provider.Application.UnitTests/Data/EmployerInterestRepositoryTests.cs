@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Data;
+using FluentAssertions;
 using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
@@ -27,8 +28,10 @@ public class EmployerInterestRepositoryTests
 
         dbContextWrapper
             .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s => s.Contains("DELETE dbo.EmployerInterest")))
-            .Returns(count);
+                Arg.Is<string>(s => s.Contains("DELETE dbo.EmployerInterest")),
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null))
+        .Returns(count);
 
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
 
