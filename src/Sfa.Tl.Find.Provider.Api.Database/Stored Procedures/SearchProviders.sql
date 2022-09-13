@@ -26,6 +26,12 @@ AS
 				[Email] NVARCHAR(320),
 				[Telephone] NVARCHAR(150),
 				[Website] NVARCHAR(500),
+				[EmployerContactEmail] NVARCHAR(320),
+				[EmployerContactTelephone] NVARCHAR(150),
+				[EmployerContactWebsite] NVARCHAR(500),
+				[StudentContactEmail] NVARCHAR(320),
+				[StudentContactTelephone] NVARCHAR(150),
+				[StudentContactWebsite] NVARCHAR(500),
 				[Distance] FLOAT,
 				INDEX IX_Distance NONCLUSTERED(Distance, ProviderName, LocationName)
 				)
@@ -58,6 +64,12 @@ AS
 				p.[Email],
 				p.[Telephone],
 				p.[Website],
+				p.[EmployerContactEmail],
+				p.[EmployerContactTelephone],
+				p.[EmployerContactWebsite],
+				p.[StudentContactEmail],
+				p.[StudentContactTelephone],
+				p.[StudentContactWebsite],
 				--Need to filter so providers in the additional data set are overidden by ones in the main data set
 				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
 		FROM	[Provider] p
@@ -78,6 +90,12 @@ AS
 				COALESCE(NULLIF(l.[Email], ''), p.[Email]) AS [Email],
 				COALESCE(NULLIF(l.[Telephone], ''), p.[Telephone]) AS [Telephone],
 				COALESCE(NULLIF(l.[Website], ''), p.[Website]) AS [Website],
+				COALESCE(NULLIF(l.[EmployerContactEmail], ''), p.[EmployerContactEmail]) AS [EmployerContactEmail],
+				COALESCE(NULLIF(l.[EmployerContactTelephone], ''), p.[EmployerContactTelephone]) AS [EmployerContactTelephone],
+				COALESCE(NULLIF(l.[EmployerContactWebsite], ''), p.[EmployerContactWebsite]) AS [EmployerContactWebsite],
+				COALESCE(NULLIF(l.[StudentContactEmail], ''), p.[StudentContactEmail]) AS [StudentContactEmail],
+				COALESCE(NULLIF(l.[StudentContactTelephone], ''), p.[StudentContactTelephone]) AS [StudentContactTelephone],
+				COALESCE(NULLIF(l.[StudentContactWebsite], ''), p.[StudentContactWebsite]) AS [StudentContactWebsite],
 				l.[Location].STDistance(@fromLocation) / 1609.3399999999999E0 AS [Distance] --(Miles)
 		FROM	[ProvidersCTE] p
 		INNER JOIN	[dbo].[Location] l
@@ -140,7 +158,13 @@ AS
 				[County],
 				[Email],
 				[Telephone],
-				[Website],
+				[Website],				
+				[EmployerContactEmail],
+				[EmployerContactTelephone],
+				[EmployerContactWebsite],
+				[StudentContactEmail],
+				[StudentContactTelephone],
+				[StudentContactWebsite],				
 				[Distance],
 				lq.[DeliveryYear] AS [Year],
 				rq.[RouteId],

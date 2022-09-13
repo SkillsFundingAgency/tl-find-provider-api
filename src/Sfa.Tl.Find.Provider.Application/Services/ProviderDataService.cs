@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.Json;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -153,7 +154,7 @@ public class ProviderDataService : IProviderDataService
             };
         }
     }
-    
+
     public async Task<ProviderSearchResponse> FindProviders(
         double latitude,
         double longitude,
@@ -207,6 +208,39 @@ public class ProviderDataService : IProviderDataService
         }
 
         return stream.ToArray();
+    }
+    
+    public async Task ImportProviderContacts(Stream stream)
+    {
+        using var reader = new StreamReader(stream);
+        using var csvReader = new CsvReader(reader,
+            new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                PrepareHeaderForMatch = args =>
+                {
+                    if (string.Compare(args.Header, "UKPRN", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    {
+                        return "UkPrn";
+                    }
+
+                    return args.Header
+                            .Replace(" ", "");
+                },
+                MissingFieldFound = _ => { /* ignore empty column values */ }
+            });
+
+        csvReader.Context.TypeConverterOptionsCache.GetOptions<string>()
+            .NullValues
+            .AddRange(new[] { "", "NULL", "NA", "N/A" });
+
+        var contacts = csvReader
+            .GetRecords<ProviderContactDto>()
+            .ToList();
+
+        var resultCount = await _providerRepository.UpdateProviderContacts(contacts);
+
+        _logger.LogInformation("Updated contacts for {resultCount} providers from {contactsCount}.",
+            resultCount, contacts.Count);
     }
 
     public async Task<bool> HasQualifications()
@@ -328,7 +362,7 @@ public class ProviderDataService : IProviderDataService
 
         return geoLocation;
     }
-    
+
     private async Task<ProviderSearchResponse> Search(IList<int> routeIds, IList<int> qualificationIds, int page, int pageSize, GeoLocation geoLocation)
     {
         var (searchResults, totalSearchResults) =

@@ -134,6 +134,23 @@ public class DbContextWrapper : IDbContextWrapper
                 context);
     }
 
+    public async Task<int> ExecuteAsync(
+        IDbConnection connection,
+        string sql,
+        object param = null,
+        IDbTransaction transaction = null,
+        int? commandTimeout = null,
+        CommandType? commandType = null)
+    {
+        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+            return await retryPolicy
+                .ExecuteAsync(async _ =>
+                        await connection.ExecuteAsync(
+                            sql, param, transaction,
+                            commandTimeout, commandType),
+                    context);
+    }
+    
     public async Task<T> ExecuteScalarAsync<T>(
         IDbConnection connection,
         string sql,

@@ -22,6 +22,9 @@ public static class Constants
     public const string VersionConfigKey = "Version";
     public const string ServiceNameConfigKey = "ServiceName";
 
+    public const string StartupTasksJobKeyName = "Perform Startup Tasks";
+    public const string CourseDirectoryImportJobKeyName = "Import Course Data";
+
     public const int ProviderNameMaxLength = 400;
     public const int LocationNameMaxLength = 400;
     public const int QualificationNameMaxLength = 400;
