@@ -15,6 +15,7 @@ public class SettingsBuilder
     private const string GovNotifyApiKey = "1fff7b5b-bf64-4af9-9857-1797d0d525a3";
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
+    private const int RetentionDays = 10;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
 
     public ApiSettings BuildApiSettings(
@@ -34,12 +35,18 @@ public class SettingsBuilder
         };
 
     public EmailSettings BuildEmailSettings(
-    string govNotifyApiKey = GovNotifyApiKey,
-    string supportEmailAddress = SupportEmailAddress) => new()
-    {
-        GovNotifyApiKey = govNotifyApiKey,
-        SupportEmailAddress = supportEmailAddress
-    };
+        string govNotifyApiKey = GovNotifyApiKey,
+        string supportEmailAddress = SupportEmailAddress) => new()
+        {
+            GovNotifyApiKey = govNotifyApiKey,
+            SupportEmailAddress = supportEmailAddress
+        };
+
+    public EmployerInterestSettings BuildEmployerInterestSettings(
+        int retentionDays = RetentionDays) => new()
+        {
+            RetentionDays = retentionDays
+        };
 
     public PostcodeApiSettings BuildPostcodeApiSettings(
         string postcodeRetrieverUri = PostcodeRetrieverUri) => new()
@@ -57,6 +64,7 @@ public class SettingsBuilder
         ApiSettings apiSettings = null,
         CourseDirectoryApiSettings courseDirectoryApiSettings = null,
         EmailSettings emailSettings = null,
+        EmployerInterestSettings employerInterestSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
         SearchSettings searchSettings = null,
         string sqlConnectionString = "TestConnection",
@@ -66,6 +74,7 @@ public class SettingsBuilder
             ApiSettings = apiSettings ?? BuildApiSettings(),
             CourseDirectoryApiSettings = courseDirectoryApiSettings ?? BuildCourseDirectoryApiSettings(),
             EmailSettings = emailSettings ?? BuildEmailSettings(),
+            EmployerInterestSettings = employerInterestSettings ?? BuildEmployerInterestSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             SqlConnectionString = sqlConnectionString,

@@ -51,9 +51,11 @@ try
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
+        .AddTransient<IEmployerInterestService, EmployerInterestService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
+        .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
         .AddTransient<IProviderRepository, ProviderRepository>()
         .AddTransient<IQualificationRepository, QualificationRepository>()
         .AddTransient<IRouteRepository, RouteRepository>()
@@ -64,7 +66,8 @@ try
 
     builder.Services.AddQuartzServices(
         siteConfiguration.CourseDirectoryImportSchedule,
-        siteConfiguration.TownDataImportSchedule);
+        siteConfiguration.TownDataImportSchedule,
+        siteConfiguration.EmployerInterestSettings?.CleanupJobSchedule);
 
     builder.Services
         .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()

@@ -62,6 +62,20 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "EmployerInterestSettings": {
+      "properties": {
+        "CleanupJobSchedule": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_CleanupJobSchedule"
+        },
+        "RetentionDays": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_RetentionDays"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "PostcodeApiSettings": {
       "properties": {
         "BaseUri": {

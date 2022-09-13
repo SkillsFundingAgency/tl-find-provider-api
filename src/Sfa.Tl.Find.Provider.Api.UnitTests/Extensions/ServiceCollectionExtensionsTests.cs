@@ -152,13 +152,14 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddQuartzServices_With_Cron_Schedule_Should_AddService()
+    public async Task AddQuartzServices_With_Cron_Schedule_Should_AddService()
     {
         var services = new ServiceCollection();
 
         services.AddQuartzServices(
             "0 0 9 ? * MON-FRI",
-            "0 0 10 ? * *");
+            "0 0 10 ? * *",
+            "0 0 11 ? * *");
 
         services.Should().Contain(t =>
             t.ImplementationType != null &&
