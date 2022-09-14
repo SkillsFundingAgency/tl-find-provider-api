@@ -37,7 +37,7 @@ public class EmployerInterestService : IEmployerInterestService
         var date = _dateTimeService.Today.AddDays(-_employerInterestSettings.RetentionDays);
         var count = await _employerInterestRepository.DeleteBefore(date);
 
-        _logger.LogInformation("Removed {count} employer interest records because they are over {days} old (Date: {date}",
+        _logger.LogInformation("Removed {count} employer interest records because they are over {days} days (older than {date:yyyy-MM-dd}",
             count, _employerInterestSettings.RetentionDays, date);
 
         return count;
