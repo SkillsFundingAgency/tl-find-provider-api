@@ -307,9 +307,22 @@ public class ProviderRepository : IProviderRepository
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
 
+        //@
         var resultCount = 0;
         foreach (var contact in contacts)
         {
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                contact.UkPrn,
+                contact.EmployerContactEmail,
+                contact.EmployerContactTelephone,
+                contact.EmployerContactWebsite,
+                contact.StudentContactEmail,
+                contact.StudentContactTelephone,
+                contact.StudentContactWebsite,
+                currentTime = _dateTimeService.UtcNow
+            });
+
             resultCount += await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "UPDATE dbo.Provider " +
@@ -318,9 +331,10 @@ public class ProviderRepository : IProviderRepository
                 "    EmployerContactWebsite = @EmployerContactWebsite, " +
                 "    StudentContactEmail = @StudentContactEmail, " +
                 "    StudentContactTelephone = @StudentContactTelephone, " +
-                "    StudentContactWebsite = @StudentContactWebsite " +
+                "    StudentContactWebsite = @StudentContactWebsite, " +
+                "    ModifiedOn = @currentTime " +
                 "WHERE UkPrn = @UkPrn",
-                contact);
+                _dynamicParametersWrapper.DynamicParameters);
         }
 
         return resultCount;
