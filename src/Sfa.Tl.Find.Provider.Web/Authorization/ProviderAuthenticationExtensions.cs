@@ -1,7 +1,9 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json.Linq;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
@@ -40,7 +42,7 @@ public static class ProviderAuthenticationExtensions
         })
         .AddCookie(options =>
         {
-                //TODO: List auth cookie on cookies page?
+            //TODO: List auth cookie on cookies page?
             options.Cookie.Name = AuthenticationCookieName;
             options.Cookie.SecurePolicy = cookieSecurePolicy;
             options.SlidingExpiration = true;
@@ -63,6 +65,9 @@ public static class ProviderAuthenticationExtensions
             options.Scope.Add("email");
             options.Scope.Add("profile");
             options.Scope.Add("organisationid");
+            options.Scope.Add("organisation");
+            options.Scope.Add("Organisation");
+            options.Scope.Add("organisation.id");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In
             options.MaxAge = overallSessionTimeout;
@@ -125,8 +130,18 @@ public static class ProviderAuthenticationExtensions
                 OnTokenValidated = async ctx =>
                 {
                     var claims = new List<Claim>();
+
+                    foreach (var claim in ctx.Principal?.Claims)
+                    {
+                        Debug.WriteLine($"Claim {claim.Type} = {claim.Value}");
+                    }
+
                     //TODO: Use System.Text.Json
-                    var organisation = JObject.Parse(ctx.Principal.FindFirst("Organisation").Value);
+                    var organisationClaim = ctx.Principal.FindFirst("Organisation");
+                    
+                    var organisation = organisationClaim != null 
+                        ? JObject.Parse(ctx.Principal.FindFirst("Organisation").Value)
+                        : new JObject();
 
                     if (organisation.HasValues)
                     {

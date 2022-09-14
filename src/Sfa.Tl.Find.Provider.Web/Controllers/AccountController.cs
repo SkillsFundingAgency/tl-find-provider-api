@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -86,9 +86,12 @@ public class AccountController : Controller
             //    CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
+        //await HttpContext.SignOutAsync();
+        //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
         return SignOut(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            ProviderAuthenticationExtensions.AuthenticationCookieName);
+            OpenIdConnectDefaults.AuthenticationScheme,
+            CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
     //[AllowAnonymous]
