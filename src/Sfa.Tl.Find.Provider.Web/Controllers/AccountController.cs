@@ -74,51 +74,11 @@ public class AccountController : Controller
 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignOutAsync(ProviderAuthenticationExtensions.AuthenticationCookieName);
-            return RedirectToPage("/signedout");
-
-            //return SignOut(
-            //    new AuthenticationProperties
-            //    {
-            //        RedirectUri = "/signedout",
-            //        //AllowRefresh = true
-            //    },
-            //    ProviderAuthenticationExtensions.AuthenticationCookieName,
-            //    CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToPage("/SignedOut");
         }
-
-        //await HttpContext.SignOutAsync();
-        //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         return SignOut(
             OpenIdConnectDefaults.AuthenticationScheme,
             CookieAuthenticationDefaults.AuthenticationScheme);
     }
-
-    //[AllowAnonymous]
-    //[HttpGet]
-    //[Route("signout-complete", Name = RouteConstants.SignOutComplete)]
-    //public IActionResult SignoutComplete()
-    //{
-    //    if (_signInSettings.SignOutRedirectUriEnabled && !string.IsNullOrWhiteSpace(_signInSettings.SignOutRedirectUri))
-    //    {
-    //        return Redirect(_signInSettings.SignOutRedirectUri);
-    //    }
-    //    else
-    //    {
-    //        return RedirectToAction(nameof(HomeController.Index), Constants.HomeController);
-    //    }
-    //}
-
-    //[Authorize]
-    //[HttpGet]
-    //[Route("account-profile", Name = RouteConstants.AccountProfile)]
-    //public IActionResult Profile()
-    //{
-    //    if (string.IsNullOrEmpty(_signInSettings.ProfileUrl))
-    //    {
-    //        _logger.LogWarning(LogEvent.ConfigurationMissing, $"Unable to read config: DfeSignInSettings.ProfileUrl, User: {User?.GetUserEmail()}");
-    //        return RedirectToRoute("/Error/404");
-    //    }
-    //    return Redirect(_signInSettings.ProfileUrl);
-    //}
 }

@@ -1,13 +1,13 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Controllers;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
@@ -111,7 +111,7 @@ public class AccountControllerTests
         var signOutResult = result as SignOutResult;
         signOutResult.Should().NotBeNull();
         signOutResult!.AuthenticationSchemes.Should().Contain(CookieAuthenticationDefaults.AuthenticationScheme);
-        signOutResult.AuthenticationSchemes.Should().Contain(ProviderAuthenticationExtensions.AuthenticationCookieName);
+        signOutResult.AuthenticationSchemes.Should().Contain(OpenIdConnectDefaults.AuthenticationScheme);
     }
 
     [Fact]
@@ -127,6 +127,6 @@ public class AccountControllerTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/signedout");
+        redirectResult!.PageName.Should().Be("/SignedOut");
     }
 }

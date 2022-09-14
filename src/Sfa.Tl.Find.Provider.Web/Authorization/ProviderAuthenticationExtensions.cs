@@ -3,7 +3,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json.Linq;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
@@ -66,18 +65,17 @@ public static class ProviderAuthenticationExtensions
             options.Scope.Add("profile");
             options.Scope.Add("organisationid");
             options.Scope.Add("organisation");
-            options.Scope.Add("Organisation");
-            options.Scope.Add("organisation.id");
+            //options.Scope.Add("organisation.id");
+
+            //options.Scope.Add("offline_access");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In
             options.MaxAge = overallSessionTimeout;
 
             options.SaveTokens = true;
             options.CallbackPath = new PathString("/auth/cb");
-            //options.CallbackPath = new PathString(signInSettings.CallbackPath);
-            //options.SignedOutCallbackPath = new PathString(signInSettings.SignedOutCallbackPath);
-            //options.SignedOutCallbackPath = new PathString(signInSettings.SignedOutCallbackPath);
-            //options.SignedOutRedirectUri = "/signout-complete";
+            options.SignedOutCallbackPath = "/signout/complete";
+            //options.SignedOutRedirectUri = "/signout/complete";
             options.SecurityTokenValidator = new JwtSecurityTokenHandler
             {
                 InboundClaimTypeMap = new Dictionary<string, string>(),
@@ -130,7 +128,7 @@ public static class ProviderAuthenticationExtensions
                 OnTokenValidated = async ctx =>
                 {
                     var claims = new List<Claim>();
-
+                    
                     foreach (var claim in ctx.Principal?.Claims)
                     {
                         Debug.WriteLine($"Claim {claim.Type} = {claim.Value}");

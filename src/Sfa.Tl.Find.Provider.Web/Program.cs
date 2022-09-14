@@ -40,8 +40,10 @@ builder.Services.AddResponseCaching();
 
 builder.Services.AddRazorPages(options =>
 {
-    options.Conventions.AuthorizePage("/Index");
-    options.Conventions.AuthorizeFolder("/Error");
+    //options.Conventions.AddPageRoute("/SignedOut", "/signout/complete");
+    options.Conventions.AllowAnonymousToPage("/Index");
+    options.Conventions.AuthorizePage("/Dashboard");
+    //options.Conventions.AuthorizeFolder("/Error");
 });
 builder.Services.AddControllers();
 

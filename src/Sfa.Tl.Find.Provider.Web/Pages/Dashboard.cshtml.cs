@@ -4,6 +4,7 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
+using System.Diagnostics;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
@@ -31,6 +32,12 @@ public class DashboardModel : PageModel
     public async Task OnGet()
     {
         var isAuthenticated = User.Identity.IsAuthenticated;
+
+        var claims = User.Claims.ToList();
+        foreach (var claim in claims)
+        {
+            Debug.WriteLine($"User claim {claim.Type} = {claim.Value}");
+        }
 
         UkPrn = HttpContext.User.GetClaim(ProviderClaims.ProviderUkprn);
         DisplayName = HttpContext.User.GetClaim(ProviderClaims.DisplayName);
