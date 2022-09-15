@@ -23,6 +23,30 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public async Task<int> Delete(Guid uniqueId)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+        connection.Open();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            uniqueId
+        });
+
+        using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+        var result = await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "DELETE dbo.EmployerInterest " +
+            "WHERE UniqueId = @uniqueId",
+            _dynamicParametersWrapper.DynamicParameters,
+            transaction);
+
+        transaction.Commit();
+
+        return result;
+    }
+
     public async Task<int> DeleteBefore(DateTime date)
     {
         using var connection = _dbContextWrapper.CreateConnection();

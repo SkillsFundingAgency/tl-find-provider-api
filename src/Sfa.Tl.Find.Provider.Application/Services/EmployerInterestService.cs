@@ -25,6 +25,16 @@ public class EmployerInterestService : IEmployerInterestService
                                     ?? throw new ArgumentNullException(nameof(employerInterestOptions));
     }
 
+    public async Task<int> DeleteEmployerInterest(Guid uniqueId)
+    {
+        var count = await _employerInterestRepository.Delete(uniqueId);
+
+        _logger.LogInformation("Removed {count} employer interest records with unique id {uniqueId}",
+            count, uniqueId);
+
+        return count;
+    }
+
     public async Task<int> RemoveExpiredEmployerInterest()
     {
         if (_employerInterestSettings.RetentionDays <= 0)

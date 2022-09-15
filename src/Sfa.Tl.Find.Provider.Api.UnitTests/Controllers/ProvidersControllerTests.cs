@@ -427,7 +427,6 @@ public class ProvidersControllerTests
         result.Should().BeOfType(typeof(StatusCodeResult));
         var statusCodeResult = result as StatusCodeResult;
 
-        statusCodeResult!.StatusCode.Should().Be(500);
         statusCodeResult!.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
     }
 
