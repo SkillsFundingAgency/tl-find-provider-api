@@ -19,4 +19,6 @@ public interface IProviderRepository
         int page,
         int pageSize,
         bool includeAdditionalData);
+
+    Task<int> UpdateProviderContacts(IEnumerable<ProviderContactDto> contacts);
 }

@@ -16,7 +16,15 @@ public static class ModelValidationExtensions
         string email,
         string telephone,
         string website,
-        int locationCount = 0)
+        string employerContactEmail = null,
+        string employerContactTelephone = null,
+        string employerContactWebsite = null,
+        string studentContactEmail = null,
+        string studentContactTelephone = null,
+        string studentContactWebsite = null,
+        int locationCount = 0,
+        bool isAdditionalData = false
+        )
     {
         provider.UkPrn.Should().Be(ukPrn);
         provider.Name.Should().Be(name);
@@ -29,6 +37,15 @@ public static class ModelValidationExtensions
         provider.Telephone.Should().Be(telephone);
         provider.Website.Should().Be(website);
 
+        provider.EmployerContactEmail.Should().Be(employerContactEmail);
+        provider.EmployerContactTelephone.Should().Be(employerContactTelephone);
+        provider.EmployerContactWebsite.Should().Be(employerContactWebsite);
+        provider.StudentContactEmail.Should().Be(studentContactEmail);
+        provider.StudentContactTelephone.Should().Be(studentContactTelephone);
+        provider.StudentContactWebsite.Should().Be(studentContactWebsite);
+        
+        provider.IsAdditionalData.Should().Be(isAdditionalData);
+        
         provider.Locations.Should().NotBeNull();
         provider.Locations.Should().HaveCount(locationCount);
     }
@@ -101,6 +118,20 @@ public static class ModelValidationExtensions
         provider.RouteName.Should().Be(expected.RouteName);
         provider.QualificationId.Should().Be(expected.QualificationId);
         provider.QualificationName.Should().Be(expected.QualificationName);
+    }
+    
+    public static void Validate(this ProviderContactDto provider,
+        ProviderContactDto expected)
+    {
+        provider.Should().NotBeNull();
+        provider.UkPrn.Should().Be(expected.UkPrn);
+        provider.Name.Should().Be(expected.Name);
+        provider.EmployerContactEmail.Should().Be(expected.EmployerContactEmail);
+        provider.EmployerContactTelephone.Should().Be(expected.EmployerContactTelephone);
+        provider.EmployerContactWebsite.Should().Be(expected.EmployerContactWebsite);
+        provider.StudentContactEmail.Should().Be(expected.StudentContactEmail);
+        provider.StudentContactTelephone.Should().Be(expected.StudentContactTelephone);
+        provider.StudentContactWebsite.Should().Be(expected.StudentContactWebsite);
     }
 
     public static void Validate(this Location location,

@@ -116,7 +116,7 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2021-04-01",
             "name": "[concat('ui-app-service','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -136,28 +136,32 @@
                         "value": "[parameters('sharedEnvResourceGroup')]"
                     },
                     "appServiceAppSettings": {
-                        "value": [
-                            {
-                                "name": "EnvironmentName",
-                                "value": "[toUpper(parameters('environmentNameAbbreviation'))]"
-                            },
-                            {
-                                "name": "ConfigurationStorageConnectionString",
-                                "value": "[parameters('configurationStorageConnectionString')]"
-                            },
-                            {
-                                "name": "Version",
-                                "value": "1.0"
-                            },
-                            {
-                                "name": "ServiceName",
-                                "value": "Sfa.Tl.Find.Provider.Api"
-                            },
-                            {
-                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
-                            }
-                        ]
+                      "value": [
+                        {
+                          "name": "EnvironmentName",
+                          "value": "[toUpper(parameters('environmentNameAbbreviation'))]"
+                        },
+                        {
+                          "name": "ConfigurationStorageConnectionString",
+                          "value": "[parameters('configurationStorageConnectionString')]"
+                        },
+                        {
+                          "name": "Version",
+                          "value": "1.0"
+                        },
+                        {
+                          "name": "ServiceName",
+                          "value": "Sfa.Tl.Find.Provider.Api"
+                        },
+                        {
+                          "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
+                        }
+                        //{
+                        //  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                        //  "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation')), '2021-04-01').outputs.ConnectionString]"
+                        //}
+                      ]
                     },
                     "customHostName": {
                         "value": "[parameters('uiCustomHostName')]"

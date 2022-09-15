@@ -54,7 +54,7 @@ public class ProviderRepositoryTests
     }
 
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(ProviderRepository)
             .ShouldNotAcceptNullConstructorArguments();

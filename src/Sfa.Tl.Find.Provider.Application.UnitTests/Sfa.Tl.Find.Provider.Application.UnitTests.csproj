@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Builders\Csv\Assets\ProviderContacts.csv" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tlevels.json" />
     <None Remove="Builders\Json\Assets\NationalStatistics\nationalstatisticslocationsresponse.json" />
@@ -25,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Builders\Csv\Assets\ProviderContacts.csv" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tlevels.json" />
     <EmbeddedResource Include="Builders\Json\Assets\NationalStatistics\nationalstatisticslocationsresponse.json" />
@@ -45,7 +47,7 @@
 	<PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.17.0" />
 	<PackageReference Include="AutoFixture.Idioms" Version="4.17.0" />
 	<PackageReference Include="FluentAssertions" Version="6.7.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
 	<PackageReference Include="NSubstitute" Version="4.4.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">

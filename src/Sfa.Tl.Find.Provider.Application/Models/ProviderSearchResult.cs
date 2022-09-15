@@ -24,6 +24,14 @@ public class ProviderSearchResult
     public string Email { get; init; }
     public string Telephone { get; init; }
     public string Website { get; init; }
+    //TODO: Include these in a future version of the API
+    //public string EmployerContactEmail { get; init; }
+    //public string EmployerContactTelephone { get; init; }
+    //public string EmployerContactWebsite { get; init; }
+    //public string StudentContactEmail { get; init; }
+    //public string StudentContactTelephone { get; init; }
+    //public string StudentContactWebsite { get; init; }
+
     public double Distance { get; init; }
     [JsonIgnore]
     public string JourneyToLink { get; set; }
