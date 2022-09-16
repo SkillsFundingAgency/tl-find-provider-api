@@ -27,7 +27,7 @@ public class ProviderAuthorizationHandler : AuthorizationHandler<ProviderUkPrnRe
 
     private bool IsProviderAuthorized(AuthorizationHandlerContext context)
     {
-        if (!context.User.HasClaim(c => c.Type.Equals(ProviderClaims.ProviderUkprn)))
+        if (!context.User.HasClaim(c => c.Type.Equals(CustomClaimTypes.UkPrn)))
         {
             return false;
         }
@@ -36,7 +36,7 @@ public class ProviderAuthorizationHandler : AuthorizationHandler<ProviderUkPrnRe
             && _httpContextAccessor.HttpContext.Request.RouteValues.ContainsKey(UkPrnRootValue))
         {
             var ukPrnFromUrl = _httpContextAccessor.HttpContext.Request.RouteValues[UkPrnRootValue].ToString();
-            var ukPrn = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
+            var ukPrn = context.User.FindFirst(c => c.Type.Equals(CustomClaimTypes.UkPrn)).Value;
 
             return ukPrn.Equals(ukPrnFromUrl);
         }

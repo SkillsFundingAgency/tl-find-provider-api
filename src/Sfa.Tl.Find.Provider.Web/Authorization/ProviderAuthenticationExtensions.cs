@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json.Linq;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Web.Authorization;
@@ -14,18 +15,16 @@ public static class ProviderAuthenticationExtensions
     public const string AuthenticationCookieName = "tl-provider-auth-cookie";
     public const string AuthenticationTypeName = "DfE-SignIn";
 
-    public static void AddProviderAuthentication(this IServiceCollection services, DfeSignInSettings signInSettings)
+    public static void AddProviderAuthentication(
+        this IServiceCollection services, 
+        DfeSignInSettings signInSettings,
+        IWebHostEnvironment environment)
     {
-        var cookieSecurePolicy = CookieSecurePolicy.Always;
+        var cookieSecurePolicy = environment.IsDevelopment() 
+            ? CookieSecurePolicy.SameAsRequest 
+            : CookieSecurePolicy.Always;
 
-        var cookieOptions = new Action<CookieAuthenticationOptions>(options =>
-        {
-            options.CookieManager = new ChunkingCookieManager { ChunkSize = 3000 };
-            options.Cookie.SecurePolicy = cookieSecurePolicy;
-            options.AccessDeniedPath = "/error/403";
-        });
-
-        var cookieAndSessionTimeout = 20; //settings.Timeout;
+        var cookieAndSessionTimeout = signInSettings.Timeout;
         var overallSessionTimeout = TimeSpan.FromMinutes(cookieAndSessionTimeout);
 
         services.AddAntiforgery(options =>
@@ -128,7 +127,7 @@ public static class ProviderAuthenticationExtensions
                 OnTokenValidated = async ctx =>
                 {
                     var claims = new List<Claim>();
-                    
+
                     foreach (var claim in ctx.Principal?.Claims)
                     {
                         Debug.WriteLine($"Claim {claim.Type} = {claim.Value}");
@@ -136,46 +135,47 @@ public static class ProviderAuthenticationExtensions
 
                     //TODO: Use System.Text.Json
                     var organisationClaim = ctx.Principal.FindFirst("Organisation");
-                    
-                    var organisation = organisationClaim != null 
+
+                    var organisation = organisationClaim != null
                         ? JObject.Parse(ctx.Principal.FindFirst("Organisation").Value)
                         : new JObject();
+
+                    //if (!organisation.HasValues)
+                    //{
+                    //    //Testing only!
+                    //    var organisationId = "TEST";
+                    //    var userId = ctx.Principal.FindFirst("sub").Value;
+                    //    var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
+                    //    var userInfo = await dfeSignInApiClient.GetDfeSignInUserInfo(organisationId, userId);
+                    //}
 
                     if (organisation.HasValues)
                     {
                         var organisationId = organisation.SelectToken("id").ToString();
                         var userId = ctx.Principal.FindFirst("sub").Value;
 
-                        //var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetService<IDfeSignInApiClient>();
-                        //var userInfo = await dfeSignInApiClient.GetDfeSignInUserInfo(organisationId, userId);
+                        var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
+                        var userInfo = await dfeSignInApiClient.GetDfeSignInUserInfo(organisationId, userId);
 
-                        //if (userInfo.HasAccessToService)
-                        //{
-                        //    var internalApiClient = ctx.HttpContext.RequestServices.GetService<IResultsAndCertificationInternalApiClient>();
-                        //    var loggedInUserTypeResponse = userInfo.Ukprn.Value == 1
-                        //                                    ? new LoggedInUserTypeInfo { Ukprn = userInfo.Ukprn.Value, UserType = LoginUserType.AwardingOrganisation }
-                        //                                    : await internalApiClient.GetLoggedInUserTypeInfoAsync(userInfo.Ukprn.Value);
+                        if (userInfo.HasAccessToService)
+                        {
+                            claims.AddRange(new List<Claim>
+                            {
+                                new(CustomClaimTypes.UserId, userId),
+                                new(CustomClaimTypes.OrganisationId, organisationId),
+                                new(CustomClaimTypes.UkPrn, userInfo.UkPrn.HasValue ? userInfo.UkPrn.Value.ToString() : string.Empty),
+                                new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name").Value),
+                                new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name").Value),
+                                new(ClaimTypes.Email, ctx.Principal.FindFirst("email").Value),
+                                new(CustomClaimTypes.HasAccessToService, userInfo.HasAccessToService.ToString()),
+                                //new Claim(CustomClaimTypes.LoginUserType, ((int)loggedInUserTypeResponse.UserType).ToString())
+                        });
 
-                        //    if (loggedInUserTypeResponse != null && loggedInUserTypeResponse.UserType != LoginUserType.NotSpecified)
-                        //    {
-                        //        claims.AddRange(new List<Claim>
-                        //        {
-                        //                            new Claim(CustomClaimTypes.UserId, userId),
-                        //                            new Claim(CustomClaimTypes.OrganisationId, organisationId),
-                        //                            new Claim(CustomClaimTypes.Ukprn, userInfo.Ukprn.HasValue ? userInfo.Ukprn.Value.ToString() : string.Empty),
-                        //                            new Claim(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name").Value),
-                        //                            new Claim(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name").Value),
-                        //                            new Claim(ClaimTypes.Email, ctx.Principal.FindFirst("email").Value),
-                        //                            new Claim(CustomClaimTypes.HasAccessToService, userInfo.HasAccessToService.ToString()),
-                        //                            new Claim(CustomClaimTypes.LoginUserType, ((int)loggedInUserTypeResponse.UserType).ToString())
-                        //        });
-
-                        //        if (userInfo.Roles != null && userInfo.Roles.Any())
-                        //        {
-                        //            claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
-                        //        }
-                        //    }
-                        //}
+                            if (userInfo.Roles != null && userInfo.Roles.Any())
+                            {
+                                claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
+                            }
+                        }
                     }
                     else
                     {
@@ -190,43 +190,5 @@ public static class ProviderAuthenticationExtensions
                 }
             };
         });
-        // ReSharper disable CommentTypo
-        /*
-        services
-            .AddAuthentication(sharedOptions =>
-            {
-                sharedOptions.DefaultScheme =
-                    CookieAuthenticationDefaults.AuthenticationScheme;
-                sharedOptions.DefaultSignInScheme =
-                    CookieAuthenticationDefaults.AuthenticationScheme;
-                sharedOptions.DefaultChallengeScheme =
-                    WsFederationDefaults.AuthenticationScheme;
-            })
-            //.AddWsFederation(options =>
-            //{
-            //    options.MetadataAddress = settings.MetadataAddress;
-            //    options.Wtrealm = settings.Wtrealm;
-            //    options.CallbackPath = "/{ukprn}/home";
-            //    options.Events.OnSecurityTokenValidated = async (ctx) =>
-            //    {
-            //        await PopulateProviderClaims(ctx.HttpContext, ctx.Principal);
-            //    };
-            //})
-            //.AddCookie(cookieOptions)
-            ;
-        */
-        // ReSharper restore CommentTypo
-
-    }
-
-    private static Task PopulateProviderClaims(HttpContext httpContext, ClaimsPrincipal principal)
-    {
-        var providerId = principal.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
-        var displayName = principal.Claims.First(c => c.Type.Equals(ProviderClaims.DisplayName)).Value;
-        httpContext.Items.Add(ClaimsIdentity.DefaultNameClaimType, providerId);
-        httpContext.Items.Add(ProviderClaims.DisplayName, displayName);
-        principal.Identities.First().AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, providerId));
-        principal.Identities.First().AddClaim(new Claim(ProviderClaims.DisplayName, displayName));
-        return Task.CompletedTask;
     }
 }

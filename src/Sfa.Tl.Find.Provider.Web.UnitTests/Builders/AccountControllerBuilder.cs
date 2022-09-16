@@ -10,6 +10,7 @@ using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Web.Authorization;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class AccountControllerBuilder
@@ -28,16 +29,17 @@ public class AccountControllerBuilder
         var signInOptions = signInSettings.ToOptions();
 
         logger ??= Substitute.For<ILogger<AccountController>>();
-        
+
         var authenticationService = Substitute.For<IAuthenticationService>();
         authenticationService
             .SignInAsync(Arg.Any<HttpContext>(), Arg.Any<string>(), Arg.Any<ClaimsPrincipal>(),
-                Arg.Any<AuthenticationProperties>()).Returns(Task.FromResult((object)null));
+                Arg.Any<AuthenticationProperties>()).Returns(Task.FromResult((object)null!));
 
         var authSchemaProvider = Substitute.For<IAuthenticationSchemeProvider>();
         authSchemaProvider!.GetDefaultAuthenticateSchemeAsync()
             .Returns((new AuthenticationScheme(
-                "oidc", "oidc",
+                OpenIdConnectDefaults.AuthenticationScheme,
+                OpenIdConnectDefaults.DisplayName,
                 typeof(IAuthenticationHandler))));
 
         var systemClock = Substitute.For<ISystemClock>();
@@ -46,13 +48,13 @@ public class AccountControllerBuilder
         services.AddSingleton(authenticationService);
         services.AddSingleton(systemClock);
         services.AddSingleton(authSchemaProvider);
-        
+
         var claims = new List<Claim>
         {
-            new(ProviderClaims.ProviderUkprn, DefaultUkPrn),
+            new(CustomClaimTypes.UkPrn, DefaultUkPrn)
             //new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
-            //new(ProviderClaims.DisplayName, DefaultDisplayName),
-            //new(ProviderClaims.Service, DefaultService)
+            //new(CustomClaimTypes.DisplayName, DefaultDisplayName),
+            //new(CustomClaimTypes.Service, DefaultService)
         };
 
         var httpContext = new DefaultHttpContext

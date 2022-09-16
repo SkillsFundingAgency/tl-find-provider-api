@@ -19,9 +19,9 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
         var claims = new[]
         {
             new Claim(ClaimsIdentity.DefaultNameClaimType, "10000001"),
-            new Claim(ProviderClaims.DisplayName, "AED User"),
-            new Claim(ProviderClaims.Service, "DAA"),
-            new Claim(ProviderClaims.ProviderUkprn, "10000001")
+            new Claim(CustomClaimTypes.DisplayName, "Test User"),
+            new Claim(CustomClaimTypes.Service, "DTLSAA"),
+            new Claim(CustomClaimTypes.UkPrn, "10000001")
         };
         var identity = new ClaimsIdentity(claims, "Provider-stub");
         var principal = new ClaimsPrincipal(identity);
@@ -30,7 +30,7 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
         var result = AuthenticateResult.Success(ticket);
 
         _httpContextAccessor.HttpContext?.Items.Add(ClaimsIdentity.DefaultNameClaimType, "10000001");
-        _httpContextAccessor.HttpContext?.Items.Add(ProviderClaims.DisplayName, "AED User");
+        _httpContextAccessor.HttpContext?.Items.Add(CustomClaimTypes.DisplayName, "Test User");
 
         return Task.FromResult(result);
     }

@@ -39,9 +39,9 @@ public class DashboardModel : PageModel
             Debug.WriteLine($"User claim {claim.Type} = {claim.Value}");
         }
 
-        UkPrn = HttpContext.User.GetClaim(ProviderClaims.ProviderUkprn);
-        DisplayName = HttpContext.User.GetClaim(ProviderClaims.DisplayName);
-        Service = HttpContext.User.GetClaim(ProviderClaims.Service);
+        UkPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
+        DisplayName = HttpContext.User.GetClaim(CustomClaimTypes.DisplayName);
+        Service = HttpContext.User.GetClaim(CustomClaimTypes.Service);
     }
 
     public async Task OnPost()

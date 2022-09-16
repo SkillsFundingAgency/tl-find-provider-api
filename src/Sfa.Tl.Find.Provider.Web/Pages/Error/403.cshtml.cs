@@ -22,7 +22,7 @@ public class Error403Model : PageModel
 
         if (User.Identity is { IsAuthenticated: true })
         {
-            _logger.LogError(feature.Error, "Unexpected error occurred during request to path: {path} by user: {user}", feature.Path, User.FindFirstValue(ProviderClaims.UserId));
+            _logger.LogError(feature.Error, "Unexpected error occurred during request to path: {path} by user: {user}", feature.Path, User.FindFirstValue(CustomClaimTypes.UserId));
         }
         else
         {

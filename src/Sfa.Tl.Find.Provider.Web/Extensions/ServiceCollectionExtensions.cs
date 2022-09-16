@@ -43,11 +43,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<PostcodeApiSettings>>()
                         .Value;
 
-                    client.BaseAddress =
-                        postcodeApiSettings.BaseUri.EndsWith("/")
-                            ? new Uri(postcodeApiSettings.BaseUri)
-                            : new Uri(postcodeApiSettings.BaseUri + "/");
-
+                    client.BaseAddress = new Uri(postcodeApiSettings.BaseUri);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                 }
@@ -64,6 +60,18 @@ public static class ServiceCollectionExtensions
             )
             .AddRetryPolicyHandler<TownDataService>();
 
+        services.AddHttpClient<IDfeSignInApiService, DfeSignInApiService>(
+                (serviceProvider, client) =>
+                {
+                    var dfeSignInSettings = serviceProvider
+                        .GetRequiredService<IOptions<DfeSignInSettings>>()
+                        .Value;
+
+                    client.BaseAddress = new Uri(dfeSignInSettings.ApiUri);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                })
+            .AddRetryPolicyHandler<DfeSignInApiService>();
+        
         return services;
     }
 

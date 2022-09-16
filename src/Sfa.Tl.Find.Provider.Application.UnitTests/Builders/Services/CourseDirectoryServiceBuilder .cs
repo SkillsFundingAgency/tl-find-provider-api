@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
 public class CourseDirectoryServiceBuilder
 {
-    private const string CourseDirectoryApiBaseAbsoluteUri = "https://https://test.com/findacourse/api/";
+    private const string CourseDirectoryApiBaseAbsoluteUri = "https://test.com/findacourse/api/";
     private static readonly Uri CourseDirectoryApiBaseUri = new(CourseDirectoryApiBaseAbsoluteUri);
 
     public ICourseDirectoryService Build(

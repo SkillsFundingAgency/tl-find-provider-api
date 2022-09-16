@@ -22,11 +22,11 @@ public class ClaimsExtensionsTests
     {
         var claims = new List<Claim>
         {
-            new(ProviderClaims.ProviderUkprn, DefaultUkPrn)
+            new(CustomClaimTypes.UkPrn, DefaultUkPrn)
         };
         var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
 
-        var result = claimsPrincipal.GetClaim(ProviderClaims.ProviderUkprn);
+        var result = claimsPrincipal.GetClaim(CustomClaimTypes.UkPrn);
         result.Should().Be(DefaultUkPrn);
     }
 }

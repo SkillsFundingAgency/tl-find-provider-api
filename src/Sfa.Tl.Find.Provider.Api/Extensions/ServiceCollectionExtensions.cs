@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddApiVersioning(config =>
         {
             config.DefaultApiVersion = new ApiVersion(
-                Constants.DefaultApiMajorVersion, 
+                Constants.DefaultApiMajorVersion,
                 Constants.DefaultApiMinorVersion);
             config.AssumeDefaultVersionWhenUnspecified = true;
             config.ReportApiVersions = true;
@@ -113,11 +113,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<PostcodeApiSettings>>()
                         .Value;
 
-                    client.BaseAddress =
-                        postcodeApiSettings.BaseUri.EndsWith("/")
-                            ? new Uri(postcodeApiSettings.BaseUri)
-                            : new Uri(postcodeApiSettings.BaseUri + "/");
-
+                    client.BaseAddress = new Uri(postcodeApiSettings.BaseUri);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                 }
@@ -132,11 +128,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<CourseDirectoryApiSettings>>()
                         .Value;
 
-                    client.BaseAddress =
-                        courseDirectoryApiSettings.BaseUri.EndsWith("/")
-                            ? new Uri(courseDirectoryApiSettings.BaseUri)
-                            : new Uri(courseDirectoryApiSettings.BaseUri + "/");
-
+                    client.BaseAddress = new Uri(courseDirectoryApiSettings.BaseUri);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", courseDirectoryApiSettings.ApiKey);
@@ -167,7 +159,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddNotifyService(
         this IServiceCollection services,
         string govNotifyApiKey)
@@ -194,7 +186,7 @@ public static class ServiceCollectionExtensions
             q.UseMicrosoftDependencyInjectionJobFactory();
 
             var startupJobKey = new JobKey(Constants.StartupTasksJobKeyName);
-            q.AddJob<InitializationJob>(opts => 
+            q.AddJob<InitializationJob>(opts =>
                     opts.WithIdentity(startupJobKey))
                 .AddTrigger(opts => opts
                     .ForJob(startupJobKey)
@@ -203,7 +195,7 @@ public static class ServiceCollectionExtensions
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
                 var courseImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
-                q.AddJob<CourseDataImportJob>(opts => 
+                q.AddJob<CourseDataImportJob>(opts =>
                         opts.WithIdentity(courseImportJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(courseImportJobKey)
@@ -211,11 +203,11 @@ public static class ServiceCollectionExtensions
                             CronScheduleBuilder
                                 .CronSchedule(courseDirectoryImportCronSchedule)));
             }
-            
+
             if (!string.IsNullOrEmpty(townDataImportCronSchedule))
             {
                 var townImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
-                q.AddJob<TownDataImportJob>(opts => 
+                q.AddJob<TownDataImportJob>(opts =>
                         opts.WithIdentity(townImportJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(townImportJobKey)
@@ -227,7 +219,7 @@ public static class ServiceCollectionExtensions
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
             {
                 var employerInterestCleanupJobKey = new JobKey(Constants.EmployerInterestCleanupJobKeyName);
-                q.AddJob<EmployerInterestCleanupJob>(opts => 
+                q.AddJob<EmployerInterestCleanupJob>(opts =>
                         opts.WithIdentity(employerInterestCleanupJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(employerInterestCleanupJobKey)
@@ -241,7 +233,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddRateLimitPolicy(
         this IServiceCollection services)
     {
@@ -268,7 +260,7 @@ public static class ServiceCollectionExtensions
                     Version = version
                 });
 
-            c.ResolveConflictingActions(apiDescriptions 
+            c.ResolveConflictingActions(apiDescriptions
                 => apiDescriptions.First());
 
             //c.EnableAnnotations(); //Needed with Swashbuckle.AspNetCore.Annotations

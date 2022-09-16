@@ -19,9 +19,12 @@ public class SettingsBuilder
     private const int RetentionDays = 10;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
 
+    private const string SignInApiUri = "https://test.api.oidc.com";
+    private const string SignInApiSecret = "apisecret";
     private const string SignInAudience = "signin.oidc.com";
     private const string SignInAuthority = "https://test.signin.oidc.com";
     private const string SignInClientId = "testclient";
+    private const string SignInIssuer = "testissuer";
     private const string SignInClientSecret = "secretsecret";
     private const string SignInMetadataAddress = "https://test.signin.oidc.com/metadata";
 
@@ -46,20 +49,25 @@ public class SettingsBuilder
             BaseUri = findCourseApiBaseUri,
             ApiKey = findCourseApiKey
         };
-
-
+    
     public DfeSignInSettings BuildDfeSignInSettings(
+        string metadataAddress = SignInMetadataAddress,
         string audience = SignInAudience,
         string authority = SignInAuthority,
         string clientId = SignInClientId,
         string clientSecret = SignInClientSecret,
-        string metadataAddress = SignInMetadataAddress) => new()
+        string apiUri = SignInApiUri,
+        string apiSecret = SignInApiSecret,
+        string issuer = SignInIssuer) => new()
     {
         Audience = audience,
         Authority = authority,
         ClientId = clientId,
         ClientSecret = clientSecret,
+        ApiUri = apiUri,
+        ApiSecret = apiSecret,
         MetadataAddress = metadataAddress,
+        Issuer = issuer,
     };
 
     public EmailSettings BuildEmailSettings(

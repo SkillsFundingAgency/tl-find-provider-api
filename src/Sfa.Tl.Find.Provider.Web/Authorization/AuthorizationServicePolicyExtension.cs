@@ -15,8 +15,8 @@ public static class AuthorizationServicePolicyExtension
                 , policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.RequireClaim(ProviderClaims.ProviderUkprn);
-                    policy.RequireClaim(ProviderClaims.Service, ProviderDaa, ProviderDab, ProviderDac, ProviderDav);
+                    policy.RequireClaim(CustomClaimTypes.UkPrn);
+                    policy.RequireClaim(CustomClaimTypes.Service, ProviderDaa, ProviderDab, ProviderDac, ProviderDav);
                     policy.Requirements.Add(new ProviderUkPrnRequirement());
                 });
         });
