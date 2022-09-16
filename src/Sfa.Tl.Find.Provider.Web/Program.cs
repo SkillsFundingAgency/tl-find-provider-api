@@ -63,6 +63,7 @@ builder.Services.AddHttpClients();
 builder.Services
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
+    .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
     .AddTransient<IProviderDataService, ProviderDataService>()

@@ -16,6 +16,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration, SiteConfiguration siteConfiguration)
     {
         services
+            .Configure<DfeSignInSettings>(x =>
+            {
+                x.ApiUri = siteConfiguration.DfeSignInSettings.ApiUri;
+                x.ApiSecret = siteConfiguration.DfeSignInSettings.ApiSecret;
+                x.Audience = siteConfiguration.DfeSignInSettings.Audience;
+                x.Issuer = siteConfiguration.DfeSignInSettings.Issuer;
+            })
             .Configure<EmailSettings>(x =>
             {
                 x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;

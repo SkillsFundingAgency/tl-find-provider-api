@@ -17,15 +17,11 @@ public class DfeSignInTokenService : IDfeSignInTokenService
         _signInSettings = signInOptions.Value;
     }
 
-    public string GetApiToken()
-    {
-        var token = new JwtBuilder()
+    public string GetApiToken() =>
+        new JwtBuilder()
             .WithAlgorithm(new HMACSHA256Algorithm())
             .Issuer(_signInSettings.Issuer)
             .Audience(_signInSettings.Audience)
             .WithSecret(_signInSettings.ApiSecret)
             .Encode();
-
-        return token;
-    }
 }
