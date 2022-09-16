@@ -94,4 +94,14 @@ public class TestController : ControllerBase
         var scheduler = await _schedulerFactory.GetScheduler();
         await scheduler.TriggerJob(new JobKey(Constants.StartupTasksJobKeyName));
     }
+    
+    [HttpGet, HttpPost]
+    // ReSharper disable once StringLiteralTypo
+    [Route("triggeremployerinterestcleanupjob")]
+    public async Task TriggerEmployerInterestCleanupJob(
+        [FromQuery(Name = "to")] string recipients)
+    {
+        var scheduler = await _schedulerFactory.GetScheduler();
+        await scheduler.TriggerJob(new JobKey(Constants.EmployerInterestCleanupJobKeyName));
+    }
 }

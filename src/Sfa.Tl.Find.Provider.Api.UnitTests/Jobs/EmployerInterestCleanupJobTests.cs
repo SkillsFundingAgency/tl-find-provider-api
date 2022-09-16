@@ -1,4 +1,5 @@
-﻿using Quartz;
+﻿using NSubstitute;
+using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Jobs;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -6,38 +7,41 @@ using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Jobs;
 
-public class CourseDataImportJobTests
+public class EmployerInterestCleanupJobTests
 {
     [Fact]
-    public void Constructor_Guards_Against_Null_Parameters()
+    public void Constructor_Guards_Against_NullParameters()
     {
-        typeof(CourseDataImportJob)
+        typeof(EmployerInterestCleanupJob)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_Bad_Parameters()
+    public void Constructor_Guards_Against_BadParameters()
     {
-        typeof(CourseDataImportJob)
+        typeof(EmployerInterestCleanupJob)
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
 
     [Fact]
     public async Task Execute_Job_Calls_Expected_Services()
     {
-        var courseDirectoryService = Substitute.For<ICourseDirectoryService>();
+        const int count = 10;
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .RemoveExpiredEmployerInterest()
+            .Returns(count);
 
         var trigger = Substitute.For<ITrigger>();
         trigger.JobKey.Returns(new JobKey("Test"));
         var jobContext = Substitute.For<IJobExecutionContext>();
         jobContext.Trigger.Returns(trigger);
 
-        var job = new CourseDataImportJobBuilder()
-            .Build(courseDirectoryService);
+        var job = new EmployerInterestCleanupJobBuilder()
+            .Build(employerInterestService);
 
         await job.Execute(jobContext);
 
-        //await courseDirectoryService.Received(1).ImportQualifications();
-        await courseDirectoryService.Received(1).ImportProviders();
+        await employerInterestService.Received(1).RemoveExpiredEmployerInterest();
     }
 }
