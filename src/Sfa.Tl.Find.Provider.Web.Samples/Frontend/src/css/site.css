@@ -1,0 +1,51 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.tl-geolocator span {
+    margin-top: 5px;
+    color: #1d70b8;
+    text-decoration: underline;
+    font-family: "GDS Transport", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.25;
+    cursor: pointer;
+}
+
+.tl-geolocator span:hover {
+    color: #003078;
+}
+
+.tl-geolocator span:visited {
+    color: #4c2c92;
+}
+
+.tl-geolocator span:active {
+    color: #0b0c0c;
+}
+
+.tl-geolocator span:focus {
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    text-decoration: none;
+}
