@@ -48,6 +48,8 @@ jobs:
             -configurationStorageConnectionString "$(ConfigurationStorageConnectionString)"
             -uiCustomHostName "$(UICustomHostName)"
             -uiCertificateName "$(CertificateName)"'
+            # -apiCustomHostName "$(UICustomHostName)"
+            # -apiCertificateName "$(CertificateName)"'
             # -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
             # -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
             # -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
