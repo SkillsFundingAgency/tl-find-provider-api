@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Quartz;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -13,15 +14,17 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class TestController : ControllerBase
 {
     private readonly IEmailService _emailService;
-
     private readonly ILogger<TestController> _logger;
+    private readonly ISchedulerFactory _schedulerFactory;
 
     public TestController(
         IEmailService emailService,
-        ILogger<TestController> logger)
+        ILogger<TestController> logger,
+        ISchedulerFactory schedulerFactory)
     {
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _schedulerFactory = schedulerFactory ?? throw new ArgumentNullException(nameof(schedulerFactory));
     }
 
     [HttpPost]
@@ -38,7 +41,7 @@ public class TestController : ControllerBase
     public async Task<IActionResult> GetSendEmail(
         [FromQuery(Name = "to")] string recipients)
     {
-        var template = "TestWithoutPersonalisation";
+        const string template = "TestWithoutPersonalisation";
 
         var tokens = new Dictionary<string, string>();
 
@@ -70,5 +73,25 @@ public class TestController : ControllerBase
         var result = await _emailService.SendEmail(recipients, template, tokens);
 
         return Ok(result);
+    }
+
+    [HttpGet, HttpPost]
+    // ReSharper disable once StringLiteralTypo
+    [Route("triggerimportjob")]
+    public async Task TriggerCourseDirectoryImportJob(
+        [FromQuery(Name = "to")] string recipients)
+    {
+        var scheduler = await _schedulerFactory.GetScheduler();
+        await scheduler.TriggerJob(new JobKey(Constants.CourseDirectoryImportJobKeyName));
+    }
+
+    [HttpGet, HttpPost]
+    // ReSharper disable once StringLiteralTypo
+    [Route("triggerstartuptasksjob")]
+    public async Task TriggerStartupTasksJob(
+        [FromQuery(Name = "to")] string recipients)
+    {
+        var scheduler = await _schedulerFactory.GetScheduler();
+        await scheduler.TriggerJob(new JobKey(Constants.StartupTasksJobKeyName));
     }
 }

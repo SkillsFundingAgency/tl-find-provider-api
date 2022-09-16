@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Microsoft.VisualBasic.FileIO;
+using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -17,14 +18,14 @@ public class ProviderDataServiceTests
     private readonly IList<int> _testQualificationIds = new List<int> { 37, 40, 51 };
 
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(ProviderDataService)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(ProviderDataService)
             .ShouldNotAcceptNullOrBadConstructorArguments();
@@ -787,37 +788,83 @@ public class ProviderDataServiceTests
         provider.Should().NotBeNull();
 
         // ReSharper disable once StringLiteralTypo
-        provider!.Name.Should().Be("BURNTWOOD SCHOOL");
-        provider.Postcode.Should().Be("SW17 0AQ");
-        provider.Website.Should().Be("https://www.burntwoodschool.com/");
-        provider.Email.Should().Be("info@burntwoodschool.com");
-        provider.Telephone.Should().Be("020 8946 6201");
-        provider.Town.Should().Be("London");
+        provider.Validate(
+            10042223,
+        "BURNTWOOD SCHOOL",
+            null,
+            null,
+            "London",
+            null,
+            "SW17 0AQ",
+        "info@burntwoodschool.com",
+        "020 8946 6201",
+            "https://www.burntwoodschool.com/",
+            locationCount: 1,
+            isAdditionalData: true);
 
-        provider.IsAdditionalData.Should().BeTrue();
+        var location = provider!.Locations.First();
 
-        provider.Locations.Should().NotBeNull();
-        provider.Locations.Count.Should().Be(1);
-
-        var location = provider.Locations.First();
-
-        location.Postcode.Should().Be("SW17 0AQ");
-        location.Town.Should().Be("London");
-        location.Latitude.Should().Be(51.438125);
-        location.Longitude.Should().Be(-0.180083);
-        location.Website.Should().Be("https://www.burntwoodschool.com/");
-        location.Email.Should().Be("info@burntwoodschool.com");
-        location.Telephone.Should().Be("020 8946 6201");
-        location.DeliveryYears.Should().NotBeNull();
-        location.DeliveryYears.Count.Should().Be(1);
-
+        // ReSharper disable once StringLiteralTypo
+        location.Validate(
+            "BURNTWOOD SCHOOL",
+            "SW17 0AQ",
+            null,
+            null,
+            "London",
+            null,
+            "info@burntwoodschool.com",
+            "020 8946 6201",
+            "https://www.burntwoodschool.com/",
+            51.438125,
+            -0.180083,
+            1);
         var deliveryYear = location.DeliveryYears.First();
 
-        deliveryYear.Year.Should().Be(2022);
-        deliveryYear.Qualifications.Should().NotBeNull();
-        deliveryYear.Qualifications.Count.Should().Be(1);
+        deliveryYear.Validate(2022,
+            new[] { 38 });
+    }
 
-        var qualification = deliveryYear.Qualifications.First();
-        qualification.Id.Should().Be(38);
+    [Fact]
+    public async Task ImportProviderContacts_Works_As_Expected()
+    {
+        var receivedProviders = new List<ProviderContactDto>();
+
+        var providerRepository = Substitute.For<IProviderRepository>();
+        await providerRepository
+            .UpdateProviderContacts(Arg.Do<IEnumerable<ProviderContactDto>>(
+                p =>
+                    receivedProviders.AddRange(p)));
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await using var stream = ProviderContactsCsvBuilder
+            .BuildProviderContactsCsvAsStream();
+
+        await service.ImportProviderContacts(stream);
+
+        await providerRepository
+            .Received(1)
+            .UpdateProviderContacts(Arg.Is<IEnumerable<ProviderContactDto>>(
+                p => p.Any()));
+
+        var providerContacts = receivedProviders.SingleOrDefault(p => p.UkPrn == 10000055);
+
+        var expectedContacts = new ProviderContactDtoBuilder().Build();
+        providerContacts.Validate(
+            new ProviderContactDto
+            {
+                UkPrn = 10000055,
+                Name = "ABINGDON AND WITNEY COLLEGE",
+                EmployerContactEmail = "employer.guidance@abingdon-witney.ac.uk",
+                EmployerContactTelephone = "01235 789010",
+                EmployerContactWebsite = "http://www.abingdon-witney.ac.uk/employers",
+                StudentContactEmail = "student.counseller@abingdon-witney.ac.uk",
+                StudentContactTelephone = "01235 789010",
+                StudentContactWebsite = "http://www.abingdon-witney.ac.uk/students"
+            });
+
+        providerContacts.Validate(expectedContacts);
+
     }
 }

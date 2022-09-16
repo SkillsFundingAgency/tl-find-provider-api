@@ -187,7 +187,7 @@ public static class ServiceCollectionExtensions
 
             q.UseMicrosoftDependencyInjectionJobFactory();
 
-            var startupJobKey = new JobKey("Perform Startup Tasks");
+            var startupJobKey = new JobKey(Constants.StartupTasksJobKeyName);
             q.AddJob<InitializationJob>(opts => opts.WithIdentity(startupJobKey))
                 .AddTrigger(opts => opts
                     .ForJob(startupJobKey)
@@ -195,7 +195,7 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
-                var courseImportJobKey = new JobKey("Import Course Data");
+                var courseImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
                 q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(courseImportJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(courseImportJobKey)

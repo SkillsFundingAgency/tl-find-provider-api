@@ -12,7 +12,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Data;
 public class DbContextWrapperTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(DbContextWrapper)
             .ShouldNotAcceptNullConstructorArguments();
@@ -170,7 +170,38 @@ public class DbContextWrapperTests
 
         var connection = Substitute.For<IDbConnection>();
 
-        var _ = await dbContextWrapper.ExecuteScalarAsync<int>(
+        var _ = await dbContextWrapper.ExecuteAsync(
+            connection,
+            sql);
+
+        await policy.Received(1).ExecuteAsync(
+            Arg.Any<Func<Context, Task<int>>>(),
+            Arg.Any<Context>());
+
+        await policy.Received(1).ExecuteAsync(
+            Arg.Any<Func<Context, Task<int>>>(),
+            Arg.Is<Context>(ctx =>
+                ctx.ContainsKey(PolicyContextItems.Logger) &&
+                ctx[PolicyContextItems.Logger] == logger
+            ));
+    }
+    
+    [Fact]
+    public async Task ExecuteAsync_Calls_Retry_Policy_With_Logger()
+    {
+        var logger = Substitute.For<ILogger<DbContextWrapper>>();
+
+        var (policy, policyRegistry) = PollyPolicyBuilder.BuildPolicyAndRegistry();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .Build(policyRegistry: policyRegistry,
+                logger: logger);
+
+        const string sql = "SELECT * FROM Qualification";
+
+        var connection = Substitute.For<IDbConnection>();
+
+        var _ = await dbContextWrapper.ExecuteAsync(
             connection,
             sql);
 

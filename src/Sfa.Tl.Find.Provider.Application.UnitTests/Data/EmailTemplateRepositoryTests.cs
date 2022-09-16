@@ -18,7 +18,7 @@ public class EmailTemplateRepositoryTests
             .First();
 
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(EmailTemplateRepository)
             .ShouldNotAcceptNullConstructorArguments();

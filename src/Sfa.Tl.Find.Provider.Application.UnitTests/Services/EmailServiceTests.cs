@@ -20,14 +20,14 @@ public class EmailServiceTests
     private const string TestEmail = "test@test.com";
 
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(EmailService)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(EmailService)
             .ShouldNotAcceptNullOrBadConstructorArguments();
