@@ -28,6 +28,7 @@ public static class Constants
     public const string CourseDirectoryImportScheduleConfigKey = "CourseDirectoryImportSchedule";
     public const string DfeSignInSettingsConfigKey = "DfeSignInSettings";
     public const string EmailSettingsConfigKey = "EmailSettings";
+    public const string EmployerInterestSettingsConfigKey = "EmployerInterestSettings";
     public const string PostcodeApiSettingsConfigKey = "PostcodeApiSettings";
     public const string SqlConnectionStringConfigKey = "SqlConnectionString";
     public const string SearchSettingsConfigKey = "SearchSettings";
