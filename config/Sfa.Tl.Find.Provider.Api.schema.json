@@ -54,6 +54,10 @@
           "type": "string",
           "environmentVariable": "EmailSettings_GovNotifyApiKey"
         },
+        "DeliveryStatusToken": {
+          "type": "string",
+          "environmentVariable": "EmailSettings_DeliveryStatusToken"
+        },
         "SupportEmailAddress": {
           "type": "string",
           "environmentVariable": "EmailSettings_SupportEmailAddress"

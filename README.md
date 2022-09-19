@@ -53,7 +53,8 @@ Add a new row to the table with:
         "CourseDirectoryImportSchedule": "<CRON string>",
         "EmailSettings": {
             "GovNotifyApiKey": "<key from GOV.UK Notify>",
-            "SupportEmailAddress": "<email>"
+            "SupportEmailAddress": "<email>",
+            "DeliveryStatusToken" :  "<token>" 
         },
         "TownDataImportSchedule": "<CRON string>",
         "PostcodeApiSettings": {

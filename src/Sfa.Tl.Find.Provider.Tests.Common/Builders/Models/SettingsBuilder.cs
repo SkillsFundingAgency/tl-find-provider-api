@@ -13,6 +13,7 @@ public class SettingsBuilder
     private const string FindCourseApiBaseAbsoluteUri = "https://test.com/findacourse/api";
     public static readonly Uri FindCourseApiBaseUri = new(FindCourseApiBaseAbsoluteUri);
     private const string GovNotifyApiKey = "1fff7b5b-bf64-4af9-9857-1797d0d525a3";
+    private const string GovNotifyDeliveryStatusToken = "2d5230c5-6dd5-4b9d-8006-564f9568d386";
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
     private const int RetentionDays = 10;
@@ -36,9 +37,11 @@ public class SettingsBuilder
 
     public EmailSettings BuildEmailSettings(
         string govNotifyApiKey = GovNotifyApiKey,
+        string deliveryStatusToken = GovNotifyDeliveryStatusToken,
         string supportEmailAddress = SupportEmailAddress) => new()
         {
             GovNotifyApiKey = govNotifyApiKey,
+            DeliveryStatusToken = deliveryStatusToken,
             SupportEmailAddress = supportEmailAddress
         };
 
