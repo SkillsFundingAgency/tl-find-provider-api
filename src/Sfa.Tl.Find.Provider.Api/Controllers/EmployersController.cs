@@ -23,9 +23,9 @@ public class EmployersController : ControllerBase
     }
 
     /// <summary>
-    /// Returns a list of all routes.
+    /// Deletes in Employer Interest record based on it's unique identifier.
     /// </summary>
-    /// <returns>Json with routes.</returns>
+    /// <returns>A status result indicating whether the action succeeded.</returns>
     [HttpDelete, HttpGet]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
