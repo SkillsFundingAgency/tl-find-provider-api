@@ -44,6 +44,7 @@ public class DfeSignInApiService : IDfeSignInApiService
 
     public async Task<DfeUserInfo> GetDfeSignInUserInfo(string organisationId, string userId)
     {
+        var users = await GetUserList();
         var organisationUkPrn = GetOrganisationUkprn(organisationId, userId);
         var userInfo = GetUserInfo(organisationId, userId);
 
@@ -58,11 +59,6 @@ public class DfeSignInApiService : IDfeSignInApiService
             userInfoResult.HasAccessToService = false;
 
         return userInfoResult;
-
-        return new DfeUserInfo
-        {
-            UserId = new Guid(userId)
-        };
     }
 
     private async Task<long?> GetOrganisationUkprn(string organisationId, string userId)
@@ -98,17 +94,34 @@ public class DfeSignInApiService : IDfeSignInApiService
             var userClaims2 = JsonSerializer
                 .Deserialize<DfeUserInfo>(
                     responseContent
-                    //await content.ReadAsStringAsync(),
-                    //new JsonSerializerOptions
-                    //{
-                    //   AllowTrailingCommas = true
-                    //}
+                //await content.ReadAsStringAsync(),
+                //new JsonSerializerOptions
+                //{
+                //   AllowTrailingCommas = true
+                //}
                 );
         }
         else if (response.StatusCode == HttpStatusCode.NotFound)
         {
             userClaims.HasAccessToService = false;
         }
+
         return userClaims;
     }
+
+    //TODO: Remove this, it's for testing only
+    private async Task<IList<string>> GetUserList()
+    {
+        var users = new List<string>();
+        var requestUri = "users?page=1&pageSize=25";
+        var response = await _httpClient.GetAsync(requestUri);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+        }
+
+        return users;
+    }
+
 }

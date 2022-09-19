@@ -140,6 +140,7 @@ public static class ProviderAuthenticationExtensions
                         ? JObject.Parse(ctx.Principal.FindFirst("Organisation").Value)
                         : new JObject();
 
+                    //TODO: Remove this section
                     if (!organisation.HasValues)
                     {
                         //Testing only!

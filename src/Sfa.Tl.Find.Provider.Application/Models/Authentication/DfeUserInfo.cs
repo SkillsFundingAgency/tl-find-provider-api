@@ -3,7 +3,7 @@
 namespace Sfa.Tl.Find.Provider.Application.Models.Authentication;
 
 [DebuggerDisplay("UKPRN {" + nameof(UkPrn) + "}" +
-                 " {" + nameof(DisplayName) + ", nq}")]
+                 " {" + nameof(Email) + ", nq}")]
 public class DfeUserInfo
 {
     public Guid UserId { get; set; }
@@ -11,13 +11,6 @@ public class DfeUserInfo
     public string FirstName { get; set; }
 
     public string Surname { get; set; }
-
-    public string DisplayName =>
-        string.IsNullOrEmpty(FirstName) 
-            ? Surname
-            : string.IsNullOrEmpty(Surname)
-                ? FirstName
-                : $"{FirstName} {Surname}";
 
     public string Email { get; set; }
 
