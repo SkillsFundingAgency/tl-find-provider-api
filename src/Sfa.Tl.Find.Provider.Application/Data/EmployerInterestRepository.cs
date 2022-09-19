@@ -59,6 +59,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
+        _logger.LogInformation("{method} preparing to delete before {date}.", nameof(DeleteBefore), date);
+
         var result = await _dbContextWrapper.ExecuteAsync(
             connection,
             "DELETE dbo.EmployerInterest " +
@@ -66,7 +68,9 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             _dynamicParametersWrapper.DynamicParameters,
             transaction);
         
+        _logger.LogInformation("{method} deleted {count} records.", nameof(DeleteBefore), result);
         transaction.Commit();
+        _logger.LogInformation("{method} commit complete.", nameof(DeleteBefore));
 
         return result;
     }
