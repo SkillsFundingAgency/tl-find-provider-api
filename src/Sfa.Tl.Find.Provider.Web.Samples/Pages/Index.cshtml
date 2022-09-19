@@ -7,7 +7,6 @@
 <main id="main-content" role="main">
     <div class="govuk-width-container govuk-main-wrapper govuk-!-padding-top-0">
 
-        <!-- Search Box -->
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
                 <h1 class="govuk-heading-xl govuk-!-margin-top-7 govuk-!-margin-bottom-7">Test</h1>
@@ -16,5 +15,16 @@
                 <p>Api url: @Model.ApiKey</p>
             </div>
         </div>
+        
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-m">Test Unsubscribe</h2>
+                @{
+                    var employerUniqueId = "A78BA9E5-EB8B-4FF8-ABFC-36035A029AC1";
+                }
+                <a asp-page="Unsubscribe" asp-route-id="@employerUniqueId">Unsubscribe employer @employerUniqueId</a>
+            </div>
+        </div>
+
     </div>
 </main>

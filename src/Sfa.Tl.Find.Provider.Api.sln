@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web.UnitTests", "Sfa.Tl.Find.Provider.Web.UnitTests\Sfa.Tl.Find.Provider.Web.UnitTests.csproj", "{3EDFE0B8-5E1B-4CF6-A6AF-4D5C25A366C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Web.Samples", "Sfa.Tl.Find.Provider.Web.Samples\Sfa.Tl.Find.Provider.Web.Samples.csproj", "{E66CEAC7-8D58-431E-A9B6-25B0A42EAFD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web.Samples", "Sfa.Tl.Find.Provider.Web.Samples\Sfa.Tl.Find.Provider.Web.Samples.csproj", "{E66CEAC7-8D58-431E-A9B6-25B0A42EAFD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

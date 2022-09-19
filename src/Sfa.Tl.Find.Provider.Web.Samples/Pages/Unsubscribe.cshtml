@@ -1,0 +1,121 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Samples.Pages.UnsubscribeModel
+@{
+}
+
+<main id="main-content" role="main">
+    <div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="tl-card--grey">
+                <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Prototype</h1>
+                <p class="govuk-body">Are you sure you want to unsubscribe?</p>
+
+                <form>
+                    <button class="govuk-button tl-button--blue tl-fap-home--submit" id="tl-confirm-unsubscribe-employer" data-module="govuk-button">
+                        Confirm
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden fields to pass parameters to script -->
+    <div>
+        <input type="hidden" id="find_provider_api_uri" value=@Model.ApiUrl>
+        <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId>
+        <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/crypto.js"></script>
+
+    @*<script src="~/js/employerInterest.js"
+            data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
+            data-findProviderAppId="{{ settings.find_provider_api_app_id }}" 
+            data-findProviderApiKey="{{ settings.find_provider_api_api_key }}"
+            asp-append-version="true">
+    </script>*@
+
+    <script>
+
+        $(document).ready(function() {
+            let findProvidersApiUri = $('#find_provider_api_uri').val();
+            console.log('set findProvidersApiUri = ' + findProvidersApiUri);
+            if (findProviderApiUri !== null && findProviderApiUri.substr(-1) !== '/') findProviderApiUri += '/';
+
+            console.log(`API Url: ${$('#find_provider_api_uri')}`);
+
+            const employerId = getUrlParameter("id");
+            console.log(`Employer id: ${employerId}`);
+
+            $("#tl-confirm-unsubscribe-employer").click(function () {
+                //const searchTerm = $("#tl-term").val().trim();
+                console.log("Confirm clicked");
+
+                if (employerId) {
+                    const uri = findProviderApiUri + "employers/deleteinterest/" + employerId;
+                    console.log("Calling delete on " + uri);
+                    $.ajax({
+                        type: "DELETE",
+                        url: uri,
+                        //contentType: "application/json",
+                        beforeSend: function (xhr) {
+                            addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey);
+                            addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, "DELETE");
+                        }
+                    }).done(function (response) {
+                        console.log('delete employer interest succeeded');
+                    }).fail(function (error) {
+                        console.log('Call to delete employer interest failed. ' + error);
+                    });
+                }
+
+                event.stopPropagation();
+                event.preventDefault();
+                return false;
+            });
+
+
+        });
+
+        function getUrlParameter(key, url) {
+            if (!url) {
+                url = window.location.search.substring(1);
+            }
+            const urlVars = url.split('&');
+            for (let i = 0; i < urlVars.length; i++) {
+                const parameter = urlVars[i].split('=');
+                if (parameter[0] === key) {
+                    return parameter[1];
+                }
+            }
+
+            return null;
+        }
+
+        //NOTE: Added method parameter to this
+        /*
+        function addHmacAuthHeader(xhr, uri, appId, apiKey, method) {
+            method = (page === undefined ? "GET" : method);
+             
+            page = (page === undefined ? 0 : page);
+            const ts = Math.round((new Date()).getTime() / 1000);
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function (c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            const nonce = CryptoJS.enc.Hex.parse(uuid);
+            const data = appId + method + uri.toLowerCase() + ts + nonce;
+            console.log('HMAC data = ' + data);
+
+            const hash = CryptoJS.HmacSHA256(data, apiKey);
+            const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+
+            xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
+        }
+        */
+
+    </script>
+}

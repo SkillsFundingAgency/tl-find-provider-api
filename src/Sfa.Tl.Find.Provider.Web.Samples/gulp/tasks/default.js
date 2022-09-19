@@ -44,6 +44,18 @@ gulp.task('fapTileJs', () => {
         .pipe(gulp.dest(paths.dist.JS));
 });
 
+gulp.task('cryptoJs', () => {
+    return src([
+            'node_modules/crypto-js/core.js',
+            'node_modules/crypto-js/enc-base64.js',
+            'node_modules/crypto-js/sha256.js',
+            'node_modules/crypto-js/hmac.js',
+            'node_modules/crypto-js/hmac-sha256.js'
+        ])
+        .pipe(concat('crypto.js'))
+        .pipe(gulp.dest(paths.dist.JS));
+});
+
 gulp.task('css', () => {
     return src(paths.src.CSS)
         .pipe(replace('$assets-arrowupdown-png', '/assets/arrowupdown.png'))

@@ -1,8 +1,8 @@
 //js goes here
 
-function addHmacAuthHeader(xhr, uri, appId, apiKey) {
-    //const appId = $('#find_provider_api_app_id').val();
-    //const apiKey = $('#find_provider_api_key').val();
+function addHmacAuthHeader(xhr, uri, appId, apiKey, method) {
+    method = (page === undefined ? "GET" : method);
+
     const ts = Math.round((new Date()).getTime() / 1000);
 
     const uuid = //createUniqueId();
@@ -16,7 +16,8 @@ function addHmacAuthHeader(xhr, uri, appId, apiKey) {
             });
     const nonce = CryptoJS.enc.Hex.parse(uuid); // 12 Bytes
 
-    const data = appId + "GET" + uri.toLowerCase() + ts + nonce;
+    const data = appId + method + uri.toLowerCase() + ts + nonce;
+    console.log('HMAC data = ' + data);
 
     const hash = CryptoJS.HmacSHA256(data, apiKey);
     const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
