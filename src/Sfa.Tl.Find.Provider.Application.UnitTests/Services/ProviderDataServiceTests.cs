@@ -9,6 +9,7 @@ using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Microsoft.VisualBasic.FileIO;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
+using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -781,6 +782,118 @@ public class ProviderDataServiceTests
             .Build(providerRepository: providerRepository);
 
         await service.LoadAdditionalProviderData();
+
+        receivedProviders.Should().NotBeNullOrEmpty();
+
+        var provider = receivedProviders
+            .SingleOrDefault(p =>
+                p.UkPrn == 10042223);
+        provider.Should().NotBeNull();
+
+        // ReSharper disable once StringLiteralTypo
+        provider.Validate(
+            10042223,
+        "BURNTWOOD SCHOOL",
+            null,
+            null,
+            "London",
+            null,
+            "SW17 0AQ",
+        "info@burntwoodschool.com",
+        "020 8946 6201",
+            "https://www.burntwoodschool.com/",
+            locationCount: 1,
+            isAdditionalData: true);
+
+        var location = provider!.Locations.First();
+
+        // ReSharper disable once StringLiteralTypo
+        location.Validate(
+            "BURNTWOOD SCHOOL",
+            "SW17 0AQ",
+            null,
+            null,
+            "London",
+            null,
+            "info@burntwoodschool.com",
+            "020 8946 6201",
+            "https://www.burntwoodschool.com/",
+            51.438125,
+            -0.180083,
+            1);
+        var deliveryYear = location.DeliveryYears.First();
+
+        deliveryYear.Validate(2022,
+            new[] { 38 });
+    }
+
+    [Fact]
+    public async Task ImportProviderData_Calls_Repository_To_Save_Data()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
+
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await service.ImportProviderData(stream, true);
+
+        await providerRepository
+            .Received(1)
+            .Save(Arg.Any<IList<Application.Models.Provider>>(),
+                Arg.Is<bool>(b => b));
+    }
+
+    [Fact]
+    public async Task ImportProviderData_Calls_Repository_To_Save_Data_With_Additional_Data_Flag_Set()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
+
+        IList<Application.Models.Provider> receivedProviders = null;
+
+        await providerRepository
+            .Save(Arg.Do<IList<Application.Models.Provider>>(
+                x => receivedProviders = x),
+                Arg.Any<bool>());
+
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await service.ImportProviderData(stream, true);
+
+        receivedProviders.Should().NotBeNullOrEmpty();
+
+        foreach (var provider in receivedProviders)
+        {
+            provider.IsAdditionalData.Should().BeTrue();
+            foreach (var location in provider.Locations)
+            {
+                location.IsAdditionalData.Should().BeTrue();
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ImportProviderData_Loads_Expected_Provider()
+    {
+        var providerRepository = Substitute.For<IProviderRepository>();
+
+        IList<Application.Models.Provider> receivedProviders = null;
+
+        await providerRepository
+            .Save(Arg.Do<IList<Application.Models.Provider>>(
+                x => receivedProviders = x),
+                Arg.Any<bool>());
+
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(providerRepository: providerRepository);
+
+        await service.ImportProviderData(stream, true);
 
         receivedProviders.Should().NotBeNullOrEmpty();
 

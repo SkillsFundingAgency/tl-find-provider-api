@@ -23,6 +23,7 @@
     <None Remove="Builders\Json\Assets\Postcodes\validoutcodewithnulllatlongresponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\validpostcoderesponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\validpostcodewithnulllatlongresponse.json" />
+    <None Remove="Builders\Json\Assets\ProviderData\ProviderData.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +41,7 @@
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validoutcodewithnulllatlongresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validpostcoderesponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validpostcodewithnulllatlongresponse.json" />
+    <EmbeddedResource Include="Builders\Json\Assets\ProviderData\ProviderData.json" />
   </ItemGroup>
 
   <ItemGroup>

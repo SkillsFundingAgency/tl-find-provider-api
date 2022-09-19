@@ -29,8 +29,10 @@ public interface IProviderDataService
     Task<ProviderDetailResponse> GetAllProviders();
 
     Task LoadAdditionalProviderData();
-    
+
+    Task ImportProviderData(Stream stream, bool isAdditionalData);
+
     Task<byte[]> GetCsv();
 
-    Task ImportProviderContacts(Stream ms);
+    Task ImportProviderContacts(Stream stream);
 }

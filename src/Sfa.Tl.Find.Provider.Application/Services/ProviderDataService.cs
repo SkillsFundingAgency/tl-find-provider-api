@@ -209,7 +209,7 @@ public class ProviderDataService : IProviderDataService
 
         return stream.ToArray();
     }
-    
+
     public async Task ImportProviderContacts(Stream stream)
     {
         using var reader = new StreamReader(stream);
@@ -253,15 +253,31 @@ public class ProviderDataService : IProviderDataService
         return await _providerRepository.HasAny();
     }
 
+    public async Task ImportProviderData(Stream stream, bool isAdditionalData)
+    {
+        var jsonDocument = await JsonDocument
+            .ParseAsync(stream);
+        var count = await LoadAdditionalProviderData(jsonDocument);
+
+        _logger.LogInformation("Loaded {count} providers from stream.", count);
+    }
+
     public async Task LoadAdditionalProviderData()
     {
-        //if (!_mergeAdditionalProviderData) return;
+        const string jsonFile = "Assets.ProviderData.json";
+        var count = await LoadAdditionalProviderData(
+            JsonDocument
+                .Parse(jsonFile.ReadManifestResourceStreamAsString()));
 
+        _logger.LogInformation("Loaded {count} providers from {jsonFile}.",
+            count, jsonFile);
+    }
+    
+    private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
+    {
         try
         {
-            const string jsonFile = "Assets.ProviderData.json";
-            var providers = JsonDocument
-                    .Parse(jsonFile.ReadManifestResourceStreamAsString())
+            var providers = jsonDocument
                     .RootElement
                     .GetProperty("providers")
                     .EnumerateArray()
@@ -312,8 +328,7 @@ public class ProviderDataService : IProviderDataService
 
             await _providerRepository.Save(providers, true);
 
-            _logger.LogInformation("Loaded {providerCount} providers from {jsonFile}.",
-                providers.Count, jsonFile);
+            return providers.Count;
         }
         catch (Exception ex)
         {
