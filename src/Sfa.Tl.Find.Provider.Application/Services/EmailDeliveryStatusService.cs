@@ -1,4 +1,5 @@
-﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Humanizer;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -26,22 +27,29 @@ public class EmailDeliveryStatusService : IEmailDeliveryStatusService
 
     public async Task<int> HandleEmailDeliveryStatus(EmailDeliveryReceipt deliveryReceipt)
     {
-        /*
+        if (deliveryReceipt.EmailDeliveryStatus.ToUpper() == "DELIVERED")
+        {
+            return 0;
+        }
+
+        //TODO: Look up in db
+        var emailTemplateName = deliveryReceipt.TemplateId
+            .ToString();
+
         var tokens = new Dictionary<string, string>()
         {
-            { "summary", summary },
-            { "email_type", emailTemplateName.Humanize().ToLower() },
-            { "body", emailBody },
-            { "reason", emailBodyDto.EmailDeliveryStatusType.Humanize() },
-            { "sender_username", emailHistoryDto.CreatedBy },
-            { "email_body", emailBodyDto.Body }
+            { "email_type", emailTemplateName },//.Humanize().ToLower() },
+            { "reference", deliveryReceipt.Reference },
+            { "reason", deliveryReceipt.EmailDeliveryStatus.Humanize() },
+            { "sender_username", deliveryReceipt.To },
         };
-
+        
         await _emailService.SendEmail(
             _emailSettings.SupportEmailAddress,
-            EmailTemplateNames.EmailDeliveryStatus
+            EmailTemplateNames.EmailDeliveryStatus,
+            tokens
             );
-    */
+    
 
         return 1;
     }

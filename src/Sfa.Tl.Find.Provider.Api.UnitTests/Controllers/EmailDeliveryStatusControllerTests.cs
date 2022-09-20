@@ -6,6 +6,7 @@ using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -31,7 +32,7 @@ public class EmailDeliveryStatusControllerTests
     public async Task EmailDeliveryStatusCallback_Returns_Expected_Result()
     {
         var emailDeliverReceipt = new EmailDeliveryReceiptBuilder()
-            //.WithDeliveryStatus("delivered")
+            .WithDeliveryStatus(EmailDeliveryStatus.Delivered)
             .Build();
 
         var emailSettings = new SettingsBuilder().BuildEmailSettings();
@@ -79,7 +80,6 @@ public class EmailDeliveryStatusControllerTests
     public async Task EmailDeliveryStatusCallback_Returns_Error_For_Incorrect_Authorization_Header()
     {
         var emailDeliverReceipt = new EmailDeliveryReceiptBuilder()
-            //.WithDeliveryStatus("delivered")
             .Build();
 
         var emailSettings = new SettingsBuilder().BuildEmailSettings();

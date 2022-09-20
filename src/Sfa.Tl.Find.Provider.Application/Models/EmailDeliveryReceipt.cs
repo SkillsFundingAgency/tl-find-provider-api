@@ -27,5 +27,9 @@ public class EmailDeliveryReceipt
     [JsonPropertyName("notification_type")]
     public string NotificationType { get; set; }
 
+    [JsonPropertyName("template_id")]
+    public Guid TemplateId { get; set; }
+    
     public string EmailDeliveryStatus => string.IsNullOrEmpty(Status) ? "unknown-failure" : Status;
+
 }
