@@ -93,11 +93,16 @@ public static class ServiceCollectionExtensions
                 .Select(s => s.TrimEnd('/'))
                 .ToArray();
 
-            services.AddCors(options => options.AddPolicy(policyName, builder =>
-                builder
-                    .WithMethods(HttpMethod.Get.Method)
-                    .AllowAnyHeader()
-                    .WithOrigins(corsOrigins)));
+            services.AddCors(options => 
+                options
+                    .AddPolicy(policyName, builder =>
+                        builder
+                            .WithMethods(
+                                HttpMethod.Get.Method, 
+                                HttpMethod.Post.Method, 
+                                HttpMethod.Delete.Method)
+                            .AllowAnyHeader()
+                            .WithOrigins(corsOrigins)));
         }
 
         return services;
