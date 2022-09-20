@@ -12,6 +12,8 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 
 public class EmailDeliveryStatusControllerBuilder
 {
+    private string _authorizationToken;
+
     public EmailDeliveryStatusController Build(
         IEmailDeliveryStatusService emailDeliveryStatusService = null,
         EmailSettings emailSettings = null,
@@ -24,8 +26,7 @@ public class EmailDeliveryStatusControllerBuilder
         var emailOptions = emailSettings.ToOptions();
 
         var controller = new EmailDeliveryStatusController(
-            //emailService,
-            emailDeliveryStatusService, 
+            emailDeliveryStatusService,
             emailOptions,
             logger)
         {
@@ -35,6 +36,22 @@ public class EmailDeliveryStatusControllerBuilder
             }
         };
 
+        if (!string.IsNullOrEmpty(_authorizationToken))
+        {
+            controller
+                    .ControllerContext
+                    .HttpContext
+                    .Request
+                    .Headers["Authorization"] =
+                $"Bearer {_authorizationToken}";
+        }
         return controller;
+    }
+
+    public EmailDeliveryStatusControllerBuilder WithAuthorizationToken(string authorizationToken)
+    {
+        _authorizationToken = authorizationToken;
+
+        return this;
     }
 }

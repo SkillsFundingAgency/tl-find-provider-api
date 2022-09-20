@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -26,14 +28,35 @@ public class EmailDeliveryStatusControllerTests
     }
 
     [Fact]
-    public async Task EmailDeliveryStatusCallback_Returns_Expected_List()
+    public async Task EmailDeliveryStatusCallback_Returns_Expected_Result()
     {
-        //if (!(Request.Headers
-        //          .TryGetValue("Authorization", out var token)
-        //      && token.Equals($"Bearer {_emailSettings.DeliveryStatusToken}")))
-
         var emailDeliverReceipt = new EmailDeliveryReceiptBuilder()
             //.WithDeliveryStatus("delivered")
+            .Build();
+
+        var emailSettings = new SettingsBuilder().BuildEmailSettings();
+
+        var emailDeliveryStatusService = Substitute.For<IEmailDeliveryStatusService>();
+        emailDeliveryStatusService.HandleEmailDeliveryStatus(emailDeliverReceipt).Returns(1);
+
+        var controller = new EmailDeliveryStatusControllerBuilder()
+            .WithAuthorizationToken(emailSettings.DeliveryStatusToken)
+            .Build(emailDeliveryStatusService,
+                emailSettings);
+
+        var result = await controller.EmailDeliveryStatusCallback(emailDeliverReceipt);
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+
+        okResult.Value.Should().BeEquivalentTo("1 record(s) updated.");
+    }
+
+    [Fact]
+    public async Task EmailDeliveryStatusCallback_Returns_Error_For_Missing_Authorization_Header()
+    {
+        var emailDeliverReceipt = new EmailDeliveryReceiptBuilder()
             .Build();
 
         var emailSettings = new SettingsBuilder().BuildEmailSettings();
@@ -45,25 +68,59 @@ public class EmailDeliveryStatusControllerTests
             .Build(emailDeliveryStatusService,
                 emailSettings);
 
-        //var headers = new Dictionary<string, StringValues> { { "Authorization", "Bearer 72b561ed-a7f3-4c0c-82a9-aae800a51de7" } };
+        var result = await controller.EmailDeliveryStatusCallback(emailDeliverReceipt);
 
-        controller
-            .ControllerContext
-            .HttpContext
-            .Request
-            .Headers
-            .Add("Authorization",
-                $"Bearer {emailSettings.DeliveryStatusToken}");
+        var unauthorizedResult = result as UnauthorizedObjectResult;
+        unauthorizedResult.Should().NotBeNull();
+        unauthorizedResult!.Value.Should().BeEquivalentTo("Missing or malformed 'Authorization' header.");
+    }
+
+    [Fact]
+    public async Task EmailDeliveryStatusCallback_Returns_Error_For_Incorrect_Authorization_Header()
+    {
+        var emailDeliverReceipt = new EmailDeliveryReceiptBuilder()
+            //.WithDeliveryStatus("delivered")
+            .Build();
+
+        var emailSettings = new SettingsBuilder().BuildEmailSettings();
+
+        var emailDeliveryStatusService = Substitute.For<IEmailDeliveryStatusService>();
+        emailDeliveryStatusService.HandleEmailDeliveryStatus(emailDeliverReceipt).Returns(1);
+
+        var controller = new EmailDeliveryStatusControllerBuilder()
+            .WithAuthorizationToken("72b561ed-a7f3-4c0c-82a9-aae800a51de7")
+            .Build(emailDeliveryStatusService,
+                emailSettings);
 
         var result = await controller.EmailDeliveryStatusCallback(emailDeliverReceipt);
 
-        var okResult = result as OkObjectResult;
-        okResult.Should().NotBeNull();
-        okResult!.StatusCode.Should().Be(200);
-
-        //var innerResult = okResult.Value as int;
-        okResult.Value.Should().BeEquivalentTo("1 record(s) updated.");
+        var unauthorizedResult = result as UnauthorizedObjectResult;
+        unauthorizedResult.Should().NotBeNull();
+        unauthorizedResult!.Value.Should().BeEquivalentTo("Missing or malformed 'Authorization' header.");
     }
 
-    //TODO: Add more tests
+    [Fact]
+    public async Task EmailDeliveryStatusCallback_Returns_Error_Result_When_Exception_Thrown()
+    {
+        var emailDeliverReceipt = new EmailDeliveryReceiptBuilder()
+            .Build();
+
+        var emailSettings = new SettingsBuilder().BuildEmailSettings();
+
+        var emailDeliveryStatusService = Substitute.For<IEmailDeliveryStatusService>();
+        emailDeliveryStatusService
+            .HandleEmailDeliveryStatus(emailDeliverReceipt)
+            .Throws(new Exception());
+
+        var controller = new EmailDeliveryStatusControllerBuilder()
+            .WithAuthorizationToken(emailSettings.DeliveryStatusToken)
+            .Build(emailDeliveryStatusService,
+                emailSettings);
+
+        var result = await controller.EmailDeliveryStatusCallback(emailDeliverReceipt);
+
+        var statusCodeResult = result as StatusCodeResult;
+        statusCodeResult.Should().NotBeNull();
+        statusCodeResult!.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+    }
 }
