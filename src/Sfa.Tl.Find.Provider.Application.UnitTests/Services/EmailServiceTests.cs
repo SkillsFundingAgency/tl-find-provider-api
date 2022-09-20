@@ -67,7 +67,7 @@ public class EmailServiceTests
     {
         var notificationClient = Substitute.For<IAsyncNotificationClient>();
 
-        var emailTemplateRepository =new EmailTemplateRepositoryBuilder()
+        var emailTemplateRepository = new EmailTemplateRepositoryBuilder()
             .BuildSubstitute(TestEmailTemplateId, TestEmailTemplateName);
 
         var personalisationTokens = new Dictionary<string, dynamic>

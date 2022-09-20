@@ -45,7 +45,7 @@ public class EmailService : IEmailService
             return false;
         }
 
-        var emailTemplate = await _emailTemplateRepository.GetEmailTemplate(templateName);
+        var emailTemplate = await _emailTemplateRepository.GetEmailTemplateByName(templateName);
         if (emailTemplate == null)
         {
             _logger.LogWarning("Email template {templateName} not found. No emails sent.", templateName);

@@ -11,10 +11,12 @@ public  class EmailDeliveryStatusServiceBuilder
 {
     public IEmailDeliveryStatusService Build(
         IEmailService emailService = null,
+        IEmailTemplateRepository emailTemplateRepository = null,
         EmailSettings emailSettings = null,
         ILogger<EmailDeliveryStatusService> logger = null)
     {
         emailService ??= Substitute.For<IEmailService>();
+        emailTemplateRepository ??= Substitute.For<IEmailTemplateRepository>();
         logger ??= Substitute.For<ILogger<EmailDeliveryStatusService>>();
 
         emailSettings ??= new SettingsBuilder().BuildEmailSettings();
@@ -22,6 +24,7 @@ public  class EmailDeliveryStatusServiceBuilder
         
         return new EmailDeliveryStatusService(
             emailService,
+            emailTemplateRepository,
             emailOptions,
             logger);
     }

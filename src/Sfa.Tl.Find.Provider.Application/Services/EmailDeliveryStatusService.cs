@@ -10,15 +10,18 @@ namespace Sfa.Tl.Find.Provider.Application.Services;
 public class EmailDeliveryStatusService : IEmailDeliveryStatusService
 {
     private readonly IEmailService _emailService;
+    private readonly IEmailTemplateRepository _emailTemplateRepository;
     private readonly EmailSettings _emailSettings;
     private readonly ILogger<EmailDeliveryStatusService> _logger;
 
     public EmailDeliveryStatusService(
         IEmailService emailService,
+        IEmailTemplateRepository emailTemplateRepository,
         IOptions<EmailSettings> emailOptions,
         ILogger<EmailDeliveryStatusService> logger)
     {
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+        _emailTemplateRepository = emailTemplateRepository ?? throw new ArgumentNullException(nameof(emailTemplateRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _emailSettings = emailOptions?.Value
@@ -27,14 +30,16 @@ public class EmailDeliveryStatusService : IEmailDeliveryStatusService
 
     public async Task<int> HandleEmailDeliveryStatus(EmailDeliveryReceipt deliveryReceipt)
     {
-        if (deliveryReceipt.EmailDeliveryStatus.ToUpper() == "DELIVERED")
+        if (string.Compare(deliveryReceipt.EmailDeliveryStatus, EmailDeliveryStatus.Delivered, StringComparison.OrdinalIgnoreCase) == 0)
         {
             return 0;
         }
 
-        //TODO: Look up in db
-        var emailTemplateName = deliveryReceipt.TemplateId
-            .ToString();
+        var emailTemplate = await _emailTemplateRepository
+            .GetEmailTemplate(deliveryReceipt.TemplateId.ToString());
+        var emailTemplateName = emailTemplate != null 
+            ? emailTemplate.Name 
+            : $"Unknown template {deliveryReceipt.TemplateId}";
 
         var tokens = new Dictionary<string, string>()
         {
