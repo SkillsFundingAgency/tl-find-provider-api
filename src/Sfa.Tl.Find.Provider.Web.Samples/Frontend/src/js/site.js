@@ -1,7 +1,8 @@
 //js goes here
 
 function addHmacAuthHeader(xhr, uri, appId, apiKey, method) {
-    method = (page === undefined ? "GET" : method);
+    method = (method === undefined ? "GET" : method);
+    console.log('hmac method is ' + method);
 
     const ts = Math.round((new Date()).getTime() / 1000);
 

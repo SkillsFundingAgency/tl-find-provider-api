@@ -8,6 +8,7 @@
         <div class="govuk-grid-column-two-thirds">
             <div class="tl-card--grey">
                 <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Prototype</h1>
+                <h3 class="govuk-heading-s" id="tl-employer-id"></h3>
                 <p class="govuk-body">Are you sure you want to unsubscribe?</p>
 
                 <form>
@@ -40,43 +41,54 @@
     <script>
 
         $(document).ready(function() {
-            let findProvidersApiUri = $('#find_provider_api_uri').val();
-            console.log('set findProvidersApiUri = ' + findProvidersApiUri);
+
+            let findProviderApiUri = $('#find_provider_api_uri').val();
             if (findProviderApiUri !== null && findProviderApiUri.substr(-1) !== '/') findProviderApiUri += '/';
 
-            console.log(`API Url: ${$('#find_provider_api_uri')}`);
+            const findProviderAppId = $('#find_provider_api_app_id').val();
+            const findProviderApiKey = $('#find_provider_api_key').val();
 
+            console.log('set findProviderApiUri = ' + findProviderApiUri);
+            
             const employerId = getUrlParameter("id");
             console.log(`Employer id: ${employerId}`);
+            $("#tl-employer-id").html(employerId);
 
             $("#tl-confirm-unsubscribe-employer").click(function () {
+                event.stopPropagation();
+                event.preventDefault();
+
                 //const searchTerm = $("#tl-term").val().trim();
                 console.log("Confirm clicked");
-
+                console.log(`Confirm clicked for ${employerId}`);
                 if (employerId) {
                     const uri = findProviderApiUri + "employers/deleteinterest/" + employerId;
                     console.log("Calling delete on " + uri);
+                    console.log(findProviderAppId);
+                    console.log(findProviderApiKey);
+                    console.log("DELETE");
+
                     $.ajax({
                         type: "DELETE",
                         url: uri,
                         //contentType: "application/json",
                         beforeSend: function (xhr) {
-                            addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey);
                             addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, "DELETE");
                         }
-                    }).done(function (response) {
+                    }).done(function (data, status, xhr) {
                         console.log('delete employer interest succeeded');
-                    }).fail(function (error) {
-                        console.log('Call to delete employer interest failed. ' + error);
+                        console.log('data = ' + data);
+                        console.log('xhr.status = ' + xhr.status);
+                    }).fail(function(xhr, status, error) {
+                        console.log('Call to delete employer interest failed. ' + status + ' ' + error);
+                        console.log('error = ' + error);
+                        console.log('status = ' +  status);
+                        console.log('xhr.status = ' + xhr.status);
                     });
                 }
-
-                event.stopPropagation();
-                event.preventDefault();
+                console.log('exiting');
                 return false;
             });
-
-
         });
 
         function getUrlParameter(key, url) {
