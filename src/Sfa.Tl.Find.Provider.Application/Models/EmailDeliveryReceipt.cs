@@ -1,6 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
+
+[DebuggerDisplay(" {" + nameof(Id) + ", nq}" +
+                 " {" + nameof(EmailDeliveryStatus) + "}")]
 public class EmailDeliveryReceipt
 {
     public Guid Id { get; set; }
@@ -24,5 +28,4 @@ public class EmailDeliveryReceipt
     public string NotificationType { get; set; }
 
     public string EmailDeliveryStatus => string.IsNullOrEmpty(Status) ? "unknown-failure" : Status;
-
 }

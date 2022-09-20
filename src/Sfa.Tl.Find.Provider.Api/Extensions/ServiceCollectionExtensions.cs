@@ -168,7 +168,6 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-
     public static IServiceCollection AddNotifyService(
         this IServiceCollection services,
         string govNotifyApiKey)

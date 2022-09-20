@@ -51,6 +51,7 @@ try
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
+        .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
         .AddTransient<IEmployerInterestService, EmployerInterestService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
