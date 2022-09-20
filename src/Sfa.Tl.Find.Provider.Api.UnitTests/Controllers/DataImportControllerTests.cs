@@ -54,10 +54,10 @@ public class DataImportControllerTests
 
         var result = await controller.UploadProviderContacts(null);
 
-        var statusCodeResult = result as BadRequestObjectResult;
-        statusCodeResult.Should().NotBeNull();
-        statusCodeResult!.StatusCode.Should().Be(400);
-        statusCodeResult!.Value.Should().Be("File is required.");
+        var badRequestResult = result as BadRequestObjectResult;
+        badRequestResult.Should().NotBeNull();
+        badRequestResult!.StatusCode.Should().Be(400);
+        badRequestResult!.Value.Should().Be("File is required.");
     }
 
    private static async Task<Stream> BuildTestCsvFileStream(

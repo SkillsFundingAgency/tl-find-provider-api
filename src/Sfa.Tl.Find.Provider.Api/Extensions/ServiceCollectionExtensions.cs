@@ -59,6 +59,11 @@ public static class ServiceCollectionExtensions
                 x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
                 x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
             })
+            .Configure<EmployerInterestSettings>(x =>
+            {
+                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
+                x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
+            })
             .Configure<PostcodeApiSettings>(x =>
             {
                 x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
@@ -179,7 +184,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddQuartzServices(
         this IServiceCollection services,
         string courseDirectoryImportCronSchedule = null,
-        string townDataImportCronSchedule = null)
+        string townDataImportCronSchedule = null,
+        string employerInterestCleanupCronSchedule = null)
     {
         services.AddQuartz(q =>
         {
@@ -188,7 +194,8 @@ public static class ServiceCollectionExtensions
             q.UseMicrosoftDependencyInjectionJobFactory();
 
             var startupJobKey = new JobKey(Constants.StartupTasksJobKeyName);
-            q.AddJob<InitializationJob>(opts => opts.WithIdentity(startupJobKey))
+            q.AddJob<InitializationJob>(opts => 
+                    opts.WithIdentity(startupJobKey))
                 .AddTrigger(opts => opts
                     .ForJob(startupJobKey)
                     .StartNow());
@@ -196,7 +203,8 @@ public static class ServiceCollectionExtensions
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
                 var courseImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
-                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(courseImportJobKey))
+                q.AddJob<CourseDataImportJob>(opts => 
+                        opts.WithIdentity(courseImportJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(courseImportJobKey)
                         .WithSchedule(
@@ -206,13 +214,26 @@ public static class ServiceCollectionExtensions
             
             if (!string.IsNullOrEmpty(townDataImportCronSchedule))
             {
-                var townImportJobKey = new JobKey("Import Town Data");
-                q.AddJob<TownDataImportJob>(opts => opts.WithIdentity(townImportJobKey))
+                var townImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
+                q.AddJob<TownDataImportJob>(opts => 
+                        opts.WithIdentity(townImportJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(townImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
                                 .CronSchedule(townDataImportCronSchedule)));
+            }
+
+            if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
+            {
+                var employerInterestCleanupJobKey = new JobKey(Constants.EmployerInterestCleanupJobKeyName);
+                q.AddJob<EmployerInterestCleanupJob>(opts => 
+                        opts.WithIdentity(employerInterestCleanupJobKey))
+                    .AddTrigger(opts => opts
+                        .ForJob(employerInterestCleanupJobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(employerInterestCleanupCronSchedule)));
             }
         });
 

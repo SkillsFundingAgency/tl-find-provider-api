@@ -158,7 +158,8 @@ public class ServiceCollectionExtensionsTests
 
         services.AddQuartzServices(
             "0 0 9 ? * MON-FRI",
-            "0 0 10 ? * *");
+            "0 0 10 ? * *",
+            "0 0 11 ? * *");
 
         services.Should().Contain(t =>
             t.ImplementationType != null &&

@@ -47,7 +47,7 @@ public class InitializationJobTests
 
         await job.Execute(jobContext);
 
-        await courseDirectoryService.Received(1).ImportQualifications();
+        //await courseDirectoryService.Received(1).ImportQualifications();
         await courseDirectoryService.Received(1).ImportProviders();
         await townDataService.Received(1).ImportTowns();
     }
