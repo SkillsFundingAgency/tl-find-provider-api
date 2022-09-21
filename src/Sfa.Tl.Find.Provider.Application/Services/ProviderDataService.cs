@@ -257,20 +257,11 @@ public class ProviderDataService : IProviderDataService
     {
         var jsonDocument = await JsonDocument
             .ParseAsync(stream);
+        //var json = jsonDocument.PrettifyJson();
+
         var count = await LoadAdditionalProviderData(jsonDocument);
 
         _logger.LogInformation("Loaded {count} providers from stream.", count);
-    }
-
-    public async Task LoadAdditionalProviderData()
-    {
-        const string jsonFile = "Assets.ProviderData.json";
-        var count = await LoadAdditionalProviderData(
-            JsonDocument
-                .Parse(jsonFile.ReadManifestResourceStreamAsString()));
-
-        _logger.LogInformation("Loaded {count} providers from {jsonFile}.",
-            count, jsonFile);
     }
     
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
