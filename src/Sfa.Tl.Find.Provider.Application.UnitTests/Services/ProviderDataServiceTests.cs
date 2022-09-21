@@ -17,6 +17,8 @@ public class ProviderDataServiceTests
 {
     private const int TestPage = 3;
     private const int TestPageSize = Constants.DefaultPageSize + 10;
+    private const int TestUkPrn = 10099099;
+
     private readonly IList<int> _testRouteIds = new List<int> { 6, 7 };
     private readonly IList<int> _testQualificationIds = new List<int> { 37, 40, 51 };
 
@@ -793,21 +795,21 @@ public class ProviderDataServiceTests
 
         var provider = receivedProviders
             .SingleOrDefault(p =>
-                p.UkPrn == 10042223);
+                p.UkPrn == TestUkPrn);
         provider.Should().NotBeNull();
 
         // ReSharper disable once StringLiteralTypo
         provider.Validate(
-            10042223,
-        "BURNTWOOD SCHOOL",
+            TestUkPrn,
+        "TEST SCHOOL",
             null,
             null,
             "London",
             null,
             "SW17 0AQ",
-        "info@burntwoodschool.com",
-        "020 8946 6201",
-            "https://www.burntwoodschool.com/",
+        "info@testschool.com",
+        "020 5555 5555",
+            "https://www.testschool.com/",
             locationCount: 1,
             isAdditionalData: true);
 
@@ -815,17 +817,17 @@ public class ProviderDataServiceTests
 
         // ReSharper disable once StringLiteralTypo
         location.Validate(
-            "BURNTWOOD SCHOOL",
+            "TEST SCHOOL",
             "SW17 0AQ",
             null,
             null,
             "London",
             null,
-            "info@burntwoodschool.com",
-            "020 8946 6201",
-            "https://www.burntwoodschool.com/",
-            51.438125,
-            -0.180083,
+            "info@testschool.com",
+            "020 5555 5555",
+            "https://www.testschool.com/",
+            51.439999,
+            -0.1789765,
             1);
         var deliveryYear = location.DeliveryYears.First();
 
