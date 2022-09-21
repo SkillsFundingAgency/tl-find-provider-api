@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
@@ -51,5 +52,10 @@ public class EmployerInterestService : IEmployerInterestService
             count, _employerInterestSettings.RetentionDays, date);
 
         return count;
+    }
+
+    public Task<IEnumerable<EmployerInterest>> FindEmployerInterest()
+    {
+        return _employerInterestRepository.GetAll();
     }
 }

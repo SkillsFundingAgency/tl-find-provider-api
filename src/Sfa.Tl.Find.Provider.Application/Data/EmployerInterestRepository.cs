@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Data;
 
@@ -69,5 +70,29 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         transaction.Commit();
 
         return result;
+    }
+
+    public async Task<IEnumerable<EmployerInterest>> GetAll()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        return await _dbContextWrapper.QueryAsync<EmployerInterest>(
+            connection,
+            "SELECT [Id, " +
+            "UniqueId, " +
+            "OrganisationName, " +
+            "ContactName, " +
+            "Postcode, " +
+            "HasMultipleLocations, " +
+            "LocationCount, " +
+            "IndustryId,  " +
+            "SpecificRequirements, " +
+            "Email, " +
+            "Telephone, " +
+            "ContactPreferenceType, " +
+            "CreatedOn, " +
+            "ModifiedOn, " +
+            "FROM dbo.EmployerInterest " +
+            "ORDER BY OrganisationName");
     }
 }

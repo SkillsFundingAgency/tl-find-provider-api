@@ -1,9 +1,8 @@
-﻿using FluentAssertions;
-using NSubstitute;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
@@ -102,5 +101,27 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
         await repository
             .Received(1)
             .DeleteBefore(Arg.Is<DateTime>(d => d == expectedDate));
+    }
+
+    [Fact]
+    public async Task FindEmployerInterest_Returns_Expected_List()
+    {
+        var employerInterests = new EmployerInterestBuilder()
+            .BuildList()
+            .ToList();
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.GetAll()
+            .Returns(employerInterests);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository);
+
+        var results = (await service.FindEmployerInterest()).ToList();
+        results.Should().BeEquivalentTo(employerInterests);
+
+        await employerInterestRepository
+            .Received(1)
+            .GetAll();
     }
 }
