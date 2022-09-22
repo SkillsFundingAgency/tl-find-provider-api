@@ -54,6 +54,7 @@ if (!builder.Environment.IsDevelopment())
         options.MaxAge = TimeSpan.FromDays(365);
     });
 }
+
 builder.Services
     .AddPolicyRegistry()
     .AddDapperRetryPolicy();
@@ -66,9 +67,11 @@ builder.Services
     .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
+    .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
     .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
+    .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
     .AddTransient<IProviderRepository, ProviderRepository>()
     .AddTransient<IQualificationRepository, QualificationRepository>()
     .AddTransient<IRouteRepository, RouteRepository>()

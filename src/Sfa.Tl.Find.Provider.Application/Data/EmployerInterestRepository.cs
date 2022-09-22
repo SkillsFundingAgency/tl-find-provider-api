@@ -78,7 +78,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
         return await _dbContextWrapper.QueryAsync<EmployerInterest>(
             connection,
-            "SELECT [Id, " +
+            "SELECT Id, " +
             "UniqueId, " +
             "OrganisationName, " +
             "ContactName, " +
@@ -91,7 +91,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             "Telephone, " +
             "ContactPreferenceType, " +
             "CreatedOn, " +
-            "ModifiedOn, " +
+            "ModifiedOn " +
             "FROM dbo.EmployerInterest " +
             "ORDER BY OrganisationName");
     }

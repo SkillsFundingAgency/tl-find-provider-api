@@ -140,16 +140,6 @@ public static class ProviderAuthenticationExtensions
                         ? JObject.Parse(ctx.Principal.FindFirst("Organisation").Value)
                         : new JObject();
 
-                    //TODO: Remove this section
-                    if (!organisation.HasValues)
-                    {
-                        //Testing only!
-                        var organisationId = "TEST";
-                        var userId = ctx.Principal.FindFirst("sub").Value;
-                        var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
-                        var userInfo = await dfeSignInApiClient.GetDfeSignInUserInfo(organisationId, userId);
-                    }
-
                     if (organisation.HasValues)
                     {
                         var organisationId = organisation.SelectToken("id").ToString();

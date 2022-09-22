@@ -2,7 +2,7 @@
 public class EmployerInterest
 {
     public int Id { get; init; }
-    public string UniqueId { get; init; }
+    public Guid UniqueId { get; init; }
     public string OrganisationName { get; init; }
     public string ContactName { get; init; }
     public string Postcode { get; init; }
