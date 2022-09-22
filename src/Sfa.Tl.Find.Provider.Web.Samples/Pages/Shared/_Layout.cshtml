@@ -22,34 +22,24 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main class="govuk-main-wrapper " id="main-content" role="main">
             @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2022 - Sfa.Tl.Find.Provider.Web.Samples - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2022 - Sfa.Tl.Find.Provider.Web.Samples
         </div>
     </footer>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-@*<script src="~/js/core.js"></script>*@
-@*<script src="~/js/enc-base64.js"></script>*@
-@*<script src="~/js/sha256.js"></script>*@
-@*<script src="~/js/hmac.js"></script>*@
-@*<script src="~/js/hmac-sha256.js"></script>*@
-@*<script src="~/js/hmac-sha256.js"></script>*@
-@*<script src="~/js/accessible-autocomplete.min.js"></script>*@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

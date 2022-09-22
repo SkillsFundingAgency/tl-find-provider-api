@@ -1,9 +1,8 @@
 ﻿@page
-@model Sfa.Tl.Find.Provider.Web.Samples.Pages.UnsubscribeModel
+@model UnsubscribeModel
 @{
 }
 
-<main id="main-content" role="main">
     <div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
         <div class="govuk-grid-column-two-thirds">
             <div class="tl-card--grey">
@@ -26,7 +25,6 @@
         <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId>
         <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey>
     </div>
-</main>
 
 @section Scripts {
     <script src="~/js/crypto.js"></script>

@@ -1,21 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Sfa.Tl.Find.Provider.Web.Samples.Pages;
-public class IndexModel : PageModel
+public class IndexModel : ApiPageModel
 {
-    public string ApiAppId { get; }
-    public string ApiKey { get; }
-    public string ApiUrl { get; }
+    //public string ApiAppId { get; }
+    //public string ApiKey { get; }
+    //public string ApiUrl { get; }
 
     private readonly ILogger<IndexModel> _logger;
 
     public IndexModel(
         IConfiguration config, 
-        ILogger<IndexModel> logger)
+        ILogger<IndexModel> logger) : base(config)
     {
-        ApiAppId = config["FapApiSettings:AppId"];
-        ApiKey = config["FapApiSettings:ApiKey"];
-        ApiUrl = config["FapApiSettings:ApiUri"];
+        //ApiAppId = config["FapApiSettings:AppId"];
+        //ApiKey = config["FapApiSettings:ApiKey"];
+        //ApiUrl = config["FapApiSettings:ApiUri"];
 
         _logger = logger;
     }
