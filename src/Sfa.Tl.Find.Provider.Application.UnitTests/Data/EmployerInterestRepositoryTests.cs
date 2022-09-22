@@ -18,6 +18,31 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
+    public async Task Create_Returns_Expected_Result()
+    {
+        //var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
+
+        var employerInterest = new EmployerInterestBuilder().Build();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("INSERT INTO dbo.EmployerInterest")),
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null))
+            .Returns(1);
+
+        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
+
+        var result = await repository.Create(employerInterest);
+
+        result.Should().Be(employerInterest.UniqueId);
+    }
+
+    [Fact]
     public async Task Delete_Returns_Expected_Result()
     {
         const int count = 1;

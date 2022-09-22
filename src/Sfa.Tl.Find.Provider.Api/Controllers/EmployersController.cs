@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -42,5 +43,34 @@ public class EmployersController : ControllerBase
         return deleted > 0
             ? NoContent()
             : NotFound();
+    }
+
+    /// <summary>
+    /// Creates an Employer Interest record.
+    /// </summary>
+    /// <returns>A status result indicating whether the action succeeded.</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // ReSharper disable once StringLiteralTypo
+    [Route("createinterest")]
+    public async Task<IActionResult> CreateInterest(EmployerInterest employerInterest)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(EmployersController)} {nameof(DeleteInterest)} called.");
+        }
+
+        //TODO: Validate the model
+
+        var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(EmployersController)} {nameof(DeleteInterest)} called.");
+        }
+
+        return Ok(uniqueId);
     }
 }

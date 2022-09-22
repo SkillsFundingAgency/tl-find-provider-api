@@ -10,8 +10,6 @@ namespace Sfa.Tl.Find.Provider.Web.Pages;
 
 public class DashboardModel : PageModel
 {
-    private readonly IEmailService _emailService;
-    private readonly EmailSettings _emailSettings;
     private readonly ILogger<DashboardModel> _logger;
 
     public string? DisplayName { get; private set; }
@@ -19,14 +17,9 @@ public class DashboardModel : PageModel
     public string? UkPrn { get; private set; }
 
     public DashboardModel(
-        IOptions<EmailSettings>? emailOptions,
-        IEmailService emailService,
         ILogger<DashboardModel> logger)
     {
-        _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _emailSettings = emailOptions?.Value
-                         ?? throw new ArgumentNullException(nameof(emailOptions));
     }
 
     public async Task OnGet()
@@ -42,19 +35,5 @@ public class DashboardModel : PageModel
         UkPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
         DisplayName = HttpContext.User.GetClaim(CustomClaimTypes.DisplayName);
         Service = HttpContext.User.GetClaim(CustomClaimTypes.Service);
-    }
-
-    public async Task OnPost()
-    {
-        const string template = "TestWithoutPersonalisation";
-        var tokens = new Dictionary<string, string>();
-        var recipients = _emailSettings.SupportEmailAddress;
-
-        var sent = await _emailService.SendEmail(recipients, template, tokens);
-
-        if (sent)
-            _logger.LogInformation("Sent one email");
-        else
-            _logger.LogWarning("Failed to send email");
     }
 }

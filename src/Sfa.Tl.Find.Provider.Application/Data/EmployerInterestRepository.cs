@@ -24,6 +24,64 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public async Task<Guid> Create(EmployerInterest employerInterest)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+        connection.Open();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            employerInterest.UniqueId,
+            employerInterest.OrganisationName,
+            employerInterest.ContactName,
+            employerInterest.Postcode,
+            employerInterest.HasMultipleLocations,
+            employerInterest.LocationCount,
+            employerInterest.IndustryId,
+            employerInterest.SpecificRequirements,
+            employerInterest.Email,
+            employerInterest.Telephone,
+            employerInterest.ContactPreferenceType
+        });
+        var sql = "INSERT INTO dbo.EmployerInterest " +
+                  "(UniqueId, " +
+                  " OrganisationName, " +
+                  " ContactName, " +
+                  " Postcode, " +
+                  " HasMultipleLocations, " +
+                  " LocationCount, " +
+                  " IndustryId, " +
+                  " SpecificRequirements, " +
+                  " Email, " +
+                  " Telephone, " +
+                  " ContactPreferenceType) " +
+                  "VALUES (" +
+                  " @uniqueId, " +
+                  " @organisationName, " +
+                  " @contactName, " +
+                  " @postcode, " +
+                  " @hasMultipleLocations, " +
+                  " @locationCount, " +
+                  " @industryId, " +
+                  " @specificRequirements, " +
+                  " @email, " +
+                  " @telephone, " +
+                  " @contactPreferenceType" +
+                  ")";
+
+        using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+        var result = await _dbContextWrapper.ExecuteAsync(
+            connection,
+            sql,
+            _dynamicParametersWrapper.DynamicParameters,
+            transaction);
+
+        transaction.Commit();
+
+        return employerInterest.UniqueId;
+    }
+
     public async Task<int> Delete(Guid uniqueId)
     {
         using var connection = _dbContextWrapper.CreateConnection();

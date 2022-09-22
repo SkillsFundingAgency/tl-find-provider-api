@@ -23,6 +23,138 @@ public class EmployerInterestServiceTests
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
 
+
+    [Fact]
+    public async Task CreateEmployerInterest_Calls_Repository()
+    {
+        var employerInterest = new EmployerInterestBuilder().Build();
+
+        var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
+
+        var repository = Substitute.For<IEmployerInterestRepository>();
+        repository.Create(employerInterest)
+            .Returns(uniqueId);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: repository);
+
+        var result = await service.CreateEmployerInterest(employerInterest);
+
+        result.Should().Be(uniqueId);
+
+        await repository
+            .Received(1)
+            .Create(employerInterest);
+    }
+
+    [Fact]
+    public async Task CreateEmployerInterest_Calls_EmailService()
+    {
+        var employerInterest = new EmployerInterestBuilder().Build();
+
+        var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>())
+            .Returns(true);
+
+        var repository = Substitute.For<IEmployerInterestRepository>();
+        repository.Create(employerInterest)
+            .Returns(uniqueId);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                emailService: emailService,
+                employerInterestRepository: repository);
+
+        var result = await service.CreateEmployerInterest(employerInterest);
+
+        result.Should().Be(uniqueId);
+
+        //TODO: use EmailTemplateNames.EmployerRegisterInterest
+        const string templateName = "EmployerRegisterInterest";
+        
+        await emailService
+                .Received(1)
+                .SendEmail(
+                    employerInterest.Email,
+                    templateName, //EmailTemplateNames.EmployerRegisterInterest
+                    Arg.Any<IDictionary<string, string>>()
+            );
+    }
+
+    [Fact]
+    public async Task CreateEmployerInterest_Calls_EmailService_With_Expected_Tokens()
+    {
+        var employerInterest = new EmployerInterestBuilder().Build();
+
+        var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>())
+            .Returns(true);
+
+        var repository = Substitute.For<IEmployerInterestRepository>();
+        repository.Create(employerInterest)
+            .Returns(uniqueId);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                emailService: emailService,
+                employerInterestRepository: repository);
+
+        var result = await service.CreateEmployerInterest(employerInterest);
+
+        result.Should().Be(uniqueId);
+
+        //TODO: use EmailTemplateNames.EmployerRegisterInterest
+        const string templateName = "EmployerRegisterInterest";
+        await emailService
+            .Received(1)
+            .SendEmail(
+                employerInterest.Email,
+                templateName, //EmailTemplateNames.EmployerRegisterInterest
+                Arg.Is<IDictionary<string, string>>(tokens =>
+                    //TODO: Use the shared token validation class
+                    //tokens.ValidateTokens()
+                    ValidateTokens(tokens, new Dictionary<string, string>
+                    {
+                        { "organisation_name", employerInterest.OrganisationName },
+                        { "contact_name", employerInterest.ContactName },
+                        { "email_address", employerInterest.Email },
+                        { "telephone", employerInterest.Telephone },
+                        //Need to convert to text 1=Email, 2=Telephone
+                        { "contact_preference", employerInterest.ContactPreferenceType.ToString() },
+                        //Need to convert to text
+                        { "primary_industry", employerInterest.IndustryId.ToString() },
+                        { "postcode", employerInterest.Postcode },
+                        { "specific_requirements", employerInterest.SpecificRequirements },
+                        //{ "how_many_locations", employerInterest.HasMultipleLocations + employerInterest.LocationCount }, //A single location
+                        { "how_many_locations", employerInterest.LocationCount.ToString() }, //A single location
+                        //TODO: Get this into config - EmployerInterestSettings_EmployerSupportSiteUri
+                        //{ "employer_support_site", employerInterestConfiguration.EmployerSupportSiteUri },
+                        { "employer_support_site", "https://test/" },
+                        { "unique_id", employerInterest.UniqueId.ToString() },
+                    })));
+    }
+
+    private static bool ValidateTokens(IDictionary<string, string> tokens, IDictionary<string, string> expectedTokens)
+    {
+        foreach (var (key, value) in expectedTokens)
+        {
+            tokens.Should().ContainKey(key);
+            tokens[key].Should().Be(value,
+                $"this is the expected value for key '{key}'");
+        }
+
+        return true;
+    }
     [Fact]
     public async Task RemoveExpiredEmployerInterest_Does_Not_Call_Repository_For_Zero_RetentionDays()
     {
@@ -45,8 +177,8 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(dateTimeService,
-                repository,
-                settings);
+                employerInterestRepository: repository,
+                employerInterestSettings:settings);
 
         var result = await service.RemoveExpiredEmployerInterest();
 
@@ -79,25 +211,14 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService, 
-                repository,
-                settings
-                );
+                dateTimeService,
+                employerInterestRepository: repository,
+                employerInterestSettings: settings);
 
         var result = await service.RemoveExpiredEmployerInterest();
 
         result.Should().Be(count);
 
-        await repository
-            .Received(1)
-            .DeleteBefore(Arg.Any<DateTime>());
-
-        /*
-    NSubstitute.Exceptions.ReceivedCallsException : Expected to receive exactly 1 call matching:
-	DeleteBefore(d => (d == value(Sfa.Tl.Find.Provider.Application.UnitTests.Services.EmployerInterestServiceTests+<>c__DisplayClass2_0).expectedDate))
-Actually received no matching calls.
-Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-	DeleteBefore(*03/08/2022 00:00:00*)         */
         await repository
             .Received(1)
             .DeleteBefore(Arg.Is<DateTime>(d => d == expectedDate));

@@ -45,4 +45,7 @@ public class EmployerInterestBuilder
 
     public IList<EmployerInterest> BuildList(int numberToTake) =>
         BuildList().Take(numberToTake).ToList();
+
+    public EmployerInterest Build() =>
+        BuildList().First();
 }
