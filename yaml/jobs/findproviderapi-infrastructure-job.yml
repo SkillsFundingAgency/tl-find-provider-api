@@ -47,9 +47,9 @@ jobs:
             -sqlDatabaseTier "$(SQLDatabaseTier)"
             -configurationStorageConnectionString "$(ConfigurationStorageConnectionString)"
             -uiCustomHostName "$(UICustomHostName)"
-            -uiCertificateName "$(CertificateName)"'
-            # -apiCustomHostName "$(UICustomHostName)"
-            # -apiCertificateName "$(CertificateName)"'
+            -uiCertificateName "$(UiCertificateName)"
+            -apiCustomHostName "$(ApiCustomHostName)"
+            -apiCertificateName "$(ApiCertificateName)"'
             # -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
             # -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
             # -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
