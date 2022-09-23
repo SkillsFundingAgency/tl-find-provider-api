@@ -60,7 +60,10 @@ Add a new row to the table with:
             "EmployerSupportSiteUri": "https://test.employers.tlevels.gov.uk/",
             "RetentionDays": 84
         },
-        "GoogleMapsApiKey": "<API key>",
+        "GoogleMapsApiSettings": {
+            "ApiKey": "<API key>",
+            "BaseUri": "https://maps.googleapis.com/maps/api/"
+        },
         "TownDataImportSchedule": "<CRON string>",
         "PostcodeApiSettings": {
             "BaseUri": "https://api.postcodes.io/"
