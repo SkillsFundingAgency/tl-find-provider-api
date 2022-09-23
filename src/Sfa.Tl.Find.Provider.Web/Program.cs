@@ -135,22 +135,19 @@ bool IsNotJsFile(string path)
 
 bool IsNotImgFile(string path)
 {
-    var starts = path.StartsWith(webRootPath);
-    var starts2 = path.StartsWith(contentRootPath);
+    if (string.IsNullOrEmpty(path)) return false;
     return !path.Contains("/assets/images/");
 }
 
 bool IsNotJsOrCssFile(string path)
 {
-    var starts = path.StartsWith(webRootPath);
-    var starts2 = path.StartsWith(contentRootPath);
+    if (string.IsNullOrEmpty(path)) return false;
     return !path.EndsWith(".css") && !path.EndsWith(".js");
 }
 
 bool IsNotCssOrImgOrFontFile(string path)
 {
-    var starts = path.StartsWith(webRootPath);
-    var starts2 = path.StartsWith(contentRootPath);
+    if (string.IsNullOrEmpty(path)) return false;
     return !path.Contains(".css") &&
            !path.Contains("/assets/fonts/") &&
            !path.Contains("/assets/images/");
