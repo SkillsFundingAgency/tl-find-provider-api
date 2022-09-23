@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -80,6 +81,9 @@ public class EmployerInterestService : IEmployerInterestService
         //EmailTemplateNames.EmployerRegisterInterest
         const string templateName = "EmployerRegisterInterest";
 
+        var unsubscribeUri = new Uri(new Uri(_employerInterestSettings.EmployerSupportSiteUri),
+            employerInterest.UniqueId.ToString("D").ToLower());
+
         var tokens = new Dictionary<string, string>()
         {
             { "organisation_name", employerInterest.OrganisationName },
@@ -94,17 +98,11 @@ public class EmployerInterestService : IEmployerInterestService
             { "specific_requirements", employerInterest.SpecificRequirements },
             //{ "how_many_locations", employerInterest.HasMultipleLocations + employerInterest.LocationCount }, //A single location
             { "how_many_locations", employerInterest.LocationCount.ToString() }, //A single location
-            //TODO: Get this into config - EmployerInterestSettings_EmployerSupportSiteUri
-            //TODO: make sure it ends in /
-            { "employer_support_site", "https://test/" },
-            //{ "employer_support_site", employerInterest.EmployerSupportSiteUri },
+            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri },
             { "unique_id", employerInterest.UniqueId.ToString() },
-            //EmployerSiteSettings_SiteUrl
-            //https://employers.tlevels.gov.uk/
-            //Will this work? If not need to pass the full url for unsubscribe into email
-            //(((employer_support_site))((unique_id))) 
+            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
         };
-        
+
         return await _emailService.SendEmail(
             employerInterest.Email,
             templateName,

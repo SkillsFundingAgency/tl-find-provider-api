@@ -18,6 +18,7 @@ public class SettingsBuilder
     private const bool MergeAdditionalProviderData = true;
     private const int RetentionDays = 10;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
+    private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
 
     private const string SignInApiUri = "https://test.api.oidc.com";
     private const string SignInApiSecret = "apisecret";
@@ -79,8 +80,10 @@ public class SettingsBuilder
         };
 
     public EmployerInterestSettings BuildEmployerInterestSettings(
+        string employerSupportSiteUri = EmployerSupportSiteUri,
         int retentionDays = RetentionDays) => new()
         {
+            EmployerSupportSiteUri = employerSupportSiteUri,
             RetentionDays = retentionDays
         };
 

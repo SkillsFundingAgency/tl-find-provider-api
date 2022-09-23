@@ -55,6 +55,12 @@ Add a new row to the table with:
             "GovNotifyApiKey": "<key from GOV.UK Notify>",
             "SupportEmailAddress": "<email>"
         },
+        "EmployerInterestSettings": {
+            "CleanupJobSchedule": "0 0 3 * * ?",
+            "EmployerSupportSiteUri": "https://test.employers.tlevels.gov.uk/",
+            "RetentionDays": 84
+        },
+        "GoogleMapsApiKey": "<API key>",
         "TownDataImportSchedule": "<CRON string>",
         "PostcodeApiSettings": {
             "BaseUri": "https://api.postcodes.io/"

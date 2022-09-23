@@ -4,6 +4,7 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using static Dapper.SqlMapper;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -104,14 +105,21 @@ public class EmployerInterestServiceTests
         repository.Create(employerInterest)
             .Returns(uniqueId);
 
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
         var service = new EmployerInterestServiceBuilder()
             .Build(
                 emailService: emailService,
-                employerInterestRepository: repository);
+                employerInterestRepository: repository,
+                employerInterestSettings: settings);
 
         var result = await service.CreateEmployerInterest(employerInterest);
 
         result.Should().Be(uniqueId);
+
+        var formattedUniqueId = employerInterest.UniqueId.ToString("D").ToLower();
+        var expectedUnsubscribeUri =
+            $"{settings.EmployerSupportSiteUri}{(settings.EmployerSupportSiteUri.EndsWith('/') ? "" : "/")}{formattedUniqueId}";
 
         //TODO: use EmailTemplateNames.EmployerRegisterInterest
         const string templateName = "EmployerRegisterInterest";
@@ -122,7 +130,7 @@ public class EmployerInterestServiceTests
                 templateName, //EmailTemplateNames.EmployerRegisterInterest
                 Arg.Is<IDictionary<string, string>>(tokens =>
                     //TODO: Use the shared token validation class
-                    //tokens.ValidateTokens()
+                    //tokens.ValidateTokens(
                     ValidateTokens(tokens, new Dictionary<string, string>
                     {
                         { "organisation_name", employerInterest.OrganisationName },
@@ -139,8 +147,8 @@ public class EmployerInterestServiceTests
                         { "how_many_locations", employerInterest.LocationCount.ToString() }, //A single location
                         //TODO: Get this into config - EmployerInterestSettings_EmployerSupportSiteUri
                         //{ "employer_support_site", employerInterestConfiguration.EmployerSupportSiteUri },
-                        { "employer_support_site", "https://test/" },
-                        { "unique_id", employerInterest.UniqueId.ToString() },
+                        { "employer_support_site", settings.EmployerSupportSiteUri },
+                        { "employer_unsubscribe_uri", expectedUnsubscribeUri }
                     })));
     }
 
@@ -149,6 +157,10 @@ public class EmployerInterestServiceTests
         foreach (var (key, value) in expectedTokens)
         {
             tokens.Should().ContainKey(key);
+
+            if (key == "")
+            {
+            }
             tokens[key].Should().Be(value,
                 $"this is the expected value for key '{key}'");
         }
@@ -165,11 +177,6 @@ public class EmployerInterestServiceTests
 
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2022-08-13"));
-
-        //Expected date is Today - RetentionDays 
-        //var expectedDate = DateTime.Parse("2022-08-01");
-
-        //const int count = 9;
 
         var repository = Substitute.For<IEmployerInterestRepository>();
         repository.DeleteBefore(Arg.Any<DateTime>())

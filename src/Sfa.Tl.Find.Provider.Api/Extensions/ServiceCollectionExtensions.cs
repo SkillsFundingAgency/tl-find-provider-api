@@ -64,6 +64,7 @@ public static class ServiceCollectionExtensions
             {
                 x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
                 x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
+                x.EmployerSupportSiteUri = siteConfiguration.EmployerInterestSettings.EmployerSupportSiteUri;
             })
             .Configure<PostcodeApiSettings>(x =>
             {
