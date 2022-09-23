@@ -80,6 +80,20 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "GoogleMapsApiSettings": {
+      "properties": {
+        "ApiKey": {
+          "type": "string",
+          "environmentVariable": "GoogleMapsApiSettings_ApiKey"
+        },
+        "BaseUri": {
+          "type": "string",
+          "environmentVariable": "GoogleMapsApiSettings_BaseUri"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "PostcodeApiSettings": {
       "properties": {
         "BaseUri": {

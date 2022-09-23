@@ -65,6 +65,11 @@ public static class ServiceCollectionExtensions
                 x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
                 x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
             })
+            .Configure<GoogleMapsApiSettings>(x =>
+            {
+                x.ApiKey = siteConfiguration.GoogleMapsApiSettings.ApiKey;
+                x.BaseUri = siteConfiguration.GoogleMapsApiSettings.BaseUri;
+            })
             .Configure<PostcodeApiSettings>(x =>
             {
                 x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
@@ -154,6 +159,22 @@ public static class ServiceCollectionExtensions
                 return handler;
             })
             .AddRetryPolicyHandler<CourseDirectoryService>();
+
+        services
+            .AddHttpClient<IGoogleMapsApiService, GoogleMapsApiService>(
+                (serviceProvider, client) =>
+                {
+                    var googleMapsApiSettings = serviceProvider
+                        .GetRequiredService<IOptions<GoogleMapsApiSettings>>()
+                        .Value;
+
+                    client.BaseAddress = new Uri(googleMapsApiSettings.BaseUri);
+
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+            )
+            .AddRetryPolicyHandler<GoogleMapsApiService>();
 
         services
             .AddHttpClient<ITownDataService, TownDataService>(
