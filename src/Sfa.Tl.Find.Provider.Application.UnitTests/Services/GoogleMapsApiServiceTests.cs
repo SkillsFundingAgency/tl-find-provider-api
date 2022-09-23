@@ -13,6 +13,8 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
 public class GoogleMapsApiServiceTests
 {
+    private const string TestPostcode = "CV1 2WT";
+
     [Fact]
     public void Constructor_Guards_Against_Null_Parameters()
     {
@@ -25,6 +27,36 @@ public class GoogleMapsApiServiceTests
     {
         typeof(GoogleMapsApiService)
             .ShouldNotAcceptNullOrBadConstructorArguments();
+    }
+
+    [Fact]
+    public async Task GetAddressDetail_Returns_Empty_Result_For_Empty_Postcode()
+    {
+        var googleMapsApiClient = new GoogleMapsApiServiceBuilder()
+            .Build();
+
+        var addressDetails = await googleMapsApiClient.GetAddressDetails("");
+        addressDetails.Should().BeNullOrEmpty();
+    }
+
+    [Fact]
+    public async Task GetAddressDetail_Returns_Empty_Result_For_Null_Postcode()
+    {
+        var googleMapsApiClient = new GoogleMapsApiServiceBuilder()
+            .Build();
+
+        var addressDetails = await googleMapsApiClient.GetAddressDetails(null);
+        addressDetails.Should().BeNullOrEmpty();
+    }
+    
+    [Fact]
+    public async Task GetAddressDetail_Returns_Empty_Result_For_Missing_ApiKey()
+    {
+        var settings = new SettingsBuilder().BuildGoogleMapsApiSettings(apiKey: "");
+        var googleMapsApiClient = new GoogleMapsApiServiceBuilder()
+            .Build(googleMapsApiSettings: settings);
+        var addressDetails = await googleMapsApiClient.GetAddressDetails(TestPostcode);
+        addressDetails.Should().BeNullOrEmpty();
     }
 
     /*

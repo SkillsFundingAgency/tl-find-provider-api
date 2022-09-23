@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
@@ -15,16 +16,19 @@ public class GoogleMapsApiServiceBuilder
 
     public IGoogleMapsApiService Build(
         HttpClient httpClient = null,
-        GoogleMapsApiSettings googleMapsApiSettings = null)
+        GoogleMapsApiSettings googleMapsApiSettings = null,
+        ILogger<GoogleMapsApiService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
+        logger ??= Substitute.For<ILogger<GoogleMapsApiService>>();
 
         googleMapsApiSettings ??= new SettingsBuilder().BuildGoogleMapsApiSettings();
         var googleMapsApiOptions = googleMapsApiSettings.ToOptions();
 
         return new GoogleMapsApiService(
             httpClient,
-            googleMapsApiOptions);
+            googleMapsApiOptions,
+            logger);
     }
 
     public IGoogleMapsApiService Build(
