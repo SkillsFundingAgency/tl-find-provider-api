@@ -14,13 +14,13 @@ parameters:
 jobs:
 - job: PublishSite_${{ parameters.name }}
   variables:
-  - name: ConfigStorageAccountName
-    value: $[stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName']]
-  - name: appName
-    ${{ if eq( parameters['appName'], 'ui' )}}:
-      value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName']]
-    ${{ elseif eq( parameters['appName'], 'api' )}}:
-      value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName']]
+    - name: ConfigStorageAccountName
+      value: $[stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName']]
+    - name: appName
+      ${{ if eq( parameters['appName'], 'api' )}}:
+        value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.webAppName']]
+      ${{ elseif eq( parameters['appName'], 'ui' )}}:
+        value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName']]
 
   pool:
     name: 'Azure Pipelines'
@@ -40,7 +40,7 @@ jobs:
     displayName: 'Azure App Service Deploy: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: $(appName)
+      WebAppName: '$(appName)'
       DeployToSlotFlag: true
       ResourceGroupName: '$(ResourceGroupName)'
       SlotName: 'staging'
@@ -53,7 +53,7 @@ jobs:
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Start Azure App Service'
-      WebAppName: $(appName)
+      WebAppName: '$(appName)'
       SpecifySlotOrASE: true
       ResourceGroupName: '$(ResourceGroupName)'
       Slot: 'staging'
@@ -62,7 +62,7 @@ jobs:
     displayName: 'Swap Slots: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: $(appName)
+      WebAppName: '$(appName)'
       ResourceGroupName: '$(ResourceGroupName)'
       SourceSlot: staging
 
@@ -71,7 +71,7 @@ jobs:
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Stop Azure App Service'
-      WebAppName: $(appName)
+      WebAppName: '$(appName)'
       ResourceGroupName: '$(ResourceGroupName)'
       SpecifySlotOrASE: true
       Slot: 'staging'

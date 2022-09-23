@@ -31,6 +31,7 @@ stages:
     - name: environmentTagName
       value: ${{parameters.environmentTagName}}
 
+
   displayName: '${{parameters.environmentName}} [${{parameters.environmentId}}] deployment'
   jobs:
   - template: ../jobs/findproviderapi-infrastructure-job.yml
@@ -50,38 +51,23 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
 
-  - job: Print_vars
-    pool:
-      name: 'Azure Pipelines'
-      vmImage: 'windows-2019'
-    dependsOn:
-      - DeployfindproviderapiInfrastructure
-      - GenerateConfigs
-    steps:
-    - task: PowerShell@2
-      inputs:
-        targetType: 'inline'
-        script: 'Get-ChildItem -Path Env:\ | Format-List'
-
-  # This is actually the job for the API despite the appName being ui
-  - template: ../jobs/findproviderapi-publish-site-job.yml
-    parameters:
-      serviceConnection: ${{ parameters.serviceConnection }}
-      sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
-      appName: 'ui'
-      name: 'API'
-      dependencies:
-        - DeployInfrastructure
-        - GenerateConfigs
-      package: 'Sfa.Tl.Find.Provider.Api.zip'
-
-  # This is actually the job for the UI despite the appName being api
   - template: ../jobs/findproviderapi-publish-site-job.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
       appName: 'api'
       name: 'API'
+      dependencies:
+        - DeployInfrastructure
+        - GenerateConfigs
+      package: 'Sfa.Tl.Find.Provider.Api.zip'
+
+  - template: ../jobs/findproviderapi-publish-site-job.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
+      appName: 'ui'
+      name: 'UI'
       dependencies:
         - DeployInfrastructure
         - GenerateConfigs
