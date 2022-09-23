@@ -48,7 +48,7 @@
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
         "webAppName": "[concat(parameters('resourceNamePrefix'), '-web')]",
         "appInsightName": "[concat(parameters('resourceNamePrefix'), '-ai')]",
-        "uiAppName": "[concat(parameters('resourceNamePrefix'), '-api')]",
+        "uiAppName": "[concat(parameters('resourceNamePrefix'), '-ui')]",
         // "workerFunctionAppName": "[concat(parameters('resourceNamePrefix'), '-func-worker')]",
         "sqlDatabaseName": "[concat(parameters('resourceNamePrefix'), '-sqldb')]",
         "storageAccountName": "[replace(concat(parameters('resourceNamePrefix'), 'str'), '-', '')]"
