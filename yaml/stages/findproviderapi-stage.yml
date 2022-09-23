@@ -71,7 +71,7 @@ stages:
       dependencies:
         - DeployInfrastructure
         - GenerateConfigs
-      package: 'Sfa.Tl.Find.Provider.Api.zip'
+      package: 'Sfa.Tl.Find.Provider.Web.zip'
 
   # - template: ../jobs/findproviderapi-publish-function-job.yml
   #   parameters:

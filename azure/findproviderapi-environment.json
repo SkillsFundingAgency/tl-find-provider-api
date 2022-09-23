@@ -236,7 +236,7 @@
                             },
                             {
                                 "name": "ServiceName",
-                                "value": "Sfa.Tl.Find.Provider.Api"
+                                "value": "Sfa.Tl.Find.Provider.Web"
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
