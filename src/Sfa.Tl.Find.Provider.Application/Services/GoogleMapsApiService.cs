@@ -4,6 +4,7 @@ using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class GoogleMapsApiService : IGoogleMapsApiService
@@ -45,16 +46,12 @@ public class GoogleMapsApiService : IGoogleMapsApiService
         var documentRoot = jsonDocument
             .RootElement;
 
-        var status =
-            documentRoot
-                .GetProperty("status")
-                .GetString();
+        var town = default(string);
+        var status = documentRoot.SafeGetString("status");
 
-        if (status != "OK")
-            return string.Empty;
-
-        var town =
-            documentRoot
+        if (status == "OK")
+        {
+            town = documentRoot
                 .GetProperty("results")
                 .EnumerateArray()
                 .First()
@@ -62,8 +59,9 @@ public class GoogleMapsApiService : IGoogleMapsApiService
                 .GetString()
                 ?.Split(",")
                 .Last()
-                .Replace(postcode, string.Empty)
+                .Replace(postcode.Replace(" ", ""), string.Empty)
                 .Trim();
+        }
 
         return town ?? string.Empty;
     }

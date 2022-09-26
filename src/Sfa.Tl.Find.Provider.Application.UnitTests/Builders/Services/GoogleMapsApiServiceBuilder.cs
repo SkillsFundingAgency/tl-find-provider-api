@@ -32,30 +32,40 @@ public class GoogleMapsApiServiceBuilder
     }
 
     public IGoogleMapsApiService Build(
-        IDictionary<string, HttpResponseMessage> responseMessages)
+        IDictionary<string, HttpResponseMessage> responseMessages,
+        GoogleMapsApiSettings googleMapsApiSettings = null)
     {
+        var apiBaseUri = !string.IsNullOrEmpty(googleMapsApiSettings?.BaseUri)
+            ? new Uri(googleMapsApiSettings.BaseUri)
+            : ApiBaseUri;
+
         var responsesWithUri = responseMessages
             .ToDictionary(
-                item => new Uri(ApiBaseUri, item.Key),
+                item => new Uri(apiBaseUri, item.Key),
                 item => item.Value);
 
         var httpClient = new TestHttpClientFactory()
             .CreateHttpClientWithBaseUri(ApiBaseUri, responsesWithUri);
 
-        return Build(httpClient);
+        return Build(httpClient, googleMapsApiSettings);
     }
 
     public IGoogleMapsApiService Build(
-        IDictionary<string, string> responseMessages)
+        IDictionary<string, string> responseMessages,
+        GoogleMapsApiSettings googleMapsApiSettings = null)
     {
+        var apiBaseUri = !string.IsNullOrEmpty(googleMapsApiSettings?.BaseUri)
+            ? new Uri(googleMapsApiSettings.BaseUri)
+            : ApiBaseUri;
+
         var responsesWithUri = responseMessages
             .ToDictionary(
-                item => new Uri(ApiBaseUri, item.Key),
+                item => new Uri(apiBaseUri, item.Key),
                 item => item.Value);
 
         var httpClient = new TestHttpClientFactory()
             .CreateHttpClientWithBaseUri(ApiBaseUri, responsesWithUri);
 
-        return Build(httpClient);
+        return Build(httpClient, googleMapsApiSettings);
     }
 }
