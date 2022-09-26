@@ -19,6 +19,7 @@ jobs:
         updateAssemblyInfo: true
 
     - task: NodeTool@0
+      displayName: 'Node install'
       inputs:
         versionSpec: '16.x'
 
