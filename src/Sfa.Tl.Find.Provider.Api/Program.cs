@@ -3,6 +3,7 @@ using AspNetCoreRateLimit;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Application.Data;
@@ -45,6 +46,11 @@ try
         .AddDapperRetryPolicy();
 
     builder.Services.AddHttpClients();
+
+    builder.Services.Configure<FormOptions>(options =>
+    {
+        options.MultipartBodyLengthLimit = int.MaxValue;
+    });
 
     builder.Services
         .AddScoped<IDateTimeService, DateTimeService>()
