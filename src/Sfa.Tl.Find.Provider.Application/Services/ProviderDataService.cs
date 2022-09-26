@@ -257,7 +257,6 @@ public class ProviderDataService : IProviderDataService
     {
         var jsonDocument = await JsonDocument
             .ParseAsync(stream);
-        //var json = jsonDocument.PrettifyJson();
 
         var count = await LoadAdditionalProviderData(jsonDocument);
 

@@ -58,6 +58,7 @@ public class DataImportController : ControllerBase
     [HttpGet]
     [HttpPost]
     [Route("provider/data")]
+    [RequestSizeLimit(250_000_000)]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -69,48 +70,6 @@ public class DataImportController : ControllerBase
             {
                 _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadProviderData)} called.");
             }
-
-            if (file is null)
-            {
-                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderData)} has no file.");
-                return BadRequest("File is required.");
-            }
-
-            const bool isAdditionalData = true;
-            await _providerDataService.ImportProviderData(
-                file.OpenReadStream(), isAdditionalData);
-
-            return Accepted();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
-    }
-
-    [HttpGet]
-    [HttpPost]
-    [Route("provider/data-upload")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadProviderDataFromModel([FromForm] JsonFileUploadModel model)
-    {
-        try
-        {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadProviderData)} called.");
-            }
-
-            if (model is null)
-            {
-                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderData)} has no model in form.");
-                return BadRequest("Input data is required.");
-            }
-
-            var file = model.File;
 
             if (file is null)
             {
