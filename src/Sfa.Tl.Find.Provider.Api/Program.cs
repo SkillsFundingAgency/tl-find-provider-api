@@ -47,10 +47,22 @@ try
 
     builder.Services.AddHttpClients();
 
-    //builder.Services.Configure<FormOptions>(options =>
-    //{
-    //    options.MultipartBodyLengthLimit = int.MaxValue;
-    //});
+    builder.Services.Configure<IISServerOptions>(options =>
+    {
+        options.MaxRequestBodySize = int.MaxValue;
+    });
+
+    builder.Services.Configure<FormOptions>(o =>
+    {
+        o.ValueLengthLimit = int.MaxValue;
+        o.MultipartBodyLengthLimit = int.MaxValue;
+        o.MultipartBoundaryLengthLimit = int.MaxValue;
+        o.MultipartHeadersCountLimit = int.MaxValue;
+        o.MultipartHeadersLengthLimit = int.MaxValue;
+        o.BufferBodyLengthLimit = int.MaxValue;
+        o.BufferBody = true;
+        o.ValueCountLimit = int.MaxValue;
+    });
 
     builder.Services
         .AddScoped<IDateTimeService, DateTimeService>()
