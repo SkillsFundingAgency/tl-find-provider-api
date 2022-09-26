@@ -54,46 +54,14 @@ public class DataImportController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
-
-    [HttpGet]
-    [HttpPost]
-    [Route("provider/data-ping")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> PingProviderData()
-    {
-        return Ok("hello");
-    }
-
-    [HttpGet]
-    [HttpPost]
-    [Route("provider/data2")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadProviderData2(IFormFile dataFile)
-    {
-        return Ok("yes-2");
-    }
-
-    [HttpGet]
-    [HttpPost]
-    [Route("provider/data3")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadProviderData3(
-        [FromBody]IFormFile dataFile)
-    {
-        return Ok("yes-3");
-    }
-
+    
     [HttpGet]
     [HttpPost]
     [Route("provider/data")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadProviderData(IFormFile file)
+    public async Task<IActionResult> UploadProviderData([FromForm] IFormFile file)
     {
         try
         {
@@ -101,6 +69,48 @@ public class DataImportController : ControllerBase
             {
                 _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadProviderData)} called.");
             }
+
+            if (file is null)
+            {
+                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderData)} has no file.");
+                return BadRequest("File is required.");
+            }
+
+            const bool isAdditionalData = true;
+            await _providerDataService.ImportProviderData(
+                file.OpenReadStream(), isAdditionalData);
+
+            return Accepted();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpGet]
+    [HttpPost]
+    [Route("provider/data-upload")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UploadProviderDataFromModel([FromForm] JsonFileUploadModel model)
+    {
+        try
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadProviderData)} called.");
+            }
+
+            if (model is null)
+            {
+                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderData)} has no model in form.");
+                return BadRequest("Input data is required.");
+            }
+
+            var file = model.File;
 
             if (file is null)
             {
