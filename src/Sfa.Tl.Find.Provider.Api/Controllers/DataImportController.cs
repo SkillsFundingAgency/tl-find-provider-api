@@ -58,7 +58,8 @@ public class DataImportController : ControllerBase
     [HttpGet]
     [HttpPost]
     [Route("provider/data")]
-    [DisableRequestSizeLimit]
+    [RequestSizeLimit(500 * 1024 * 1024)] //unit is bytes => 500Mb
+    [RequestFormLimits(MultipartBodyLengthLimit = 500 * 1024 * 1024)]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

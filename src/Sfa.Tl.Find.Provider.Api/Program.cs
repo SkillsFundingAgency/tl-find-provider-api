@@ -47,10 +47,10 @@ try
 
     builder.Services.AddHttpClients();
 
-    builder.Services.Configure<FormOptions>(options =>
-    {
-        options.MultipartBodyLengthLimit = int.MaxValue;
-    });
+    //builder.Services.Configure<FormOptions>(options =>
+    //{
+    //    options.MultipartBodyLengthLimit = int.MaxValue;
+    //});
 
     builder.Services
         .AddScoped<IDateTimeService, DateTimeService>()
