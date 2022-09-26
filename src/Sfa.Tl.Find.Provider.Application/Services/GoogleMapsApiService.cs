@@ -59,7 +59,7 @@ public class GoogleMapsApiService : IGoogleMapsApiService
                 .GetString()
                 ?.Split(",")
                 .Last()
-                .Replace(postcode.Replace(" ", ""), string.Empty)
+                .Replace(postcode, string.Empty)
                 .Trim();
         }
 

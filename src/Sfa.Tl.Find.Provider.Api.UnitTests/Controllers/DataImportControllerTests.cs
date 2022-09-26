@@ -60,7 +60,7 @@ public class DataImportControllerTests
         badRequestResult!.Value.Should().Be("File is required.");
     }
 
-        [Fact]
+    [Fact]
     public async Task UploadProviderData_Processes_File()
     {
         var providerDataService = Substitute.For<IProviderDataService>();
@@ -96,28 +96,28 @@ public class DataImportControllerTests
         badRequestResult!.Value.Should().Be("File is required.");
     }
 
-   private static async Task<Stream> BuildTestCsvFileStream(
-        string content = "col1, col2\r\n123,Test")
-   {
-       return await BuildTestFileStream(content);
-   }
+    private static async Task<Stream> BuildTestCsvFileStream(
+         string content = "col1, col2\r\n123,Test")
+    {
+        return await BuildTestFileStream(content);
+    }
 
-   private static async Task<Stream> BuildTestJsonFileStream(
-       string content = "{ \"data\": \"test\" }")
-   {
-       return await BuildTestFileStream(content);
-   }
+    private static async Task<Stream> BuildTestJsonFileStream(
+        string content = "{ \"data\": \"test\" }")
+    {
+        return await BuildTestFileStream(content);
+    }
 
     private static async Task<Stream> BuildTestFileStream(
        string content)
-   {
-       var stream = new MemoryStream();
+    {
+        var stream = new MemoryStream();
 
-       await using var writer = new StreamWriter(stream, leaveOpen: true);
-       await writer.WriteAsync(content);
-       await writer.FlushAsync();
-       stream.Position = 0;
+        await using var writer = new StreamWriter(stream, leaveOpen: true);
+        await writer.WriteAsync(content);
+        await writer.FlushAsync();
+        stream.Position = 0;
 
-       return stream;
-   }
+        return stream;
+    }
 }
