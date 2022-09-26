@@ -57,6 +57,38 @@ public class DataImportController : ControllerBase
 
     [HttpGet]
     [HttpPost]
+    [Route("provider/data-ping")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> PingProviderData()
+    {
+        return Ok("hello");
+    }
+
+    [HttpGet]
+    [HttpPost]
+    [Route("provider/data2")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UploadProviderData2(IFormFile dataFile)
+    {
+        return Ok("yes-2");
+    }
+
+    [HttpGet]
+    [HttpPost]
+    [Route("provider/data3")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UploadProviderData3(
+        [FromBody]IFormFile dataFile)
+    {
+        return Ok("yes-3");
+    }
+
+    [HttpGet]
+    [HttpPost]
     [Route("provider/data")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
