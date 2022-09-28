@@ -4,7 +4,7 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Extensions;
 
 public class PageExtensionsTests
 {
-    private const string DefaultServiceName = "Get help finding employers interested in T Levels";
+    private const string DefaultServiceName = "Connect with employers interested in T Levels";
 
     [Fact]
     public void GetServiceName_Returns_Expected_Value()
