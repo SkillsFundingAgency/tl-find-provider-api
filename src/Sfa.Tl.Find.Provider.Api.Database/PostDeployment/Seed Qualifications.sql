@@ -35,7 +35,7 @@ USING (VALUES
   (55, N'Media, Broadcast and Production', 0),
   (56, N'Catering', 0),
   (57, N'Agriculture, Land Management and Production', 0),
-  (58, N'Animal Care', 0)
+  (58, N'Animal Care and Management', 0)
   )
   AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 
