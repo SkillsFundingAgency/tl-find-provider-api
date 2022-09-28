@@ -105,6 +105,10 @@
     <Build Include="Tables\EmailTemplate.sql" />
     <Build Include="Stored Procedures\GetAllProviderDetails.sql" />
     <Build Include="Tables\EmployerInterest.sql" />
+    <Build Include="Stored Procedures\CreateEmployerInterest.sql" />
+    <Build Include="Tables\EmployerLocation.sql" />
+    <Build Include="Indexes\SPATIAL_EmployerLocation_Location.sql" />
+    <Build Include="Types\EmployerInterestDataTableType.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

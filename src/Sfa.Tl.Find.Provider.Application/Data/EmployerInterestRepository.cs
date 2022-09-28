@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Data;
+using Microsoft.Extensions.Logging;
 using Polly.Registry;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 
@@ -28,54 +30,52 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
+        
+        employerInterest.UniqueId = new Guid();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            employerInterest.UniqueId,
-            employerInterest.OrganisationName,
-            employerInterest.ContactName,
-            employerInterest.Postcode,
-            employerInterest.HasMultipleLocations,
-            employerInterest.LocationCount,
-            employerInterest.IndustryId,
-            employerInterest.SpecificRequirements,
-            employerInterest.Email,
-            employerInterest.Telephone,
-            employerInterest.ContactPreferenceType
+            data = new List<EmployerInterest>
+                    {
+                        employerInterest
+                    }
+                .AsTableValuedParameter("dbo.EmployerInterestTableType")
         });
-        var sql = "INSERT INTO dbo.EmployerInterest " +
-                  "(UniqueId, " +
-                  " OrganisationName, " +
-                  " ContactName, " +
-                  " Postcode, " +
-                  " HasMultipleLocations, " +
-                  " LocationCount, " +
-                  " IndustryId, " +
-                  " SpecificRequirements, " +
-                  " Email, " +
-                  " Telephone, " +
-                  " ContactPreferenceType) " +
-                  "VALUES (" +
-                  " @uniqueId, " +
-                  " @organisationName, " +
-                  " @contactName, " +
-                  " @postcode, " +
-                  " @hasMultipleLocations, " +
-                  " @locationCount, " +
-                  " @industryId, " +
-                  " @specificRequirements, " +
-                  " @email, " +
-                  " @telephone, " +
-                  " @contactPreferenceType" +
-                  ")";
+
+        //var sql = "INSERT INTO dbo.EmployerInterest " +
+        //          "(UniqueId, " +
+        //          " OrganisationName, " +
+        //          " ContactName, " +
+        //          " Postcode, " +
+        //          " HasMultipleLocations, " +
+        //          " LocationCount, " +
+        //          " IndustryId, " +
+        //          " SpecificRequirements, " +
+        //          " Email, " +
+        //          " Telephone, " +
+        //          " ContactPreferenceType) " +
+        //          "VALUES (" +
+        //          " @uniqueId, " +
+        //          " @organisationName, " +
+        //          " @contactName, " +
+        //          " @postcode, " +
+        //          " @hasMultipleLocations, " +
+        //          " @locationCount, " +
+        //          " @industryId, " +
+        //          " @specificRequirements, " +
+        //          " @email, " +
+        //          " @telephone, " +
+        //          " @contactPreferenceType" +
+        //          ")";
 
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
         var result = await _dbContextWrapper.ExecuteAsync(
             connection,
-            sql,
+            "CreateEmployerInterest",
             _dynamicParametersWrapper.DynamicParameters,
-            transaction);
+            transaction,
+            commandType: CommandType.StoredProcedure);
 
         transaction.Commit();
 

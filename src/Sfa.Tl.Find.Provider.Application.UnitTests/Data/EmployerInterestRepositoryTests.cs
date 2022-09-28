@@ -22,6 +22,8 @@ public class EmployerInterestRepositoryTests
     {
         //var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
 
+        //TODO: Need a GuidGeneratorService for testing
+
         var employerInterest = new EmployerInterestBuilder().Build();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()

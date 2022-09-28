@@ -14,15 +14,15 @@ public class EmployerInterestBuilder
                 OrganisationName = "Test Employer",
                 ContactName = "Test Contact",
                 Postcode = "CV1 2WT",
+                Latitude = 52.400997,
+                Longitude = -1.508122,
                 HasMultipleLocations = false,
                 LocationCount = 1,
                 IndustryId = 37,
                 SpecificRequirements = "These are my requirements: none",
                 Email ="test.contact1@emplyer.co.uk",
                 Telephone ="020 555 6666 ext 1",
-                ContactPreferenceType = 1,
-                CreatedOn = DateTime.Parse("2022-10-01 09:00"),
-                ModifiedOn = null
+                ContactPreferenceType = 1
             },
             new()
             {
@@ -31,15 +31,15 @@ public class EmployerInterestBuilder
                 OrganisationName = "Test Employer 2",
                 ContactName = "Test Contact 2",
                 Postcode = "CV1 3XT",
+                Latitude = 52.400997,
+                Longitude = -1.508122,
                 HasMultipleLocations = false,
                 LocationCount = 1,
                 IndustryId = 51,
                 SpecificRequirements = "These are my requirements: a few good people",
                 Email ="test.contact2@emplyer.co.uk",
                 Telephone ="020 555 6666 ext 2",
-                ContactPreferenceType = 2,
-                CreatedOn = DateTime.Parse("2022-10-01 10:11"),
-                ModifiedOn = null
+                ContactPreferenceType = 2
             }
         };
 
