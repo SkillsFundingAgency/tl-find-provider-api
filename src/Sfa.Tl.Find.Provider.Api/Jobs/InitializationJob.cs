@@ -38,7 +38,7 @@ public class InitializationJob : IJob
             }
 
             _logger.LogInformation($"{nameof(InitializationJob)} importing additional provider data.");
-            await _providerDataService.LoadAdditionalProviderData();
+            //await _providerDataService.LoadAdditionalProviderData();
 
             if (!await _townDataService.HasTowns())
             {
