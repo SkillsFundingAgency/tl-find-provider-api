@@ -34,7 +34,7 @@ public class EmployerInterestServiceTests
 
         var repository = Substitute.For<IEmployerInterestRepository>();
         repository.Create(employerInterest)
-            .Returns(uniqueId);
+            .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
             .Build(employerInterestRepository: repository);
@@ -64,7 +64,7 @@ public class EmployerInterestServiceTests
 
         var repository = Substitute.For<IEmployerInterestRepository>();
         repository.Create(employerInterest)
-            .Returns(uniqueId);
+            .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
@@ -103,7 +103,7 @@ public class EmployerInterestServiceTests
 
         var repository = Substitute.For<IEmployerInterestRepository>();
         repository.Create(employerInterest)
-            .Returns(uniqueId);
+            .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
 

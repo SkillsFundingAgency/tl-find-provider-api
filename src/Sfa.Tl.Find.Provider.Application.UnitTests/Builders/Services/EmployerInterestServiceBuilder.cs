@@ -13,12 +13,14 @@ public class EmployerInterestServiceBuilder
     public IEmployerInterestService Build(
         IDateTimeService dateTimeService = null,
         IEmailService emailService = null,
+        IPostcodeLookupService postcodeLookupService = null,
         IEmployerInterestRepository employerInterestRepository = null,
         EmployerInterestSettings employerInterestSettings = null,
         ILogger<EmployerInterestService> logger = null)
     {
         dateTimeService ??= Substitute.For<IDateTimeService>();
         emailService ??= Substitute.For<IEmailService>();
+        postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         employerInterestRepository ??= Substitute.For<IEmployerInterestRepository>();
         logger ??= Substitute.For<ILogger<EmployerInterestService>>();
 
@@ -30,6 +32,7 @@ public class EmployerInterestServiceBuilder
         return new EmployerInterestService(
             dateTimeService,
             emailService,
+            postcodeLookupService,
             employerInterestRepository,
             employerInterestOptions,
             logger);

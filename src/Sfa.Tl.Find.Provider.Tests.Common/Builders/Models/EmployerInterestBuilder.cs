@@ -4,13 +4,15 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class EmployerInterestBuilder
 {
+    private IList<Guid> _uniqueIds = new List<Guid>();
+
     public IEnumerable<EmployerInterest> BuildList() =>
         new List<EmployerInterest>
         {
             new()
             {
                 Id = 1,
-                UniqueId = Guid.Parse("847ad919-2c1e-45d2-a7da-080b325094a1"),
+                UniqueId = _uniqueIds.FirstOrDefault(),
                 OrganisationName = "Test Employer",
                 ContactName = "Test Contact",
                 Postcode = "CV1 2WT",
@@ -27,7 +29,7 @@ public class EmployerInterestBuilder
             new()
             {
                 Id = 2,
-                UniqueId = Guid.Parse("8e646160-c9eb-4700-a037-7ca613fd4099"),
+                UniqueId = _uniqueIds.Skip(1).FirstOrDefault(),
                 OrganisationName = "Test Employer 2",
                 ContactName = "Test Contact 2",
                 Postcode = "CV1 3XT",
@@ -48,4 +50,19 @@ public class EmployerInterestBuilder
 
     public EmployerInterest Build() =>
         BuildList().First();
+
+    public EmployerInterestBuilder WithUniqueId(Guid uniqueId)
+    {
+        _uniqueIds.Clear();
+        _uniqueIds.Add(uniqueId);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithUniqueIds(IEnumerable<Guid> uniqueIds)
+    {
+        _uniqueIds = uniqueIds.ToList();
+
+        return this;
+    }
 }

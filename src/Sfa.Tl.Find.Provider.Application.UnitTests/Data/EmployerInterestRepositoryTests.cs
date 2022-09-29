@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Sfa.Tl.Find.Provider.Application.Data;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
@@ -18,13 +19,47 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
+    public async Task Create_Calls_Database_As_Expected()
+    {
+        var employerInterest = new EmployerInterestBuilder()
+            .Build();
+
+        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithTransaction();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper);
+
+        await repository.Create(employerInterest);
+
+        dbContextWrapper
+            .Received(1)
+            .BeginTransaction(dbConnection);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                "CreateEmployerInterest",
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null),
+                commandType: CommandType.StoredProcedure);
+
+        transaction
+            .Received(1)
+            .Commit();
+    }
+
+    [Fact]
     public async Task Create_Returns_Expected_Result()
     {
-        //var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
+        var uniqueId = new Guid();
+        var guidService = Substitute.For<IGuidService>();
+        guidService
+            .NewGuid()
+            .Returns(uniqueId);
 
-        //TODO: Need a GuidGeneratorService for testing
-
-        var employerInterest = new EmployerInterestBuilder().Build();
+        var employerInterest = new EmployerInterestBuilder()
+            .Build();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
@@ -32,18 +67,52 @@ public class EmployerInterestRepositoryTests
         dbContextWrapper
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("INSERT INTO dbo.EmployerInterest")),
+                    s == "CreateEmployerInterest"),
                 Arg.Any<object>(),
-                Arg.Is<IDbTransaction>(t => t != null))
+                Arg.Is<IDbTransaction>(t => t != null),
+                commandType: CommandType.StoredProcedure)
             .Returns(1);
 
-        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                guidService: guidService);
 
         var result = await repository.Create(employerInterest);
 
-        result.Should().Be(employerInterest.UniqueId);
+        result.Count.Should().Be(1);
+        result.UniqueId.Should().Be(uniqueId);
     }
 
+    [Fact]
+    public async Task Delete_Calls_Database_As_Expected()
+    {
+        var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
+
+        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithTransaction();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper);
+
+        await repository.Delete(uniqueId);
+
+        dbContextWrapper
+            .Received(1)
+            .BeginTransaction(dbConnection);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("DELETE dbo.EmployerInterest WHERE UniqueId = @uniqueId")),
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null));
+
+        transaction
+            .Received(1)
+            .Commit();
+    }
+    
     [Fact]
     public async Task Delete_Returns_Expected_Result()
     {

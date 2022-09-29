@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -10,6 +9,7 @@ public class EmployerInterestService : IEmployerInterestService
 {
     private readonly IDateTimeService _dateTimeService;
     private readonly IEmailService _emailService;
+    private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmployerInterestRepository _employerInterestRepository;
     private readonly ILogger<EmployerInterestService> _logger;
     private readonly EmployerInterestSettings _employerInterestSettings;
@@ -17,12 +17,14 @@ public class EmployerInterestService : IEmployerInterestService
     public EmployerInterestService(
         IDateTimeService dateTimeService,
         IEmailService emailService,
+        IPostcodeLookupService postcodeLookupService,
         IEmployerInterestRepository employerInterestRepository,
         IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<EmployerInterestService> logger)
     {
         _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+        _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _employerInterestRepository = employerInterestRepository ?? throw new ArgumentNullException(nameof(employerInterestRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -32,7 +34,7 @@ public class EmployerInterestService : IEmployerInterestService
 
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
-        var uniqueId = await _employerInterestRepository.Create(employerInterest);
+        var (count, uniqueId) = await _employerInterestRepository.Create(employerInterest);
 
         if (uniqueId != Guid.Empty)
         {

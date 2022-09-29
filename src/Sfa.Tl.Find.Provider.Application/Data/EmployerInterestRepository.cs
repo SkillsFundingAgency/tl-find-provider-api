@@ -11,6 +11,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
     private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
+    private readonly IGuidService _guidService;
     private readonly ILogger<EmployerInterestRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
@@ -18,20 +19,22 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         IDbContextWrapper dbContextWrapper,
         IDynamicParametersWrapper dynamicParametersWrapper,
         IReadOnlyPolicyRegistry<string> policyRegistry,
+        IGuidService guidService,
         ILogger<EmployerInterestRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
         _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
+        _guidService = guidService ?? throw new ArgumentNullException(nameof(guidService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<Guid> Create(EmployerInterest employerInterest)
+    public async Task<(int, Guid)> Create(EmployerInterest employerInterest)
     {
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
         
-        employerInterest.UniqueId = new Guid();
+        employerInterest.UniqueId = _guidService.NewGuid();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
@@ -41,35 +44,9 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                     }
                 .AsTableValuedParameter("dbo.EmployerInterestTableType")
         });
-
-        //var sql = "INSERT INTO dbo.EmployerInterest " +
-        //          "(UniqueId, " +
-        //          " OrganisationName, " +
-        //          " ContactName, " +
-        //          " Postcode, " +
-        //          " HasMultipleLocations, " +
-        //          " LocationCount, " +
-        //          " IndustryId, " +
-        //          " SpecificRequirements, " +
-        //          " Email, " +
-        //          " Telephone, " +
-        //          " ContactPreferenceType) " +
-        //          "VALUES (" +
-        //          " @uniqueId, " +
-        //          " @organisationName, " +
-        //          " @contactName, " +
-        //          " @postcode, " +
-        //          " @hasMultipleLocations, " +
-        //          " @locationCount, " +
-        //          " @industryId, " +
-        //          " @specificRequirements, " +
-        //          " @email, " +
-        //          " @telephone, " +
-        //          " @contactPreferenceType" +
-        //          ")";
-
+        
         using var transaction = _dbContextWrapper.BeginTransaction(connection);
-
+        
         var result = await _dbContextWrapper.ExecuteAsync(
             connection,
             "CreateEmployerInterest",
@@ -79,7 +56,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
         transaction.Commit();
 
-        return employerInterest.UniqueId;
+        return (result, employerInterest.UniqueId);
     }
 
     public async Task<int> Delete(Guid uniqueId)
