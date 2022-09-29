@@ -1,4 +1,99 @@
 ﻿@page
-@model Sfa.Tl.Find.Provider.Web.Samples.Pages.EmployerInterest.CreateModel
+@model CreateModel
 @{
+    ViewData["Title"] = "Register Employer Interest";
+}
+
+<div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Register Employer Interest</h1>
+
+        <form novalidate id="tl-confirm-employer-interest-form">
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
+                            Primary contact
+                        </h2>
+                    </legend>
+
+                    <div class="govuk-form-group" sfa-validation-for="PrimaryContact" sfa-validationerror-class="govuk-form-group--error">
+                        <label class="govuk-label">
+                            Primary contact name
+                        </label>
+                        <span class="govuk-error-message" ></span>
+                        <input class="govuk-input govuk-input--width-20" type="text">
+                    </div>
+
+                    <div class="govuk-form-group" >
+                        <label class="govuk-label">
+                            Primary contact email
+                        </label>
+                        <span class="govuk-error-message" ></span>
+                        <input class="govuk-input govuk-input--width-20" type="email">
+                    </div>
+
+                    <div class="govuk-form-group" >
+                        <label class="govuk-label">
+                            Primary contact telephone
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" type="tel">
+                    </div>
+                </fieldset>
+            </div>
+
+
+            <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save opportunity</button>
+        </form>
+
+    </div>
+</div>
+
+<div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body">
+            <a asp-page="/EmployerInterest/Confirm">Go to the confirmation page</a>
+        </p>
+    </div>
+</div>
+
+<!-- Hidden fields to pass parameters to script -->
+<div>
+    <input type="hidden" id="find_provider_api_uri" value=@Model.ApiUrl>
+    <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId>
+    <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey>
+</div>
+
+@section Scripts {
+    <script src="~/js/crypto.js"></script>
+
+    @*<script src="~/js/employerInterest.js"
+            data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
+            data-findProviderAppId="{{ settings.find_provider_api_app_id }}"
+            data-findProviderApiKey="{{ settings.find_provider_api_api_key }}"
+            asp-append-version="true">
+    </script>*@
+
+    <script>
+        $(document).ready(function () {
+
+            let findProviderApiUri = $('#find_provider_api_uri').val();
+            if (findProviderApiUri !== null && findProviderApiUri.substr(-1) !== '/') findProviderApiUri += '/';
+
+            const findProviderAppId = $('#find_provider_api_app_id').val();
+            const findProviderApiKey = $('#find_provider_api_key').val();
+
+            console.log('set findProviderApiUri = ' + findProviderApiUri);
+
+            $("#tl-confirm").click(function () {
+                event.stopPropagation();
+                event.preventDefault();
+
+                //const searchTerm = $("#tl-term").val().trim();
+                console.log("Confirm clicked");
+                return false;
+            });
+        }
+    </script>
 }

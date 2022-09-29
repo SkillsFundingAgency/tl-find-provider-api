@@ -1,4 +1,77 @@
 ﻿@page
-@model Sfa.Tl.Find.Provider.Web.Samples.Pages.EmployerInterest.ConfirmModel
+@model ConfirmModel
 @{
+    ViewData["Title"] = "Confirm Employer Interest";
 }
+
+<div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Confirm Employer Interest details</h1>
+
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9" id="tl-placement-table">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Organisation name
+                </dt>
+                <dd class="govuk-summary-list__value" id="tl-organisation-name">
+                </dd>
+            </div>
+        </dl>
+
+        <form novalidate id="tl-confirm-employer-interest-form">
+            <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save opportunity</button>
+        </form>
+
+    </div>
+</div>
+
+<!-- Hidden fields to pass parameters to script -->
+<div>
+    <input type="hidden" id="find_provider_api_uri" value=@Model.ApiUrl>
+    <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId>
+    <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey>
+</div>
+
+@section Scripts {
+    <script src="~/js/crypto.js"></script>
+
+    @*<script src="~/js/employerInterest.js"
+            data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
+            data-findProviderAppId="{{ settings.find_provider_api_app_id }}"
+            data-findProviderApiKey="{{ settings.find_provider_api_api_key }}"
+            asp-append-version="true">
+    </script>*@
+
+    <script>
+        $(document).ready(function () {
+
+            let findProviderApiUri = $('#find_provider_api_uri').val();
+            if (findProviderApiUri !== null && findProviderApiUri.substr(-1) !== '/') findProviderApiUri += '/';
+
+            const findProviderAppId = $('#find_provider_api_app_id').val();
+            const findProviderApiKey = $('#find_provider_api_key').val();
+
+            console.log('set findProviderApiUri = ' + findProviderApiUri);
+            
+            //TODO: Pull data from storage and populate the detal items above
+
+
+            $("#tl-organisation-name").val("Test Organisation");
+
+
+            $("#tl-confirm-employer-interest-form").submit(function() {
+                event.stopPropagation();
+                event.preventDefault();
+                console.log('form submitted');
+                return false;
+            });
+        //    $("#tl-confirm").click(function () {
+        //        event.stopPropagation();
+        //        event.preventDefault();
+
+        //        //const searchTerm = $("#tl-term").val().trim();
+        //        console.log("Confirm clicked");
+        //        return false;
+        //});
+    </script>
+    }

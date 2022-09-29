@@ -1,44 +1,45 @@
 ﻿@page
 @model UnsubscribeModel
 @{
+    ViewData["Title"] = "Unsubscribe Employer Interest";
 }
 
-    <div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
-        <div class="govuk-grid-column-two-thirds">
-            <div class="tl-card--grey">
-                <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Prototype</h1>
-                <h3 class="govuk-heading-s" id="tl-employer-id"></h3>
-                <p class="govuk-body">Are you sure you want to unsubscribe?</p>
+<div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="tl-card--grey">
+            <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Prototype</h1>
+            <h3 class="govuk-heading-s" id="tl-employer-id"></h3>
+            <p class="govuk-body">Are you sure you want to unsubscribe?</p>
 
-                <form>
-                    <button class="govuk-button tl-button--blue tl-fap-home--submit" id="tl-confirm-unsubscribe-employer" data-module="govuk-button">
-                        Confirm
-                    </button>
-                </form>
-            </div>
+            <form>
+                <button class="govuk-button tl-button--blue tl-fap-home--submit" id="tl-confirm-unsubscribe-employer" data-module="govuk-button">
+                    Confirm
+                </button>
+            </form>
         </div>
     </div>
-    
-    <!-- Hidden fields to pass parameters to script -->
-    <div>
-        <input type="hidden" id="find_provider_api_uri" value=@Model.ApiUrl>
-        <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId>
-        <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey>
-    </div>
+</div>
+
+<!-- Hidden fields to pass parameters to script -->
+<div>
+    <input type="hidden" id="find_provider_api_uri" value=@Model.ApiUrl>
+    <input type="hidden" id="find_provider_api_app_id" value=@Model.ApiAppId>
+    <input type="hidden" id="find_provider_api_key" value=@Model.ApiKey>
+</div>
 
 @section Scripts {
     <script src="~/js/crypto.js"></script>
 
     @*<script src="~/js/employerInterest.js"
             data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
-            data-findProviderAppId="{{ settings.find_provider_api_app_id }}" 
+            data-findProviderAppId="{{ settings.find_provider_api_app_id }}"
             data-findProviderApiKey="{{ settings.find_provider_api_api_key }}"
             asp-append-version="true">
     </script>*@
 
     <script>
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             let findProviderApiUri = $('#find_provider_api_uri').val();
             if (findProviderApiUri !== null && findProviderApiUri.substr(-1) !== '/') findProviderApiUri += '/';
@@ -47,7 +48,7 @@
             const findProviderApiKey = $('#find_provider_api_key').val();
 
             console.log('set findProviderApiUri = ' + findProviderApiUri);
-            
+
             const employerId = getUrlParameter("id");
             console.log(`Employer id: ${employerId}`);
             $("#tl-employer-id").html(employerId);
@@ -56,15 +57,9 @@
                 event.stopPropagation();
                 event.preventDefault();
 
-                //const searchTerm = $("#tl-term").val().trim();
-                console.log("Confirm clicked");
-                console.log(`Confirm clicked for ${employerId}`);
                 if (employerId) {
                     const uri = findProviderApiUri + "employers/deleteinterest/" + employerId;
                     console.log("Calling delete on " + uri);
-                    console.log(findProviderAppId);
-                    console.log(findProviderApiKey);
-                    console.log("DELETE");
 
                     $.ajax({
                         type: "DELETE",
@@ -77,10 +72,10 @@
                         console.log('delete employer interest succeeded');
                         console.log('data = ' + data);
                         console.log('xhr.status = ' + xhr.status);
-                    }).fail(function(xhr, status, error) {
+                    }).fail(function (xhr, status, error) {
                         console.log('Call to delete employer interest failed. ' + status + ' ' + error);
                         console.log('error = ' + error);
-                        console.log('status = ' +  status);
+                        console.log('status = ' + status);
                         console.log('xhr.status = ' + xhr.status);
                     });
                 }
@@ -104,11 +99,11 @@
             return null;
         }
 
-        //NOTE: Added method parameter to this
+                //NOTE: Added method parameter to this
         /*
         function addHmacAuthHeader(xhr, uri, appId, apiKey, method) {
             method = (page === undefined ? "GET" : method);
-             
+
             page = (page === undefined ? 0 : page);
             const ts = Math.round((new Date()).getTime() / 1000);
             const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
