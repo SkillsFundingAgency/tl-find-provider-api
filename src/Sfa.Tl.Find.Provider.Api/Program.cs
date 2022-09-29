@@ -105,6 +105,8 @@ try
         });
 
     builder.Services.AddHealthChecks()
+        .AddSqlServer(siteConfiguration.SqlConnectionString, 
+            tags: new[] { "database" })
         .Services
         .AddHealthChecksUI()
         .AddInMemoryStorage();
