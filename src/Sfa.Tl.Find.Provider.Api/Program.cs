@@ -3,11 +3,13 @@ using AspNetCoreRateLimit;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Application.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
@@ -102,6 +104,11 @@ try
             options.KnownProxies.Clear();
         });
 
+    builder.Services.AddHealthChecks()
+        .Services
+        .AddHealthChecksUI()
+        .AddInMemoryStorage();
+
     var app = builder.Build();
 
     app.UseForwardedHeaders();
@@ -119,6 +126,13 @@ try
             "/swagger/v3/swagger.json",
             "T Levels Find a Provider.Api v3"));
     }
+
+    //Add before CORS policy so this will be allowed through
+    app.UseHealthChecks("/health", new HealthCheckOptions
+        {
+            ResponseWriter = HealthCheckResponseWriter.WriteJsonResponse
+        })
+        .UseHealthChecksUI();
 
     if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
     {
