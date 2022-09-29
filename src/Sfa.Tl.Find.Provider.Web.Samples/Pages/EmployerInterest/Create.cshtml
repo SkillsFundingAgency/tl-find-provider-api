@@ -8,41 +8,123 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Register Employer Interest</h1>
 
-        <form novalidate id="tl-confirm-employer-interest-form">
+        <form novalidate id="tl-employer-interest-form">
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
-                            Primary contact
-                        </h2>
-                    </legend>
 
                     <div class="govuk-form-group" sfa-validation-for="PrimaryContact" sfa-validationerror-class="govuk-form-group--error">
                         <label class="govuk-label">
-                            Primary contact name
-                        </label>
-                        <span class="govuk-error-message" ></span>
-                        <input class="govuk-input govuk-input--width-20" type="text">
-                    </div>
-
-                    <div class="govuk-form-group" >
-                        <label class="govuk-label">
-                            Primary contact email
-                        </label>
-                        <span class="govuk-error-message" ></span>
-                        <input class="govuk-input govuk-input--width-20" type="email">
-                    </div>
-
-                    <div class="govuk-form-group" >
-                        <label class="govuk-label">
-                            Primary contact telephone
+                            Organisation name
                         </label>
                         <span class="govuk-error-message"></span>
-                        <input class="govuk-input govuk-input--width-20" type="tel">
+                        <input class="govuk-input govuk-input--width-20" id="tl-organisation-name" type="text">
+                    </div>
+
+                    <div class="govuk-form-group" sfa-validation-for="PrimaryContact" sfa-validationerror-class="govuk-form-group--error">
+                        <label class="govuk-label">
+                            Contact name
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" id="tl-contact-name" type="text">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label">
+                            Email
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" id="tl-email" type="email">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label">
+                            Telephone
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" id="tl-telephone" type="tel">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label">
+                            Postcode
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" id="tl-postcode" type="text">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <div class="govuk-checkboxes govuk-checkboxes--small">
+                            <div class="govuk-checkboxes__item">
+                                <label class="govuk-label govuk-checkboxes__label" for="tl-multiple-locations">
+                                    Multiple locations?
+                                </label>
+                                <input class="govuk-checkboxes__input" id="tl-multiple-locations" name="multiple-locations" type="checkbox">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="govuk-form-group tl-hidden" id="tl-location-count-container">
+                        <label class="govuk-label">
+                            Location count
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" id="tl-location-count" type="number">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label">
+                            Industry
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" id="tl-industry" type="number">
+                    </div>
+
+                    @* <div class="govuk-form-group">
+                    <label class="govuk-label">
+                    Contact preference (1=email, 2=telephone)
+                    </label>
+                    <span class="govuk-error-message"></span>
+                    <input class="govuk-input govuk-input--width-20" id="tl-contact-preference" type="number">
+                    </div>*@
+
+                    <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m" id="PlacementsKnown" name="PlacementsKnown">
+                                Contact preference
+                            </legend>
+                            @*<label><input type="radio" name="tl-contact-preference" id="tl-contact-preference-email" value="1" /> 1</label>
+                            <br />
+                            <label><input type="radio" name="tl-contact-preference" id="tl-contact-preference-telephone" value="2" /> 2</label>
+                            <br />*@
+
+
+                            <div id="tl-contact-preference-group" class="govuk-radios govuk-radios--conditional" data-module="radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" name="tl-contact-preference" id="tl-contact-preference-email" type="radio" value="1">
+                                    <label class="govuk-label govuk-radios__label" for="tl-contact-preference-email">
+                                        Email
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" name="tl-contact-preference" id="tl-contact-preference-telephone" type="radio" value="2">
+                                    <label class="govuk-label govuk-radios__label" for="tl-contact-preference-telephone">
+                                        Telephone
+                                    </label>
+                                </div>
+                            </div>
+
+                        </fieldset>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label">
+                            Specific requirements
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <textarea maxlength="500" class="govuk-textarea govuk-js-character-count" id="tl-specific-requirements" rows="5" aria-describedby="Comment-info"></textarea>
                     </div>
                 </fieldset>
             </div>
-
 
             <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save opportunity</button>
         </form>
@@ -86,14 +168,42 @@
 
             console.log('set findProviderApiUri = ' + findProviderApiUri);
 
-            $("#tl-confirm").click(function () {
-                event.stopPropagation();
-                event.preventDefault();
+            $("#tl-multiple-locations").change(function () {
+                if (this.checked) {
+                    console.log('multiple locations checked');
+                    $("#tl-location-count-container").removeClass("tl-hidden");
+                }
+                else {
+                    console.log('multiple locations unchecked');
+                    $("#tl-location-count-container").addClass("tl-hidden")
+                }
+            });
 
-                //const searchTerm = $("#tl-term").val().trim();
-                console.log("Confirm clicked");
+            $("#tl-employer-interest-form").submit(function () {
+                submitEmployerInterest();
                 return false;
             });
-        }
+
+            function submitEmployerInterest() {
+                console.log('submitting...');
+
+                console.log('Organisation:\t' + $("#tl-organisation-name").val());
+                console.log('Contact:\t' + $("#tl-contact-name").val());
+                console.log('Email:\t' + $("#tl-email").val());
+                console.log('Telephone:\t' + $("#tl-telephone").val());
+                console.log('Postcode:\t' + $("#tl-postcode").val());
+
+                console.log('Multiple locations:\t' + $("#tl-multiple-locations").val());
+                console.log('Location count:\t' + $("#tl-location-count").val());
+                console.log('Industry:\t' + $("#tl-industry").val());
+                console.log('Specific requirements:\t' + $("#tl-specific-requirements").val());
+                console.log('Contact preference:\t' + $('input[name=tl-contact-preference]:checked').val());
+            }
+
+            //$('#tl-employer-interest-form input').on('change', function () {
+            //    console.log($('input[name=tl-contact-preference]:checked').val());
+            //});
+
+        });
     </script>
 }

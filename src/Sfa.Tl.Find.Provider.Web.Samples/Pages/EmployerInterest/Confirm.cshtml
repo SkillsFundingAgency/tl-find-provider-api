@@ -13,13 +13,86 @@
                 <dt class="govuk-summary-list__key">
                     Organisation name
                 </dt>
-                <dd class="govuk-summary-list__value" id="tl-organisation-name">
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-organisation-name"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Contact name
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-contact-name"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Postcode
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-postcode"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Email
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-email"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Telephone
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-telephone"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Contact preference
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-contact-preference"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Has multiple locations?
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-multiple-locations"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row tl-hidden" id="tl-location-count-container">
+                <dt class="govuk-summary-list__key">
+                    Location count
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-location-count"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Industry
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-industry"></span>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Specific-requirements
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <span id="tl-specific-requirements"></span>
                 </dd>
             </div>
         </dl>
 
         <form novalidate id="tl-confirm-employer-interest-form">
-            <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save opportunity</button>
+            <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save</button>
         </form>
 
     </div>
@@ -52,26 +125,50 @@
             const findProviderApiKey = $('#find_provider_api_key').val();
 
             console.log('set findProviderApiUri = ' + findProviderApiUri);
-            
-            //TODO: Pull data from storage and populate the detal items above
 
+            populateEmployerInterestDetails();
 
-            $("#tl-organisation-name").val("Test Organisation");
+            $("#tl-confirm-employer-interest-form").submit(function () {
+                console.log('form submitted');
 
-
-            $("#tl-confirm-employer-interest-form").submit(function() {
                 event.stopPropagation();
                 event.preventDefault();
-                console.log('form submitted');
+                submitEmployerInterest();
                 return false;
             });
-        //    $("#tl-confirm").click(function () {
-        //        event.stopPropagation();
-        //        event.preventDefault();
 
-        //        //const searchTerm = $("#tl-term").val().trim();
-        //        console.log("Confirm clicked");
-        //        return false;
-        //});
+            function populateEmployerInterestDetails() {
+                //TODO: Pull data from storage and populate the detal items above
+                const hasMultipleLocations = true;
+                const locationCount = 2;
+                const contactPreference = 1;
+
+                $("#tl-organisation-name").html("Test Organisation");
+                $("#tl-contact-name").html("Test Contact");
+                $("#tl-postcode").html("Test Postcode");
+                $("#tl-multiple-locations").html(hasMultipleLocations ? "Yes" : "No");
+                $("#tl-location-count").html(locationCount);
+                if (hasMultipleLocations) $("#tl-location-count-container").removeClass("tl-hidden")
+                $("#tl-industry").html("Test Industry Id");
+                $("#tl-specific-requirements").html("Test Specific Requirements");
+                $("#tl-email").html("test@tlevels.gov.uk");
+                $("#tl-telephone").html("+44 20 555 6789");
+                switch (contactPreference) {
+                    case 1:
+                        $("#tl-contact-preference").html("Email");
+                        break;
+
+                    case 2:
+                        $("#tl-contact-preference").html("Telephone");
+                        break;
+                    default:
+                        $("#tl-contact-preference").html("Unknown");
+                }
+            }
+
+            function submitEmployerInterest() {
+                console.log('submitting...');
+            }
+        });
     </script>
-    }
+}
