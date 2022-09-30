@@ -56,8 +56,8 @@ public static class SecurityHeaderExtensions
                 builder.AddImgSrc().None();
                 builder.AddFormAction().None();
                 builder.AddFontSrc().None();
-                builder.AddStyleSrc().None().From("/ui/resources/");
-                builder.AddScriptSrc().From("/ui/resources/");
+                builder.AddStyleSrc().From("/ui/resources/healthchecksui-min.css'");
+                builder.AddScriptSrc().From("/ui/resources/healthchecks-bundle.js");
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
                 builder.AddCustomDirective("require-trusted-types-for", "'script'");
@@ -78,7 +78,7 @@ public static class SecurityHeaderExtensions
                 builder.AddFormAction().Self();
                 builder.AddFontSrc().Self();
                 builder.AddStyleSrc().Self().UnsafeInline();
-                builder.AddScriptSrc().Self().UnsafeInline();//.WithNonce();
+                builder.AddScriptSrc().Self().UnsafeInline();
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
             });
