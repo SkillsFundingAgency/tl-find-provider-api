@@ -54,7 +54,7 @@ public static class SecurityHeaderExtensions
                 builder.AddObjectSrc().None();
                 builder.AddBlockAllMixedContent();
                 builder.AddImgSrc().Self()
-                    .From("https://avatars3.githubusercontent.com/u/25212406?s=460&v=4");
+                    .From("https://avatars3.githubusercontent.com/u/25212406");
                 builder.AddFormAction().None();
                 builder.AddFontSrc().None();
                 builder.AddStyleSrc().Self().UnsafeInline();
