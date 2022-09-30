@@ -139,6 +139,16 @@
 
             function populateEmployerInterestDetails() {
                 //TODO: Pull data from storage and populate the detal items above
+                const dataItem = window.localStorage.getItem('employerInterestData');
+                console.log(dataItem);
+
+                if (dataItem) {
+                    console.log('data item found');
+                    console.log(dataItem);
+                    const data = JSON.parse(dataItem);
+                    console.log(data);
+                }
+
                 const hasMultipleLocations = true;
                 const locationCount = 2;
                 const contactPreference = 1;

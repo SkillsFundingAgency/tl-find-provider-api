@@ -198,6 +198,23 @@
                 console.log('Industry:\t' + $("#tl-industry").val());
                 console.log('Specific requirements:\t' + $("#tl-specific-requirements").val());
                 console.log('Contact preference:\t' + $('input[name=tl-contact-preference]:checked').val());
+
+                const data = {
+                    organisation: $("#tl-organisation-name").val(),
+                    contact: $("#tl-contact-name").val(),
+                    email: $("#tl-email").val(),
+                    telephone: $("#tl-telephone").val(),
+                    postcode: $("#tl-postcode").val(),
+                    multipleLocations: $("#tl-multiple-locations").val(),
+                    locationCount: $("#tl-location-count").val(),
+                    industry: $("#tl-industry").val(),
+                    specificRequirements: $("#tl-specific-requirements").val(),
+                    contactPreference: $('input[name=tl-contact-preference]:checked').val()
+                };
+
+                console.log(JSON.stringify(data));
+
+                window.localStorage.setItem('employerInterestData', JSON.stringify(data));
             }
 
             //$('#tl-employer-interest-form input').on('change', function () {
