@@ -56,8 +56,8 @@ public static class SecurityHeaderExtensions
                 builder.AddImgSrc().None();
                 builder.AddFormAction().None();
                 builder.AddFontSrc().None();
-                builder.AddStyleSrc().From("/ui/resources/healthchecksui-min.css'");
-                builder.AddScriptSrc().From("/ui/resources/healthchecks-bundle.js");
+                builder.AddStyleSrc().Self();
+                builder.AddScriptSrc().Self();
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
                 builder.AddCustomDirective("require-trusted-types-for", "'script'");
