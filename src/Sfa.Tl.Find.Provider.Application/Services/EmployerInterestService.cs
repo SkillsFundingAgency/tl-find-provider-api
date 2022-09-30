@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class EmployerInterestService : IEmployerInterestService
@@ -11,6 +15,7 @@ public class EmployerInterestService : IEmployerInterestService
     private readonly IEmailService _emailService;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmployerInterestRepository _employerInterestRepository;
+    private readonly IMemoryCache _cache;
     private readonly ILogger<EmployerInterestService> _logger;
     private readonly EmployerInterestSettings _employerInterestSettings;
 
@@ -19,6 +24,7 @@ public class EmployerInterestService : IEmployerInterestService
         IEmailService emailService,
         IPostcodeLookupService postcodeLookupService,
         IEmployerInterestRepository employerInterestRepository,
+        IMemoryCache cache,
         IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<EmployerInterestService> logger)
     {
@@ -26,6 +32,7 @@ public class EmployerInterestService : IEmployerInterestService
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _employerInterestRepository = employerInterestRepository ?? throw new ArgumentNullException(nameof(employerInterestRepository));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _employerInterestSettings = employerInterestOptions?.Value
@@ -34,6 +41,25 @@ public class EmployerInterestService : IEmployerInterestService
 
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
+        var geoLocation = await GetPostcode(employerInterest.Postcode);
+
+        //Create a copy - will find a cleaner way to do this later
+        employerInterest = new EmployerInterest
+        {
+            OrganisationName = employerInterest.OrganisationName,
+            ContactName = employerInterest.ContactName,
+            Postcode = geoLocation.Location,
+            Latitude = geoLocation.Latitude,
+            Longitude = geoLocation.Longitude,
+            HasMultipleLocations = employerInterest.HasMultipleLocations,
+            LocationCount = employerInterest.LocationCount,
+            IndustryId = employerInterest.IndustryId,
+            SpecificRequirements = employerInterest.SpecificRequirements,
+            Email = employerInterest.Email,
+            Telephone = employerInterest.Telephone,
+            ContactPreferenceType = employerInterest.ContactPreferenceType
+        };
+
         var (count, uniqueId) = await _employerInterestRepository.Create(employerInterest);
 
         if (uniqueId != Guid.Empty)
@@ -109,5 +135,29 @@ public class EmployerInterestService : IEmployerInterestService
             employerInterest.Email,
             templateName,
             tokens);
+    }
+
+    private async Task<GeoLocation> GetPostcode(string postcode)
+    {
+        var key = CacheKeys.PostcodeKey(postcode);
+
+        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
+        {
+            geoLocation = postcode.Length <= 4
+                ? await _postcodeLookupService.GetOutcode(postcode)
+                : await _postcodeLookupService.GetPostcode(postcode);
+
+            if (geoLocation is null)
+            {
+                throw new PostcodeNotFoundException(postcode);
+            }
+
+            _cache.Set(key, geoLocation,
+                CacheUtilities.DefaultMemoryCacheEntryOptions(
+                    _dateTimeService,
+                    _logger));
+        }
+
+        return geoLocation;
     }
 }

@@ -1,10 +1,13 @@
-﻿using FluentAssertions;
+﻿using CsvHelper;
+using FluentAssertions;
 using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 public static class ModelValidationExtensions
 {
+    public const double DoubleTolerance = 0.0001;
+
     public static void Validate(this Application.Models.Provider provider,
         long ukPrn,
         string name,
@@ -266,4 +269,29 @@ public static class ModelValidationExtensions
         qualification.Id.Should().Be(expected.Id);
         qualification.Name.Should().Be(expected.Name);
     }
+
+    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected, bool validateId = false, bool validateUniqueId = false)
+    {
+        if(validateId) employerInterest.Id.Should().Be(expected.Id);
+        if (validateUniqueId) employerInterest.UniqueId.Should().Be(expected.UniqueId);
+
+        employerInterest.OrganisationName.Should().Be(expected.OrganisationName);
+        employerInterest.ContactName.Should().Be(expected.ContactName);
+
+        employerInterest.Email.Should().Be(expected.Email);
+        employerInterest.Telephone.Should().Be(expected.Telephone);
+
+        employerInterest.Postcode.Should().Be(expected.Postcode);
+        employerInterest.Longitude.Should().BeApproximately(expected.Longitude, DoubleTolerance);
+        employerInterest.Latitude.Should().BeApproximately(expected.Latitude, DoubleTolerance);
+        
+        employerInterest.HasMultipleLocations.Should().Be(expected.HasMultipleLocations);
+        employerInterest.LocationCount.Should().Be(expected.LocationCount);
+        employerInterest.IndustryId.Should().Be(expected.IndustryId);
+        employerInterest.SpecificRequirements.Should().Be(expected.SpecificRequirements);
+        employerInterest.ContactPreferenceType.Should().Be(expected.ContactPreferenceType);
+
+        return true;
+    }
+
 }

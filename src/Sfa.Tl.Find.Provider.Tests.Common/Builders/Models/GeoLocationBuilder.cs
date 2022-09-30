@@ -69,11 +69,13 @@ public static class GeoLocationBuilder
         };
 
     public static GeoLocation BuildGeoLocation(
-        string location) =>
+        string location,
+        double latitude = 50.0,
+        double longitude = -1.0) =>
         new()
         {
             Location = location,
-            Latitude = 50.0,
-            Longitude = -1.0
+            Latitude = latitude,
+            Longitude = longitude
         };
 }

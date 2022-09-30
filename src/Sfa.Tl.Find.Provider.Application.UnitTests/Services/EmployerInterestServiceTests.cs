@@ -1,10 +1,10 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using static Dapper.SqlMapper;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -32,12 +32,21 @@ public class EmployerInterestServiceTests
 
         var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
 
+        var geoLocation = GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode);
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(geoLocation);
+
         var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.Create(employerInterest)
+        repository.Create(Arg.Any<EmployerInterest>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
-            .Build(employerInterestRepository: repository);
+            .Build(
+                postcodeLookupService: postcodeLookupService,
+                employerInterestRepository: repository);
 
         var result = await service.CreateEmployerInterest(employerInterest);
 
@@ -45,7 +54,28 @@ public class EmployerInterestServiceTests
 
         await repository
             .Received(1)
-            .Create(employerInterest);
+            .Create(Arg.Any<EmployerInterest>());
+        
+        var expectedEmployerInterest = new EmployerInterest
+        {
+            OrganisationName = employerInterest.OrganisationName,
+            ContactName = employerInterest.ContactName,
+            Postcode = geoLocation.Location,
+            Latitude = geoLocation.Latitude,
+            Longitude = geoLocation.Longitude,
+            HasMultipleLocations = employerInterest.HasMultipleLocations,
+            LocationCount = employerInterest.LocationCount,
+            IndustryId = employerInterest.IndustryId,
+            SpecificRequirements = employerInterest.SpecificRequirements,
+            Email = employerInterest.Email,
+            Telephone = employerInterest.Telephone,
+            ContactPreferenceType = employerInterest.ContactPreferenceType
+        };
+
+        await repository
+            .Received(1)
+            .Create(Arg.Is<EmployerInterest>(e =>
+                e.Validate(expectedEmployerInterest, false, false)));
     }
 
     [Fact]
@@ -55,6 +85,11 @@ public class EmployerInterestServiceTests
 
         var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
 
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
+
         var emailService = Substitute.For<IEmailService>();
         emailService.SendEmail(
                 Arg.Any<string>(),
@@ -63,12 +98,13 @@ public class EmployerInterestServiceTests
             .Returns(true);
 
         var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.Create(employerInterest)
+        repository.Create(Arg.Any<EmployerInterest>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
                 emailService: emailService,
+                postcodeLookupService: postcodeLookupService,
                 employerInterestRepository: repository);
 
         var result = await service.CreateEmployerInterest(employerInterest);
@@ -77,7 +113,7 @@ public class EmployerInterestServiceTests
 
         //TODO: use EmailTemplateNames.EmployerRegisterInterest
         const string templateName = "EmployerRegisterInterest";
-        
+
         await emailService
                 .Received(1)
                 .SendEmail(
@@ -101,8 +137,13 @@ public class EmployerInterestServiceTests
                 Arg.Any<IDictionary<string, string>>())
             .Returns(true);
 
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
+
         var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.Create(employerInterest)
+        repository.Create(Arg.Any<EmployerInterest>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -110,6 +151,7 @@ public class EmployerInterestServiceTests
         var service = new EmployerInterestServiceBuilder()
             .Build(
                 emailService: emailService,
+                postcodeLookupService: postcodeLookupService,
                 employerInterestRepository: repository,
                 employerInterestSettings: settings);
 
@@ -152,6 +194,30 @@ public class EmployerInterestServiceTests
                     })));
     }
 
+    [Fact]
+    public async Task CreateEmployerInterest_Calls_PostcodeLookupService()
+    {
+        var employerInterest = new EmployerInterestBuilder().Build();
+
+        var geoLocation = GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode);
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(geoLocation);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                postcodeLookupService: postcodeLookupService);
+
+        await service.CreateEmployerInterest(employerInterest);
+
+        await postcodeLookupService
+            .Received(1)
+            .GetPostcode(
+                employerInterest.Postcode);
+    }
+
     private static bool ValidateTokens(IDictionary<string, string> tokens, IDictionary<string, string> expectedTokens)
     {
         foreach (var (key, value) in expectedTokens)
@@ -185,7 +251,7 @@ public class EmployerInterestServiceTests
         var service = new EmployerInterestServiceBuilder()
             .Build(dateTimeService,
                 employerInterestRepository: repository,
-                employerInterestSettings:settings);
+                employerInterestSettings: settings);
 
         var result = await service.RemoveExpiredEmployerInterest();
 
