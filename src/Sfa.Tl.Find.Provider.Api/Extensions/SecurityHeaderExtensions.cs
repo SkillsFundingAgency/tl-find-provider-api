@@ -57,7 +57,7 @@ public static class SecurityHeaderExtensions
                 builder.AddFormAction().None();
                 builder.AddFontSrc().None();
                 builder.AddStyleSrc().Self();
-                builder.AddScriptSrc().Self();
+                builder.AddScriptSrc().Self().UnsafeInline();
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
                 builder.AddCustomDirective("require-trusted-types-for", "'script'");
