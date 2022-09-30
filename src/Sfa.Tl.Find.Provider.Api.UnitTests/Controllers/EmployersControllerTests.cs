@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using NSubstitute;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;

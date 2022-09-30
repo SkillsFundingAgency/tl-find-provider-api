@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+﻿namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 public static class AssertionExtensions
 {
