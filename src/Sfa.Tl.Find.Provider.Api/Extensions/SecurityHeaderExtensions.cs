@@ -53,14 +53,15 @@ public static class SecurityHeaderExtensions
             {
                 builder.AddObjectSrc().None();
                 builder.AddBlockAllMixedContent();
-                builder.AddImgSrc().None();
+                builder.AddImgSrc().Self()
+                    .From("https://avatars3.githubusercontent.com/u/25212406?s=460&v=4");
                 builder.AddFormAction().None();
                 builder.AddFontSrc().None();
-                builder.AddStyleSrc().Self();
+                builder.AddStyleSrc().Self().UnsafeInline();
                 builder.AddScriptSrc().Self().UnsafeInline();
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
-                builder.AddCustomDirective("require-trusted-types-for", "'script'");
+                //builder.AddCustomDirective("require-trusted-types-for", "'script'");
             });
 
             policy
