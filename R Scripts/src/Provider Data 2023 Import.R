@@ -224,9 +224,6 @@ provider_data <- provider_data %>%  #85 x 79
               filter(!is.na(latitude)) %>% 
               select(postcode, latitude, longitude)) 
 
-# provider_data %>% select(ukprn, postcode, latitude, longitude) 
-
-
 ####################
 # Fix known errors #
 ####################
@@ -257,39 +254,43 @@ provider_data_with_qualifications <- provider_data %>%
 
 #View(provider_data_with_qualifications)
 
+#Look for duplicates
+provider_data %>% 
+  group_by(ukprn, providerName) %>% 
+  summarise(n = n()) %>% 
+  filter(n > 1) %>% View()
+
 ########################
 # Nest the hierarchies #
 ########################
 
-# provider_data_nested <- provider_data %>% 
-#   filter(!is.na(postcode)) %>% 
-#   select(ukPrn = ukprn, 
-#          name = providerName, 
-#          postcode, 
-#          latitude,
-#          longitude,
-#          town, 
-#          website, 
-#          email, 
-#          telephone) %>% 
-#   #Add test rows
-#   #bind_rows(list(ukprn = 10000560, providerName = "BASINGSTOKE COLLEGE OF TECHNOLOGY", postcode = "OX2 9GX", town = "Oxford", website = "", email = "", telephone = "")) %>%   
-#   #bind_rows(list(ukprn = 10000560, providerName = "BASINGSTOKE COLLEGE OF TECHNOLOGY", postcode = "OX2 9GX", town = "Oxford")) %>%   
-#   nest_by(ukPrn, name, 
-#           .key = "locations") %>% 
-#   arrange(name)
+#Need to remove 2023 qualifications from 2022 providers
+provider_data_with_qualifications %>% 
+  ##filter(approved_year == 2022, deliveryYear == 2022, ukprn == 10007527) %>% 
+  #filter(approved_year == 2023, deliveryYear == 2022) %>% 
+  filter(deliveryYear == approved_year) 
+View(provider_data_for_delivery_years)
 
-provider_data_nested_without_details <- provider_data_with_qualifications %>% 
-  # Only select delivery year 2022
-  #filter(deliveryYear == 2022) %>%
+filtered_provider_data <- provider_data_with_qualifications %>% 
+  # Only select delivery years that we want to upload
   filter(deliveryYear %in% included_years) %>%
-  #Only include existing locations 
-  filter(!is.na(postcode)) %>%
-  #For campaign site, don't need email or phone
-  select(-email, -telephone) %>% 
+  # But also only include 2022 delivery for 2022 since the 2023 data is out of date
+  #  - note this filter might change from 2024
+  filter((approved_year == 2022 & deliveryYear == 2022) |
+           (approved_year >= 2023)) %>% 
+  # Only include existing locations 
+  filter(!is.na(postcode)) %>% 
   rename(ukPrn = ukprn, 
          name = providerName) %>% 
-  select(-approved_year, -is_in_course_directory) %>% 
+  select(-approved_year, -is_in_course_directory) 
+#filtered_provider_data %>% filter(ukPrn == 10007527)
+
+provider_data_nested_without_details <- filtered_provider_data %>% 
+  #For campaign site, don't need email or phone
+  select(-email, -telephone) %>% 
+  # rename(ukPrn = ukprn, 
+  #        name = providerName) %>% 
+  # select(-approved_year, -is_in_course_directory) %>% 
   group_by(ukPrn, postcode, deliveryYear) %>% 
   mutate(qualifications = list(sort(unlist(list(frameworkCode))))) %>%
   distinct(ukPrn, postcode, deliveryYear, .keep_all = TRUE) %>% 
@@ -309,16 +310,10 @@ provider_data_nested_without_details <- provider_data_with_qualifications %>%
           .key = "locations") %>% 
   arrange(name) 
 
-provider_data_nested_with_details <- provider_data_with_qualifications %>% 
-  # Only select certain delivery years
-  filter(deliveryYear %in% included_years) %>%
-  #Only include existing locations 
-  filter(!is.na(postcode)) %>%
-  #For campaign site, don't need email or phone
-  #select(-email, -telephone) %>% 
-  rename(ukPrn = ukprn, 
-         name = providerName) %>% 
-  select(-approved_year, -is_in_course_directory) %>% 
+provider_data_nested_with_details <- filtered_provider_data %>% 
+  # rename(ukPrn = ukprn, 
+  #        name = providerName) %>% 
+  # select(-approved_year, -is_in_course_directory) %>% 
   group_by(ukPrn, postcode, deliveryYear) %>% 
   mutate(qualifications = list(sort(unlist(list(frameworkCode))))) %>%
   distinct(ukPrn, postcode, deliveryYear, .keep_all = TRUE) %>% 
