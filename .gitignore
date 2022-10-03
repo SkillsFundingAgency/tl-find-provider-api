@@ -304,4 +304,3 @@ local.settings.development.json
 
 # Benchmark.Net folder
 BenchmarkDotNet.Artifacts/
-.Rproj.user
