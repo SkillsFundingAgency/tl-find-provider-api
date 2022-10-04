@@ -259,6 +259,7 @@ public class ProviderDataService : IProviderDataService
             .ParseAsync(stream);
 
         var count = await LoadAdditionalProviderData(jsonDocument);
+        ClearCaches();
 
         _logger.LogInformation("Loaded {count} providers from stream.", count);
     }
@@ -385,5 +386,12 @@ public class ProviderDataService : IProviderDataService
             SearchResults = searchResults.ToList(),
             TotalResults = totalSearchResults
         };
+    }
+
+    private void ClearCaches()
+    {
+        _cache.Remove(CacheKeys.QualificationsKey);
+        _cache.Remove(CacheKeys.RoutesKey);
+        _cache.Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

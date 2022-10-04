@@ -836,6 +836,31 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task ImportProviderData_Clears_Caches()
+    {
+        var cache = Substitute.For<IMemoryCache>();
+
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(cache: cache);
+
+        await service.ImportProviderData(stream, true);
+        
+        cache
+            .Received(1)
+            .Remove(CacheKeys.QualificationsKey);
+
+        cache
+            .Received(1)
+            .Remove(CacheKeys.ProviderDataDownloadInfoKey);
+
+        cache
+            .Received(1)
+            .Remove(CacheKeys.RoutesKey);
+    }
+
+    [Fact]
     public async Task ImportProviderContacts_Works_As_Expected()
     {
         var receivedProviders = new List<ProviderContactDto>();

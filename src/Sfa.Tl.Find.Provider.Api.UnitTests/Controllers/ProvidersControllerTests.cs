@@ -582,7 +582,6 @@ public class ProvidersControllerTests
         const string formattedDate = "August 2022";
         const int fileSize = 10101;
 
-        //var bytes = new byte[] { 104, 101, 108, 108, 111 };
         var cachedInfo = new ProviderDataDownloadInfoResponse
             {
                 FormattedFileDate = formattedDate,
