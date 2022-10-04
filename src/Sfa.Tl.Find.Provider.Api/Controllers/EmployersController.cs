@@ -49,6 +49,7 @@ public class EmployersController : ControllerBase
     /// Creates an Employer Interest record.
     /// </summary>
     /// <returns>A status result indicating whether the action succeeded.</returns>
+    [HttpGet]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

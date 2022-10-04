@@ -4,97 +4,105 @@
     ViewData["Title"] = "Confirm Employer Interest";
 }
 
+<a asp-page="/EmployerInterest/Create" class="govuk-back-link" id="tl-back">Back</a>
+
 <div class="govuk-grid-row govuk-!-margin-top-7 tl-fap-home--container">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l govuk-!-margin-top-2 govuk-!-margin-bottom-7">Confirm Employer Interest details</h1>
 
-        <dl class="govuk-summary-list govuk-!-margin-bottom-9" id="tl-placement-table">
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Organisation name
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-organisation-name"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Contact name
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-contact-name"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Postcode
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-postcode"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Email
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-email"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Telephone
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-telephone"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Contact preference
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-contact-preference"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Has multiple locations?
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-multiple-locations"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row tl-hidden" id="tl-location-count-container">
-                <dt class="govuk-summary-list__key">
-                    Location count
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-location-count"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Industry
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-industry"></span>
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    Specific-requirements
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    <span id="tl-specific-requirements"></span>
-                </dd>
-            </div>
-        </dl>
+        <div id="tl-confirm-employer-interest">
+            <dl class="govuk-summary-list govuk-!-margin-bottom-9" id="tl-employer-interest-table">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Organisation name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-organisation-name"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Contact name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-contact-name"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Postcode
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-postcode"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Email
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-email"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Telephone
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-telephone"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Contact preference
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-contact-preference"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Has multiple locations?
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-multiple-locations"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row tl-hidden" id="tl-location-count-container">
+                    <dt class="govuk-summary-list__key">
+                        Location count
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-location-count"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Industry
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-industry"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Specific-requirements
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-specific-requirements"></span>
+                    </dd>
+                </div>
+            </dl>
 
-        <form novalidate id="tl-confirm-employer-interest-form">
-            <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save</button>
-        </form>
+            <form novalidate id="tl-confirm-employer-interest-form">
+                <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save</button>
+                <button type="button" class="govuk-button--warning" id="tl-get-routes">Test routes</button>
+            </form>
+        </div>
 
+        <div class="tl-hidden" id="tl-complete">
+            <p class="govuk-body">Your interest has been noted.</p>
+        </div>
     </div>
 </div>
 
@@ -116,6 +124,8 @@
     </script>*@
 
     <script>
+        const employerInterestDataKey = 'employerInterestData';
+
         $(document).ready(function () {
 
             let findProviderApiUri = $('#find_provider_api_uri').val();
@@ -129,45 +139,42 @@
             populateEmployerInterestDetails();
 
             $("#tl-confirm-employer-interest-form").submit(function () {
-                console.log('form submitted');
-
                 event.stopPropagation();
                 event.preventDefault();
                 submitEmployerInterest();
                 return false;
             });
+            $("#tl-get-routes").click(function () {
+                getRoutes();
+                return false;
+            });
 
             function populateEmployerInterestDetails() {
                 //TODO: Pull data from storage and populate the detal items above
-                const dataItem = window.localStorage.getItem('employerInterestData');
+                const dataItem = window.localStorage.getItem(employerInterestDataKey);
                 console.log(dataItem);
 
-                if (dataItem) {
-                    console.log('data item found');
-                    console.log(dataItem);
-                    const data = JSON.parse(dataItem);
-                    console.log(data);
+                if (!dataItem) {
+                    console.log('data not item found');
+                    return;
                 }
+                const data = JSON.parse(dataItem);
+                console.log(data);
 
-                const hasMultipleLocations = true;
-                const locationCount = 2;
-                const contactPreference = 1;
-
-                $("#tl-organisation-name").html("Test Organisation");
-                $("#tl-contact-name").html("Test Contact");
-                $("#tl-postcode").html("Test Postcode");
-                $("#tl-multiple-locations").html(hasMultipleLocations ? "Yes" : "No");
-                $("#tl-location-count").html(locationCount);
-                if (hasMultipleLocations) $("#tl-location-count-container").removeClass("tl-hidden")
-                $("#tl-industry").html("Test Industry Id");
-                $("#tl-specific-requirements").html("Test Specific Requirements");
-                $("#tl-email").html("test@tlevels.gov.uk");
-                $("#tl-telephone").html("+44 20 555 6789");
-                switch (contactPreference) {
+                $("#tl-organisation-name").html(data.organisationName);
+                $("#tl-contact-name").html(data.contactName);
+                $("#tl-postcode").html(data.postcode);
+                $("#tl-multiple-locations").html(data.hasMultipleLocations ? "Yes" : "No");
+                $("#tl-location-count").html(data.locationCount);
+                if (data.hasMultipleLocations) $("#tl-location-count-container").removeClass("tl-hidden")
+                $("#tl-industry").html(data.industryId);
+                $("#tl-specific-requirements").html(data.specificRequirements);
+                $("#tl-email").html(data.email);
+                $("#tl-telephone").html(data.telephone);
+                switch (data.contactPreferenceType) {
                     case 1:
                         $("#tl-contact-preference").html("Email");
                         break;
-
                     case 2:
                         $("#tl-contact-preference").html("Telephone");
                         break;
@@ -176,9 +183,104 @@
                 }
             }
 
+            function getRoutes() {
+                ///Test to make sure HMAC works
+                console.log('loading routes');
+                const routesUri = findProviderApiUri + "routes";
+                $.ajax({
+                    type: "GET",
+                    url: routesUri,
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        NEW_addHmacAuthHeader(xhr, routesUri, findProviderAppId, findProviderApiKey);
+                    }
+                }).done(function (response) {
+                    console.log("got routes");
+                    console.log(response);
+                }).fail(function (error) {
+                    console.log('Call to get routes failed. ' + error);
+                });
+            }
+
             function submitEmployerInterest() {
                 console.log('submitting...');
+                const uri = findProviderApiUri + "employers/createinterest";
+                //const method = "GET";
+                const method = "POST";
+                const dataItem = window.localStorage.getItem(employerInterestDataKey);
+                const data = JSON.parse(dataItem);
+                $.ajax({
+                    type: method,
+                    url: uri,
+                    data: dataItem,
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        NEW_addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method, dataItem);
+                    }
+                }).done(function (response) {
+                    console.log('done!');
+                    console.log(response);
+                    $("#tl-confirm-employer-interest").addClass("tl-hidden");
+                    $("#tl-complete").removeClass("tl-hidden");
+                }).fail(function (xhr, status, error) {
+                    console.log('Call to create employer interest failed. ' + status + ' ' + error);
+                    console.log('error = ' + error);
+                    console.log('status = ' + status);
+                    console.log('xhr.status = ' + xhr.status);
+                });
             }
         });
+
+        function NEW_addHmacAuthHeader(xhr, uri, appId, apiKey, method, data) {
+            console.log('in NEW_addHmacAuthHeader');
+            method = (method === undefined ? "GET" : method);
+            console.log('hmac method is ' + method);
+
+            const ts = Math.round((new Date()).getTime() / 1000);
+
+            // ReSharper disable StringLiteralTypo
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                // ReSharper restore StringLiteralTypo
+                function (c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            const nonce = CryptoJS.enc.Hex.parse(uuid); // 12 Bytes
+
+            var requestContentBase64String = "";
+
+            console.log("data:");
+            console.log(data);
+
+            if (data !== undefined && data) {
+                var dataString = data;//.toString();
+                console.log("data string = " + dataString);
+
+                if (dataString) {
+                    console.log("encoding data");
+                    console.log(dataString);
+                    //console.log(CryptoJS.MD5);
+                    var md5 = CryptoJS.MD5(dataString);
+                    requestContentBase64String = CryptoJS.enc.Base64.stringify(md5);
+                }
+            }
+
+            const dataToHash = appId + method + uri.toLowerCase() + ts + nonce + requestContentBase64String;
+
+            console.log('appId = ' + appId);
+            console.log('method = ' + method);
+            console.log('uri = ' + uri.toLowerCase());
+            console.log('ts = ' + ts);
+            console.log('nonce = ' + nonce);
+            console.log('requestContentBase64String = ' + requestContentBase64String);
+            console.log('HMAC data = ' + dataToHash);
+
+            const hash = CryptoJS.HmacSHA256(dataToHash, apiKey);
+            const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+
+            xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
+        }
+
     </script>
 }

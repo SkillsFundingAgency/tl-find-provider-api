@@ -103,6 +103,14 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
 
         var data = $"{appId}{request.Method.ToUpper()}{requestUri}{requestTimeStamp}{nonce}{requestContentBase64String}";
 
+        //Debug.WriteLine($"appId = {appId}");
+        //Debug.WriteLine($"method = {request.Method}");
+        //Debug.WriteLine($"uri = {requestUri}");
+        //Debug.WriteLine($"timestamp = {requestTimeStamp}");
+        //Debug.WriteLine($"nonce = {nonce}");
+        //Debug.WriteLine($"requestContentBase64String={requestContentBase64String}");
+        //Debug.WriteLine($"data = {data}");
+
         var secretKeyBytes = Encoding.ASCII.GetBytes(sharedKey);
         var signature = Encoding.ASCII.GetBytes(data);
         using var hmac = new HMACSHA256(secretKeyBytes);

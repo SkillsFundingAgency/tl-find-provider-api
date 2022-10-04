@@ -49,10 +49,10 @@ try
     builder.Services
         .AddScoped<IDateTimeService, DateTimeService>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
+        .AddScoped<IGuidService, GuidService>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
         .AddTransient<IEmployerInterestService, EmployerInterestService>()
-        .AddScoped<IGuidService, GuidService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()

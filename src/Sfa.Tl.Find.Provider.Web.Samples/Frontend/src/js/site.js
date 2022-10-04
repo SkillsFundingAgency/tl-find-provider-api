@@ -6,9 +6,8 @@ function addHmacAuthHeader(xhr, uri, appId, apiKey, method) {
 
     const ts = Math.round((new Date()).getTime() / 1000);
 
-    const uuid = //createUniqueId();
 // ReSharper disable StringLiteralTypo
-        'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
 // ReSharper restore StringLiteralTypo
             function (c) {
                 const r = Math.random() * 16 | 0;
