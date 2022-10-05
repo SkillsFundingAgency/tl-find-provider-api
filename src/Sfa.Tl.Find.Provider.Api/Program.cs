@@ -108,7 +108,12 @@ try
         .AddSqlServer(siteConfiguration.SqlConnectionString, 
             tags: new[] { "database" })
         .Services
-        .AddHealthChecksUI()
+        .AddHealthChecksUI(setup =>
+        {
+            setup.SetEvaluationTimeInSeconds(30);
+            setup.MaximumHistoryEntriesPerEndpoint(60);
+            setup.AddHealthCheckEndpoint("Find Provider API Health Checks", "/health");
+        })
         .AddInMemoryStorage();
 
     var app = builder.Build();
