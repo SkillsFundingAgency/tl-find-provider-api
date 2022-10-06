@@ -96,6 +96,15 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
             using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
+            var firstResult = await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "DELETE dbo.EmployerLocation " +
+                "WHERE EmployerInterestId = " +
+                "       (SELECT Id FROM dbo.EmployerInterest " +
+                "        WHERE uniqueId = @uniqueId)",
+                _dynamicParametersWrapper.DynamicParameters,
+                transaction);
+
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "DELETE dbo.EmployerInterest " +
