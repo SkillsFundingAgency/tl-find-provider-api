@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
             .Configure<DfeSignInSettings>(x =>
             {
                 x.ApiUri = siteConfiguration.DfeSignInSettings.ApiUri;
+                x.ClientId = siteConfiguration.DfeSignInSettings.ClientId;
                 x.ApiSecret = siteConfiguration.DfeSignInSettings.ApiSecret;
                 x.Audience = siteConfiguration.DfeSignInSettings.Audience;
                 x.Issuer = siteConfiguration.DfeSignInSettings.Issuer;

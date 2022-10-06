@@ -1,10 +1,5 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Sfa.Tl.Find.Provider.Application.Models.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,7 +11,6 @@ namespace Sfa.Tl.Find.Provider.Application.Services;
 public class DfeSignInApiService : IDfeSignInApiService
 {
     private readonly HttpClient _httpClient;
-    private readonly DfeSignInSettings _signInSettings;
     private readonly string _clientId;
     private readonly IDfeSignInTokenService _tokenService;
     private readonly ILogger<DfeSignInApiService> _logger;
@@ -32,8 +26,7 @@ public class DfeSignInApiService : IDfeSignInApiService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (signInOptions is null) throw new ArgumentNullException(nameof(signInOptions));
 
-        _signInSettings = signInOptions.Value;
-        _clientId = _signInSettings?.ClientId;
+        _clientId = signInOptions.Value?.ClientId;
 
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _httpClient.DefaultRequestHeaders.Authorization =
@@ -44,7 +37,6 @@ public class DfeSignInApiService : IDfeSignInApiService
 
     public async Task<DfeUserInfo> GetDfeSignInUserInfo(string organisationId, string userId)
     {
-        var users = await GetUserList();
         var organisationUkPrn = GetOrganisationUkprn(organisationId, userId);
         var userInfo = GetUserInfo(organisationId, userId);
 
@@ -108,20 +100,4 @@ public class DfeSignInApiService : IDfeSignInApiService
 
         return userClaims;
     }
-
-    //TODO: Remove this, it's for testing only
-    private async Task<IList<string>> GetUserList()
-    {
-        var users = new List<string>();
-        var requestUri = "users?page=1&pageSize=25";
-        var response = await _httpClient.GetAsync(requestUri);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var responseContent = await response.Content.ReadAsStringAsync();
-        }
-
-        return users;
-    }
-
 }

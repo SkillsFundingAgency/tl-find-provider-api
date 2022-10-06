@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Newtonsoft.Json.Linq;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
@@ -16,12 +17,12 @@ public static class ProviderAuthenticationExtensions
     public const string AuthenticationTypeName = "DfE-SignIn";
 
     public static void AddProviderAuthentication(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         DfeSignInSettings signInSettings,
         IWebHostEnvironment environment)
     {
-        var cookieSecurePolicy = environment.IsDevelopment() 
-            ? CookieSecurePolicy.SameAsRequest 
+        var cookieSecurePolicy = environment.IsDevelopment()
+            ? CookieSecurePolicy.SameAsRequest
             : CookieSecurePolicy.Always;
 
         var cookieAndSessionTimeout = signInSettings.Timeout;
@@ -47,6 +48,23 @@ public static class ProviderAuthenticationExtensions
             options.ExpireTimeSpan = overallSessionTimeout;
             //options.LogoutPath = signInSettings.LogoutPath;
             options.AccessDeniedPath = "/Error/403";
+            options.Events = new CookieAuthenticationEvents
+            {
+                OnValidatePrincipal = async x =>
+                {
+                    // since our cookie lifetime is based on the access token one,
+                    // check if we're more than halfway of the cookie lifetime
+                    // assume a timeout of 20 minutes.
+                    var timeElapsed = DateTimeOffset.UtcNow.Subtract(x.Properties.IssuedUtc.Value);
+
+                    if (timeElapsed > TimeSpan.FromMinutes(19.5))
+                    {
+                        var identity = (ClaimsIdentity)x.Principal.Identity;
+                        var accessTokenClaim = identity.FindFirst("access_token");
+                        var refreshTokenClaim = identity.FindFirst("refresh_token");
+                    }
+                }
+            };
         })
         .AddOpenIdConnect(options =>
         {
@@ -132,17 +150,19 @@ public static class ProviderAuthenticationExtensions
                     {
                         Debug.WriteLine($"Claim {claim.Type} = {claim.Value}");
                     }
+                    
+                    var organisationIds = ctx.Principal
+                        .FindAll("Organisation")
+                        .Select(org => JsonDocument.Parse(org.Value))
+                        .Select(jsonDoc => 
+                            jsonDoc
+                                .RootElement
+                                .SafeGetString("id"))
+                        .Where(orgId => orgId != null).ToList();
 
-                    //TODO: Use System.Text.Json
-                    var organisationClaim = ctx.Principal.FindFirst("Organisation");
-
-                    var organisation = organisationClaim != null
-                        ? JObject.Parse(ctx.Principal.FindFirst("Organisation").Value)
-                        : new JObject();
-
-                    if (organisation.HasValues)
+                    if (organisationIds.Any())
                     {
-                        var organisationId = organisation.SelectToken("id").ToString();
+                        var organisationId = organisationIds.First();
                         var userId = ctx.Principal.FindFirst("sub").Value;
 
                         var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
@@ -160,7 +180,7 @@ public static class ProviderAuthenticationExtensions
                                 new(ClaimTypes.Email, ctx.Principal.FindFirst("email").Value),
                                 new(CustomClaimTypes.HasAccessToService, userInfo.HasAccessToService.ToString()),
                                 //new Claim(CustomClaimTypes.LoginUserType, ((int)loggedInUserTypeResponse.UserType).ToString())
-                        });
+                            });
 
                             if (userInfo.Roles != null && userInfo.Roles.Any())
                             {
