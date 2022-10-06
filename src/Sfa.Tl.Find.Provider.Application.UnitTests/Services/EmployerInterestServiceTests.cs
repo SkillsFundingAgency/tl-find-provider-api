@@ -55,7 +55,7 @@ public class EmployerInterestServiceTests
         await repository
             .Received(1)
             .Create(Arg.Any<EmployerInterest>());
-        
+
         var expectedEmployerInterest = new EmployerInterest
         {
             OrganisationName = employerInterest.OrganisationName,
@@ -159,10 +159,12 @@ public class EmployerInterestServiceTests
 
         result.Should().Be(uniqueId);
 
-        var formattedUniqueId = employerInterest.UniqueId.ToString("D").ToLower();
-        var expectedUnsubscribeUri =
-            $"{settings.EmployerSupportSiteUri}{(settings.EmployerSupportSiteUri.EndsWith('/') ? "" : "/")}{formattedUniqueId}";
+        const string expectedContactPreference = "Email";
+        const string expectedLocations = "A single location";
 
+        var expectedUnsubscribeUri =
+            $"{settings.UnsubscribeEmployerUri.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+        
         //TODO: use EmailTemplateNames.EmployerRegisterInterest
         const string templateName = "EmployerRegisterInterest";
         await emailService
@@ -179,21 +181,16 @@ public class EmployerInterestServiceTests
                         { "contact_name", employerInterest.ContactName },
                         { "email_address", employerInterest.Email },
                         { "telephone", employerInterest.Telephone },
-                        //Need to convert to text 1=Email, 2=Telephone
-                        { "contact_preference", employerInterest.ContactPreferenceType.ToString() },
-                        //Need to convert to text
+                        { "contact_preference", expectedContactPreference },
                         { "primary_industry", employerInterest.IndustryId.ToString() },
                         { "postcode", employerInterest.Postcode },
                         { "specific_requirements", employerInterest.SpecificRequirements },
-                        //{ "how_many_locations", employerInterest.HasMultipleLocations + employerInterest.LocationCount }, //A single location
-                        { "how_many_locations", employerInterest.LocationCount.ToString() }, //A single location
-                        //TODO: Get this into config - EmployerInterestSettings_EmployerSupportSiteUri
-                        //{ "employer_support_site", employerInterestConfiguration.EmployerSupportSiteUri },
+                        { "how_many_locations", expectedLocations },
                         { "employer_support_site", settings.EmployerSupportSiteUri },
                         { "employer_unsubscribe_uri", expectedUnsubscribeUri }
                     })));
     }
-
+    
     [Fact]
     public async Task CreateEmployerInterest_Calls_PostcodeLookupService()
     {

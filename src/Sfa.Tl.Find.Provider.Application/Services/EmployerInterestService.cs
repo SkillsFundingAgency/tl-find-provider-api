@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Extensions;
@@ -6,7 +7,6 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
-using System.Text.RegularExpressions;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class EmployerInterestService : IEmployerInterestService
@@ -64,6 +64,7 @@ public class EmployerInterestService : IEmployerInterestService
 
         if (uniqueId != Guid.Empty)
         {
+            employerInterest.UniqueId = uniqueId;
             await SendEmployerRegisterInterestEmail(employerInterest);
         }
 
@@ -109,23 +110,38 @@ public class EmployerInterestService : IEmployerInterestService
         //EmailTemplateNames.EmployerRegisterInterest
         const string templateName = "EmployerRegisterInterest";
 
-        var unsubscribeUri = new Uri(new Uri(_employerInterestSettings.EmployerSupportSiteUri),
-            employerInterest.UniqueId.ToString("D").ToLower());
+        var unsubscribeUri = new Uri(QueryHelpers.AddQueryString(
+            _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
+            "id",
+            employerInterest.UniqueId.ToString("D").ToLower()));
+        
+        //https://localhost:7191/EmployerInterest/Unsubscribe?id=A78BA9E5-EB8B-4FF8-ABFC-36035A029AC1
+        //    "UnsubscribeEmployerUri": "https://localhost:7191/EmployerInterest/Unsubscribe",
 
-        var tokens = new Dictionary<string, string>()
+        var contactPreference = employerInterest.ContactPreferenceType switch
+        {
+            1 => "Email",
+            2 => "Telephone",
+            _ => "Unknown"
+        };
+
+        var howManyLocations =
+        employerInterest.HasMultipleLocations && employerInterest.LocationCount > 0
+            ? $"{employerInterest.LocationCount} location {(employerInterest.LocationCount > 1 ? "s" : "")}"
+                : "A single location";
+
+        var tokens = new Dictionary<string, string>
         {
             { "organisation_name", employerInterest.OrganisationName },
             { "contact_name", employerInterest.ContactName },
             { "email_address", employerInterest.Email },
             { "telephone", employerInterest.Telephone },
-            //Need to convert to text 1=Email, 2=Telephone
-            { "contact_preference", employerInterest.ContactPreferenceType.ToString() },
+            { "contact_preference", contactPreference },
             //Need to convert to text
             { "primary_industry", employerInterest.IndustryId.ToString() },
             { "postcode", employerInterest.Postcode },
             { "specific_requirements", employerInterest.SpecificRequirements },
-            //{ "how_many_locations", employerInterest.HasMultipleLocations + employerInterest.LocationCount }, //A single location
-            { "how_many_locations", employerInterest.LocationCount.ToString() }, //A single location
+            { "how_many_locations", howManyLocations },
             { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri },
             { "unique_id", employerInterest.UniqueId.ToString() },
             { "employer_unsubscribe_uri", unsubscribeUri.ToString() }

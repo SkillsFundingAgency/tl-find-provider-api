@@ -19,7 +19,8 @@ public class SettingsBuilder
     private const int RetentionDays = 10;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
     private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
-
+    private const string UnsubscribeEmployerUri = "https://test.employerssupportgov.uk/unsubscribeinterest/";
+    
     private const string SignInApiUri = "https://test.api.oidc.com";
     private const string SignInApiSecret = "apisecret";
     private const string SignInAudience = "signin.oidc.com";
@@ -81,10 +82,12 @@ public class SettingsBuilder
 
     public EmployerInterestSettings BuildEmployerInterestSettings(
         string employerSupportSiteUri = EmployerSupportSiteUri,
+        string unsubscribeEmployerUri = UnsubscribeEmployerUri,
         int retentionDays = RetentionDays) => new()
         {
             EmployerSupportSiteUri = employerSupportSiteUri,
-            RetentionDays = retentionDays
+            RetentionDays = retentionDays,
+            UnsubscribeEmployerUri = unsubscribeEmployerUri
         };
 
     public PostcodeApiSettings BuildPostcodeApiSettings(

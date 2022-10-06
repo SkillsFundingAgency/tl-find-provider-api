@@ -22,7 +22,7 @@ public class EmployerInterestBuilder
                 LocationCount = 1,
                 IndustryId = 37,
                 SpecificRequirements = "These are my requirements: none",
-                Email ="test.contact1@emplyer.co.uk",
+                Email ="test.contact1@employer.co.uk",
                 Telephone ="020 555 6666 ext 1",
                 ContactPreferenceType = 1
             },
@@ -39,7 +39,7 @@ public class EmployerInterestBuilder
                 LocationCount = 1,
                 IndustryId = 51,
                 SpecificRequirements = "These are my requirements: a few good people",
-                Email ="test.contact2@emplyer.co.uk",
+                Email ="test.contact2@employer.co.uk",
                 Telephone ="020 555 6666 ext 2",
                 ContactPreferenceType = 2
             }

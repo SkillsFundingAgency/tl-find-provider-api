@@ -68,9 +68,13 @@
           "type": "string",
           "environmentVariable": "EmployerInterestSettings_CleanupJobSchedule"
         },
-        "EmployerInterestSettings_EmployerSupportSiteUri": {
+        "EmployerSupportSiteUri": {
           "type": "string",
           "environmentVariable": "EmployerInterestSettings_EmployerSupportSiteUri"
+        },
+        "UnsubscribeEmployerUri": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_UnsubscribeEmployerUri"
         },
         "RetentionDays": {
           "type": "integer",

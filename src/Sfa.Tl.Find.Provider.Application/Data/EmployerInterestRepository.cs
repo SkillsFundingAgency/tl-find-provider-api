@@ -36,30 +36,28 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             using var connection = _dbContextWrapper.CreateConnection();
             connection.Open();
 
-            var employerInterestDto = new EmployerInterestDto
-            {
-                UniqueId = _guidService.NewGuid(),
-                OrganisationName = employerInterest.OrganisationName,
-                ContactName = employerInterest.ContactName,
-                Postcode = employerInterest.Postcode,
-                Latitude = employerInterest.Latitude,
-                Longitude = employerInterest.Longitude,
-                HasMultipleLocations = employerInterest.HasMultipleLocations,
-                LocationCount = employerInterest.LocationCount,
-                IndustryId = employerInterest.IndustryId,
-                SpecificRequirements = employerInterest.SpecificRequirements,
-                Email = employerInterest.Email,
-                Telephone = employerInterest.Telephone,
-                ContactPreferenceType = employerInterest.ContactPreferenceType
-            };
+            var uniqueId = _guidService.NewGuid();
 
-            //employerInterest.UniqueId = _guidService.NewGuid();
-            
             _dynamicParametersWrapper.CreateParameters(new
             {
                 data = new List<EmployerInterestDto>
                     {
-                        employerInterestDto
+                        new()
+                        {
+                            UniqueId = uniqueId,
+                            OrganisationName = employerInterest.OrganisationName,
+                            ContactName = employerInterest.ContactName,
+                            Postcode = employerInterest.Postcode,
+                            Latitude = employerInterest.Latitude,
+                            Longitude = employerInterest.Longitude,
+                            HasMultipleLocations = employerInterest.HasMultipleLocations,
+                            LocationCount = employerInterest.LocationCount,
+                            IndustryId = employerInterest.IndustryId,
+                            SpecificRequirements = employerInterest.SpecificRequirements,
+                            Email = employerInterest.Email,
+                            Telephone = employerInterest.Telephone,
+                            ContactPreferenceType = employerInterest.ContactPreferenceType
+                        }
                     }
                     .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
             });
@@ -75,7 +73,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
             transaction.Commit();
 
-            return (result, employerInterest.UniqueId);
+            return (result, uniqueId);
         }
         catch (Exception ex)
         {

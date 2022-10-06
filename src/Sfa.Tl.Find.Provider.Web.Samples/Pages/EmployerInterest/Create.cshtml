@@ -77,6 +77,9 @@
                         </label>
                         <span class="govuk-error-message"></span>
                         <input class="govuk-input govuk-input--width-20" id="tl-industry" type="number">
+                        <select class="govuk-select govuk-body-s" id="tl-industries" name="industries">
+                            <option value="0">Loading...</option>
+                        </select>
                     </div>
 
                     @* <div class="govuk-form-group">
@@ -127,10 +130,9 @@
             </div>
 
             <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save opportunity</button>
-            <button type="button" class="govuk-button--secondary" id="tl-clear">Clear</button>
-            <button type="button" class="govuk-button--secondary" id="tl-clear-all">Clear all</button>
+            <button type="button" class="govuk-button--warning" id="tl-clear">Clear</button>
+            <button type="button" class="govuk-button--warning" id="tl-clear-all">Clear all</button>
         </form>
-
     </div>
 </div>
 
@@ -150,7 +152,7 @@
 </div>
 
 @section Scripts {
-    @*<script src="~/js/crypto.js"></script>*@
+    <script src="~/js/crypto.js"></script>
 
     @*<script src="~/js/employerInterest.js"
             data-findProviderApiUri="{{ settings.find_provider_api_uri }}"
@@ -172,13 +174,28 @@
 
             console.log('set findProviderApiUri = ' + findProviderApiUri);
 
-            const dataItem = window.localStorage.getItem(employerInterestDataKey);
+            getIndustries();
 
+            const dataItem = window.localStorage.getItem(employerInterestDataKey);
             if (dataItem) {
                 console.log('have data');
                 console.log(JSON.parse(dataItem));
                 populateForm(JSON.parse(dataItem));
             }
+            else {
+                console.log("at start - checked is " + $('#tl-multiple-locations').prop('checked'));
+                displayMultipleLocationsValue($('#tl-multiple-locations').prop('checked'));
+            }
+
+            $("#tl-industry").change(function () {
+                console.log("tl-industry changed " + $("#tl-industry").val());
+                setSelectedIndustry();
+            });
+
+            $("#tl-industries").change(function () {
+                console.log("tl-industries changed" + $("#tl-industries").val());
+                $("#tl-industry").val($("#tl-industries").val(industryId));
+            });
 
             $("#tl-multiple-locations").change(function () {
                 if (this.checked) {
@@ -219,7 +236,26 @@
 
             function clearForm() {
                 $("#tl-employer-interest-form").trigger("reset");
-                $("tl-multiple-locations-value").text("");
+                console.log("after clear - checked is " + $('#tl-multiple-locations').prop('checked'));
+                displayMultipleLocationsValue($('#tl-multiple-locations').prop('checked'));
+            }
+
+            function getIndustries() {
+                const industriesUri = findProviderApiUri + "industries";
+                $.ajax({
+                    type: "GET",
+                    url: industriesUri,
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        addHmacAuthHeader(xhr, industriesUri, findProviderAppId, findProviderApiKey);
+                    }
+                }).done(function (data) {
+                    console.log("got industries");
+                    console.log(data);
+                    populateIndustries(data);
+                }).fail(function (error) {
+                    console.log('Call to get industries failed. ' + error);
+                });
             }
 
             function populateForm(data) {
@@ -228,12 +264,38 @@
                 $("#tl-email").val(data.email);
                 $("#tl-telephone").val(data.telephone);
                 $("#tl-postcode").val(data.postcode);
-                $("#tl-multiple-locations").val(data.hasMultipleLocations);
+                $('#tl-multiple-locations').prop('checked', data.hasMultipleLocations);
                 displayMultipleLocationsValue(data.hasMultipleLocations);
                 $("#tl-location-count").val(data.locationCount);
-                $("#tl-industry").val(data.industryId);
+                $("#tl-industry").val(data.industryId !== 0 ? data.industryId : "");
                 $("#tl-specific-requirements").val(data.specificRequirements);
                 $("input[name=tl-contact-preference][value='" + data.contactPreferenceType + "']").prop("checked", true);
+                setSelectedIndustry();
+            }
+
+            function populateIndustries(data) {
+                const select = $("#tl-industries");
+                //select.find("option:not(:first)").remove();
+                select.find("option").remove();
+                $.each(data,
+                    function (_, item) {
+                        console.log("adding item " + item.name + ' - ' + item.id)
+                        select.append(new Option(item.name, item.id));
+                    });
+                setSelectedIndustry();
+            }
+
+            function setSelectedIndustry() {
+                console.log("current value of industry id = " + $("#tl-industry").val());
+                const industryId = parseInt($("#tl-industry").val()) || 0;
+                console.log("current industry id = " + industryId);
+                console.log("number of items in dropdown : " + $('#input1 option').length);
+                //TODO: if have values in dropdown, select the one with the same value as industryid
+                var val1 = $('#tl-industries').find(":selected").val();
+                var val2 = $('#tl-industries').val();
+                console.log('tl-industries selected value ' + val1 + " - " + val2);
+                //const select = $("#tl-industries");
+                if (industryId) $("#tl-industries").val(industryId);
             }
 
             function submitEmployerInterest() {
@@ -243,7 +305,7 @@
                 console.log('Email:\t' + $("#tl-email").val());
                 console.log('Telephone:\t' + $("#tl-telephone").val());
                 console.log('Postcode:\t' + $("#tl-postcode").val());
-                console.log('Multiple locations:\t' + $("#tl-multiple-locations").checked);
+                console.log('Multiple locations:\t' + $('#tl-multiple-locations').prop('checked'));
                 console.log('Location count:\t' + $("#tl-location-count").val());
                 console.log('Industry:\t' + $("#tl-industry").val());
                 console.log('Specific requirements:\t' + $("#tl-specific-requirements").val());
@@ -255,9 +317,9 @@
                     email: $("#tl-email").val(),
                     telephone: $("#tl-telephone").val(),
                     postcode: $("#tl-postcode").val(),
-                    hasMultipleLocations: $("#tl-multiple-locations").checked,
-                    locationCount: $("#tl-location-count").val(),
-                    industryId: $("#tl-industry").val(),
+                    hasMultipleLocations: $('#tl-multiple-locations').prop('checked'),
+                    locationCount: parseInt($("#tl-location-count").val()) || 0,
+                    industryId: parseInt($("#tl-industry").val()) || 0,
                     specificRequirements: $("#tl-specific-requirements").val(),
                     contactPreferenceType: parseInt($('input[name=tl-contact-preference]:checked').val())
                 };
@@ -268,10 +330,6 @@
 
                 window.location.href = './Confirm';
             }
-
-            //$('#tl-employer-interest-form input').on('change', function () {
-            //    console.log($('input[name=tl-contact-preference]:checked').val());
-            //});
         });
 
     </script>
