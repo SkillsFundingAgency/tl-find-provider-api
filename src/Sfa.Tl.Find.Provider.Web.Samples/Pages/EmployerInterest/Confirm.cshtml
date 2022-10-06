@@ -96,7 +96,7 @@
 
             <form novalidate id="tl-confirm-employer-interest-form">
                 <button type="submit" class="govuk-button" id="tl-confirm">Confirm and save</button>
-                <button type="button" class="govuk-button--warning" id="tl-get-routes">Test routes</button>
+                <button type="button" class="govuk-button--warning" id="tl-get-industries">Test industries</button>
             </form>
         </div>
 
@@ -144,8 +144,8 @@
                 submitEmployerInterest();
                 return false;
             });
-            $("#tl-get-routes").click(function () {
-                getRoutes();
+            $("#tl-get-industries").click(function () {
+                getIndustries();
                 return false;
             });
 
@@ -183,22 +183,20 @@
                 }
             }
 
-            function getRoutes() {
-                ///Test to make sure HMAC works
-                console.log('loading routes');
-                const routesUri = findProviderApiUri + "routes";
+            function getIndustries() {
+                const industriesUri = findProviderApiUri + "industries";
                 $.ajax({
                     type: "GET",
-                    url: routesUri,
+                    url: industriesUri,
                     contentType: "application/json",
                     beforeSend: function (xhr) {
-                        NEW_addHmacAuthHeader(xhr, routesUri, findProviderAppId, findProviderApiKey);
+                        addHmacAuthHeader(xhr, industriesUri, findProviderAppId, findProviderApiKey);
                     }
-                }).done(function (response) {
-                    console.log("got routes");
-                    console.log(response);
+                }).done(function (data) {
+                    console.log("got industries");
+                    console.log(data);
                 }).fail(function (error) {
-                    console.log('Call to get routes failed. ' + error);
+                    console.log('Call to get industries failed. ' + error);
                 });
             }
 
@@ -215,7 +213,7 @@
                     data: dataItem,
                     contentType: "application/json",
                     beforeSend: function (xhr) {
-                        NEW_addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method, dataItem);
+                        addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method, dataItem);
                     }
                 }).done(function (response) {
                     console.log('done!');
@@ -230,57 +228,6 @@
                 });
             }
         });
-
-        function NEW_addHmacAuthHeader(xhr, uri, appId, apiKey, method, data) {
-            console.log('in NEW_addHmacAuthHeader');
-            method = (method === undefined ? "GET" : method);
-            console.log('hmac method is ' + method);
-
-            const ts = Math.round((new Date()).getTime() / 1000);
-
-            // ReSharper disable StringLiteralTypo
-            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-                // ReSharper restore StringLiteralTypo
-                function (c) {
-                    const r = Math.random() * 16 | 0;
-                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-            const nonce = CryptoJS.enc.Hex.parse(uuid); // 12 Bytes
-
-            var requestContentBase64String = "";
-
-            console.log("data:");
-            console.log(data);
-
-            if (data !== undefined && data) {
-                var dataString = data;//.toString();
-                console.log("data string = " + dataString);
-
-                if (dataString) {
-                    console.log("encoding data");
-                    console.log(dataString);
-                    //console.log(CryptoJS.MD5);
-                    var md5 = CryptoJS.MD5(dataString);
-                    requestContentBase64String = CryptoJS.enc.Base64.stringify(md5);
-                }
-            }
-
-            const dataToHash = appId + method + uri.toLowerCase() + ts + nonce + requestContentBase64String;
-
-            console.log('appId = ' + appId);
-            console.log('method = ' + method);
-            console.log('uri = ' + uri.toLowerCase());
-            console.log('ts = ' + ts);
-            console.log('nonce = ' + nonce);
-            console.log('requestContentBase64String = ' + requestContentBase64String);
-            console.log('HMAC data = ' + dataToHash);
-
-            const hash = CryptoJS.HmacSHA256(dataToHash, apiKey);
-            const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
-
-            xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
-        }
-
+        
     </script>
 }

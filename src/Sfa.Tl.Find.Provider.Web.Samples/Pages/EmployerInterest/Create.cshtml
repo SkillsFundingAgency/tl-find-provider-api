@@ -188,13 +188,14 @@
             }
 
             $("#tl-industry").change(function () {
-                console.log("tl-industry changed " + $("#tl-industry").val());
+                console.log("tl-industry changed to " + $("#tl-industry").val());
                 setSelectedIndustry();
             });
 
             $("#tl-industries").change(function () {
-                console.log("tl-industries changed" + $("#tl-industries").val());
-                $("#tl-industry").val($("#tl-industries").val(industryId));
+                const industryId = $("#tl-industries").val();
+                console.log("tl-industries changed to " + industryId);
+                $("#tl-industry").val(industryId);
             });
 
             $("#tl-multiple-locations").change(function () {

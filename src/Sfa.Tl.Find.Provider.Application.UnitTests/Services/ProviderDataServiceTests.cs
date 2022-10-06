@@ -32,6 +32,60 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task GetIndustries_Returns_Expected_List()
+    {
+        var industries = new IndustryBuilder()
+            .BuildList()
+            .ToList();
+
+        var industryRepository = Substitute.For<IIndustryRepository>();
+        industryRepository.GetAll()
+            .Returns(industries);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(industryRepository: industryRepository);
+
+        var results = (await service.GetIndustries()).ToList();
+        results.Should().BeEquivalentTo(industries);
+
+        await industryRepository
+            .Received(1)
+            .GetAll();
+    }
+
+    [Fact]
+    public async Task GetIndustries_Returns_Expected_List_From_Cache()
+    {
+        var industries = new IndustryBuilder().BuildList();
+
+        var industryRepository = Substitute.For<IIndustryRepository>();
+
+        var cache = Substitute.For<IMemoryCache>();
+        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Industry>>())
+            .Returns(x =>
+            {
+                if ((string)x[0] == CacheKeys.IndustriesKey)
+                {
+                    x[1] = industries;
+                    return true;
+                }
+
+                return false;
+            });
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(industryRepository: industryRepository,
+                cache: cache);
+
+        var results = await service.GetIndustries();
+        results.Should().BeEquivalentTo(industries);
+
+        await industryRepository
+            .DidNotReceive()
+            .GetAll();
+    }
+
+    [Fact]
     public async Task GetQualifications_Returns_Expected_List()
     {
         var qualifications = new QualificationBuilder()

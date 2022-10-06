@@ -57,6 +57,7 @@ try
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
         .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
+        .AddTransient<IIndustryRepository, IndustryRepository>()
         .AddTransient<IProviderRepository, ProviderRepository>()
         .AddTransient<IQualificationRepository, QualificationRepository>()
         .AddTransient<IRouteRepository, RouteRepository>()

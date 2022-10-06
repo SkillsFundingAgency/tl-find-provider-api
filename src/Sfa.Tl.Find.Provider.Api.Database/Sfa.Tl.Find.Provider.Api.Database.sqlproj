@@ -109,6 +109,8 @@
     <Build Include="Tables\EmployerLocation.sql" />
     <Build Include="Indexes\SPATIAL_EmployerLocation_Location.sql" />
     <Build Include="Types\EmployerInterestDataTableType.sql" />
+    <Build Include="Tables\Industry.sql" />
+    <None Include="PostDeployment\Seed Industries.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

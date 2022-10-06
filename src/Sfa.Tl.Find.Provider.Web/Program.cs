@@ -19,7 +19,7 @@ builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguratio
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
 //builder.Services.AddAuthorizationServicePolicies();
 
-if(bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
+if (bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
 {
     builder.Services.AddProviderStubAuthentication();
 }
@@ -73,6 +73,7 @@ builder.Services
     .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
+    .AddTransient<IIndustryRepository, IndustryRepository>()
     .AddTransient<IProviderRepository, ProviderRepository>()
     .AddTransient<IQualificationRepository, QualificationRepository>()
     .AddTransient<IRouteRepository, RouteRepository>()
@@ -93,7 +94,7 @@ app.UseXContentTypeOptions()
     .UseReferrerPolicy(opts => opts.NoReferrer())
     ;
 
-app.UseWhen(ctx => 
+app.UseWhen(ctx =>
         ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern, Constants.FontsPathPattern),
         appBuilder =>
             appBuilder
@@ -119,7 +120,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCookiePolicy();
 
-app.UseWhen(ctx => 
+app.UseWhen(ctx =>
         ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern),
     appBuilder =>
         appBuilder.UseXXssProtection(opts => opts.EnabledWithBlockMode()));
@@ -140,4 +141,4 @@ app.UseResponseCaching();
 app.Run();
 
 // ReSharper disable once UnusedMember.Global - Required so tests can see this class
-public partial class Program { } 
+public partial class Program { }

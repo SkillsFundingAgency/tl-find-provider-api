@@ -22,6 +22,7 @@ public class ProviderDataService : IProviderDataService
     private readonly IProviderRepository _providerRepository;
     private readonly IQualificationRepository _qualificationRepository;
     private readonly IRouteRepository _routeRepository;
+    private readonly IIndustryRepository _industryRepository;
     private readonly IMemoryCache _cache;
     private readonly ILogger<ProviderDataService> _logger;
     private readonly bool _mergeAdditionalProviderData;
@@ -32,6 +33,7 @@ public class ProviderDataService : IProviderDataService
         IProviderRepository providerRepository,
         IQualificationRepository qualificationRepository,
         IRouteRepository routeRepository,
+        IIndustryRepository industryRepository,
         ITownDataService townDataService,
         IMemoryCache cache,
         IOptions<SearchSettings> searchOptions,
@@ -42,12 +44,33 @@ public class ProviderDataService : IProviderDataService
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
+        _industryRepository = industryRepository ?? throw new ArgumentNullException(nameof(industryRepository));
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
                                        ?? throw new ArgumentNullException(nameof(searchOptions));
+    }
+
+    public async Task<IEnumerable<Industry>> GetIndustries()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting industries");
+        }
+
+        const string key = CacheKeys.IndustriesKey;
+        if (!_cache.TryGetValue(key, out IList<Industry> industries))
+        {
+            industries = (await _industryRepository
+                    .GetAll())
+                .ToList();
+            _cache.Set(key, industries,
+                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+        }
+
+        return industries;
     }
 
     public async Task<IEnumerable<Qualification>> GetQualifications()
