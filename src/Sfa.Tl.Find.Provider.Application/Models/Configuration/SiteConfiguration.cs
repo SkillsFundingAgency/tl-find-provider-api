@@ -7,6 +7,7 @@ public class SiteConfiguration
     public ApiSettings ApiSettings { get; init; }
     public CourseDirectoryApiSettings CourseDirectoryApiSettings { get; init; }
     public string CourseDirectoryImportSchedule { get; init; }
+    public DfeSignInSettings DfeSignInSettings { get; init; }
     public EmailSettings EmailSettings { get; init; }
     public EmployerInterestSettings EmployerInterestSettings { get; init; }
     public GoogleMapsApiSettings GoogleMapsApiSettings { get; init; }

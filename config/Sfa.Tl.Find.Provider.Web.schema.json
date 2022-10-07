@@ -3,6 +3,66 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
+    "DfeSignInSettings": {
+      "properties": {
+        "MetadataAddress": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_MetadataAddress"
+        },
+        "Audience": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Audience"
+        },
+        "Authority": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Authority"
+        },
+        "Issuer": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Issuer"
+        },
+        "ClientId": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ClientId"
+        },
+        "ClientSecret": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ClientSecret"
+        },
+        "ApiUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ApiUri"
+        },
+        "ApiSecret": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ApiSecret"
+        },
+        "Timeout": {
+          "minLength": 1,
+          "type": "integer",
+          "environmentVariable": "DfeSignIn_Timeout"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Audience",
+        "Issuer",
+        "MetadataAddress",
+        "ClientId",
+        "ClientSecret",
+        "ApiUri",
+        "ApiSecret"
+      ],
+      "type": "object"
+    },
     "EmailSettings": {
       "properties": {
         "GovNotifyApiKey": {

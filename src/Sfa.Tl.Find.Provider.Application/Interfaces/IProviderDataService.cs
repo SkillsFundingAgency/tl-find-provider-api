@@ -8,6 +8,8 @@ public interface IProviderDataService
 
     Task<IEnumerable<Route>> GetRoutes();
 
+    Task<IEnumerable<Industry>> GetIndustries();
+
     Task<bool> HasQualifications();
     Task<bool> HasProviders();
 

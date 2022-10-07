@@ -11,6 +11,7 @@ Post-Deployment Script
 */
 
 :r ".\Seed Email Templates.sql"
+:r ".\Seed Industries.sql"
 :r ".\Seed Qualifications.sql"
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"

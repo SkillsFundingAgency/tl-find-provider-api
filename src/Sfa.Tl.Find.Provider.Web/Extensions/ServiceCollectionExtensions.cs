@@ -16,6 +16,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration, SiteConfiguration siteConfiguration)
     {
         services
+            .Configure<DfeSignInSettings>(x =>
+            {
+                x.ApiUri = siteConfiguration.DfeSignInSettings.ApiUri;
+                x.ClientId = siteConfiguration.DfeSignInSettings.ClientId;
+                x.ApiSecret = siteConfiguration.DfeSignInSettings.ApiSecret;
+                x.Audience = siteConfiguration.DfeSignInSettings.Audience;
+                x.Issuer = siteConfiguration.DfeSignInSettings.Issuer;
+            })
             .Configure<EmailSettings>(x =>
             {
                 x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
@@ -43,11 +51,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<PostcodeApiSettings>>()
                         .Value;
 
-                    client.BaseAddress =
-                        postcodeApiSettings.BaseUri.EndsWith("/")
-                            ? new Uri(postcodeApiSettings.BaseUri)
-                            : new Uri(postcodeApiSettings.BaseUri + "/");
-
+                    client.BaseAddress = new Uri(postcodeApiSettings.BaseUri);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                 }
@@ -64,12 +68,24 @@ public static class ServiceCollectionExtensions
             )
             .AddRetryPolicyHandler<TownDataService>();
 
+        services.AddHttpClient<IDfeSignInApiService, DfeSignInApiService>(
+                (serviceProvider, client) =>
+                {
+                    var dfeSignInSettings = serviceProvider
+                        .GetRequiredService<IOptions<DfeSignInSettings>>()
+                        .Value;
+
+                    client.BaseAddress = new Uri(dfeSignInSettings.ApiUri);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                })
+            .AddRetryPolicyHandler<DfeSignInApiService>();
+        
         return services;
     }
 
     public static IServiceCollection AddNotifyService(
         this IServiceCollection services,
-        string govNotifyApiKey)
+        string? govNotifyApiKey)
     {
         if (!string.IsNullOrEmpty(govNotifyApiKey))
         {

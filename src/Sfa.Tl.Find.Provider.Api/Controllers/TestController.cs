@@ -70,7 +70,7 @@ public class TestController : ControllerBase
     public async Task TriggerCourseDirectoryImportJob(
         [FromQuery(Name = "to")] string recipients)
     {
-        var scheduler  = await _schedulerFactory.GetScheduler();
+        var scheduler = await _schedulerFactory.GetScheduler();
         await scheduler.TriggerJob(new JobKey(Constants.CourseDirectoryImportJobKeyName));
     }
 

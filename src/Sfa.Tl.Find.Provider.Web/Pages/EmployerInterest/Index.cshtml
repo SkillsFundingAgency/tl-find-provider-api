@@ -1,0 +1,42 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest.IndexModel
+@{
+    ViewData["Title"] = "Employer Interest";
+}
+
+<a asp-page="/Dashboard" class="govuk-back-link" id="tl-back">Back</a>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header" scope="col">Organisation</th>
+                    <th class="govuk-table__header" scope="col">Postcode</th>
+                    <th class="govuk-table__header" scope="col">Contact</th>
+                    <th class="govuk-table__header" scope="col">Email</th>
+                    <th class="govuk-table__header" scope="col">Telephone</th>
+                    <th class="govuk-table__header" scope="col">Id</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if (Model.EmployerInterestList != null && Model.EmployerInterestList.Any())
+                {
+                    foreach (var employerInterest in Model.EmployerInterestList)
+                    {
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header" scope="row">@employerInterest.OrganisationName</th>
+                            <td class="govuk-table__cell">@employerInterest.Postcode</td>
+                            <td class="govuk-table__cell">@employerInterest.ContactName</td>
+                            <td class="govuk-table__cell">@employerInterest.Email</td>
+                            <td class="govuk-table__cell">@employerInterest.Telephone</td>
+                            <td class="govuk-table__cell">@employerInterest.UniqueId</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

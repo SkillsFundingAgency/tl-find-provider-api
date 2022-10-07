@@ -2,6 +2,7 @@
 
 public static class CacheKeys
 {
+    public const string IndustriesKey = "INDUSTRIES";
     public const string QualificationsKey = "QUALIFICATIONS";
     public const string RoutesKey = "ROUTES";
     public const string ProviderDataDownloadInfoKey = "PROVIDER_DATA_DOWNLOAD_INFO";

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
@@ -12,12 +12,18 @@ public class EmployerInterestServiceBuilder
 {
     public IEmployerInterestService Build(
         IDateTimeService dateTimeService = null,
+        IEmailService emailService = null,
+        IPostcodeLookupService postcodeLookupService = null,
         IEmployerInterestRepository employerInterestRepository = null,
+        IMemoryCache cache = null,
         EmployerInterestSettings employerInterestSettings = null,
         ILogger<EmployerInterestService> logger = null)
     {
         dateTimeService ??= Substitute.For<IDateTimeService>();
+        emailService ??= Substitute.For<IEmailService>();
+        postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         employerInterestRepository ??= Substitute.For<IEmployerInterestRepository>();
+        cache ??= Substitute.For<IMemoryCache>();
         logger ??= Substitute.For<ILogger<EmployerInterestService>>();
 
         var employerInterestOptions = Options.Create(
@@ -27,7 +33,10 @@ public class EmployerInterestServiceBuilder
 
         return new EmployerInterestService(
             dateTimeService,
+            emailService,
+            postcodeLookupService,
             employerInterestRepository,
+            cache,
             employerInterestOptions,
             logger);
     }

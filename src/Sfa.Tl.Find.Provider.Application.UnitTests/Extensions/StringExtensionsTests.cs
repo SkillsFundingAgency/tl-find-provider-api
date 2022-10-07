@@ -64,6 +64,22 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
+    [Theory(DisplayName = nameof(StringExtensions.DoesNotMatch) + " Data Tests")]
+    [InlineData("/", Constants.CssPathPattern, true)]
+    [InlineData("/Index", Constants.CssPathPattern, true)]
+    [InlineData("/Folder/Index", Constants.CssPathPattern, true)]
+    [InlineData("/Folder/Index", Constants.JsPathPattern, true)]
+    [InlineData("/Folder/Index", Constants.FontsPathPattern, true)]
+    [InlineData("/css/test.css", Constants.CssPathPattern, false)]
+    [InlineData("/js/test.js", Constants.JsPathPattern, false)]
+    [InlineData("/assets/fonts/bold-a123d-v2.woff", Constants.FontsPathPattern, false)]
+    [InlineData("/assets/fonts/bold-a123d-v2.woff2", Constants.FontsPathPattern, false)]
+    public void String_DoesNotMatch_Data_Tests(string input, string pattern, bool expectedResult)
+    {
+        var result = input.DoesNotMatch(pattern);
+        result.Should().Be(expectedResult);
+    }
+    
     [Theory(DisplayName = nameof(StringExtensions.IsFullOrPartialPostcode) + " Data Tests")]
     [InlineData("CV1 2WT", true)]
     [InlineData("cv1 2wt", true)]

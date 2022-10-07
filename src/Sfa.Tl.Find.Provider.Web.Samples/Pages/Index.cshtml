@@ -1,0 +1,54 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<main id="main-content" role="main">
+    <div class="govuk-width-container govuk-main-wrapper govuk-!-padding-top-0">
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 class="govuk-heading-xl govuk-!-margin-top-7 govuk-!-margin-bottom-7">Test</h1>
+                @*<p>Api url: @Model.ApiUrl</p>*@
+                @*<p>App id: @Model.ApiAppId</p>*@
+                @*<p>Api key: @Model.ApiKey</p>*@
+            </div>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-m">Create</h2>
+                <p class="govuk-body">
+                    <a asp-page="/EmployerInterest/Create">Create Employer Interest</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-m">Test Unsubscribe xx</h2>
+                <input type="text" id="tl-employer-unique-id-input" value="0BDB8629-0900-4963-87FF-306FF4A0BCFD" />
+                @{
+                    var employerUniqueId = "A78BA9E5-EB8B-4FF8-ABFC-36035A029AC1";
+                }
+                <br />
+                <a class="tl-unsubscribe-link" asp-page="/EmployerInterest/Unsubscribe" asp-route-id="@employerUniqueId">Unsubscribe employer <span class="tl-employer-unique-id">@employerUniqueId</span></a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('#tl-employer-unique-id-input').on('input', function (e) {
+                const employerId = $(this).val();// $('#tl-employer-unique-id-input').val();
+                $(".tl-employer-unique-id").text(employerId);
+                $("a.tl-unsubscribe-link").attr("href", "/EmployerInterest/Unsubscribe?id=" + employerId);
+            });
+        });
+    </script>
+}

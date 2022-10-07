@@ -69,6 +69,7 @@ try
     builder.Services
         .AddScoped<IDateTimeService, DateTimeService>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
+        .AddScoped<IGuidService, GuidService>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
         .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
@@ -77,6 +78,7 @@ try
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
         .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
+        .AddTransient<IIndustryRepository, IndustryRepository>()
         .AddTransient<IProviderRepository, ProviderRepository>()
         .AddTransient<IQualificationRepository, QualificationRepository>()
         .AddTransient<IRouteRepository, RouteRepository>()

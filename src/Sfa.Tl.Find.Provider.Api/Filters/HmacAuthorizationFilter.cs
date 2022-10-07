@@ -102,7 +102,6 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         var sharedKey = AllowedApps[appId];
 
         var data = $"{appId}{request.Method.ToUpper()}{requestUri}{requestTimeStamp}{nonce}{requestContentBase64String}";
-
         var secretKeyBytes = Encoding.ASCII.GetBytes(sharedKey);
         var signature = Encoding.ASCII.GetBytes(data);
         using var hmac = new HMACSHA256(secretKeyBytes);

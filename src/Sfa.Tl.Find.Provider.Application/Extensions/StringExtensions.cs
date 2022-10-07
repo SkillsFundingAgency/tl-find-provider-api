@@ -54,6 +54,11 @@ public static class StringExtensions
         return Regex.IsMatch(formattedPostcode, regex);
     }
 
+    public static bool DoesNotMatch(this string input, params string[] patterns)
+    {
+        return !patterns.Any(p => Regex.IsMatch(input, p));
+    }
+
     public static string ParseTLevelDefinitionName(this string fullName, int maxLength = -1)
     {
         if (string.IsNullOrWhiteSpace(fullName)) return "";
@@ -112,7 +117,7 @@ public static class StringExtensions
 
         //Fix S after apostrophe, if it is before space or at end of string
         result = Regex.Replace(result, @"(['’])S(\s|$)", "$1s$2");
-        
+
         return result.Trim();
     }
 }

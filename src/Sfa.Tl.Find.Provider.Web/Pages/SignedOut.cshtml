@@ -1,0 +1,13 @@
+﻿@page
+@model SignedOutModel
+@{
+    ViewData["Title"] = "Signed out";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Signed out</h1>
+        <p class="govuk-body">You have been signed out.</p>
+       <p class="govuk-body">Click <a asp-controller="Account" asp-action="SignIn">here</a> to sign in again.</p>
+    </div>
+</div>
