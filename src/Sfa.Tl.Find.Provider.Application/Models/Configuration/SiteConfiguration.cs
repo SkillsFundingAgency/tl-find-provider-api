@@ -9,6 +9,7 @@ public class SiteConfiguration
     public string CourseDirectoryImportSchedule { get; init; }
     public EmailSettings EmailSettings { get; init; }
     public EmployerInterestSettings EmployerInterestSettings { get; init; }
+    public GoogleMapsApiSettings GoogleMapsApiSettings { get; init; }
     public PostcodeApiSettings PostcodeApiSettings { get; init; }
     public SearchSettings SearchSettings { get; init; }
     public string SqlConnectionString { get; init; }

@@ -13,7 +13,13 @@ public class SettingsBuilder
     private const string FindCourseApiKey = "0f608e5d437f4baabc04a0bc2dabbc1b";
     private const string FindCourseApiBaseAbsoluteUri = "https://test.com/findacourse/api";
     public static readonly Uri FindCourseApiBaseUri = new(FindCourseApiBaseAbsoluteUri);
+    
     private const string GovNotifyApiKey = "1fff7b5b-bf64-4af9-9857-1797d0d525a3";
+    private const string GovNotifyDeliveryStatusToken = "2d5230c5-6dd5-4b9d-8006-564f9568d386";
+
+    private const string GoogleMapsApiKey = "a6d49b031a124597b7dc9bc793738040";
+    private const string GoogleMapsBaseUri = "https://maps.googleapis.com/maps/api/";
+    
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
     private const int RetentionDays = 10;
@@ -43,9 +49,11 @@ public class SettingsBuilder
 
     public EmailSettings BuildEmailSettings(
         string govNotifyApiKey = GovNotifyApiKey,
+        string deliveryStatusToken = GovNotifyDeliveryStatusToken,
         string supportEmailAddress = SupportEmailAddress) => new()
         {
             GovNotifyApiKey = govNotifyApiKey,
+            DeliveryStatusToken = deliveryStatusToken,
             SupportEmailAddress = supportEmailAddress
         };
 
@@ -54,6 +62,14 @@ public class SettingsBuilder
         {
             RetentionDays = retentionDays
         };
+
+    public GoogleMapsApiSettings BuildGoogleMapsApiSettings(
+        string apiKey = GoogleMapsApiKey,
+        string baseUri = GoogleMapsBaseUri) => new()
+    {
+        ApiKey = apiKey,
+        BaseUri = baseUri
+    };
 
     public PostcodeApiSettings BuildPostcodeApiSettings(
         string postcodeRetrieverUri = PostcodeRetrieverUri) => new()

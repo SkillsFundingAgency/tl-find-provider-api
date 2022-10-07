@@ -70,7 +70,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Error in {nameof(HmacAuthorizationFilter)}.");
-            context.Result = new StatusCodeResult(500);
+            context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 

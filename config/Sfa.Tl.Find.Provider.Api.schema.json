@@ -54,6 +54,10 @@
           "type": "string",
           "environmentVariable": "EmailSettings_GovNotifyApiKey"
         },
+        "DeliveryStatusToken": {
+          "type": "string",
+          "environmentVariable": "EmailSettings_DeliveryStatusToken"
+        },
         "SupportEmailAddress": {
           "type": "string",
           "environmentVariable": "EmailSettings_SupportEmailAddress"
@@ -71,6 +75,20 @@
         "RetentionDays": {
           "type": "integer",
           "environmentVariable": "EmployerInterestSettings_RetentionDays"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GoogleMapsApiSettings": {
+      "properties": {
+        "ApiKey": {
+          "type": "string",
+          "environmentVariable": "GoogleMapsApiSettings_ApiKey"
+        },
+        "BaseUri": {
+          "type": "string",
+          "environmentVariable": "GoogleMapsApiSettings_BaseUri"
         }
       },
       "additionalProperties": false,

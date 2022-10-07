@@ -7,6 +7,7 @@ using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Microsoft.VisualBasic.FileIO;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
+using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -14,6 +15,8 @@ public class ProviderDataServiceTests
 {
     private const int TestPage = 3;
     private const int TestPageSize = Constants.DefaultPageSize + 10;
+    private const int TestUkPrn = 10099099;
+
     private readonly IList<int> _testRouteIds = new List<int> { 6, 7 };
     private readonly IList<int> _testQualificationIds = new List<int> { 37, 40, 51 };
 
@@ -717,16 +720,18 @@ public class ProviderDataServiceTests
             .Received(1)
             .HasAny();
     }
-
+    
     [Fact]
-    public async Task LoadAdditionalProviderData_Calls_Repository_To_Save_Data()
+    public async Task ImportProviderData_Calls_Repository_To_Save_Data()
     {
         var providerRepository = Substitute.For<IProviderRepository>();
+
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
 
         var service = new ProviderDataServiceBuilder()
             .Build(providerRepository: providerRepository);
 
-        await service.LoadAdditionalProviderData();
+        await service.ImportProviderData(stream, true);
 
         await providerRepository
             .Received(1)
@@ -735,7 +740,7 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task LoadAdditionalProviderData_Calls_Repository_To_Save_Data_With_Additional_Data_Flag_Set()
+    public async Task ImportProviderData_Calls_Repository_To_Save_Data_With_Additional_Data_Flag_Set()
     {
         var providerRepository = Substitute.For<IProviderRepository>();
 
@@ -746,10 +751,12 @@ public class ProviderDataServiceTests
                 x => receivedProviders = x),
                 Arg.Any<bool>());
 
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
+
         var service = new ProviderDataServiceBuilder()
             .Build(providerRepository: providerRepository);
 
-        await service.LoadAdditionalProviderData();
+        await service.ImportProviderData(stream, true);
 
         receivedProviders.Should().NotBeNullOrEmpty();
 
@@ -764,7 +771,7 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task LoadAdditionalProviderData_Loads_Expected_Provider()
+    public async Task ImportProviderData_Loads_Expected_Provider()
     {
         var providerRepository = Substitute.For<IProviderRepository>();
 
@@ -775,30 +782,32 @@ public class ProviderDataServiceTests
                 x => receivedProviders = x),
                 Arg.Any<bool>());
 
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
+
         var service = new ProviderDataServiceBuilder()
             .Build(providerRepository: providerRepository);
 
-        await service.LoadAdditionalProviderData();
+        await service.ImportProviderData(stream, true);
 
         receivedProviders.Should().NotBeNullOrEmpty();
 
         var provider = receivedProviders
             .SingleOrDefault(p =>
-                p.UkPrn == 10042223);
+                p.UkPrn == TestUkPrn);
         provider.Should().NotBeNull();
 
         // ReSharper disable once StringLiteralTypo
         provider.Validate(
-            10042223,
-        "BURNTWOOD SCHOOL",
+            TestUkPrn,
+        "TEST SCHOOL",
             null,
             null,
             "London",
             null,
             "SW17 0AQ",
-        "info@burntwoodschool.com",
-        "020 8946 6201",
-            "https://www.burntwoodschool.com/",
+        "info@testschool.com",
+        "020 5555 5555",
+            "https://www.testschool.com/",
             locationCount: 1,
             isAdditionalData: true);
 
@@ -806,22 +815,47 @@ public class ProviderDataServiceTests
 
         // ReSharper disable once StringLiteralTypo
         location.Validate(
-            "BURNTWOOD SCHOOL",
+            "TEST SCHOOL",
             "SW17 0AQ",
             null,
             null,
             "London",
             null,
-            "info@burntwoodschool.com",
-            "020 8946 6201",
-            "https://www.burntwoodschool.com/",
-            51.438125,
-            -0.180083,
+            "info@testschool.com",
+            "020 5555 5555",
+            "https://www.testschool.com/",
+            51.439999,
+            -0.1789765,
             1);
         var deliveryYear = location.DeliveryYears.First();
 
         deliveryYear.Validate(2022,
             new[] { 38 });
+    }
+
+    [Fact]
+    public async Task ImportProviderData_Clears_Caches()
+    {
+        var cache = Substitute.For<IMemoryCache>();
+
+        await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(cache: cache);
+
+        await service.ImportProviderData(stream, true);
+        
+        cache
+            .Received(1)
+            .Remove(CacheKeys.QualificationsKey);
+
+        cache
+            .Received(1)
+            .Remove(CacheKeys.ProviderDataDownloadInfoKey);
+
+        cache
+            .Received(1)
+            .Remove(CacheKeys.RoutesKey);
     }
 
     [Fact]

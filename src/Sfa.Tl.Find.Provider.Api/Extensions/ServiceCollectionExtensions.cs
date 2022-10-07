@@ -58,12 +58,18 @@ public static class ServiceCollectionExtensions
             .Configure<EmailSettings>(x =>
             {
                 x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
+                x.DeliveryStatusToken = siteConfiguration.EmailSettings.DeliveryStatusToken;
                 x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
             })
             .Configure<EmployerInterestSettings>(x =>
             {
                 x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
                 x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
+            })
+            .Configure<GoogleMapsApiSettings>(x =>
+            {
+                x.ApiKey = siteConfiguration.GoogleMapsApiSettings.ApiKey;
+                x.BaseUri = siteConfiguration.GoogleMapsApiSettings.BaseUri;
             })
             .Configure<PostcodeApiSettings>(x =>
             {
@@ -156,6 +162,22 @@ public static class ServiceCollectionExtensions
             .AddRetryPolicyHandler<CourseDirectoryService>();
 
         services
+            .AddHttpClient<IGoogleMapsApiService, GoogleMapsApiService>(
+                (serviceProvider, client) =>
+                {
+                    var googleMapsApiSettings = serviceProvider
+                        .GetRequiredService<IOptions<GoogleMapsApiSettings>>()
+                        .Value;
+
+                    client.BaseAddress = new Uri(googleMapsApiSettings.BaseUri);
+
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+            )
+            .AddRetryPolicyHandler<GoogleMapsApiService>();
+
+        services
             .AddHttpClient<ITownDataService, TownDataService>(
                 (_, client) =>
                 {
@@ -167,7 +189,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddNotifyService(
         this IServiceCollection services,
         string govNotifyApiKey)
