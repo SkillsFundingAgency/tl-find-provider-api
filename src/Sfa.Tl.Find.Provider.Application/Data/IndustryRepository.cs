@@ -19,7 +19,7 @@ public class IndustryRepository : IIndustryRepository
 
         return await _dbContextWrapper.QueryAsync<Industry>(
             connection,
-            "SELECT Id, Name, ShortName " +
+            "SELECT Id, Name " +
             "FROM dbo.Industry " +
             "WHERE IsDeleted = 0 " +
             "ORDER BY Name");

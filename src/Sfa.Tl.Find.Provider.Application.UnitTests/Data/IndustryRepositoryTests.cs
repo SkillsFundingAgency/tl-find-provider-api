@@ -32,7 +32,7 @@ public class IndustryRepositoryTests
             .Returns(industries);
 
         const string expectedSql =
-            "SELECT Id, Name, ShortName FROM dbo.Industry WHERE IsDeleted = 0 ORDER BY Name";
+            "SELECT Id, Name FROM dbo.Industry WHERE IsDeleted = 0 ORDER BY Name";
 
         var repository = new IndustryRepositoryBuilder().Build(dbContextWrapper);
 

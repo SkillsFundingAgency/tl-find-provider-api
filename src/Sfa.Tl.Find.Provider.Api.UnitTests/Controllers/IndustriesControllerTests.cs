@@ -69,6 +69,5 @@ public class IndustriesControllerTests
 
         results.Single().Id.Should().Be(industries.Single().Id);
         results.Single().Name.Should().Be(industries.Single().Name);
-        results.Single().ShortName.Should().Be(industries.Single().ShortName);
     }
 }
