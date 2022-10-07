@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 
@@ -11,13 +12,16 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class LocationsController : ControllerBase
 {
     private readonly ITownDataService _townDataService;
+    private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly ILogger<LocationsController> _logger;
 
     public LocationsController(
         ITownDataService townDataService,
+        IPostcodeLookupService postcodeLookupService,
         ILogger<LocationsController> logger)
     {
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
+        _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
     
@@ -38,5 +42,18 @@ public class LocationsController : ControllerBase
 
         var towns = await _townDataService.Search(searchTerm);
         return Ok(towns);
+    }
+
+    [HmacAuthorization]
+    [HttpGet]
+    [Route("validate", Name = "ValidatePostcode")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> ValidatePostcode(string postcode)
+    {
+        return !string.IsNullOrEmpty(postcode) 
+               && await _postcodeLookupService.IsValid(postcode)
+            ? Ok()
+            : new StatusCodeResult(StatusCodes.Status422UnprocessableEntity);
     }
 }

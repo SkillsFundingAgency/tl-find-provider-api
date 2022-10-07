@@ -9,4 +9,6 @@ public interface IPostcodeLookupService
     Task<GeoLocation> GetOutcode(string outcode);
 
     Task<GeoLocation> GetNearestPostcode(double latitude, double longitude);
+    
+    Task<bool> IsValid(string postcode);
 }

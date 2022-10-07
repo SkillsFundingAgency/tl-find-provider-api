@@ -63,4 +63,15 @@ public static class PostcodeLookupJsonBuilder
         typeof(PostcodeLookupJsonBuilder)
             .BuildJsonFromResourceStream(
                 AssetFolderPath, "postcodenotfoundresponse");
+
+    public static string BuildPostcodeValidationSuccessResponse() =>
+        typeof(PostcodeLookupJsonBuilder)
+            .BuildJsonFromResourceStream(
+                AssetFolderPath, "postcodevalidationsuccessresponse");
+
+    public static string BuildPostcodeValidationFailResponse() =>
+        typeof(PostcodeLookupJsonBuilder)
+            .BuildJsonFromResourceStream(
+                AssetFolderPath, "postcodevalidationfailresponse");
+
 }

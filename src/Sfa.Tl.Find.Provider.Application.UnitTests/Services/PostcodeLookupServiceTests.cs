@@ -259,4 +259,44 @@ public class PostcodeLookupServiceTests
 
         result.Should().BeNull();
     }
+
+    [Fact]
+    public async Task IsValidate_Returns_True_For_Valid_Postcode()
+    {
+        var validPostcodeLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+
+        var postcodeUriFragment = $"postcodes/{validPostcodeLocation.GetUriFormattedPostcode()}/validate";
+
+        var responses = new Dictionary<string, string>
+        {
+            { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildPostcodeValidationSuccessResponse() }
+        };
+
+        var service = new PostcodeLookupServiceBuilder()
+            .Build(responses);
+
+        var result = await service.IsValid(validPostcodeLocation.Location);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task IsValidate_Returns_False_For_Invalid_Postcode()
+    {
+        var validPostcodeLocation = GeoLocationBuilder.BuildInvalidPostcodeLocation();
+
+        var postcodeUriFragment = $"postcodes/{validPostcodeLocation.GetUriFormattedPostcode()}/validate";
+
+        var responses = new Dictionary<string, string>
+        {
+            { postcodeUriFragment, PostcodeLookupJsonBuilder.BuildPostcodeValidationFailResponse() }
+        };
+
+        var service = new PostcodeLookupServiceBuilder()
+            .Build(responses);
+
+        var result = await service.IsValid(validPostcodeLocation.Location);
+
+        result.Should().BeFalse();
+    }
 }

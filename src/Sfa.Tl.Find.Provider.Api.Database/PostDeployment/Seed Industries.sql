@@ -15,7 +15,7 @@ USING (VALUES
   (7,  N'Transport', 0),
   (8,  N'Utilities', 0),
   (9,  N'Manufacturing and engineering', 0),
-  (10, N'Arts, entertainment, and recreation', 0),
+  (10, N'Arts, entertainment and recreation', 0),
   (11, N'Financial services', 0),
   (12, N'Public sector', 0),
   (13, N'IT and communications', 0),

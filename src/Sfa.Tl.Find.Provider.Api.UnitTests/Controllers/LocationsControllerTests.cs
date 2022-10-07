@@ -48,4 +48,50 @@ public class LocationsControllerTests
         var results = okResult.Value as IEnumerable<Town>;
         results.Should().BeEquivalentTo(towns);
     }
+
+    [Fact]
+    public async Task ValidatePostcode_Returns_Ok_Result_For_Valid_Postcode()
+    {
+        const string postcode = "CV1 9GX";
+        var towns = new TownBuilder()
+            .BuildList()
+            .ToList();
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.IsValid(postcode)
+            .Returns(true);
+
+        var controller = new LocationsControllerBuilder()
+            .Build(postcodeLookupService: postcodeLookupService);
+
+        var result = await controller.ValidatePostcode(postcode);
+
+        var okResult = result as OkResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be(200);
+    }
+    [Fact]
+    public async Task ValidatePostcode_Returns_Ok_Result_For_Invalid_Postcode()
+    {
+        const string postcode = "CV1 9GX";
+        var towns = new TownBuilder()
+            .BuildList()
+            .ToList();
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        //TODO: Add Validate 
+        /*
+api.postcodes.io/postcodes/OX2+9GX/validate         */
+        postcodeLookupService.IsValid(postcode)
+            .Returns(false);
+
+        var controller = new LocationsControllerBuilder()
+            .Build(postcodeLookupService: postcodeLookupService);
+
+        var result = await controller.ValidatePostcode(postcode);
+
+        var statusCodeResult = result as StatusCodeResult;
+        statusCodeResult.Should().NotBeNull();
+        statusCodeResult!.StatusCode.Should().Be(422);
+    }
 }

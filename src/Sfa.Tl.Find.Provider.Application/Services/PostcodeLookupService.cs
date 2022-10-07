@@ -53,6 +53,25 @@ public class PostcodeLookupService : IPostcodeLookupService
             : await ReadPostcodeLocationFromResponse(responseMessage);
     }
 
+    public async Task<bool> IsValid(string postcode)
+    {
+        var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}/validate");
+
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            (await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync()))
+            //var resultElement = jsonDocument
+                .RootElement
+                .TryGetProperty("result", out var result);
+
+            if (result.ValueKind is JsonValueKind.True)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static async Task<GeoLocation> ReadPostcodeLocationFromResponse(
         HttpResponseMessage responseMessage,
         string postcodeFieldName = "postcode")
@@ -69,17 +88,17 @@ public class PostcodeLookupService : IPostcodeLookupService
             case JsonValueKind.Undefined:
                 return null;
             case JsonValueKind.Array:
-            {
-                var firstItem = resultElement.EnumerateArray().FirstOrDefault();
                 {
-                    return new GeoLocation
+                    var firstItem = resultElement.EnumerateArray().FirstOrDefault();
                     {
-                        Location = firstItem.SafeGetString(postcodeFieldName),
-                        Latitude = firstItem.SafeGetDouble("latitude", Constants.DefaultLatitude),
-                        Longitude = firstItem.SafeGetDouble("longitude")
-                    };
+                        return new GeoLocation
+                        {
+                            Location = firstItem.SafeGetString(postcodeFieldName),
+                            Latitude = firstItem.SafeGetDouble("latitude", Constants.DefaultLatitude),
+                            Longitude = firstItem.SafeGetDouble("longitude")
+                        };
+                    }
                 }
-            }
             case JsonValueKind.Object:
                 return new GeoLocation
                 {

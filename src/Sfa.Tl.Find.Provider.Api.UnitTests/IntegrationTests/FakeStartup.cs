@@ -124,7 +124,24 @@ public class FakeStartup
 
                 return townDataService;
             })
+            .AddTransient(_ =>
+            {
+                var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+                postcodeLookupService.GetPostcode(
+                        Arg.Any<string>())
+                    .Returns(new GeoLocation
+                    {
+                        Location = "CV1 2WT",
+                        Latitude = 52.400997, 
+                        Longitude = -1.508122
+                    });
+                postcodeLookupService.IsValid(
+                        Arg.Any<string>())
+                    .Returns(true);
 
+
+                return postcodeLookupService;
+            })
             .AddTransient(_ => Substitute.For<IProviderRepository>())
             .AddTransient(_ => Substitute.For<IQualificationRepository>())
             .AddTransient(_ => Substitute.For<ITownRepository>());

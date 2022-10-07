@@ -62,8 +62,22 @@ public class DfeSignInApiService : IDfeSignInApiService
         {
             var responseContent = await response.Content.ReadAsStringAsync();
 
-            //TODO: Change to System.Text.Json
-            var orgToken = Newtonsoft.Json.Linq.JArray.Parse(responseContent).FirstOrDefault(org => org.SelectToken("id").ToString() == organisationId);
+            var orgToken = Newtonsoft
+                    .Json
+                    .Linq
+                    .JArray
+                    .Parse(responseContent)
+                    .FirstOrDefault(org =>
+                        org.SelectToken("id")
+                            .ToString()
+                        == organisationId);
+
+            //var o = JsonDocument.Parse(responseContent)
+            //        .RootElement
+            //TODO: There will be an array here - get the one matching our organisationId
+            //        .SafeGetString("id"))
+            //    .Where(orgId => orgId == organisationId).ToList();
+            
             return orgToken?["ukprn"].ToObject<long?>();
         }
 
@@ -78,20 +92,17 @@ public class DfeSignInApiService : IDfeSignInApiService
 
         if (response.IsSuccessStatusCode)
         {
-            var responseContent = await response.Content.ReadAsStringAsync();
-            userClaims = Newtonsoft.Json.JsonConvert
-                .DeserializeObject<DfeUserInfo>(responseContent);
+            //userClaims = Newtonsoft.Json.JsonConvert
+            //    .DeserializeObject<DfeUserInfo>(
+            //        await response.Content.ReadAsStringAsync());
 
-            //TODO: Use this...
-            var userClaims2 = JsonSerializer
+            userClaims = JsonSerializer
                 .Deserialize<DfeUserInfo>(
-                    responseContent
-                //await content.ReadAsStringAsync(),
-                //new JsonSerializerOptions
-                //{
-                //   AllowTrailingCommas = true
-                //}
-                );
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
         }
         else if (response.StatusCode == HttpStatusCode.NotFound)
         {

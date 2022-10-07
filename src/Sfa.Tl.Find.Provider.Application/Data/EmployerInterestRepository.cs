@@ -96,22 +96,13 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
             using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
-            var firstResult = await _dbContextWrapper.ExecuteAsync(
-                connection,
-                "DELETE dbo.EmployerLocation " +
-                "WHERE EmployerInterestId = " +
-                "       (SELECT Id FROM dbo.EmployerInterest " +
-                "        WHERE uniqueId = @uniqueId)",
-                _dynamicParametersWrapper.DynamicParameters,
-                transaction);
-
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,
-                "DELETE dbo.EmployerInterest " +
-                "WHERE UniqueId = @uniqueId",
+                "DeleteEmployerInterest",
                 _dynamicParametersWrapper.DynamicParameters,
-                transaction);
-
+                transaction,
+                commandType: CommandType.StoredProcedure);
+            
             transaction.Commit();
 
             return result;
@@ -139,10 +130,10 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,
-                "DELETE dbo.EmployerInterest " +
-                "WHERE CreatedOn < @date",
+                "DeleteEmployerInterestBeforeDate",
                 _dynamicParametersWrapper.DynamicParameters,
-                transaction);
+                transaction,
+                commandType: CommandType.StoredProcedure);
 
             transaction.Commit();
 

@@ -104,9 +104,10 @@ public class EmployerInterestRepositoryTests
             .Received(1)
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("DELETE dbo.EmployerInterest WHERE UniqueId = @uniqueId")),
+                    s.Contains("DeleteEmployerInterest")),
                 Arg.Any<object>(),
-                Arg.Is<IDbTransaction>(t => t != null));
+                Arg.Is<IDbTransaction>(t => t != null),
+                commandType: CommandType.StoredProcedure);
 
         transaction
             .Received(1)
@@ -125,9 +126,10 @@ public class EmployerInterestRepositoryTests
         dbContextWrapper
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s => 
-                    s.Contains("DELETE dbo.EmployerInterest WHERE UniqueId = @uniqueId")),
+                    s.Contains("DeleteEmployerInterest")),
                 Arg.Any<object>(),
-                Arg.Is<IDbTransaction>(t => t != null))
+                Arg.Is<IDbTransaction>(t => t != null),
+                commandType: CommandType.StoredProcedure)
         .Returns(count);
 
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
@@ -149,9 +151,10 @@ public class EmployerInterestRepositoryTests
         dbContextWrapper
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("DELETE dbo.EmployerInterest WHERE CreatedOn < @date")),
+                    s.Contains("DeleteEmployerInterestBeforeDate")),
                 Arg.Any<object>(),
-                Arg.Is<IDbTransaction>(t => t != null))
+                Arg.Is<IDbTransaction>(t => t != null),
+                commandType: CommandType.StoredProcedure)
             .Returns(count);
 
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);

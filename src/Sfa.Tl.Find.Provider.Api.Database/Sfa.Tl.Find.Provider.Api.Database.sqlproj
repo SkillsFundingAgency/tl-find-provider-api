@@ -111,6 +111,8 @@
     <Build Include="Types\EmployerInterestDataTableType.sql" />
     <Build Include="Tables\Industry.sql" />
     <None Include="PostDeployment\Seed Industries.sql" />
+    <Build Include="Stored Procedures\DeleteEmployerInterest.sql" />
+    <Build Include="Stored Procedures\DeleteEmployerInterestBeforeDate.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
