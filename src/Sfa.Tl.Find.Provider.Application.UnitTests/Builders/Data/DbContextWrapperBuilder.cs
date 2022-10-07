@@ -1,11 +1,10 @@
 ﻿using System.Data;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NSubstitute;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 
@@ -16,17 +15,9 @@ public class DbContextWrapperBuilder
         IReadOnlyPolicyRegistry<string> policyRegistry = null,
         ILogger<DbContextWrapper> logger = null)
     {
-        connectionString ??= "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
-
-        var connectionStringOptions = new Func<IOptions<ConnectionStringSettings>>(() =>
-        {
-            var options = Substitute.For<IOptions<ConnectionStringSettings>>();
-            options.Value.Returns(new ConnectionStringSettings
-            {
-                SqlConnectionString = connectionString
-            });
-            return options;
-        }).Invoke();
+        var connectionStringOptions = new SettingsBuilder()
+            .BuildConnectionStringSettings()
+            .ToOptions();
 
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
 

@@ -9,6 +9,7 @@ public class SettingsBuilder
 {
     private const string AppId = "2b1c1371f07a4add85a54b1812b2b0de";
     private const string ApiKey = "be1a8d303ea04e10810eed67f5cf174a";
+    private const string ConnectionString = "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
     private const string FindCourseApiKey = "0f608e5d437f4baabc04a0bc2dabbc1b";
     private const string FindCourseApiBaseAbsoluteUri = "https://test.com/findacourse/api";
     public static readonly Uri FindCourseApiBaseUri = new(FindCourseApiBaseAbsoluteUri);
@@ -24,6 +25,12 @@ public class SettingsBuilder
         {
             AppId = appId,
             ApiKey = apiKey
+        };
+
+    public ConnectionStringSettings BuildConnectionStringSettings(
+        string connectionString = ConnectionString) => new()
+        {
+            SqlConnectionString = connectionString
         };
 
     public CourseDirectoryApiSettings BuildCourseDirectoryApiSettings(

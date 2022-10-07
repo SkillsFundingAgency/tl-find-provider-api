@@ -29,30 +29,30 @@
         "configurationStorageConnectionString": {
             "type": "securestring"
         },
-        "uiCustomHostName": {
+        "webCustomHostName": {
             "type": "string"
         },
-        "certificateName": {
+        "webCertificateName": {
             "type": "string"
+        },
+        "apiCustomHostname": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "apiCertificateName": {
+            "type": "string",
+            "defaultValue": ""
         }
-        // "ApiCustomHostname": {
-        //     "type": "string",
-        //     "defaultValue": ""
-        // },
-        // "ApiCertificateName": {
-        //     "type": "string",
-        //     "defaultValue": ""
-        // }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
-        "uiAppName": "[concat(parameters('resourceNamePrefix'), '-web')]",
+        "webAppName": "[concat(parameters('resourceNamePrefix'), '-web')]",
         "appInsightName": "[concat(parameters('resourceNamePrefix'), '-ai')]",
-        // "ApiAppName": "[concat(parameters('resourceNamePrefix'), '-api')]",
+        "uiAppName": "[concat(parameters('resourceNamePrefix'), '-ui')]",
         // "workerFunctionAppName": "[concat(parameters('resourceNamePrefix'), '-func-worker')]",
         "sqlDatabaseName": "[concat(parameters('resourceNamePrefix'), '-sqldb')]",
         "storageAccountName": "[replace(concat(parameters('resourceNamePrefix'), 'str'), '-', '')]"
-        // "errorLink": "[concat('https://', variables('uiAppName'), '.scm.azurewebsites.net/detectors?type=tools&name=eventviewer')]"
+        // "errorLink": "[concat('https://', variables('webAppName'), '.scm.azurewebsites.net/detectors?type=tools&name=eventviewer')]"
     },
     "resources": [
         {
@@ -87,14 +87,14 @@
                         "value": "[variables('appInsightName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('uiAppName')]"
+                        "value": "[variables('webAppName')]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "[concat('ui-app-service-certificate','-', parameters('environmentNameAbbreviation'))]",
+            "name": "[concat('web-app-service-certificate','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -104,7 +104,7 @@
                 },
                 "parameters": {
                     "keyVaultCertificateName": {
-                        "value": "[parameters('certificateName')]"
+                        "value": "[parameters('webCertificateName')]"
                     },
                     "keyVaultName": {
                         "value": "[parameters('sharedKeyVaultName')]"
@@ -117,7 +117,7 @@
         },
         {
             "apiVersion": "2021-04-01",
-            "name": "[concat('ui-app-service','-', parameters('environmentNameAbbreviation'))]",
+            "name": "[concat('web-app-service','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -127,7 +127,7 @@
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[variables('uiAppName')]"
+                        "value": "[variables('webAppName')]"
                     },
                     "appServicePlanName": {
                         "value": "[parameters('sharedASPName')]"
@@ -164,10 +164,95 @@
                       ]
                     },
                     "customHostName": {
-                        "value": "[parameters('uiCustomHostName')]"
+                        "value": "[parameters('webCustomHostName')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[reference(concat('ui-app-service-certificate','-',parameters('environmentNameAbbreviation'))).outputs.certificateThumbprint.value]"
+                        "value": "[reference(concat('web-app-service-certificate','-',parameters('environmentNameAbbreviation'))).outputs.certificateThumbprint.value]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat('web-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
+            ]
+        },
+        {
+            "condition": "[greater(length(parameters('apiCustomHostname')), 0)]",
+            "apiVersion": "2017-05-10",
+            "name": "[concat('ui-app-service-certificate','-',parameters('environmentNameAbbreviation'))]",
+            "resourceGroup": "[resourceGroup().name]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'), 'app-service-certificate.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultCertificateName": {
+                        "value": "[parameters('apiCertificateName')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "keyVaultResourceGroup": {
+                        "value": "[parameters('sharedEnvResourceGroup')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "[concat('ui-app-service','-',parameters('environmentNameAbbreviation'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServiceName": {
+                        "value": "[variables('uiAppName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('sharedASPName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[parameters('sharedEnvResourceGroup')]"
+                    },
+                    "appServiceAppSettings": {
+                        "value": [
+                            {
+                                "name": "EnvironmentName",
+                                "value": "[toUpper(parameters('environmentNameAbbreviation'))]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "Version",
+                                "value": "1.0"
+                            },
+                            {
+                                "name": "ServiceName",
+                                "value": "Sfa.Tl.Find.Provider.Web"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
+                            }
+                        ]
+                    },
+                    "appServiceConnectionStrings": {
+                        "value": [
+                        ]
+                    },
+                    "customHostName": {
+                        "value": "[parameters('apiCustomHostname')]"
+                    },
+                    "certificateThumbprint": {
+                        "value": "[if(greater(length(parameters('apiCustomHostname')), 0), reference(concat('ui-app-service-certificate','-',parameters('environmentNameAbbreviation')), '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     }
                 }
             },
@@ -175,91 +260,6 @@
                 "[concat('ui-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
             ]
         },
-        // {
-        //     "condition": "[greater(length(parameters('ApiCustomHostName')), 0)]",
-        //     "apiVersion": "2017-05-10",
-        //     "name": "[concat('api-app-service-certificate','-',parameters('environmentNameAbbreviation'))]",
-        //     "resourceGroup": "[resourceGroup().name]",
-        //     "type": "Microsoft.Resources/deployments",
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "templateLink": {
-        //             "uri": "[concat(variables('deploymentUrlBase'), 'app-service-certificate.json')]",
-        //             "contentVersion": "1.0.0.0"
-        //         },
-        //         "parameters": {
-        //             "keyVaultCertificateName": {
-        //                 "value": "[parameters('ApiCertificateName')]"
-        //             },
-        //             "keyVaultName": {
-        //                 "value": "[parameters('sharedKeyVaultName')]"
-        //             },
-        //             "keyVaultResourceGroup": {
-        //                 "value": "[parameters('sharedEnvResourceGroup')]"
-        //             }
-        //         }
-        //     }
-        // },
-        // {
-        //     "apiVersion": "2017-05-10",
-        //     "name": "[concat('api-app-service','-',parameters('environmentNameAbbreviation'))]",
-        //     "type": "Microsoft.Resources/deployments",
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "templateLink": {
-        //             "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
-        //             "contentVersion": "1.0.0.0"
-        //         },
-        //         "parameters": {
-        //             "appServiceName": {
-        //                 "value": "[variables('ApiAppName')]"
-        //             },
-        //             "appServicePlanName": {
-        //                 "value": "[parameters('sharedASPName')]"
-        //             },
-        //             "appServicePlanResourceGroup": {
-        //                 "value": "[parameters('sharedEnvResourceGroup')]"
-        //             },
-        //             "appServiceAppSettings": {
-        //                 "value": [
-        //                     {
-        //                         "name": "EnvironmentName",
-        //                         "value": "[toUpper(parameters('environmentNameAbbreviation'))]"
-        //                     },
-        //                     {
-        //                         "name": "ConfigurationStorageConnectionString",
-        //                         "value": "[parameters('configurationStorageConnectionString')]"
-        //                     },
-        //                     {
-        //                         "name": "Version",
-        //                         "value": "1.0"
-        //                     },
-        //                     {
-        //                         "name": "ServiceName",
-        //                         "value": "Sfa.Tl.Find.Provider.Api"
-        //                     },
-        //                     {
-        //                         "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-        //                         "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
-        //                     }
-        //                 ]
-        //             },
-        //             "appServiceConnectionStrings": {
-        //                 "value": [
-        //                 ]
-        //             },
-        //             "customHostName": {
-        //                 "value": "[parameters('ApiCustomHostname')]"
-        //             },
-        //             "certificateThumbprint": {
-        //                 "value": "[if(greater(length(parameters('ApiCustomHostname')), 0), reference(concat('internal-api-app-service-certificate','-',parameters('environmentNameAbbreviation')), '2018-11-01').outputs.certificateThumbprint.value, '')]"
-        //             }
-        //         }
-        //     },
-        //     "dependsOn": [
-        //         "[concat('api-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
-        //     ]
-        // },
         // {
         //     "apiVersion": "2017-05-10",
         //     "name": "[concat('function-app','-', parameters('environmentNameAbbreviation'))]",
@@ -370,7 +370,7 @@
                         "value": "AZURE_IP-"
                     },
                     "ipAddresses": {
-                        "value": "[reference(concat('ui-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value]"
+                        "value": "[reference(concat('web-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value]"
                     },
                     "serverName": {
                         "value": "[parameters('sharedSQLServerName')]"
@@ -384,18 +384,18 @@
             "type": "string",
             "value": "[variables('sqlDatabaseName')]"
         },
-        "uiAppName": {
+        "webAppName": {
             "type": "string",
-            "value": "[variables('uiAppName')]"
+            "value": "[variables('webAppName')]"
         },
         // "workerFunctionAppName": {
         //     "type": "string",
         //     "value": "[variables('workerFunctionAppName')]"
         // },
-        // "ApiAppName": {
-        //     "type": "string",
-        //     "value": "[variables('ApiAppName')]"
-        // },
+        "uiAppName": {
+            "type": "string",
+            "value": "[variables('uiAppName')]"
+        },
         "BlobStorageConnectionString": {
             "type": "string",
             "value": "[reference(concat('storage-account','-', parameters('environmentNameAbbreviation'))).outputs.storageConnectionString.value]"

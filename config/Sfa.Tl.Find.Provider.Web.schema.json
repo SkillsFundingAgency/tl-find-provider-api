@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "EmailSettings": {
+      "properties": {
+        "GovNotifyApiKey": {
+          "type": "string",
+          "environmentVariable": "EmailSettings_GovNotifyApiKey"
+        },
+        "SupportEmailAddress": {
+          "type": "string",
+          "environmentVariable": "EmailSettings_SupportEmailAddress"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PostcodeApiSettings": {
+      "properties": {
+        "BaseUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "PostcodeApiSettings_BaseUri"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "BaseUri"
+      ],
+      "type": "object"
+    },
+    "SqlConnectionString": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "SqlConnectionString"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "SqlConnectionString",
+    "PostcodeApiSettings"
+  ],
+  "type": "object"
+}

@@ -12,15 +12,20 @@ parameters:
   - name: package
     type: string
 jobs:
-- job: PublishSite
+- job: PublishSite_${{ parameters.name }}
   variables:
-    ConfigStorageAccountName: $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName'] ]
-    uiAppName: $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName'] ]
+    - name: ConfigStorageAccountName
+      value: $[stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName']]
+    - name: appName
+      ${{ if eq( parameters['appName'], 'api' )}}:
+        value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.webAppName']]
+      ${{ elseif eq( parameters['appName'], 'ui' )}}:
+        value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName']]
 
   pool:
     name: 'Azure Pipelines'
     vmImage: 'windows-2019'
-  dependsOn: 
+  dependsOn:
     - DeployfindproviderapiInfrastructure
     - GenerateConfigs
   steps:
@@ -31,22 +36,11 @@ jobs:
       artifactName: 'appdrop'
       downloadPath: '$(System.ArtifactsDirectory)'
 
-  # - task: AzureWebApp@1
-  #   inputs:
-  #     azureSubscription: ${{ parameters.serviceConnection }}
-  #     appType: 'webApp'
-  #     appName: '$(uiAppName)'
-  #     deployToSlotOrASE: true
-  #     resourceGroupName: '$(ResourceGroupName)'
-  #     slotName: 'staging'
-  #     package: '$(System.ArtifactsDirectory)/appdrop/Sfa.Tl.Find.Provider.Api.Web.zip'
-  #     deploymentMethod: 'auto'
-  
   - task: AzureRmWebAppDeployment@3
-    displayName: 'Azure App Service Deploy: $(uiAppName)'
+    displayName: 'Azure App Service Deploy: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '$(uiAppName)'
+      WebAppName: '$(appName)'
       DeployToSlotFlag: true
       ResourceGroupName: '$(ResourceGroupName)'
       SlotName: 'staging'
@@ -55,29 +49,29 @@ jobs:
       RemoveAdditionalFilesFlag: true
 
   - task: AzureAppServiceManage@0
-    displayName: 'Start staging Slot: $(uiAppName)'
+    displayName: 'Start staging Slot: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Start Azure App Service'
-      WebAppName: '$(uiAppName)'
+      WebAppName: '$(appName)'
       SpecifySlotOrASE: true
       ResourceGroupName: '$(ResourceGroupName)'
       Slot: 'staging'
-  
+
   - task: AzureAppServiceManage@0
-    displayName: 'Swap Slots: $(uiAppName)'
+    displayName: 'Swap Slots: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      WebAppName: '$(uiAppName)'
+      WebAppName: '$(appName)'
       ResourceGroupName: '$(ResourceGroupName)'
       SourceSlot: staging
-  
+
   - task: AzureAppServiceManage@0
-    displayName: 'Stop staging Slot: $(uiAppName)'
+    displayName: 'Stop staging Slot: $(appName)'
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       Action: 'Stop Azure App Service'
-      WebAppName: '$(uiAppName)'
+      WebAppName: '$(appName)'
       ResourceGroupName: '$(ResourceGroupName)'
       SpecifySlotOrASE: true
       Slot: 'staging'

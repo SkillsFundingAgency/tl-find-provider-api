@@ -1,0 +1,15 @@
+{
+  "src": {
+    "default": "Frontend/src/",
+    "SCSS": "Frontend/src/scss/*.scss",
+    "JS": "Frontend/src/js/*.js",
+    "Assets": "Frontend/src/assets/**/*"
+  },
+
+  "dist": {
+    "default": "wwwroot",
+    "SCSS": "wwwroot/css",
+    "JS": "wwwroot/js",
+    "Assets": "wwwroot/assets"
+  }
+}
