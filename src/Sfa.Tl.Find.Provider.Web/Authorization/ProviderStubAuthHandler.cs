@@ -20,7 +20,7 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
         {
             new Claim(ClaimsIdentity.DefaultNameClaimType, "10000001"),
             new Claim(CustomClaimTypes.DisplayName, "Test User"),
-            new Claim(CustomClaimTypes.Service, "TLPSUP"),
+            new Claim(CustomClaimTypes.Service, "TLevelsSupport"),
             new Claim(CustomClaimTypes.UkPrn, "10000001")
         };
         var identity = new ClaimsIdentity(claims, "Provider-stub");

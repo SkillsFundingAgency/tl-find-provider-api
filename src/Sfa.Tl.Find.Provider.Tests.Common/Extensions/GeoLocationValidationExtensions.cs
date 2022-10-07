@@ -1,5 +1,4 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
-using FluentAssertions;
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 public static class GeoLocationValidationExtensions

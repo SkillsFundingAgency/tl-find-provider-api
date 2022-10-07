@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
-using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
-using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;

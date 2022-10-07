@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using FluentAssertions;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Services;

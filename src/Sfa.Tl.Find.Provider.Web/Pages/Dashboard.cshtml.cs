@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using System.Diagnostics;

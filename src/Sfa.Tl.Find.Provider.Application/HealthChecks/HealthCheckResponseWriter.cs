@@ -21,7 +21,7 @@ public static class HealthCheckResponseWriter
                 d.Value.Data
             });
 
-        var json = System.Text.Json.JsonSerializer.Serialize(new
+        var json = JsonSerializer.Serialize(new
         {
             status = result.Status.ToString(),
             results = result.Entries.ToDictionary(
@@ -30,8 +30,8 @@ public static class HealthCheckResponseWriter
                               {
                                   Status = d.Value.Status.ToString(),
                                   Duration = d.Value.Duration.TotalSeconds.ToString(NumberFormatInfo.InvariantInfo),
-                                  Description = d.Value.Description,
-                                  Data = d.Value.Data
+                                  d.Value.Description,
+                                  d.Value.Data
                               })
         }, new JsonSerializerOptions
         {

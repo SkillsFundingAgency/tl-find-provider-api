@@ -111,14 +111,11 @@ public class EmployerInterestServiceTests
 
         result.Should().Be(uniqueId);
 
-        //TODO: use EmailTemplateNames.EmployerRegisterInterest
-        const string templateName = "EmployerRegisterInterest";
-
         await emailService
                 .Received(1)
                 .SendEmail(
                     employerInterest.Email,
-                    templateName, //EmailTemplateNames.EmployerRegisterInterest
+                    EmailTemplateNames.EmployerRegisterInterest,
                     Arg.Any<IDictionary<string, string>>()
             );
     }
@@ -164,7 +161,7 @@ public class EmployerInterestServiceTests
 
         var expectedUnsubscribeUri =
             $"{settings.UnsubscribeEmployerUri.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
-        
+
         //TODO: use EmailTemplateNames.EmployerRegisterInterest
         const string templateName = "EmployerRegisterInterest";
         await emailService
@@ -190,7 +187,7 @@ public class EmployerInterestServiceTests
                         { "employer_unsubscribe_uri", expectedUnsubscribeUri }
                     })));
     }
-    
+
     [Fact]
     public async Task CreateEmployerInterest_Calls_PostcodeLookupService()
     {
