@@ -9,6 +9,8 @@ library(magrittr)
 
 source("./src/Postcode Functions.R")
 
+#rm(list=ls())
+
 ############################
 # Constants and file paths #
 ############################
@@ -16,7 +18,8 @@ source("./src/Postcode Functions.R")
 output_dir <- "./output"
 temp_dir <- "./temp"
 
-providers_xlsx_file <- fs::path(temp_dir, "MASTER PROVIDER LIST BY T LEVEL - DO NOT DELETE.xlsx")
+#providers_xlsx_file <- fs::path(temp_dir, "MASTER PROVIDER LIST BY T LEVEL - DO NOT DELETE.xlsx")
+providers_xlsx_file <- fs::path(temp_dir, "MASTER Provider List by T level October 2022.xlsx")
 
 provider_json_file = fs::path(output_dir, "ProviderData.json")
 provider_json_simplified_file = fs::path(output_dir, "ProviderDataNoDetails.json")
@@ -165,8 +168,7 @@ new_names <- provider_spreadsheet[3,] |>
   mutate(new_name = if_else(!is.na(new_name), new_name, unclass(glue("unused_{name}_{col_index}"))))
 #View(new_names)
 
-included_years <- c(2022, 2023)
-#included_years <- c(2022)
+included_years <- c(2022, 2023, 2024)
 
 provider_data <- provider_spreadsheet %>% 
   rename_all(~new_names %>% pull(new_name)) %>% 
@@ -264,26 +266,18 @@ provider_data %>%
 # Nest the hierarchies #
 ########################
 
-#Need to remove 2023 qualifications from 2022 providers
-provider_data_with_qualifications %>% 
-  ##filter(approved_year == 2022, deliveryYear == 2022, ukprn == 10007527) %>% 
-  #filter(approved_year == 2023, deliveryYear == 2022) %>% 
-  filter(deliveryYear == approved_year) 
-View(provider_data_for_delivery_years)
-
 filtered_provider_data <- provider_data_with_qualifications %>% 
   # Only select delivery years that we want to upload
   filter(deliveryYear %in% included_years) %>%
-  # But also only include 2022 delivery for 2022 since the 2023 data is out of date
-  #  - note this filter might change from 2024
-  filter((approved_year == 2022 & deliveryYear == 2022) |
-           (approved_year >= 2023)) %>% 
+  ###filter((approved_year == 2022 & deliveryYear == 2022) |
+  ###         (approved_year >= 2023)) %>% 
   # Only include existing locations 
   filter(!is.na(postcode)) %>% 
   rename(ukPrn = ukprn, 
          name = providerName) %>% 
   select(-approved_year, -is_in_course_directory) 
 #filtered_provider_data %>% filter(ukPrn == 10007527)
+#View(filtered_provider_data)
 
 provider_data_nested_without_details <- filtered_provider_data %>% 
   #For campaign site, don't need email or phone
@@ -381,4 +375,4 @@ list(providers = provider_data_nested_without_details) %>%
              pretty = TRUE)
 
 #unlink(provider_json_file)
-
+#unlink(provider_json_simplified_file)
