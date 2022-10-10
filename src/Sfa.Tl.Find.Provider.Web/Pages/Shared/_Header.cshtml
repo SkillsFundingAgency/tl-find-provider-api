@@ -19,22 +19,27 @@
         </div>
 
         <div class="govuk-header__content">
-            <a asp-page="/" class="govuk-header__link govuk-header__link--service-name">
-                @PageExtensions.GetServiceName()
-            </a>
-            <button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
-            <ul id="navigation" class="govuk-header__navigation tl-float-right">
-                <li class="govuk-header__navigation-item">
-                    @if (Context.User.Identity!.IsAuthenticated)
-                    {
-                        <a class="govuk-header__link" asp-controller="Account" asp-action="SignOut">Sign out</a>
-                    }
-                    else
-                    {
-                        <a class="govuk-header__link" asp-area="" asp-controller="Account" asp-action="SignIn">Login</a>
-                    }
-                </li>
-            </ul>
+            @if (Context.User.Identity!.IsAuthenticated)
+            {
+                <a asp-page="/Dashboard" class="govuk-header__link govuk-header__link--service-name">
+                    @PageExtensions.GetServiceName()
+                </a>
+                <button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
+                <ul id="navigation" class="govuk-header__navigation tl-float-right">
+                    <li class="govuk-header__navigation-item">
+                        @if (Context.User.Identity!.IsAuthenticated)
+                        {
+                            <a class="govuk-header__link" asp-controller="Account" asp-action="SignOut">Sign out</a>
+                        }
+                    </li>
+                </ul>
+            }
+            else
+            {
+                <a asp-page="/" class="govuk-header__link govuk-header__link--service-name">
+                    @PageExtensions.GetServiceName()
+                </a>
+            }
         </div>
     </div>
 </header>
