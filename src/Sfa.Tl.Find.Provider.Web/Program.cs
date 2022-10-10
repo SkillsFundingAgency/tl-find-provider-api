@@ -68,6 +68,7 @@ builder.Services
     .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
+    .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
     .AddTransient<ITownDataService, TownDataService>()

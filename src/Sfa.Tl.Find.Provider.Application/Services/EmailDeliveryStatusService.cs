@@ -52,9 +52,7 @@ public class EmailDeliveryStatusService : IEmailDeliveryStatusService
         await _emailService.SendEmail(
             _emailSettings.SupportEmailAddress,
             EmailTemplateNames.EmailDeliveryStatus,
-            tokens
-            );
-    
+            tokens);
 
         return 1;
     }

@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
             .Configure<EmailSettings>(x =>
             {
                 x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
+                x.DeliveryStatusToken = siteConfiguration.EmailSettings.DeliveryStatusToken;
                 x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
             })
             .Configure<PostcodeApiSettings>(x =>
