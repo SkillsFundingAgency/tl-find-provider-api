@@ -104,7 +104,12 @@ public class EmployerInterestService : IEmployerInterestService
         return _employerInterestRepository.GetAll();
     }
 
-    public async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest)
+    public Task<EmployerInterest> GetEmployerInterest(int id)
+    {
+        return _employerInterestRepository.Get(id);
+    }
+
+    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest)
     {
         //TODO: Move to constants class:
         //EmailTemplateNames.EmployerRegisterInterest

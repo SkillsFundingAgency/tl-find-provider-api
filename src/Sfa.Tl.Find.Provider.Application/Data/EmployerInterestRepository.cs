@@ -146,6 +146,36 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
     }
 
+    public async Task<EmployerInterest> Get(int id)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            id
+        });
+
+        return (await _dbContextWrapper
+                .QueryAsync<EmployerInterest>(
+                    connection,
+                    "SELECT Id," +
+                    "UniqueId, " +
+                    "OrganisationName, " +
+                    "ContactName, " +
+                    "Postcode, " +
+                    "HasMultipleLocations, " +
+                    "LocationCount, " +
+                    "IndustryId, " +
+                    "SpecificRequirements, " +
+                    "Email, " +
+                    "Telephone, " +
+                    "ContactPreferenceType " +
+                    "FROM dbo.EmployerInterest " +
+                    "WHERE Id = @id",
+                    _dynamicParametersWrapper.DynamicParameters))
+            .SingleOrDefault();
+    }
+
     public async Task<IEnumerable<EmployerInterest>> GetAll()
     {
         using var connection = _dbContextWrapper.CreateConnection();

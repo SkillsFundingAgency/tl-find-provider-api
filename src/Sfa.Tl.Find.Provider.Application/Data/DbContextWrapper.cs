@@ -22,9 +22,7 @@ public class DbContextWrapper : IDbContextWrapper
         ILogger<DbContextWrapper> logger)
     {
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
-
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
         _connectionString = connectionStringOptions?.Value?.SqlConnectionString
                             ?? throw new ArgumentNullException(nameof(connectionStringOptions));
     }

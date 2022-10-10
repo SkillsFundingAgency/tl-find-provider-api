@@ -32,7 +32,8 @@
                             <td class="govuk-table__cell">@employerInterest.ContactName</td>
                             <td class="govuk-table__cell">@employerInterest.Email</td>
                             <td class="govuk-table__cell">@employerInterest.Telephone</td>
-                            <td class="govuk-table__cell">@employerInterest.UniqueId</td>
+                            <td class="govuk-table__cell"><a asp-page="Detail" asp-route-id="@employerInterest.Id"                                    class="govuk-link" id="tl-change-link">View</a>
+                            </td>
                         </tr>
                     }
                 }

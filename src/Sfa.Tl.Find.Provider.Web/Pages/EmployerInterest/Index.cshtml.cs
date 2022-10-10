@@ -14,7 +14,6 @@ public class IndexModel : PageModel
         IEmployerInterestService employerInterestService,
         ILogger<IndexModel> logger)
     {
-        _employerInterestService = employerInterestService;
         _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }

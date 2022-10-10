@@ -312,4 +312,26 @@ public class EmployerInterestServiceTests
             .Received(1)
             .GetAll();
     }
+    
+    [Fact]
+    public async Task GetEmployerInterest_Returns_Expected_Value()
+    {
+        var employerInterest = new EmployerInterestBuilder()
+            .Build();
+        var id = employerInterest.Id;
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Get(id)
+            .Returns(employerInterest);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository);
+
+        var result = await service.GetEmployerInterest(id);
+        result.Should().Be(employerInterest);
+
+        await employerInterestRepository
+            .Received(1)
+            .Get(id);
+    }
 }

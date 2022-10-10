@@ -11,5 +11,7 @@ public interface IEmployerInterestRepository
 
     Task<int> DeleteBefore(DateTime date);
 
+    Task<EmployerInterest> Get(int id);
+
     Task<IEnumerable<EmployerInterest>> GetAll();
 }

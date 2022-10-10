@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Dapper;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -113,7 +114,7 @@ public class EmployerInterestRepositoryTests
             .Received(1)
             .Commit();
     }
-    
+
     [Fact]
     public async Task Delete_Returns_Expected_Result()
     {
@@ -125,7 +126,7 @@ public class EmployerInterestRepositoryTests
 
         dbContextWrapper
             .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s => 
+                Arg.Is<string>(s =>
                     s.Contains("DeleteEmployerInterest")),
                 Arg.Any<object>(),
                 Arg.Is<IDbTransaction>(t => t != null),
@@ -138,7 +139,7 @@ public class EmployerInterestRepositoryTests
 
         result.Should().Be(count);
     }
-    
+
     [Fact]
     public async Task DeleteBefore_Returns_Expected_Result()
     {
@@ -162,6 +163,33 @@ public class EmployerInterestRepositoryTests
         var result = await repository.DeleteBefore(date);
 
         result.Should().Be(count);
+    }
+
+    [Fact]
+    public async Task Get_Returns_Expected_Item()
+    {
+        var employerInterest = new EmployerInterestBuilder()
+            .Build();
+        var id = employerInterest.Id;
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<EmployerInterest>(dbConnection,
+                Arg.Any<string>(),
+                Arg.Any<DynamicParameters>())
+            .Returns(new List<EmployerInterest> { employerInterest });
+
+        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
+
+        var result = await repository.Get(id);
+        result.Should().BeEquivalentTo(employerInterest);
+
+        await dbContextWrapper
+            .Received(1)
+            .QueryAsync<EmployerInterest>(dbConnection,
+                Arg.Is<string>(sql => sql.Contains("FROM dbo.EmployerInterest")));
     }
 
     [Fact]
