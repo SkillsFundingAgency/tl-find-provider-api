@@ -107,7 +107,7 @@ try
     builder.Services.AddHealthChecks()
         .AddSqlServer(siteConfiguration.SqlConnectionString, 
             tags: new[] { "database" })
-        .Services
+        //.Services
         //.AddHealthChecksUI(setup =>
         //{
         //    setup.SetEvaluationTimeInSeconds(30);
