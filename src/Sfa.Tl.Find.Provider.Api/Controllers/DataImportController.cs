@@ -111,8 +111,10 @@ public class DataImportController : ControllerBase
         const bool isAdditionalData = true;
         try
         {
-            _logger.LogInformation("{nameof(DataImportController)} {nameof(UploadProviderData)} called with file {fileName}.",
-                file?.FileName);
+            _logger.LogInformation("{className} {methodName} called with file {fileName}.", 
+                    nameof(DataImportController),
+                    nameof(UploadProviderDataZipped), 
+                    file?.FileName);
 
             if (file is null)
             {
