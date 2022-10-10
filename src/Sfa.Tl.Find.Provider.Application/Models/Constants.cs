@@ -5,6 +5,7 @@ public static class Constants
     public const string CorsPolicyName = "CorsPolicy";
 
     public const string DapperRetryPolicyName = "dapper-transient-error-retry";
+    public const string GovNotifyRetryPolicyName = "gov-uk-notify-transient-error-retry";
 
     public const int DefaultPageSize = 5;
 

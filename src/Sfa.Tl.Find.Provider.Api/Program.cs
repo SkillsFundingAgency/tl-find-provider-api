@@ -45,7 +45,8 @@ try
     builder.Services
         .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins)
         .AddPolicyRegistry()
-        .AddDapperRetryPolicy();
+        .AddDapperRetryPolicy()
+        .AddGovNotifyRetryPolicy();
 
     builder.Services.AddHttpClients();
 

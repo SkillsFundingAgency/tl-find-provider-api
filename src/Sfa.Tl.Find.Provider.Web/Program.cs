@@ -57,7 +57,8 @@ if (!builder.Environment.IsDevelopment())
 
 builder.Services
     .AddPolicyRegistry()
-    .AddDapperRetryPolicy();
+    .AddDapperRetryPolicy()
+    .AddGovNotifyRetryPolicy();
 
 builder.Services.AddHttpClients();
 
