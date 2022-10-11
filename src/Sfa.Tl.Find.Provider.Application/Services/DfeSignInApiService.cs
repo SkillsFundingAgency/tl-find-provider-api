@@ -12,7 +12,6 @@ public class DfeSignInApiService : IDfeSignInApiService
 {
     private readonly HttpClient _httpClient;
     private readonly string _clientId;
-    private readonly IDfeSignInTokenService _tokenService;
     private readonly ILogger<DfeSignInApiService> _logger;
 
     public DfeSignInApiService(
@@ -21,8 +20,7 @@ public class DfeSignInApiService : IDfeSignInApiService
         IOptions<DfeSignInSettings> signInOptions,
         ILogger<DfeSignInApiService> logger)
     {
-        _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
-
+        if (tokenService is null) throw new ArgumentNullException(nameof(tokenService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (signInOptions is null) throw new ArgumentNullException(nameof(signInOptions));
 
@@ -32,7 +30,7 @@ public class DfeSignInApiService : IDfeSignInApiService
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue(
                 "Bearer",
-                _tokenService.GetApiToken());
+                tokenService.GetApiToken());
     }
 
     public async Task<DfeUserInfo> GetDfeSignInUserInfo(string organisationId, string userId)
@@ -77,7 +75,7 @@ public class DfeSignInApiService : IDfeSignInApiService
             //TODO: There will be an array here - get the one matching our organisationId
             //        .SafeGetString("id"))
             //    .Where(orgId => orgId == organisationId).ToList();
-            
+
             return orgToken?["ukprn"].ToObject<long?>();
         }
 

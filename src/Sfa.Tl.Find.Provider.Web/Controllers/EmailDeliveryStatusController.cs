@@ -18,7 +18,7 @@ public class EmailDeliveryStatusController : ControllerBase
 
     public EmailDeliveryStatusController(
         IEmailDeliveryStatusService emailDeliveryStatusService,
-        IOptions<EmailSettings> emailOptions,
+        IOptions<EmailSettings>? emailOptions,
         ILogger<EmailDeliveryStatusController> logger)
     {
         _emailDeliveryStatusService = emailDeliveryStatusService ?? throw new ArgumentNullException(nameof(emailDeliveryStatusService));

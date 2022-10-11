@@ -15,23 +15,23 @@ public class ValidationClassTagHelper : TagHelper
     public const string ValidationForAttributeName = "sfa-validation-for";
 
     [HtmlAttributeName(ValidationForAttributeName)]
-    public ModelExpression For { get; set; }
+    public ModelExpression? For { get; set; }
 
     [HtmlAttributeName(ValidationErrorClassName)]
-    public string ValidationErrorClass { get; set; }
+    public string? ValidationErrorClass { get; set; }
 
     [HtmlAttributeNotBound]
     [ViewContext]
-    public ViewContext ViewContext { get; set; }
+    public ViewContext? ViewContext { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        ViewContext.ViewData.ModelState.TryGetValue(For.Name, out var entry);
-            
+        ViewContext!.ViewData.ModelState.TryGetValue(For!.Name, out var entry);
+
         if (entry == null || !entry.Errors.Any()) return;
 
         var tagBuilder = new TagBuilder(context.TagName);
-        tagBuilder.AddCssClass(ValidationErrorClass);
+        tagBuilder.AddCssClass(ValidationErrorClass!);
         output.MergeAttributes(tagBuilder);
     }
 }

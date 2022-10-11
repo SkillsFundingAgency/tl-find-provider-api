@@ -8,12 +8,9 @@ using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 public class DfeSignInApiServiceBuilder
 {
-    private const string DfeSignInApiBaseAbsoluteUri = "https://test.api.dfesignin.gov.uk/";
-    private static readonly Uri DfeSignInApiBaseUri = new(DfeSignInApiBaseAbsoluteUri);
-
     public IDfeSignInApiService Build(
         HttpClient httpClient = null,
-        DfeSignInSettings? signInSettings = null,
+        DfeSignInSettings signInSettings = null,
         ILogger<DfeSignInApiService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
