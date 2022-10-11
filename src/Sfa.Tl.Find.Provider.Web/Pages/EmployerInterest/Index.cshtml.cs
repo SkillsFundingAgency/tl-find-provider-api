@@ -3,6 +3,7 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 
+[Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class IndexModel : PageModel
 {
     public IEnumerable<Application.Models.EmployerInterest>? EmployerInterestList { get; private set; }
