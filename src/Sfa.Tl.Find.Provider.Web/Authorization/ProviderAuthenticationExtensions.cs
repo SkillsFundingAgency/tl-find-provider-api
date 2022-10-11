@@ -75,7 +75,7 @@ public static class ProviderAuthenticationExtensions
             options.ClientSecret = signInSettings.ClientSecret;
             options.ResponseType = OpenIdConnectResponseType.Code;
             options.GetClaimsFromUserInfoEndpoint = true;
-
+            
             options.Scope.Clear();
             options.Scope.Add("openid");
             options.Scope.Add("email");
@@ -187,10 +187,17 @@ public static class ProviderAuthenticationExtensions
                                 claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
                             }
                         }
-                    }
-                    else
-                    {
-                        //claims.Add(new Claim(CustomClaimTypes.HasAccessToService, "false"));
+                        else
+                        {
+                            //Temp code to add org name from original claims
+                            //claims.Add(new Claim(CustomClaimTypes.HasAccessToService, "false"));
+                            var org = ctx.Principal
+                                .FindFirst("Organisation");
+                            var organisationName = JsonDocument.Parse(org.Value)
+                                .RootElement
+                                .SafeGetString("name");
+                            claims.Add(new Claim(CustomClaimTypes.DisplayName, organisationName));
+                        }
                     }
 
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));

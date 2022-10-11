@@ -20,7 +20,6 @@ public class DashboardPageTests
         await dashboardModel.OnGet();
 
         dashboardModel.DisplayName.Should().Be(PageContextBuilder.DefaultDisplayName);
-        dashboardModel.Service.Should().Be(PageContextBuilder.DefaultService);
         dashboardModel.UkPrn.Should().Be(PageContextBuilder.DefaultUkPrn);
     }
 }

@@ -11,7 +11,6 @@ public class DashboardModel : PageModel
     private readonly ILogger<DashboardModel> _logger;
 
     public string? DisplayName { get; private set; }
-    public string? Service { get; private set; }
     public string? UkPrn { get; private set; }
 
     public DashboardModel(
@@ -24,19 +23,17 @@ public class DashboardModel : PageModel
     {
         var isAuthenticated = User.Identity.IsAuthenticated;
 
-        var claims = User.Claims.ToList();
-        foreach (var claim in claims)
+        foreach (var claim in User.Claims)
         {
             Debug.WriteLine($"User claim {claim.Type} = {claim.Value}");
         }
 
         UkPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
         DisplayName = HttpContext.User.GetClaim(CustomClaimTypes.DisplayName);
-        Service = HttpContext.User.GetClaim(CustomClaimTypes.Service);
 
         if (string.IsNullOrEmpty(UkPrn))
         {
-            //TODO: This won't happen when login is working correctly
+            //TODO: This won't happen when login is working correctly, so need to remove it
             return RedirectToPage("/ChooseOrganisation");
         }
 

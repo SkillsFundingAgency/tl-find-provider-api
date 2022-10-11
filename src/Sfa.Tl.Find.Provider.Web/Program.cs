@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
@@ -63,6 +64,7 @@ builder.Services
 builder.Services.AddHttpClients();
 
 builder.Services
+    .AddSingleton<IClaimsTransformation, UkPrnClaimsTransformation>()
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
     .AddScoped<IGuidService, GuidService>()

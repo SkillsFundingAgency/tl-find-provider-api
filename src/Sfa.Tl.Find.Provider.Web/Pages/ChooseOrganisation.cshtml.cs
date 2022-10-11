@@ -1,11 +1,9 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 
@@ -15,20 +13,21 @@ namespace Sfa.Tl.Find.Provider.Web.Pages;
 public class ChooseOrganisationModel : PageModel
 {
     private readonly ILogger<ChooseOrganisationModel> _logger;
+    private readonly UkPrnClaimsTransformation _ukPrnClaimsTransformation;
 
-    public const string UkprnRegexString = @"^((?!(0))[0-9]{8})$";
-    public static Regex UkprnRegex => new(@"^((?!(0))[0-9]{8})$");
+    private const string UkprnRegexString = @"^((?!(0))[0-9]{8})$";
 
     [BindProperty]
     [Required]
     [DisplayName("UKPRN")]
-    //[Display(Name = "UKPRN")]
     [RegularExpression(UkprnRegexString, ErrorMessage = "UKPRN must be an 8 digit number")]
     public string? UkPrn { get; set; }
 
     public ChooseOrganisationModel(
+        IClaimsTransformation claimsTransformation,
         ILogger<ChooseOrganisationModel> logger)
     {
+        _ukPrnClaimsTransformation = (UkPrnClaimsTransformation)claimsTransformation ?? throw new ArgumentNullException(nameof(claimsTransformation));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -46,22 +45,14 @@ public class ChooseOrganisationModel : PageModel
         }
     }
 
-    public async Task<IActionResult> OnPost()
+    public IActionResult OnPost()
     {
-        //Validate that it's a int of the correct length
-        //fluent validation rule? see Matching
-
         if (!ModelState.IsValid)
         {
-            //TODO: Validate this is a number of 8 digits
             return Page();
         }
 
-
-        //save UkPrn to claims
-
+        _ukPrnClaimsTransformation.UkPrn = UkPrn;
         return RedirectToPage("/Dashboard");
-
-
     }
 }

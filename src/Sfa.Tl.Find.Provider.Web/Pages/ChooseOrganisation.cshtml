@@ -12,7 +12,6 @@
 
         @if (!ViewData.ModelState.IsValid)
         {
-            <p>hello</p>
             <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
                 <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
                 <div class="govuk-error-summary__body">
@@ -21,10 +20,6 @@
                     </ul>
                 </div>
             </div>
-        }
-        else
-        {
-            <p>is valid</p>
         }
 
         <form id="tl-employer-interest-form" method="POST">
