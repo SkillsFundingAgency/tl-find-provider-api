@@ -8,18 +8,21 @@ public class EmployerInterestIndexModelBuilder
 {
     public IndexModel Build(
         IEmployerInterestService? employerInterestService = null,
-            ILogger<IndexModel>? logger = null,
-            PageContext? pageContext = null,
-            bool userIsAuthenticated = true)
+        IProviderDataService? providerDataService = null,
+        ILogger<IndexModel>? logger = null,
+        PageContext? pageContext = null,
+        bool userIsAuthenticated = true)
     {
         pageContext ??= new PageContextBuilder()
             .Build(userIsAuthenticated);
 
         employerInterestService ??= Substitute.For<IEmployerInterestService>();
+        providerDataService ??= Substitute.For<IProviderDataService>();
         logger ??= Substitute.For<ILogger<IndexModel>>();
 
         var pageModel = new IndexModel(
             employerInterestService,
+            providerDataService,
             logger)
         {
             PageContext = pageContext
