@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
@@ -19,7 +20,7 @@ public class DashboardModel : PageModel
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task OnGet()
+    public async Task<IActionResult> OnGet()
     {
         var isAuthenticated = User.Identity.IsAuthenticated;
 
@@ -32,5 +33,13 @@ public class DashboardModel : PageModel
         UkPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
         DisplayName = HttpContext.User.GetClaim(CustomClaimTypes.DisplayName);
         Service = HttpContext.User.GetClaim(CustomClaimTypes.Service);
+
+        if (string.IsNullOrEmpty(UkPrn))
+        {
+            //TODO: This won't happen when login is working correctly
+            return RedirectToPage("/ChooseOrganisation");
+        }
+
+        return Page();
     }
 }
