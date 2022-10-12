@@ -120,7 +120,6 @@ public class TownDataService : ITownDataService
         HttpResponseMessage responseMessage)
     {
         var jsonDocument = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
-        //var json = jsonDocument.PrettifyJson();
 
         var root = jsonDocument.RootElement;
 

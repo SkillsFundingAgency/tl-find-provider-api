@@ -10,8 +10,11 @@
 
   <ItemGroup>
     <None Remove="Builders\Csv\Assets\ProviderContacts.csv" />
+    <None Remove="Builders\HealthChecks\Assets\health.json" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tlevels.json" />
+    <None Remove="Builders\Json\Assets\GoogleApi\GooglePlacesResult.json" />
+    <None Remove="Builders\Json\Assets\GoogleApi\GooglePlacesZeroResults.json" />
     <None Remove="Builders\Json\Assets\NationalStatistics\nationalstatisticslocationsresponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\invalidpostcoderesponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\nearestpostcoderesponse.json" />
@@ -23,12 +26,16 @@
     <None Remove="Builders\Json\Assets\Postcodes\validoutcodewithnulllatlongresponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\validpostcoderesponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\validpostcodewithnulllatlongresponse.json" />
+    <None Remove="Builders\Json\Assets\ProviderData\ProviderData.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Builders\Csv\Assets\ProviderContacts.csv" />
+    <EmbeddedResource Include="Builders\HealthChecks\Assets\health.json" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tlevels.json" />
+    <EmbeddedResource Include="Builders\Json\Assets\GoogleApi\GooglePlacesResult.json" />
+    <EmbeddedResource Include="Builders\Json\Assets\GoogleApi\GooglePlacesZeroResults.json" />
     <EmbeddedResource Include="Builders\Json\Assets\NationalStatistics\nationalstatisticslocationsresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\invalidpostcoderesponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\nearestpostcoderesponse.json" />
@@ -40,6 +47,7 @@
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validoutcodewithnulllatlongresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validpostcoderesponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\validpostcodewithnulllatlongresponse.json" />
+    <EmbeddedResource Include="Builders\Json\Assets\ProviderData\ProviderData.json" />
   </ItemGroup>
 
   <ItemGroup>

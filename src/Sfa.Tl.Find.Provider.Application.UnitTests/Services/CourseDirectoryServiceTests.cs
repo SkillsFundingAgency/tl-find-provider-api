@@ -144,7 +144,35 @@ public class CourseDirectoryServiceTests
     }
 
     [Fact]
-    public async Task ImportQualifications_Removes_Qualifications_From_Cache()
+    public async Task ImportProviders_Clears_Caches()
+    {
+        var responses = new Dictionary<string, string>
+        {
+            { CourseDirectoryService.CourseDetailEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelsResponse() }
+        };
+
+        var cache = Substitute.For<IMemoryCache>();
+
+        var service = new CourseDirectoryServiceBuilder()
+            .Build(responses,
+                cache: cache);
+
+        await service.ImportProviders();
+
+        cache
+            .Received(1)
+            .Remove(CacheKeys.QualificationsKey);
+        cache
+            .Received(1)
+            .Remove(CacheKeys.RoutesKey);
+        cache
+            .Received(1)
+            .Remove(CacheKeys.ProviderDataDownloadInfoKey);
+    }
+
+
+    [Fact]
+    public async Task ImportQualifications_Clears_Caches()
     {
         var responses = new Dictionary<string, string>
         {
@@ -162,5 +190,11 @@ public class CourseDirectoryServiceTests
         cache
             .Received(1)
             .Remove(CacheKeys.QualificationsKey);
+        cache
+            .Received(1)
+            .Remove(CacheKeys.RoutesKey);
+        cache
+            .Received(1)
+            .Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

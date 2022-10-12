@@ -3,10 +3,13 @@ using AspNetCoreRateLimit;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Application.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
@@ -46,11 +49,29 @@ try
 
     builder.Services.AddHttpClients();
 
+    builder.Services.Configure<IISServerOptions>(options =>
+    {
+        options.MaxRequestBodySize = int.MaxValue;
+    });
+
+    builder.Services.Configure<FormOptions>(o =>
+    {
+        o.ValueLengthLimit = int.MaxValue;
+        o.MultipartBodyLengthLimit = int.MaxValue;
+        o.MultipartBoundaryLengthLimit = int.MaxValue;
+        o.MultipartHeadersCountLimit = int.MaxValue;
+        o.MultipartHeadersLengthLimit = int.MaxValue;
+        o.BufferBodyLengthLimit = int.MaxValue;
+        o.BufferBody = true;
+        o.ValueCountLimit = int.MaxValue;
+    });
+
     builder.Services
         .AddScoped<IDateTimeService, DateTimeService>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
+        .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
         .AddTransient<IEmployerInterestService, EmployerInterestService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
@@ -83,6 +104,19 @@ try
             options.KnownProxies.Clear();
         });
 
+    builder.Services.AddHealthChecks()
+        .AddSqlServer(siteConfiguration.SqlConnectionString, 
+            tags: new[] { "database" })
+        //.Services
+        //.AddHealthChecksUI(setup =>
+        //{
+        //    setup.SetEvaluationTimeInSeconds(30);
+        //    setup.MaximumHistoryEntriesPerEndpoint(60);
+        //    setup.AddHealthCheckEndpoint("Find Provider API Health Checks", "/health");
+        //})
+        //.AddInMemoryStorage()
+        ;
+
     var app = builder.Build();
 
     app.UseForwardedHeaders();
@@ -100,6 +134,14 @@ try
             "/swagger/v3/swagger.json",
             "T Levels Find a Provider.Api v3"));
     }
+
+    //Add before CORS policy so this will be allowed through
+    app.UseHealthChecks("/health", new HealthCheckOptions
+        {
+            ResponseWriter = HealthCheckResponseWriter.WriteJsonResponse
+        })
+        //.UseHealthChecksUI()
+        ;
 
     if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
     {

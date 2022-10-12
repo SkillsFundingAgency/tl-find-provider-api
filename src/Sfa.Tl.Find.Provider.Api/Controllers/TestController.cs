@@ -14,15 +14,19 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class TestController : ControllerBase
 {
     private readonly IEmailService _emailService;
+    private readonly IGoogleMapsApiService _googleMapsApiService;
+    
     private readonly ILogger<TestController> _logger;
     private readonly ISchedulerFactory _schedulerFactory;
 
     public TestController(
         IEmailService emailService,
+        IGoogleMapsApiService googleMapsApiService,
         ILogger<TestController> logger,
         ISchedulerFactory schedulerFactory)
     {
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+        _googleMapsApiService = googleMapsApiService ?? throw new ArgumentNullException(nameof(googleMapsApiService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _schedulerFactory = schedulerFactory ?? throw new ArgumentNullException(nameof(schedulerFactory));
     }
@@ -46,6 +50,16 @@ public class TestController : ControllerBase
         var tokens = new Dictionary<string, string>();
 
         var result = await _emailService.SendEmail(recipients, template, tokens);
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("lookup")]
+    public async Task<IActionResult> GoogleLookupPostcode(
+        [FromQuery(Name = "postcode")] string postcode)
+    {
+        var result = await _googleMapsApiService.GetAddressDetails(postcode);
 
         return Ok(result);
     }
