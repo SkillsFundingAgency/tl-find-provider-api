@@ -15,6 +15,7 @@ public class EmployerInterestService : IEmployerInterestService
     private readonly IEmailService _emailService;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmployerInterestRepository _employerInterestRepository;
+    private readonly IProviderDataService _providerDataService;
     private readonly IMemoryCache _cache;
     private readonly ILogger<EmployerInterestService> _logger;
     private readonly EmployerInterestSettings _employerInterestSettings;
@@ -23,6 +24,7 @@ public class EmployerInterestService : IEmployerInterestService
         IDateTimeService dateTimeService,
         IEmailService emailService,
         IPostcodeLookupService postcodeLookupService,
+        IProviderDataService providerDataService,
         IEmployerInterestRepository employerInterestRepository,
         IMemoryCache cache,
         IOptions<EmployerInterestSettings> employerInterestOptions,
@@ -32,6 +34,7 @@ public class EmployerInterestService : IEmployerInterestService
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _employerInterestRepository = employerInterestRepository ?? throw new ArgumentNullException(nameof(employerInterestRepository));
+        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -111,50 +114,55 @@ public class EmployerInterestService : IEmployerInterestService
 
     private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest)
     {
-        //TODO: Move to constants class:
-        //EmailTemplateNames.EmployerRegisterInterest
-        const string templateName = "EmployerRegisterInterest";
-
         var unsubscribeUri = new Uri(QueryHelpers.AddQueryString(
             _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
             "id",
             employerInterest.UniqueId.ToString("D").ToLower()));
         
-        //https://localhost:7191/EmployerInterest/Unsubscribe?id=A78BA9E5-EB8B-4FF8-ABFC-36035A029AC1
-        //    "UnsubscribeEmployerUri": "https://localhost:7191/EmployerInterest/Unsubscribe",
-
         var contactPreference = employerInterest.ContactPreferenceType switch
         {
             1 => "Email",
             2 => "Telephone",
-            _ => "Unknown"
+            _ => "No preference"
         };
 
-        var howManyLocations =
-        employerInterest.HasMultipleLocations && employerInterest.LocationCount > 0
-            ? $"{employerInterest.LocationCount} location {(employerInterest.LocationCount > 1 ? "s" : "")}"
-                : "A single location";
+        var industries = await _providerDataService.GetIndustries();
+        var routes = await _providerDataService.GetRoutes();
 
+        var industry = industries
+            .FirstOrDefault(i => i.Id == employerInterest.IndustryId)
+            ?.Name;
+        if (industry is null or "Other")
+        {
+            //TODO: Don't use "Other" in the pattern above, and use this:
+            //industry = employerInterest.OtherIndustry
+        }
+
+
+        //TODO: Add to employer interest table
+        var placementArea = "(TODO: placement area)";
+        //TODO: Rename SpecificRequirements to AdditionalInformation
+        
         var tokens = new Dictionary<string, string>
         {
-            { "organisation_name", employerInterest.OrganisationName },
             { "contact_name", employerInterest.ContactName },
-            { "email_address", employerInterest.Email },
-            { "telephone", employerInterest.Telephone },
+            { "email_address", employerInterest.Email ?? "" },
+            { "telephone", employerInterest.Telephone ?? "" },
             { "contact_preference", contactPreference },
-            //Need to convert to text
-            { "primary_industry", employerInterest.IndustryId.ToString() },
+            { "organisation_name", employerInterest.OrganisationName },
+            //TODO: Add website
+            { "website", "https://todo.com" }, //employerInterest.Website ?? "" },
+            { "primary_industry", industry },
+            { "placement_area", placementArea },
             { "postcode", employerInterest.Postcode },
-            { "specific_requirements", employerInterest.SpecificRequirements },
-            { "how_many_locations", howManyLocations },
+            { "additional_information", employerInterest.SpecificRequirements },
             { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri },
-            { "unique_id", employerInterest.UniqueId.ToString() },
             { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
         };
 
         return await _emailService.SendEmail(
             employerInterest.Email,
-            templateName,
+            EmailTemplateNames.EmployerRegisterInterest,
             tokens);
     }
 

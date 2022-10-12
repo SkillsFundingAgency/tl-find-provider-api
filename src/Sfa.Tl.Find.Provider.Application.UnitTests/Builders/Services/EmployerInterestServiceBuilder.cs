@@ -14,6 +14,7 @@ public class EmployerInterestServiceBuilder
         IDateTimeService dateTimeService = null,
         IEmailService emailService = null,
         IPostcodeLookupService postcodeLookupService = null,
+        IProviderDataService providerDataService = null,
         IEmployerInterestRepository employerInterestRepository = null,
         IMemoryCache cache = null,
         EmployerInterestSettings employerInterestSettings = null,
@@ -23,6 +24,7 @@ public class EmployerInterestServiceBuilder
         emailService ??= Substitute.For<IEmailService>();
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         employerInterestRepository ??= Substitute.For<IEmployerInterestRepository>();
+        providerDataService ??= Substitute.For<IProviderDataService>();
         cache ??= Substitute.For<IMemoryCache>();
         logger ??= Substitute.For<ILogger<EmployerInterestService>>();
 
@@ -35,6 +37,7 @@ public class EmployerInterestServiceBuilder
             dateTimeService,
             emailService,
             postcodeLookupService,
+            providerDataService,
             employerInterestRepository,
             cache,
             employerInterestOptions,

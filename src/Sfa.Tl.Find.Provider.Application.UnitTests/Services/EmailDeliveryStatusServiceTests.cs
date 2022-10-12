@@ -208,6 +208,7 @@ public class EmailDeliveryStatusServiceTests
                         }
                     )));
     }
+
     [Fact]
     public async Task EmailDeliveryStatusService_Handles_Null_Reference_Token()
     {

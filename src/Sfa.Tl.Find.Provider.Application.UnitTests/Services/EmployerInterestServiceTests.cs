@@ -39,20 +39,20 @@ public class EmployerInterestServiceTests
                 Arg.Any<string>())
             .Returns(geoLocation);
 
-        var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.Create(Arg.Any<EmployerInterest>())
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
                 postcodeLookupService: postcodeLookupService,
-                employerInterestRepository: repository);
+                employerInterestRepository: employerInterestRepository);
 
         var result = await service.CreateEmployerInterest(employerInterest);
 
         result.Should().Be(uniqueId);
 
-        await repository
+        await employerInterestRepository
             .Received(1)
             .Create(Arg.Any<EmployerInterest>());
 
@@ -72,7 +72,7 @@ public class EmployerInterestServiceTests
             ContactPreferenceType = employerInterest.ContactPreferenceType
         };
 
-        await repository
+        await employerInterestRepository
             .Received(1)
             .Create(Arg.Is<EmployerInterest>(e =>
                 e.Validate(expectedEmployerInterest, false, false)));
@@ -97,15 +97,15 @@ public class EmployerInterestServiceTests
                 Arg.Any<IDictionary<string, string>>())
             .Returns(true);
 
-        var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.Create(Arg.Any<EmployerInterest>())
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
                 emailService: emailService,
                 postcodeLookupService: postcodeLookupService,
-                employerInterestRepository: repository);
+                employerInterestRepository: employerInterestRepository);
 
         var result = await service.CreateEmployerInterest(employerInterest);
 
@@ -139,8 +139,14 @@ public class EmployerInterestServiceTests
                 Arg.Any<string>())
             .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
 
-        var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.Create(Arg.Any<EmployerInterest>())
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetIndustries()
+            .Returns(new IndustryBuilder().BuildList());
+        providerDataService.GetRoutes()
+            .Returns(new RouteBuilder().BuildList());
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -149,7 +155,8 @@ public class EmployerInterestServiceTests
             .Build(
                 emailService: emailService,
                 postcodeLookupService: postcodeLookupService,
-                employerInterestRepository: repository,
+                providerDataService: providerDataService,
+                employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
         var result = await service.CreateEmployerInterest(employerInterest);
@@ -157,35 +164,33 @@ public class EmployerInterestServiceTests
         result.Should().Be(uniqueId);
 
         const string expectedContactPreference = "Email";
-        const string expectedLocations = "A single location";
+        const string expectedIndustry = "IT and Communications";
 
         var expectedUnsubscribeUri =
             $"{settings.UnsubscribeEmployerUri.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
 
-        //TODO: use EmailTemplateNames.EmployerRegisterInterest
-        const string templateName = "EmployerRegisterInterest";
         await emailService
             .Received(1)
             .SendEmail(
                 employerInterest.Email,
-                templateName, //EmailTemplateNames.EmployerRegisterInterest
+                EmailTemplateNames.EmployerRegisterInterest,
                 Arg.Is<IDictionary<string, string>>(tokens =>
-                    //TODO: Use the shared token validation class
-                    //tokens.ValidateTokens(
-                    ValidateTokens(tokens, new Dictionary<string, string>
-                    {
-                        { "organisation_name", employerInterest.OrganisationName },
-                        { "contact_name", employerInterest.ContactName },
-                        { "email_address", employerInterest.Email },
-                        { "telephone", employerInterest.Telephone },
-                        { "contact_preference", expectedContactPreference },
-                        { "primary_industry", employerInterest.IndustryId.ToString() },
-                        { "postcode", employerInterest.Postcode },
-                        { "specific_requirements", employerInterest.SpecificRequirements },
-                        { "how_many_locations", expectedLocations },
-                        { "employer_support_site", settings.EmployerSupportSiteUri },
-                        { "employer_unsubscribe_uri", expectedUnsubscribeUri }
-                    })));
+                    tokens.ValidateTokens(
+                        new Dictionary<string, string>
+                        {
+                            { "organisation_name", employerInterest.OrganisationName },
+                            { "contact_name", employerInterest.ContactName },
+                            { "email_address", employerInterest.Email },
+                            { "telephone", employerInterest.Telephone },
+                            { "website", "https://todo.com" },//employerInterest.Website },
+                            { "contact_preference", expectedContactPreference },
+                            { "primary_industry", expectedIndustry },
+                            { "placement_area", "(TODO: placement area)" },
+                            { "postcode", employerInterest.Postcode },
+                            { "additional_information", employerInterest.SpecificRequirements },
+                            { "employer_support_site", settings.EmployerSupportSiteUri },
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
+                        })));
     }
 
     [Fact]
@@ -212,21 +217,6 @@ public class EmployerInterestServiceTests
                 employerInterest.Postcode);
     }
 
-    private static bool ValidateTokens(IDictionary<string, string> tokens, IDictionary<string, string> expectedTokens)
-    {
-        foreach (var (key, value) in expectedTokens)
-        {
-            tokens.Should().ContainKey(key);
-
-            if (key == "")
-            {
-            }
-            tokens[key].Should().Be(value,
-                $"this is the expected value for key '{key}'");
-        }
-
-        return true;
-    }
     [Fact]
     public async Task RemoveExpiredEmployerInterest_Does_Not_Call_Repository_For_Zero_RetentionDays()
     {
@@ -238,20 +228,20 @@ public class EmployerInterestServiceTests
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(DateTime.Parse("2022-08-13"));
 
-        var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.DeleteBefore(Arg.Any<DateTime>())
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.DeleteBefore(Arg.Any<DateTime>())
             .Returns(0);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(dateTimeService,
-                employerInterestRepository: repository,
+                employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
         var result = await service.RemoveExpiredEmployerInterest();
 
         result.Should().Be(0);
 
-        await repository
+        await employerInterestRepository
             .DidNotReceive()
             .DeleteBefore(Arg.Any<DateTime>());
     }
@@ -272,21 +262,21 @@ public class EmployerInterestServiceTests
 
         const int count = 9;
 
-        var repository = Substitute.For<IEmployerInterestRepository>();
-        repository.DeleteBefore(Arg.Any<DateTime>())
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.DeleteBefore(Arg.Any<DateTime>())
             .Returns(count);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
                 dateTimeService,
-                employerInterestRepository: repository,
+                employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
         var result = await service.RemoveExpiredEmployerInterest();
 
         result.Should().Be(count);
 
-        await repository
+        await employerInterestRepository
             .Received(1)
             .DeleteBefore(Arg.Is<DateTime>(d => d == expectedDate));
     }
@@ -312,7 +302,7 @@ public class EmployerInterestServiceTests
             .Received(1)
             .GetAll();
     }
-    
+
     [Fact]
     public async Task GetEmployerInterest_Returns_Expected_Value()
     {
