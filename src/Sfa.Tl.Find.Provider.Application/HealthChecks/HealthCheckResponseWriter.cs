@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -40,28 +39,5 @@ public static class HealthCheckResponseWriter
         });
 
         return httpContext.Response.WriteAsync(json);
-    }
-
-    public static HealthReport GetTestData()
-    {
-        var testData = new Dictionary<string, object>
-        {
-            {"test int", 1},
-            {"test str", "hello"},
-            //{"test obj", new {i = 1, s = "x"}},
-        };
-
-        var result = new HealthReport(
-            new ReadOnlyDictionary<string, HealthReportEntry>(
-                new Dictionary<string, HealthReportEntry>
-                {
-                    {
-                        "Info",
-                        new HealthReportEntry(HealthStatus.Degraded, "Not great", TimeSpan.FromSeconds(5), new AccessViolationException(), testData)
-                    }
-                }),
-            HealthStatus.Healthy, TimeSpan.MaxValue);
-
-        return result;
     }
 }

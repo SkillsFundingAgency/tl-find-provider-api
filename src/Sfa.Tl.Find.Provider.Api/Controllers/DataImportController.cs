@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Aspose.Zip.SevenZip;
+using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using System.IO.Compression;
@@ -107,12 +108,13 @@ public class DataImportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UploadProviderDataZipped([FromForm] IFormFile file)
     {
+        const bool isAdditionalData = true;
         try
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadProviderData)} called.");
-            }
+            _logger.LogInformation("{className} {methodName} called with file {fileName}.", 
+                    nameof(DataImportController),
+                    nameof(UploadProviderDataZipped), 
+                    file?.FileName);
 
             if (file is null)
             {
@@ -121,22 +123,39 @@ public class DataImportController : ControllerBase
             }
 
             await using var ms = new MemoryStream();
-
             await file.OpenReadStream().CopyToAsync(ms);
+            ms.Seek(0, SeekOrigin.Begin);
 
-            using var zipArchive = new ZipArchive(ms, ZipArchiveMode.Read);
-            var entry = zipArchive.Entries.FirstOrDefault(e => e.Name.EndsWith(".json"));
-            if (entry is null)
+            if (Path.GetExtension(file.FileName) == ".7z")
             {
-                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderData)} zip archive has no json file.");
-                return BadRequest("A zip file containing a json file is required.");
-            }
+                using var archive = new SevenZipArchive(ms);
+                var entry = archive.Entries.FirstOrDefault(e => e.Name.EndsWith(".json"));
+                if (entry is null)
+                {
+                    _logger.LogWarning(
+                        $"{nameof(DataImportController)} {nameof(UploadProviderData)} zip archive has no json file.");
+                    return BadRequest("A zip file containing a json file is required.");
+                }
 
-            await using var entryStream = entry.Open();
-            
-            const bool isAdditionalData = true;
-            await _providerDataService.ImportProviderData(
-                entryStream, isAdditionalData);
+                await using var entryStream = entry.Open();
+                await _providerDataService.ImportProviderData(
+                    entryStream, isAdditionalData);
+            }
+            else
+            {
+                using var zipArchive = new ZipArchive(ms, ZipArchiveMode.Read);
+                var entry = zipArchive.Entries.FirstOrDefault(e => e.Name.EndsWith(".json"));
+                if (entry is null)
+                {
+                    _logger.LogWarning(
+                        $"{nameof(DataImportController)} {nameof(UploadProviderData)} zip archive has no json file.");
+                    return BadRequest("A zip file containing a json file is required.");
+                }
+
+                await using var entryStream = entry.Open();
+                await _providerDataService.ImportProviderData(
+                    entryStream, isAdditionalData);
+            }
 
             return Accepted();
         }
@@ -146,4 +165,5 @@ public class DataImportController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
+
 }
