@@ -21,8 +21,8 @@ temp_dir <- "./temp"
 #providers_xlsx_file <- fs::path(temp_dir, "MASTER PROVIDER LIST BY T LEVEL - DO NOT DELETE.xlsx")
 providers_xlsx_file <- fs::path(temp_dir, "MASTER Provider List by T level October 2022.xlsx")
 
-provider_json_file = fs::path(output_dir, "ProviderData.json")
-provider_json_simplified_file = fs::path(output_dir, "ProviderDataNoDetails.json")
+provider_json_file = fs::path(output_dir, "ProviderData Upload for Find Provider 2023.json")
+provider_json_simplified_file = fs::path(output_dir, "ProviderData Upload for Marcoms 2023.json")
 
 ####################
 # Useful functions #
@@ -193,6 +193,8 @@ provider_data <- provider_spreadsheet %>%
   #mutate(across(c(is_in_course_directory), as.logical)) %>% 
   #mutate(is_in_course_directory = replace_na(is_in_course_directory, FALSE)) %>% 
   mutate(across(c(ukprn, approved_year), as.integer), 
+         is_in_course_directory = str_to_upper(is_in_course_directory),
+         is_in_course_directory = if_else(is_in_course_directory == "YES", "TRUE", "FALSE"),
          across(c(is_in_course_directory), as.logical),
          is_in_course_directory = replace_na(is_in_course_directory, FALSE)) %>% 
   # Filter to the required approved year and exclude any that are already in course director
