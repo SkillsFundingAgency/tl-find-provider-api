@@ -64,7 +64,6 @@ builder.Services
 builder.Services.AddHttpClients();
 
 builder.Services
-    .AddSingleton<IClaimsTransformation, UkPrnClaimsTransformation>()
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
     .AddScoped<IGuidService, GuidService>()

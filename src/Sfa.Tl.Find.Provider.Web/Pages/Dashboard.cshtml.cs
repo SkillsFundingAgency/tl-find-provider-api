@@ -21,8 +21,6 @@ public class DashboardModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        var isAuthenticated = User.Identity.IsAuthenticated;
-
         foreach (var claim in User.Claims)
         {
             Debug.WriteLine($"User claim {claim.Type} = {claim.Value}");
@@ -30,12 +28,6 @@ public class DashboardModel : PageModel
 
         UkPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
         DisplayName = HttpContext.User.GetClaim(CustomClaimTypes.DisplayName);
-
-        if (string.IsNullOrEmpty(UkPrn))
-        {
-            //TODO: This won't happen when login is working correctly, so need to remove it
-            return RedirectToPage("/ChooseOrganisation");
-        }
 
         return Page();
     }
