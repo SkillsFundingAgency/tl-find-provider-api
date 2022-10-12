@@ -13,7 +13,7 @@ namespace Sfa.Tl.Find.Provider.Web.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration, SiteConfiguration siteConfiguration)
+    public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, SiteConfiguration siteConfiguration)
     {
         services
             .Configure<DfeSignInSettings>(x =>

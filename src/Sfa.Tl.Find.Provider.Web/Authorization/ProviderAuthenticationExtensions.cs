@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -19,7 +18,8 @@ public static class ProviderAuthenticationExtensions
     public static void AddProviderAuthentication(
         this IServiceCollection services,
         DfeSignInSettings signInSettings,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment environment,
+        IConfiguration configuration)
     {
         var cookieSecurePolicy = environment.IsDevelopment()
             ? CookieSecurePolicy.SameAsRequest
@@ -75,7 +75,7 @@ public static class ProviderAuthenticationExtensions
             options.ClientSecret = signInSettings.ClientSecret;
             options.ResponseType = OpenIdConnectResponseType.Code;
             options.GetClaimsFromUserInfoEndpoint = true;
-            
+
             options.Scope.Clear();
             options.Scope.Add("openid");
             options.Scope.Add("email");
@@ -146,15 +146,10 @@ public static class ProviderAuthenticationExtensions
                 {
                     var claims = new List<Claim>();
 
-                    foreach (var claim in ctx.Principal?.Claims)
-                    {
-                        Debug.WriteLine($"Claim {claim.Type} = {claim.Value}");
-                    }
-                    
                     var organisationIds = ctx.Principal
                         .FindAll("Organisation")
                         .Select(org => JsonDocument.Parse(org.Value))
-                        .Select(jsonDoc => 
+                        .Select(jsonDoc =>
                             jsonDoc
                                 .RootElement
                                 .SafeGetString("id"))
@@ -197,6 +192,12 @@ public static class ProviderAuthenticationExtensions
                                 .RootElement
                                 .SafeGetString("name");
                             claims.Add(new Claim(CustomClaimTypes.DisplayName, organisationName));
+                            //TODO: Remove this code once we have a "real" UKPRN from DfeSignin                           
+                            var defaultUkPrn = configuration["DefaultUkprn"];
+                            if (defaultUkPrn != null)
+                            {
+                                claims.Add(new Claim(CustomClaimTypes.UkPrn, defaultUkPrn));
+                            }
                         }
                     }
 

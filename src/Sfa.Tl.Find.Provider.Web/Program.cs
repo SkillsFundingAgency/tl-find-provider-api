@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
@@ -15,7 +14,7 @@ builder.Services
     .AddApplicationInsightsTelemetry();
 
 var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
-builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
+builder.Services.AddConfigurationOptions(siteConfiguration);
 
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
 builder.Services.AddAuthorizationServicePolicies();
@@ -26,7 +25,7 @@ if (bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConf
 }
 else
 {
-    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment);
+    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment, builder.Configuration);
 }
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
