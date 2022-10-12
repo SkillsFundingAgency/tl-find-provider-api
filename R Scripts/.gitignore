@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.RDataTmp*
+.Ruserdata
+
+#Temporary outputs
+output/
+temp/
+
+#No need to keep shapefiles in git
+data/shapefiles

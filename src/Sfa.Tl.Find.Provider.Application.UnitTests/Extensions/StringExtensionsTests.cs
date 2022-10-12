@@ -90,7 +90,6 @@ public class StringExtensionsTests
     [InlineData("T Level in Parsing ", "Parsing")]
     [InlineData("T Level In Parsing ", "Parsing")]
     [InlineData("T Level Education - Education and Childcare", "Education and Childcare")]
-    [InlineData("T Level Education - Education and Childcare", "Education and Childcare")]
     [InlineData("T Level Education - Education and Childcare", "Education", 9)]
     [InlineData("T Level Education - Education and Childcare", "Education", 10)]
     public void String_ParseTLevelDefinitionName_Data_Tests(string input, string expectedResult, int maxLength = -1)

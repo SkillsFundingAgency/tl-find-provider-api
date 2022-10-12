@@ -1,0 +1,30 @@
+{
+  "providers": [
+    {
+      "ukPrn": 10099099,
+      "name": "TEST SCHOOL",
+      "postcode": "SW17 0AQ",
+      "town": "London",
+      "website": "https://www.testschool.com/",
+      "email": "info@testschool.com",
+      "telephone": "020 5555 5555",
+      "locations": [
+        {
+          "postcode": "SW17 0AQ",
+          "town": "London",
+          "latitude": 51.439999,
+          "longitude": -0.1789765,
+          "website": "https://www.testschool.com/",
+          "email": "info@testschool.com",
+          "telephone": "020 5555 5555",
+          "deliveryYears": [
+            {
+              "year": 2022,
+              "qualifications": [ 38 ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

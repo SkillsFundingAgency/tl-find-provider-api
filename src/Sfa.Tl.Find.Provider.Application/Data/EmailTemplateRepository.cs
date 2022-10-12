@@ -15,7 +15,26 @@ public class EmailTemplateRepository : IEmailTemplateRepository
         _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
     }
 
-    public async Task<EmailTemplate> GetEmailTemplate(string templateName)
+    public async Task<EmailTemplate> GetEmailTemplate(string templateId)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            templateId
+        });
+
+        return (await _dbContextWrapper
+                .QueryAsync<EmailTemplate>(
+                    connection,
+                    "SELECT TOP(1) TemplateId, Name " +
+                    "FROM dbo.EmailTemplate " +
+                    "WHERE TemplateId = @templateId",
+                    _dynamicParametersWrapper.DynamicParameters))
+            .SingleOrDefault();
+    }
+
+    public async Task<EmailTemplate> GetEmailTemplateByName(string templateName)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 

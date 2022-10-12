@@ -13,7 +13,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Data;
 public class RouteRepositoryTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(RouteRepository)
             .ShouldNotAcceptNullConstructorArguments();

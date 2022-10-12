@@ -31,14 +31,14 @@ public class ProvidersControllerTests
     private readonly IList<int> _testQualificationIds = new List<int> { 37, 40, 51 };
 
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(ProvidersController)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(ProvidersController)
             .ShouldNotAcceptNullOrBadConstructorArguments();
@@ -427,7 +427,6 @@ public class ProvidersControllerTests
         result.Should().BeOfType(typeof(StatusCodeResult));
         var statusCodeResult = result as StatusCodeResult;
 
-        statusCodeResult!.StatusCode.Should().Be(500);
         statusCodeResult!.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
     }
 
@@ -583,7 +582,6 @@ public class ProvidersControllerTests
         const string formattedDate = "August 2022";
         const int fileSize = 10101;
 
-        //var bytes = new byte[] { 104, 101, 108, 108, 111 };
         var cachedInfo = new ProviderDataDownloadInfoResponse
             {
                 FormattedFileDate = formattedDate,

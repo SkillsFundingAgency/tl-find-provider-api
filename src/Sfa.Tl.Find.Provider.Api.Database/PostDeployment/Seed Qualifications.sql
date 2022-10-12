@@ -29,14 +29,13 @@ USING (VALUES
   (49, N'Maintenance, Installation and Repair for Engineering and Manufacturing', 0),
   (50, N'Engineering, Manufacturing, Processing and Control', 0),
   (51, N'Management and Administration', 0),
-  --TODO: Fix the framework codes and hard-delete > 1000
-  (1052, N'Agriculture, Land Management and Production', 0),
-  (1053, N'Animal Care', 0),
-  (1054, N'Catering', 0),
-  (1055, N'Craft and Design', 0),
-  (1056, N'Media, Broadcast and Production', 0),
-  (1057, N'Hairdressing, Barbering and Beauty Therapy', 0),
-  (1058, N'Legal Services', 0)
+  (52, N'Legal Services', 0),
+  (53, N'Hair, Beauty and Aesthetics', 0),
+  (54, N'Craft and Design', 0),
+  (55, N'Media, Broadcast and Production', 0),
+  (56, N'Catering', 0),
+  (57, N'Agriculture, Land Management and Production', 0),
+  (58, N'Animal Care and Management', 0)
   )
   AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 

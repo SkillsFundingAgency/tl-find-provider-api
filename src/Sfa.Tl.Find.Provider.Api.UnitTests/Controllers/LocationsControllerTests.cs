@@ -13,14 +13,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 public class LocationsControllerTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(LocationsController)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public void Constructor_Guards_Against_BadParameters()
+    public void Constructor_Guards_Against_Bad_Parameters()
     {
         typeof(LocationsController)
             .ShouldNotAcceptNullOrBadConstructorArguments();

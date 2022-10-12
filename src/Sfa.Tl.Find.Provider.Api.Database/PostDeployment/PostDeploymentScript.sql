@@ -14,3 +14,8 @@ Post-Deployment Script
 :r ".\Seed Qualifications.sql"
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
+
+--This can be removed after qualifications have been cleanup in production
+--The seed scripts will soft-delete the old qualifications and replace them in RouteQualification
+DELETE FROM [dbo].[Qualification]
+WHERE [Id] > 1000;

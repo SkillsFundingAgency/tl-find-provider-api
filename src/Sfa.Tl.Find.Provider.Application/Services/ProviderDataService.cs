@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.Json;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -153,7 +154,7 @@ public class ProviderDataService : IProviderDataService
             };
         }
     }
-    
+
     public async Task<ProviderSearchResponse> FindProviders(
         double latitude,
         double longitude,
@@ -209,6 +210,39 @@ public class ProviderDataService : IProviderDataService
         return stream.ToArray();
     }
 
+    public async Task ImportProviderContacts(Stream stream)
+    {
+        using var reader = new StreamReader(stream);
+        using var csvReader = new CsvReader(reader,
+            new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                PrepareHeaderForMatch = args =>
+                {
+                    if (string.Compare(args.Header, "UKPRN", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    {
+                        return "UkPrn";
+                    }
+
+                    return args.Header
+                            .Replace(" ", "");
+                },
+                MissingFieldFound = _ => { /* ignore empty column values */ }
+            });
+
+        csvReader.Context.TypeConverterOptionsCache.GetOptions<string>()
+            .NullValues
+            .AddRange(new[] { "", "NULL", "NA", "N/A" });
+
+        var contacts = csvReader
+            .GetRecords<ProviderContactDto>()
+            .ToList();
+
+        var resultCount = await _providerRepository.UpdateProviderContacts(contacts);
+
+        _logger.LogInformation("Updated contacts for {resultCount} providers from {contactsCount}.",
+            resultCount, contacts.Count);
+    }
+
     public async Task<bool> HasQualifications()
     {
         return await _qualificationRepository.HasAny();
@@ -219,15 +253,22 @@ public class ProviderDataService : IProviderDataService
         return await _providerRepository.HasAny();
     }
 
-    public async Task LoadAdditionalProviderData()
+    public async Task ImportProviderData(Stream stream, bool isAdditionalData)
     {
-        //if (!_mergeAdditionalProviderData) return;
+        var jsonDocument = await JsonDocument
+            .ParseAsync(stream);
 
+        var count = await LoadAdditionalProviderData(jsonDocument);
+        ClearCaches();
+
+        _logger.LogInformation("Loaded {count} providers from stream.", count);
+    }
+    
+    private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
+    {
         try
         {
-            const string jsonFile = "Assets.ProviderData.json";
-            var providers = JsonDocument
-                    .Parse(jsonFile.ReadManifestResourceStreamAsString())
+            var providers = jsonDocument
                     .RootElement
                     .GetProperty("providers")
                     .EnumerateArray()
@@ -278,8 +319,7 @@ public class ProviderDataService : IProviderDataService
 
             await _providerRepository.Save(providers, true);
 
-            _logger.LogInformation("Loaded {providerCount} providers from {jsonFile}.",
-                providers.Count, jsonFile);
+            return providers.Count;
         }
         catch (Exception ex)
         {
@@ -328,7 +368,7 @@ public class ProviderDataService : IProviderDataService
 
         return geoLocation;
     }
-    
+
     private async Task<ProviderSearchResponse> Search(IList<int> routeIds, IList<int> qualificationIds, int page, int pageSize, GeoLocation geoLocation)
     {
         var (searchResults, totalSearchResults) =
@@ -346,5 +386,12 @@ public class ProviderDataService : IProviderDataService
             SearchResults = searchResults.ToList(),
             TotalResults = totalSearchResults
         };
+    }
+
+    private void ClearCaches()
+    {
+        _cache.Remove(CacheKeys.QualificationsKey);
+        _cache.Remove(CacheKeys.RoutesKey);
+        _cache.Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

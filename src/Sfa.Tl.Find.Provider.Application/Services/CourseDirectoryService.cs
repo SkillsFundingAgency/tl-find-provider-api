@@ -52,6 +52,8 @@ public class CourseDirectoryService : ICourseDirectoryService
         await _providerRepository.Save(providers.ToList());
 
         _logger.LogInformation($"{nameof(CourseDirectoryService)} saved providers.");
+
+        ClearCaches();
     }
 
     public async Task ImportQualifications()
@@ -73,7 +75,7 @@ public class CourseDirectoryService : ICourseDirectoryService
 
         _logger.LogInformation($"{nameof(CourseDirectoryService)} saved qualifications.");
 
-        _cache.Remove(CacheKeys.QualificationsKey);
+        ClearCaches();
     }
 
     private async Task<IEnumerable<Models.Provider>> ReadTLevelProvidersFromResponse(
@@ -212,5 +214,12 @@ public class CourseDirectoryService : ICourseDirectoryService
                 Id = q.SafeGetInt32("frameworkCode"),
                 Name = q.SafeGetString("name").ParseTLevelDefinitionName(Constants.QualificationNameMaxLength)
             }).ToList();
+    }
+
+    private void ClearCaches()
+    {
+        _cache.Remove(CacheKeys.QualificationsKey);
+        _cache.Remove(CacheKeys.RoutesKey);
+        _cache.Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }
