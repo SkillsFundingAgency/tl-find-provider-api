@@ -7,7 +7,7 @@ public static class TokenDictionaryValidationExtensions
         foreach (var (key, value) in expectedTokens)
         {
             tokens.Should().ContainKey(key);
-            tokens[key].Should().Be(value, 
+            tokens[key].Should().Be(value,
                 $"this is the expected value for key '{key}'");
         }
 

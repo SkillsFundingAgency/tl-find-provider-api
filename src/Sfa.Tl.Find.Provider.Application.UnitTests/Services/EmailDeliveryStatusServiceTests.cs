@@ -10,6 +10,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 public class EmailDeliveryStatusServiceTests
 {
     private const string TestEmailTemplateName = "TestTemplate";
+    private const string TestEmailTemplateNameHumanized = "Test template";
 
     [Fact]
     public void Constructor_Guards_Against_Null_Parameters()
@@ -85,7 +86,7 @@ public class EmailDeliveryStatusServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "email_type", TestEmailTemplateName },
+                            { "email_type", TestEmailTemplateNameHumanized },
                             { "reference", emailDeliveryReceipt.Reference },
                             { "reason", "permanent failure" },
                             { "sender_username", emailDeliveryReceipt.To },
@@ -124,7 +125,7 @@ public class EmailDeliveryStatusServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "email_type", TestEmailTemplateName },
+                            { "email_type", TestEmailTemplateNameHumanized },
                             { "reference", emailDeliveryReceipt.Reference },
                             { "reason", "temporary failure" },
                             { "sender_username", emailDeliveryReceipt.To },
@@ -163,7 +164,7 @@ public class EmailDeliveryStatusServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "email_type", TestEmailTemplateName },
+                            { "email_type", TestEmailTemplateNameHumanized },
                             { "reference", emailDeliveryReceipt.Reference },
                             { "reason", "technical failure" },
                             { "sender_username", emailDeliveryReceipt.To },
@@ -207,4 +208,44 @@ public class EmailDeliveryStatusServiceTests
                         }
                     )));
     }
+    [Fact]
+    public async Task EmailDeliveryStatusService_Handles_Null_Reference_Token()
+    {
+        var emailDeliveryReceipt = new EmailDeliveryReceiptBuilder()
+            .WithDeliveryStatus(EmailDeliveryStatus.PermanentFailure)
+            .WithReference(null)
+            .Build();
+
+        var emailSettings = new SettingsBuilder().BuildEmailSettings();
+        var emailService = Substitute.For<IEmailService>();
+
+        var emailTemplateRepository = new EmailTemplateRepositoryBuilder()
+            .BuildSubstitute(
+                emailDeliveryReceipt.TemplateId.ToString(),
+                TestEmailTemplateName);
+
+        var emailDeliveryStatusService = new EmailDeliveryStatusServiceBuilder()
+            .Build(emailService, emailTemplateRepository, emailSettings);
+
+        var result = await emailDeliveryStatusService.HandleEmailDeliveryStatus(
+            emailDeliveryReceipt);
+
+        result.Should().Be(1);
+
+        await emailService
+            .Received(1)
+            .SendEmail(emailSettings.SupportEmailAddress,
+                EmailTemplateNames.EmailDeliveryStatus,
+                Arg.Is<IDictionary<string, string>>(tokens =>
+                    tokens.ValidateTokens(
+                        new Dictionary<string, string>
+                        {
+                            { "email_type", TestEmailTemplateNameHumanized },
+                            { "reference", "none" },
+                            { "reason", "permanent failure" },
+                            { "sender_username", emailDeliveryReceipt.To },
+                        }
+                    )));
+    }
+
 }

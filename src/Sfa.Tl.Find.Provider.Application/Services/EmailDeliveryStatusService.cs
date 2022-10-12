@@ -38,15 +38,15 @@ public class EmailDeliveryStatusService : IEmailDeliveryStatusService
         var emailTemplate = await _emailTemplateRepository
             .GetEmailTemplate(deliveryReceipt.TemplateId.ToString());
         var emailTemplateName = emailTemplate != null 
-            ? emailTemplate.Name 
+            ? emailTemplate.Name.Humanize()
             : $"Unknown template {deliveryReceipt.TemplateId}";
 
-        var tokens = new Dictionary<string, string>()
+        var tokens = new Dictionary<string, string>
         {
-            { "email_type", emailTemplateName },//.Humanize().ToLower() },
-            { "reference", deliveryReceipt.Reference },
+            { "email_type", emailTemplateName },
+            { "reference", deliveryReceipt.Reference ?? "none" },
             { "reason", deliveryReceipt.EmailDeliveryStatus.Humanize() },
-            { "sender_username", deliveryReceipt.To },
+            { "sender_username", deliveryReceipt.To }
         };
         
         await _emailService.SendEmail(
