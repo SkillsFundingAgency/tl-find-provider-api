@@ -6,20 +6,20 @@ public class IndustryBuilder
 {
     public string[] IndustryNames = 
     {
-        "Admin and business support",
+        "Admin and Business Support",
         "Agriculture",
+        "Arts, Entertainment and Recreation",
         "Construction",
-        "Retail and wholesale",
-        "Health and social care",
-        "Education and childcare",
+        "Education and Childcare",
+        "Financial Services",
+        "Health and Social Care",
+        "Hospitality",
+        "IT and Communications",
+        "Manufacturing and Engineering",
+        "Public Sector",
+        "Retail and Wholesale",
         "Transport",
         "Utilities",
-        "Manufacturing and engineering",
-        "Arts, entertainment, and recreation",
-        "Financial services",
-        "Public sector",
-        "IT and communications",
-        "Hospitality",
         "Other"
     };
 
