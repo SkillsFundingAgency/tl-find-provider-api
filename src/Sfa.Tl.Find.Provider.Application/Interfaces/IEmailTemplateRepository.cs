@@ -4,5 +4,7 @@ namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface IEmailTemplateRepository
 {
-    Task<EmailTemplate> GetEmailTemplate(string templateName);
+    Task<EmailTemplate> GetEmailTemplate(string templateId);
+
+    Task<EmailTemplate> GetEmailTemplateByName(string templateName);
 }

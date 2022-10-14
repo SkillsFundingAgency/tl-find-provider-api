@@ -53,7 +53,8 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
                         credentials.Value.appId,
                         credentials.Value.incomingBase64Signature,
                         credentials.Value.nonce,
-                        credentials.Value.requestTimestamp);
+                        credentials.Value.requestTimestamp,
+                        credentials.Value.skipBodyEncoding);
 
                     if (isValid)
                     {
@@ -69,11 +70,11 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Error in {nameof(HmacAuthorizationFilter)}.");
-            context.Result = new StatusCodeResult(500);
+            context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
-    private async Task<bool> IsValidRequest(HttpRequest request, string appId, string incomingBase64Signature, string nonce, string requestTimeStamp)
+    private async Task<bool> IsValidRequest(HttpRequest request, string appId, string incomingBase64Signature, string nonce, string requestTimeStamp, bool skipBodyEncoding)
     {
         if (!AllowedApps.ContainsKey(appId))
         {
@@ -88,10 +89,13 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
 
         var requestContentBase64String = "";
 
-        var hash = await ComputeHash(request);
-        if (hash != null)
+        if (!skipBodyEncoding)
         {
-            requestContentBase64String = Convert.ToBase64String(hash);
+            var hash = await ComputeHash(request);
+            if (hash != null)
+            {
+                requestContentBase64String = Convert.ToBase64String(hash);
+            }
         }
 
         var requestUri = request.GetDisplayUrl().ToLower();
@@ -144,27 +148,29 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
 
     private static async Task<byte[]> ComputeHash(HttpRequest request)
     {
-        using var md5 = MD5.Create();
-
         var bodyBytes = await request.GetRawBodyBytesAsync();
         return bodyBytes.Length > 0
-            ? md5.ComputeHash(bodyBytes)
+            ? MD5.Create().ComputeHash(bodyBytes)
             : null;
     }
 
     private (string appId,
         string incomingBase64Signature,
         string nonce,
-        string requestTimestamp)?
+        string requestTimestamp,
+        bool skipBodyEncoding)?
         GetAuthorizationHeaderValues(string authorizationHeaderParameter)
     {
         var credentialsArray = authorizationHeaderParameter.Split(':');
-        if (credentialsArray.Length == 4)
+        if (credentialsArray.Length is >= 4 and <= 5)
         {
             return (credentialsArray[0],
                 credentialsArray[1],
                 credentialsArray[2],
-                credentialsArray[3]);
+                credentialsArray[3],
+                credentialsArray.Length is 5
+                    && bool.TryParse(credentialsArray[4], out var isSkip) 
+                    && isSkip);
         }
 
         _logger.LogWarning("Credentials array had unexpected length {credentialsArray.Length}",

@@ -36,8 +36,6 @@ AS
 
 	WHEN NOT MATCHED BY SOURCE 
 			 AND t.[IsDeleted] <> 1 --No need to delete again
-			 --TODO: Remove the next line when final framework codes have been added
-			 AND t.Id < 1000
 	THEN UPDATE SET
 		t.[IsDeleted] = 1,
 		t.[ModifiedOn] = GETUTCDATE() --Soft delete

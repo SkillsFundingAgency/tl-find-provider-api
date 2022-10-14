@@ -13,7 +13,7 @@ public class HmacAuthorizationFilterTests
     private const string TestUri = "https://test.com/api/test";
 
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(HmacAuthorizationFilter)
             .ShouldNotAcceptNullConstructorArguments();

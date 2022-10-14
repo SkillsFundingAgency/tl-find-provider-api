@@ -58,7 +58,18 @@ public static class ServiceCollectionExtensions
             .Configure<EmailSettings>(x =>
             {
                 x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
+                x.DeliveryStatusToken = siteConfiguration.EmailSettings.DeliveryStatusToken;
                 x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
+            })
+            .Configure<EmployerInterestSettings>(x =>
+            {
+                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
+                x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
+            })
+            .Configure<GoogleMapsApiSettings>(x =>
+            {
+                x.ApiKey = siteConfiguration.GoogleMapsApiSettings.ApiKey;
+                x.BaseUri = siteConfiguration.GoogleMapsApiSettings.BaseUri;
             })
             .Configure<PostcodeApiSettings>(x =>
             {
@@ -151,6 +162,22 @@ public static class ServiceCollectionExtensions
             .AddRetryPolicyHandler<CourseDirectoryService>();
 
         services
+            .AddHttpClient<IGoogleMapsApiService, GoogleMapsApiService>(
+                (serviceProvider, client) =>
+                {
+                    var googleMapsApiSettings = serviceProvider
+                        .GetRequiredService<IOptions<GoogleMapsApiSettings>>()
+                        .Value;
+
+                    client.BaseAddress = new Uri(googleMapsApiSettings.BaseUri);
+
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+            )
+            .AddRetryPolicyHandler<GoogleMapsApiService>();
+
+        services
             .AddHttpClient<ITownDataService, TownDataService>(
                 (_, client) =>
                 {
@@ -162,7 +189,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddNotifyService(
         this IServiceCollection services,
         string govNotifyApiKey)
@@ -179,7 +206,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddQuartzServices(
         this IServiceCollection services,
         string courseDirectoryImportCronSchedule = null,
-        string townDataImportCronSchedule = null)
+        string townDataImportCronSchedule = null,
+        string employerInterestCleanupCronSchedule = null)
     {
         services.AddQuartz(q =>
         {
@@ -187,16 +215,18 @@ public static class ServiceCollectionExtensions
 
             q.UseMicrosoftDependencyInjectionJobFactory();
 
-            var startupJobKey = new JobKey("Perform Startup Tasks");
-            q.AddJob<InitializationJob>(opts => opts.WithIdentity(startupJobKey))
+            var startupJobKey = new JobKey(Constants.StartupTasksJobKeyName);
+            q.AddJob<InitializationJob>(opts => 
+                    opts.WithIdentity(startupJobKey))
                 .AddTrigger(opts => opts
                     .ForJob(startupJobKey)
                     .StartNow());
 
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
-                var courseImportJobKey = new JobKey("Import Course Data");
-                q.AddJob<CourseDataImportJob>(opts => opts.WithIdentity(courseImportJobKey))
+                var courseImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
+                q.AddJob<CourseDataImportJob>(opts => 
+                        opts.WithIdentity(courseImportJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(courseImportJobKey)
                         .WithSchedule(
@@ -206,13 +236,26 @@ public static class ServiceCollectionExtensions
             
             if (!string.IsNullOrEmpty(townDataImportCronSchedule))
             {
-                var townImportJobKey = new JobKey("Import Town Data");
-                q.AddJob<TownDataImportJob>(opts => opts.WithIdentity(townImportJobKey))
+                var townImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
+                q.AddJob<TownDataImportJob>(opts => 
+                        opts.WithIdentity(townImportJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(townImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
                                 .CronSchedule(townDataImportCronSchedule)));
+            }
+
+            if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
+            {
+                var employerInterestCleanupJobKey = new JobKey(Constants.EmployerInterestCleanupJobKeyName);
+                q.AddJob<EmployerInterestCleanupJob>(opts => 
+                        opts.WithIdentity(employerInterestCleanupJobKey))
+                    .AddTrigger(opts => opts
+                        .ForJob(employerInterestCleanupJobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(employerInterestCleanupCronSchedule)));
             }
         });
 

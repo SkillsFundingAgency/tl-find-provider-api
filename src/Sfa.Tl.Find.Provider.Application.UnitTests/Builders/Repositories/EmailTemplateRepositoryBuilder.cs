@@ -21,9 +21,15 @@ public class EmailTemplateRepositoryBuilder
     public IEmailTemplateRepository BuildSubstitute(string templateId, string templateName)
     {
         var emailTemplateRepository = Substitute.For<IEmailTemplateRepository>();
-        if (templateId != null && templateName != null)
+        if (templateName != null)
         {
-            emailTemplateRepository.GetEmailTemplate(templateName)
+            emailTemplateRepository.GetEmailTemplate(templateId)
+                .Returns(new EmailTemplate
+                {
+                    TemplateId = templateId,
+                    Name = templateName
+                });
+            emailTemplateRepository.GetEmailTemplateByName(templateName)
                 .Returns(new EmailTemplate
                 {
                     TemplateId = templateId,

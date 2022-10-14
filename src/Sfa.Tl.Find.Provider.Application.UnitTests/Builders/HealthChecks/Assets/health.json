@@ -1,0 +1,14 @@
+{
+  "status": "Healthy",
+  "results": {
+    "Info": {
+      "status": "Degraded",
+      "duration": "5",
+      "description": "Not great",
+      "data": {
+        "test int": 1,
+        "test str": "hello"
+      }
+    }
+  }
+}

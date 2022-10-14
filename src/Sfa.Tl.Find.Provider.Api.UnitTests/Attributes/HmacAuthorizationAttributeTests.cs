@@ -12,7 +12,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Attributes;
 public class HmacAuthorizationAttributeTests
 {
     [Fact]
-    public void Constructor_Guards_Against_NullParameters()
+    public void Constructor_Guards_Against_Null_Parameters()
     {
         typeof(HmacAuthorizationAttribute)
             .ShouldNotAcceptNullConstructorArguments();

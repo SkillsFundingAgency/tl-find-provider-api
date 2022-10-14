@@ -53,14 +53,17 @@ public static class SecurityHeaderExtensions
             {
                 builder.AddObjectSrc().None();
                 builder.AddBlockAllMixedContent();
-                builder.AddImgSrc().None();
+                builder.AddImgSrc()
+                    .Self()
+                    .Data()
+                    .From("https://avatars3.githubusercontent.com/u/25212406");
                 builder.AddFormAction().None();
-                builder.AddFontSrc().None();
-                builder.AddStyleSrc().None();
-                builder.AddScriptSrc().None();
+                builder.AddFontSrc().Self();
+                builder.AddStyleSrc().Self().UnsafeInline();
+                builder.AddScriptSrc().Self().UnsafeInline();
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
-                builder.AddCustomDirective("require-trusted-types-for", "'script'");
+                //builder.AddCustomDirective("require-trusted-types-for", "'script'");
             });
 
             policy
@@ -74,11 +77,11 @@ public static class SecurityHeaderExtensions
             {
                 builder.AddObjectSrc().None();
                 builder.AddBlockAllMixedContent();
-                builder.AddImgSrc().Self().From("data:");
+                builder.AddImgSrc().Self().Data();
                 builder.AddFormAction().Self();
                 builder.AddFontSrc().Self();
                 builder.AddStyleSrc().Self().UnsafeInline();
-                builder.AddScriptSrc().Self().UnsafeInline();//.WithNonce();
+                builder.AddScriptSrc().Self().UnsafeInline();
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
             });
