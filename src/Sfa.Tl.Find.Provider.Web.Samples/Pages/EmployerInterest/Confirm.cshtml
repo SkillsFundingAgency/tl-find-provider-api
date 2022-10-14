@@ -54,6 +54,14 @@
                 </div>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
+                        Website
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <span id="tl-website"></span>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
                         Contact preference
                     </dt>
                     <dd class="govuk-summary-list__value">
@@ -86,10 +94,10 @@
                 </div>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Specific-requirements
+                        Additional information
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        <span id="tl-specific-requirements"></span>
+                        <span id="tl-additional-information"></span>
                     </dd>
                 </div>
             </dl>
@@ -168,9 +176,10 @@
                 $("#tl-location-count").html(data.locationCount);
                 if (data.hasMultipleLocations) $("#tl-location-count-container").removeClass("tl-hidden")
                 $("#tl-industry").html(data.industryId);
-                $("#tl-specific-requirements").html(data.specificRequirements);
+                $("#tl-additional-information").html(data.additionalInformation);
                 $("#tl-email").html(data.email);
                 $("#tl-telephone").html(data.telephone);
+                $("#tl-website").html(data.website);
                 switch (data.contactPreferenceType) {
                     case 1:
                         $("#tl-contact-preference").html("Email");

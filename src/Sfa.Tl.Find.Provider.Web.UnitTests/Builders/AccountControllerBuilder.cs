@@ -16,6 +16,7 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class AccountControllerBuilder
 {
     private const string DefaultUkPrn = "12345678";
+    private const string DefaultOrganisationName = "Test Organisation";
 
     public AccountController Build(
         IConfiguration? configuration = null,
@@ -51,10 +52,8 @@ public class AccountControllerBuilder
 
         var claims = new List<Claim>
         {
-            new(CustomClaimTypes.UkPrn, DefaultUkPrn)
-            //new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
-            //new(CustomClaimTypes.DisplayName, DefaultDisplayName),
-            //new(CustomClaimTypes.Service, DefaultService)
+            new(CustomClaimTypes.UkPrn, DefaultUkPrn),
+            new(CustomClaimTypes.OrganisationName, DefaultOrganisationName),
         };
 
         var httpContext = new DefaultHttpContext

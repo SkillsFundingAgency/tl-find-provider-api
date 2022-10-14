@@ -4,16 +4,24 @@ AS
 
 	--SET NOCOUNT ON;
 	
-	WITH EmployerLocations_CTE AS (
-		SELECT *
-		FROM [dbo].[EmployerLocation]
-		WHERE [EmployerInterestId] = 
-				(SELECT [Id] 
-				 FROM [dbo].[EmployerInterest]
-				 WHERE [UniqueId] = @uniqueId)	 
-		)
-		DELETE FROM EmployerLocations_CTE;
+	DECLARE @employerInterestIds TABLE (
+		[Id] INT);
+
+	INSERT INTO @employerInterestIds
+	SELECT [Id] 
+	FROM [dbo].[EmployerInterest]
+    WHERE [UniqueId] = @uniqueId
+
+	DELETE FROM [dbo].[EmployerInterestLocation]
+	WHERE [EmployerInterestId] IN (SELECT [Id] FROM @employerInterestIds);
+
+	DELETE FROM [dbo].[EmployerInterestIndustry]
+	WHERE [EmployerInterestId] IN (SELECT [Id] FROM @employerInterestIds);
+
+	DELETE FROM [dbo].[EmployerInterestRoute]
+	WHERE [EmployerInterestId] IN (SELECT [Id] FROM @employerInterestIds);
 
 	DELETE FROM [dbo].[EmployerInterest]
 	WHERE [UniqueId] = @uniqueId
 
+	RETURN (SELECT COUNT(*) FROM @employerInterestIds)

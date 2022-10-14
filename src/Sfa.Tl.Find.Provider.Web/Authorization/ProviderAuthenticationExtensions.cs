@@ -18,8 +18,7 @@ public static class ProviderAuthenticationExtensions
     public static void AddProviderAuthentication(
         this IServiceCollection services,
         DfeSignInSettings signInSettings,
-        IWebHostEnvironment environment,
-        IConfiguration configuration)
+        IWebHostEnvironment environment)
     {
         var cookieSecurePolicy = environment.IsDevelopment()
             ? CookieSecurePolicy.SameAsRequest
@@ -146,29 +145,32 @@ public static class ProviderAuthenticationExtensions
                 {
                     var claims = new List<Claim>();
 
-                    var organisationIds = ctx.Principal
-                        .FindAll("Organisation")
-                        .Select(org => JsonDocument.Parse(org.Value))
-                        .Select(jsonDoc =>
-                            jsonDoc
-                                .RootElement
-                                .SafeGetString("id"))
-                        .Where(orgId => orgId != null).ToList();
-
-                    if (organisationIds.Any())
+                    var organisation = ctx.Principal
+                        .FindFirst("Organisation");
+                    if(organisation != null )
                     {
-                        var organisationId = organisationIds.First();
+                        var organisationId = JsonDocument
+                                .Parse(organisation.Value)
+                                .RootElement
+                                .SafeGetString("id");
                         var userId = ctx.Principal.FindFirst("sub").Value;
 
                         var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
                         var userInfo = await dfeSignInApiClient.GetDfeSignInUserInfo(organisationId, userId);
+                        //TODO: If we want this name, it should come from the GetDfeSignInUserInfo above
+                        var organisationName = JsonDocument
+                            .Parse(organisation.Value)
+                            .RootElement
+                            .SafeGetString("name");
 
+                        //TODO: probably don't need this check - we have a policy to look after everything
                         if (userInfo.HasAccessToService)
                         {
                             claims.AddRange(new List<Claim>
                             {
                                 new(CustomClaimTypes.UserId, userId),
                                 new(CustomClaimTypes.OrganisationId, organisationId),
+                                new(CustomClaimTypes.OrganisationName, organisationName),
                                 new(CustomClaimTypes.UkPrn, userInfo.UkPrn.HasValue ? userInfo.UkPrn.Value.ToString() : string.Empty),
                                 new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name").Value),
                                 new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name").Value),
@@ -180,23 +182,6 @@ public static class ProviderAuthenticationExtensions
                             if (userInfo.Roles != null && userInfo.Roles.Any())
                             {
                                 claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
-                            }
-                        }
-                        else
-                        {
-                            //Temp code to add org name from original claims
-                            //claims.Add(new Claim(CustomClaimTypes.HasAccessToService, "false"));
-                            var org = ctx.Principal
-                                .FindFirst("Organisation");
-                            var organisationName = JsonDocument.Parse(org.Value)
-                                .RootElement
-                                .SafeGetString("name");
-                            claims.Add(new Claim(CustomClaimTypes.DisplayName, organisationName));
-                            //TODO: Remove this code once we have a "real" UKPRN from DfeSignin                           
-                            var defaultUkPrn = configuration["DefaultUkprn"];
-                            if (defaultUkPrn != null)
-                            {
-                                claims.Add(new Claim(CustomClaimTypes.UkPrn, defaultUkPrn));
                             }
                         }
                     }

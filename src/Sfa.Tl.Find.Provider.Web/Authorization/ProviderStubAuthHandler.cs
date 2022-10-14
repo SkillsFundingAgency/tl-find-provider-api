@@ -30,6 +30,7 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
 
         _httpContextAccessor.HttpContext?.Items.Add(ClaimsIdentity.DefaultNameClaimType, "10000001");
         _httpContextAccessor.HttpContext?.Items.Add(CustomClaimTypes.DisplayName, "Test User");
+        _httpContextAccessor.HttpContext?.Items.Add(CustomClaimTypes.OrganisationName, "Test Organisation");
 
         return Task.FromResult(result);
     }

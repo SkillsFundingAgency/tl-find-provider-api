@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[EmployerLocation]
+﻿CREATE TABLE [dbo].[EmployerInterestLocation]
 (
 	[Id] INT IDENTITY(1,1) NOT NULL,
 	[EmployerInterestId] INT NOT NULL,

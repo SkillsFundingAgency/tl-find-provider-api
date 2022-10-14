@@ -17,14 +17,14 @@ public class IndexPageTests
     [Fact]
     public async Task IndexModel_OnGet_Sets_Expected_Results()
     {
-        var employerInterest = new EmployerInterestBuilder()
+        var employerInterestSummary = new EmployerInterestSummaryItemBuilder()
             .BuildList()
             .ToList();
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
         employerInterestService
             .FindEmployerInterest()
-            .Returns(employerInterest);
+            .Returns(employerInterestSummary);
 
         var indexModel = new EmployerInterestIndexModelBuilder()
             .Build(employerInterestService);
@@ -33,6 +33,6 @@ public class IndexPageTests
 
         indexModel.EmployerInterestList
             .Should()
-            .BeEquivalentTo(employerInterest);
+            .BeEquivalentTo(employerInterestSummary);
     }
 }

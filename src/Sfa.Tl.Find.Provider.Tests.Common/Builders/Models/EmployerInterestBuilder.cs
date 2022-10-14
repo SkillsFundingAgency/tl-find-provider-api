@@ -21,9 +21,9 @@ public class EmployerInterestBuilder
                 HasMultipleLocations = false,
                 LocationCount = 1,
                 IndustryId = 9,
-                SpecificRequirements = "These are my requirements: none",
-                Email ="test.contact1@employer.co.uk",
-                Telephone ="020 555 6666 ext 1",
+                AdditionalInformation = "These are my requirements: none",
+                Email = "test.contact1@employer.co.uk",
+                Telephone = "020 555 6666 ext 1",
                 ContactPreferenceType = 1
             },
             new()
@@ -38,9 +38,9 @@ public class EmployerInterestBuilder
                 HasMultipleLocations = false,
                 LocationCount = 1,
                 IndustryId = 10,
-                SpecificRequirements = "These are my requirements: a few good people",
-                Email ="test.contact2@employer.co.uk",
-                Telephone ="020 555 6666 ext 2",
+                AdditionalInformation = "These are my requirements: a few good people",
+                Email = "test.contact2@employer.co.uk",
+                Telephone = "020 555 6666 ext 2",
                 ContactPreferenceType = 2
             }
         };

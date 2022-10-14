@@ -42,6 +42,8 @@ public class EmployerInterestService : IEmployerInterestService
                                     ?? throw new ArgumentNullException(nameof(employerInterestOptions));
     }
 
+    public int RetentionDays => _employerInterestSettings.RetentionDays;
+
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
@@ -57,7 +59,7 @@ public class EmployerInterestService : IEmployerInterestService
             HasMultipleLocations = employerInterest.HasMultipleLocations,
             LocationCount = employerInterest.LocationCount,
             IndustryId = employerInterest.IndustryId,
-            SpecificRequirements = employerInterest.SpecificRequirements,
+            AdditionalInformation = employerInterest.AdditionalInformation,
             Email = employerInterest.Email,
             Telephone = employerInterest.Telephone,
             ContactPreferenceType = employerInterest.ContactPreferenceType
@@ -102,9 +104,10 @@ public class EmployerInterestService : IEmployerInterestService
         return count;
     }
 
-    public Task<IEnumerable<EmployerInterest>> FindEmployerInterest()
+    public Task<IEnumerable<EmployerInterestSummaryItem>> FindEmployerInterest()
     {
-        return _employerInterestRepository.GetAll();
+        //TODO: Create a find method that takes lat/long or location
+        return _employerInterestRepository.GetSummaryList();
     }
 
     public Task<EmployerInterest> GetEmployerInterest(int id)
@@ -141,7 +144,6 @@ public class EmployerInterestService : IEmployerInterestService
 
         //TODO: Add to employer interest table
         var placementArea = "(TODO: placement area)";
-        //TODO: Rename SpecificRequirements to AdditionalInformation
         
         var tokens = new Dictionary<string, string>
         {
@@ -155,7 +157,7 @@ public class EmployerInterestService : IEmployerInterestService
             { "primary_industry", industry },
             { "placement_area", placementArea },
             { "postcode", employerInterest.Postcode },
-            { "additional_information", employerInterest.SpecificRequirements },
+            { "additional_information", employerInterest.AdditionalInformation },
             { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri },
             { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
         };

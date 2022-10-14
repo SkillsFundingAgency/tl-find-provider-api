@@ -19,8 +19,7 @@ USING (VALUES
   (11, N'Public Sector', 0),
   (12, N'Retail and Wholesale', 0),
   (13, N'Transport', 0),
-  (14, N'Utilities', 0),
-  (15, N'Other', 0)
+  (14, N'Utilities', 0)
   )
   AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 

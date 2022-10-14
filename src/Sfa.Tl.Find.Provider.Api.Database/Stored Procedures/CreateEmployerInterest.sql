@@ -1,5 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[CreateEmployerInterest]
-	@data [dbo].[EmployerInterestDataTableType] READONLY
+	@data [dbo].[EmployerInterestDataTableType] READONLY,
+	@industryIds [dbo].[IdListTableType] READONLY,
+	@routeIds [dbo].[IdListTableType] READONLY
 AS
 	SET NOCOUNT ON;
 
@@ -16,10 +18,10 @@ AS
         [Postcode], 
         [HasMultipleLocations], 
         [LocationCount], 
-        [IndustryId], 
-        [SpecificRequirements], 
+        [AdditionalInformation], 
         [Email], 
         [Telephone], 
+        [Website], 
         [ContactPreferenceType]) 
     SELECT [UniqueId], 
         [OrganisationName], 
@@ -27,10 +29,10 @@ AS
         [Postcode], 
         [HasMultipleLocations], 
         [LocationCount], 
-        [IndustryId], 
-        [SpecificRequirements], 
+        [AdditionalInformation], 
         [Email], 
         [Telephone], 
+        [Website], 
         [ContactPreferenceType]
     FROM @data
 

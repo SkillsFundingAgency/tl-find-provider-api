@@ -15,8 +15,9 @@ public class EmployerInterestDto
     public bool HasMultipleLocations { get; init; }
     public int LocationCount { get; init; }
     public int IndustryId { get; init; }
-    public string SpecificRequirements { get; init; }
+    public string AdditionalInformation { get; init; }
     public string Email { get; init; }
     public string Telephone { get; init; }
+    public string Website { get; init; }
     public int ContactPreferenceType { get; init; }
 }

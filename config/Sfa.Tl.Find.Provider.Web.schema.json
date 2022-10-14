@@ -81,6 +81,24 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "EmployerInterestSettings": {
+      "properties": {
+        "EmployerSupportSiteUri": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_EmployerSupportSiteUri"
+        },
+        "RetentionDays": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_RetentionDays"
+        },
+        "SearchRadius": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_SearchRadius"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "PostcodeApiSettings": {
       "properties": {
         "BaseUri": {

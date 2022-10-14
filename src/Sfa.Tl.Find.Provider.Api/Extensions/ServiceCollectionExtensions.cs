@@ -63,9 +63,9 @@ public static class ServiceCollectionExtensions
             })
             .Configure<EmployerInterestSettings>(x =>
             {
-                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
-                x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
                 x.EmployerSupportSiteUri = siteConfiguration.EmployerInterestSettings.EmployerSupportSiteUri;
+                x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
+                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
                 x.UnsubscribeEmployerUri = siteConfiguration.EmployerInterestSettings.UnsubscribeEmployerUri;
             })
             .Configure<GoogleMapsApiSettings>(x =>

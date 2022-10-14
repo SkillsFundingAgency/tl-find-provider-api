@@ -13,7 +13,7 @@ public class PageContextBuilder
     public const string DefaultUkPrn = "10000001";
     public const string DefaultNameClaimType = "10000001";
     public const string DefaultDisplayName = "Test User";
-    public const string DefaultService = "DAA";
+    public const string DefaultOrganisationName = "Test Organisation";
 
     private PageContext? _pageContext;
     private CompiledPageActionDescriptor? _actionDescriptor;
@@ -30,7 +30,7 @@ public class PageContextBuilder
                 new(CustomClaimTypes.UkPrn, DefaultUkPrn),
                 new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
                 new(CustomClaimTypes.DisplayName, DefaultDisplayName),
-                new(CustomClaimTypes.Service, DefaultService)
+                new(CustomClaimTypes.OrganisationName, DefaultOrganisationName)
             };
 
             httpContext.User = new ClaimsPrincipal(

@@ -16,7 +16,8 @@ Post-Deployment Script
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
 
---This can be removed after qualifications have been cleanup in production
---The seed scripts will soft-delete the old qualifications and replace them in RouteQualification
-DELETE FROM [dbo].[Qualification]
-WHERE [Id] > 1000;
+--Below code can be removed later
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EmployerLocation]') AND type in (N'U'))
+	PRINT 'This should cause a merge conflict - all this code can be removed'
+GO
+	

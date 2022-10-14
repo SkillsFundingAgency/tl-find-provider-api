@@ -43,6 +43,14 @@
                         <span class="govuk-error-message"></span>
                         <input class="govuk-input govuk-input--width-20" id="tl-telephone" type="tel">
                     </div>
+                    
+                    <div class="govuk-form-group">
+                        <label class="govuk-label">
+                            Website
+                        </label>
+                        <span class="govuk-error-message"></span>
+                        <input class="govuk-input govuk-input--width-20" id="tl-website" type="website">
+                    </div>
 
                     <div class="govuk-form-group">
                         <label class="govuk-label">
@@ -121,10 +129,10 @@
 
                     <div class="govuk-form-group">
                         <label class="govuk-label">
-                            Specific requirements
+                            Additional information
                         </label>
                         <span class="govuk-error-message"></span>
-                        <textarea maxlength="500" class="govuk-textarea govuk-js-character-count" id="tl-specific-requirements" rows="5" aria-describedby="Comment-info"></textarea>
+                        <textarea maxlength="500" class="govuk-textarea govuk-js-character-count" id="tl-additional-information" rows="5" aria-describedby="Comment-info"></textarea>
                     </div>
                 </fieldset>
             </div>
@@ -264,12 +272,13 @@
                 $("#tl-contact-name").val(data.contactName);
                 $("#tl-email").val(data.email);
                 $("#tl-telephone").val(data.telephone);
+                $("#tl-website").val(data.website);
                 $("#tl-postcode").val(data.postcode);
                 $('#tl-multiple-locations').prop('checked', data.hasMultipleLocations);
                 displayMultipleLocationsValue(data.hasMultipleLocations);
                 $("#tl-location-count").val(data.locationCount);
                 $("#tl-industry").val(data.industryId !== 0 ? data.industryId : "");
-                $("#tl-specific-requirements").val(data.specificRequirements);
+                $("#tl-additional-information").val(data.additionalInformation);
                 $("input[name=tl-contact-preference][value='" + data.contactPreferenceType + "']").prop("checked", true);
                 setSelectedIndustry();
             }
@@ -305,11 +314,12 @@
                 console.log('Contact:\t' + $("#tl-contact-name").val());
                 console.log('Email:\t' + $("#tl-email").val());
                 console.log('Telephone:\t' + $("#tl-telephone").val());
+                console.log('Website:\t' + $("#tl-website").val());
                 console.log('Postcode:\t' + $("#tl-postcode").val());
                 console.log('Multiple locations:\t' + $('#tl-multiple-locations').prop('checked'));
                 console.log('Location count:\t' + $("#tl-location-count").val());
                 console.log('Industry:\t' + $("#tl-industry").val());
-                console.log('Specific requirements:\t' + $("#tl-specific-requirements").val());
+                console.log('Additional information:\t' + $("#tl-additional-information").val());
                 console.log('Contact preference:\t' + $('input[name=tl-contact-preference]:checked').val());
 
                 const data = {
@@ -317,11 +327,12 @@
                     contactName: $("#tl-contact-name").val(),
                     email: $("#tl-email").val(),
                     telephone: $("#tl-telephone").val(),
+                    website: $("#tl-website").val(),
                     postcode: $("#tl-postcode").val(),
                     hasMultipleLocations: $('#tl-multiple-locations').prop('checked'),
                     locationCount: parseInt($("#tl-location-count").val()) || 0,
                     industryId: parseInt($("#tl-industry").val()) || 0,
-                    specificRequirements: $("#tl-specific-requirements").val(),
+                    AdditionalInformation: $("#tl-additional-information").val(),
                     contactPreferenceType: parseInt($('input[name=tl-contact-preference]:checked').val())
                 };
 

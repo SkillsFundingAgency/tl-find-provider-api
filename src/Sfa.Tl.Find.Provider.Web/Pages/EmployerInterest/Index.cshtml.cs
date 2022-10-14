@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 
@@ -10,9 +10,12 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class IndexModel : PageModel
 {
-    public IEnumerable<Application.Models.EmployerInterest>? EmployerInterestList { get; private set; }
+    public IEnumerable<EmployerInterestSummaryItem>? EmployerInterestList { get; private set; }
     //public IEnumerable<Application.Models.ProviderLocation>? ProviderLocations { get; private set; }
-    
+
+    public int EmployerInterestRetentionDays =>
+        _employerInterestService.RetentionDays;
+
     private IEmployerInterestService _employerInterestService;
     private IProviderDataService _providerDataService;
     private readonly ILogger<IndexModel> _logger;

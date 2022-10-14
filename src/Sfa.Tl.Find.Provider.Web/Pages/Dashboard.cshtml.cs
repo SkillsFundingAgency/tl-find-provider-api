@@ -10,7 +10,7 @@ public class DashboardModel : PageModel
 {
     private readonly ILogger<DashboardModel> _logger;
 
-    public string? DisplayName { get; private set; }
+    public string? OrganisationName { get; private set; }
     public string? UkPrn { get; private set; }
 
     public DashboardModel(
@@ -27,7 +27,7 @@ public class DashboardModel : PageModel
         }
 
         UkPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
-        DisplayName = HttpContext.User.GetClaim(CustomClaimTypes.DisplayName);
+        OrganisationName = HttpContext.User.GetClaim(CustomClaimTypes.OrganisationName);
 
         return Page();
     }

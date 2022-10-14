@@ -7,9 +7,10 @@
 	[Postcode] NVARCHAR(10) NOT NULL,
 	[HasMultipleLocations] BIT NOT NULL DEFAULT(0),
 	[LocationCount] INT NULL,
-	[IndustryId] INT NOT NULL,
-	[SpecificRequirements] NVARCHAR(MAX) NULL,
+	[OtherIndustry] NVARCHAR(400) NULL,
+	[AdditionalInformation] NVARCHAR(MAX) NULL,
 	[Email] NVARCHAR(320) NULL,
+	[Website] NVARCHAR(500) NULL,
 	[Telephone] NVARCHAR(150) NULL,
 	[ContactPreferenceType] INT NOT NULL DEFAULT (0),
 		-- 0 = No preference
@@ -19,5 +20,4 @@
 	[ModifiedOn] DATETIME2(7) NULL
     CONSTRAINT [PK_EmployerInterest] PRIMARY KEY ([Id])
 	CONSTRAINT [UQ_UniqueId] UNIQUE([UniqueId])
-	CONSTRAINT [FK_EmployerInterest_Industry] FOREIGN KEY([IndustryId]) REFERENCES [dbo].[Industry] ([Id])
 )

@@ -53,7 +53,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             HasMultipleLocations = employerInterest.HasMultipleLocations,
                             LocationCount = employerInterest.LocationCount,
                             IndustryId = employerInterest.IndustryId,
-                            SpecificRequirements = employerInterest.SpecificRequirements,
+                            AdditionalInformation = employerInterest.AdditionalInformation,
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,
                             ContactPreferenceType = employerInterest.ContactPreferenceType
@@ -102,7 +102,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                 _dynamicParametersWrapper.DynamicParameters,
                 transaction,
                 commandType: CommandType.StoredProcedure);
-            
+
             transaction.Commit();
 
             return result;
@@ -166,7 +166,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                     "HasMultipleLocations, " +
                     "LocationCount, " +
                     "IndustryId, " +
-                    "SpecificRequirements, " +
+                    "AdditionalInformation, " +
                     "Email, " +
                     "Telephone, " +
                     "ContactPreferenceType " +
@@ -190,7 +190,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             "HasMultipleLocations, " +
             "LocationCount, " +
             "IndustryId,  " +
-            "SpecificRequirements, " +
+            "AdditionalInformation, " +
             "Email, " +
             "Telephone, " +
             "ContactPreferenceType, " +
@@ -198,5 +198,16 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             "ModifiedOn " +
             "FROM dbo.EmployerInterest " +
             "ORDER BY OrganisationName");
+    }
+
+    public async Task<IEnumerable<EmployerInterestSummaryItem>> GetSummaryList()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        return await _dbContextWrapper
+            .QueryAsync<EmployerInterestSummaryItem>(
+                connection,
+                "GetAllEmployerInterest",
+                commandType: CommandType.StoredProcedure);
     }
 }

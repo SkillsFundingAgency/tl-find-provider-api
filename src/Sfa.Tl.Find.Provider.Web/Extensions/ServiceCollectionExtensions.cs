@@ -30,6 +30,12 @@ public static class ServiceCollectionExtensions
                 x.DeliveryStatusToken = siteConfiguration.EmailSettings.DeliveryStatusToken;
                 x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
             })
+            .Configure<EmployerInterestSettings>(x =>
+            {
+                x.EmployerSupportSiteUri = siteConfiguration.EmployerInterestSettings.EmployerSupportSiteUri;
+                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
+                x.SearchRadius = siteConfiguration.EmployerInterestSettings.SearchRadius;
+            })
             .Configure<PostcodeApiSettings>(x =>
             {
                 x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;

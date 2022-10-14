@@ -66,7 +66,7 @@ public class EmployerInterestServiceTests
             HasMultipleLocations = employerInterest.HasMultipleLocations,
             LocationCount = employerInterest.LocationCount,
             IndustryId = employerInterest.IndustryId,
-            SpecificRequirements = employerInterest.SpecificRequirements,
+            AdditionalInformation = employerInterest.AdditionalInformation,
             Email = employerInterest.Email,
             Telephone = employerInterest.Telephone,
             ContactPreferenceType = employerInterest.ContactPreferenceType
@@ -112,11 +112,11 @@ public class EmployerInterestServiceTests
         result.Should().Be(uniqueId);
 
         await emailService
-                .Received(1)
-                .SendEmail(
-                    employerInterest.Email,
-                    EmailTemplateNames.EmployerRegisterInterest,
-                    Arg.Any<IDictionary<string, string>>()
+            .Received(1)
+            .SendEmail(
+                employerInterest.Email,
+                EmailTemplateNames.EmployerRegisterInterest,
+                Arg.Any<IDictionary<string, string>>()
             );
     }
 
@@ -178,18 +178,18 @@ public class EmployerInterestServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "organisation_name", employerInterest.OrganisationName },
-                            { "contact_name", employerInterest.ContactName },
-                            { "email_address", employerInterest.Email },
-                            { "telephone", employerInterest.Telephone },
-                            { "website", "https://todo.com" },//employerInterest.Website },
-                            { "contact_preference", expectedContactPreference },
-                            { "primary_industry", expectedIndustry },
-                            { "placement_area", "(TODO: placement area)" },
-                            { "postcode", employerInterest.Postcode },
-                            { "additional_information", employerInterest.SpecificRequirements },
-                            { "employer_support_site", settings.EmployerSupportSiteUri },
-                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
+                            {"organisation_name", employerInterest.OrganisationName},
+                            {"contact_name", employerInterest.ContactName},
+                            {"email_address", employerInterest.Email},
+                            {"telephone", employerInterest.Telephone},
+                            {"website", "https://todo.com"}, //employerInterest.Website },
+                            {"contact_preference", expectedContactPreference},
+                            {"primary_industry", expectedIndustry},
+                            {"placement_area", "(TODO: placement area)"},
+                            {"postcode", employerInterest.Postcode},
+                            {"additional_information", employerInterest.AdditionalInformation},
+                            {"employer_support_site", settings.EmployerSupportSiteUri},
+                            {"employer_unsubscribe_uri", expectedUnsubscribeUri}
                         })));
     }
 
@@ -284,23 +284,23 @@ public class EmployerInterestServiceTests
     [Fact]
     public async Task FindEmployerInterest_Returns_Expected_List()
     {
-        var employerInterests = new EmployerInterestBuilder()
+        var employerInterestSummaryList = new EmployerInterestSummaryItemBuilder()
             .BuildList()
             .ToList();
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.GetAll()
-            .Returns(employerInterests);
+        employerInterestRepository.GetSummaryList()
+            .Returns(employerInterestSummaryList);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(employerInterestRepository: employerInterestRepository);
 
         var results = (await service.FindEmployerInterest()).ToList();
-        results.Should().BeEquivalentTo(employerInterests);
+        results.Should().BeEquivalentTo(employerInterestSummaryList);
 
         await employerInterestRepository
             .Received(1)
-            .GetAll();
+            .GetSummaryList();
     }
 
     [Fact]
@@ -323,5 +323,20 @@ public class EmployerInterestServiceTests
         await employerInterestRepository
             .Received(1)
             .Get(id);
+    }
+
+    [Fact]
+    public void RetentionDays_Returns_Expected_Value()
+    {
+        const int retentionDays = 99;
+
+        var settings = new SettingsBuilder()
+            .BuildEmployerInterestSettings(
+                retentionDays: retentionDays);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestSettings: settings);
+
+        service.RetentionDays.Should().Be(retentionDays);
     }
 }

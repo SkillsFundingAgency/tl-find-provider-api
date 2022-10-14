@@ -22,7 +22,8 @@ public class SettingsBuilder
     
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
-    private const int RetentionDays = 10;
+    private const int EmployerInterestRetentionDays = 10;
+    private const int EmployerInterestSearchRadius = 30;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
     private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
     private const string UnsubscribeEmployerUri = "https://test.employerssupportgov.uk/unsubscribeinterest/";
@@ -91,10 +92,12 @@ public class SettingsBuilder
     public EmployerInterestSettings BuildEmployerInterestSettings(
         string employerSupportSiteUri = EmployerSupportSiteUri,
         string unsubscribeEmployerUri = UnsubscribeEmployerUri,
-        int retentionDays = RetentionDays) => new()
+        int retentionDays = EmployerInterestRetentionDays,
+        int searchRadius = EmployerInterestSearchRadius) => new()
         {
             EmployerSupportSiteUri = employerSupportSiteUri,
             RetentionDays = retentionDays,
+            SearchRadius = searchRadius,
             UnsubscribeEmployerUri = unsubscribeEmployerUri
         };
 

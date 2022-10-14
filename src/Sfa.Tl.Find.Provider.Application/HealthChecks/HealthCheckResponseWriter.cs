@@ -10,16 +10,6 @@ public static class HealthCheckResponseWriter
     {
         httpContext.Response.ContentType = "application/json";
 
-        var entries = result.Entries.ToDictionary(
-            d => d.Key,
-            d => new
-            {
-                Status = d.Value.Status.ToString(),
-                Duration = d.Value.Duration.TotalSeconds.ToString(NumberFormatInfo.InvariantInfo),
-                d.Value.Description,
-                d.Value.Data
-            });
-
         var json = JsonSerializer.Serialize(new
         {
             status = result.Status.ToString(),

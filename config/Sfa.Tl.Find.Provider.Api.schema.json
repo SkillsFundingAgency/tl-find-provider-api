@@ -83,6 +83,10 @@
         "RetentionDays": {
           "type": "integer",
           "environmentVariable": "EmployerInterestSettings_RetentionDays"
+        },
+        "SearchRadius": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_SearchRadius"
         }
       },
       "additionalProperties": false,

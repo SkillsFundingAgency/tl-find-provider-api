@@ -17,12 +17,10 @@ AS
 	  )
 	  --OR [ModifiedOn] < @date
 
-	DELETE FROM [dbo].[EmployerLocation]
+	DELETE FROM [dbo].[EmployerInterestLocation]
 	WHERE [EmployerInterestId] IN (SELECT [Id] FROM @employerInterestIds);
 
 	DELETE FROM [dbo].[EmployerInterest]
 	WHERE [Id] IN (SELECT [Id] FROM @employerInterestIds);
-
-	--SELECT COUNT 1 FROM @employerInterestIds
 
 	RETURN (SELECT COUNT(*) FROM @employerInterestIds)

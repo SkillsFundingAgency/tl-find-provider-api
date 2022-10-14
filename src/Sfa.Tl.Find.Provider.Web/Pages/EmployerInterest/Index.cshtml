@@ -1,5 +1,6 @@
 ﻿@page
-@model EmployerInterest.IndexModel
+@using Sfa.Tl.Find.Provider.Application.Models
+@model Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest.IndexModel
 @{
     ViewData["Title"] = "Employer Interest";
 }
@@ -14,11 +15,9 @@
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th class="govuk-table__header" scope="col">Organisation</th>
-                    <th class="govuk-table__header" scope="col">Postcode</th>
-                    <th class="govuk-table__header" scope="col">Contact</th>
-                    <th class="govuk-table__header" scope="col">Email</th>
-                    <th class="govuk-table__header" scope="col">Telephone</th>
-                    <th class="govuk-table__header" scope="col">Id</th>
+                    <th class="govuk-table__header" scope="col">Industry</th>
+                    <th class="govuk-table__header" scope="col">Distance</th>
+                    <th class="govuk-table__header" scope="col">Data available until</th>
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
@@ -26,13 +25,33 @@
                 {
                     foreach (var employerInterest in Model.EmployerInterestList)
                     {
+                        var availabilityDate =
+                        employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
+                        var employerInterest2 = new EmployerInterestSummaryItem
+                        {
+                            Distance = 1.002,
+                        };
+                        //TODO: Make this an extension
+                        var formattedDistance = default(string);
+                        if (employerInterest2.Distance.HasValue)
+                        {
+                            var roundedDistance = Math.Round(employerInterest2.Distance.Value, 1);
+                            if (Math.Abs(roundedDistance) >= 0.01)
+                            {
+                                formattedDistance = $"{employerInterest2.Distance:#.0}";
+                                formattedDistance += formattedDistance == "1.0" ? " mile" : " miles";
+                            }
+                        }
+
                         <tr class="govuk-table__row">
                             <th class="govuk-table__header" scope="row">@employerInterest.OrganisationName</th>
-                            <td class="govuk-table__cell">@employerInterest.Postcode</td>
-                            <td class="govuk-table__cell">@employerInterest.ContactName</td>
-                            <td class="govuk-table__cell">@employerInterest.Email</td>
-                            <td class="govuk-table__cell">@employerInterest.Telephone</td>
-                            <td class="govuk-table__cell"><a asp-page="Detail" asp-route-id="@employerInterest.Id"                                    class="govuk-link" id="tl-change-link">View</a>
+                            <td class="govuk-table__cell">@employerInterest.Industry</td>
+                            <td class="govuk-table__cell">@formattedDistance</td>
+                            <td class="govuk-table__cell">
+                                @($"{availabilityDate:d MMM yyyy}")
+                            </td>
+                            <td class="govuk-table__cell">
+                                <a asp-page="Detail" asp-route-id="@employerInterest.Id" class="govuk-link" id="tl-change-link">View</a>
                             </td>
                         </tr>
                     }

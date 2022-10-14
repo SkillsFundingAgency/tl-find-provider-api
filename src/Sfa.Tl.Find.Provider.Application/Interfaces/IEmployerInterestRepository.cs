@@ -14,4 +14,6 @@ public interface IEmployerInterestRepository
     Task<EmployerInterest> Get(int id);
 
     Task<IEnumerable<EmployerInterest>> GetAll();
+
+    Task<IEnumerable<EmployerInterestSummaryItem>> GetSummaryList();
 }

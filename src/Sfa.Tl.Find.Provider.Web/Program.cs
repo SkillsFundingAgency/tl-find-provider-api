@@ -25,7 +25,7 @@ if (bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConf
 }
 else
 {
-    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment, builder.Configuration);
+    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment);
 }
 
 builder.Services.Configure<CookiePolicyOptions>(options =>

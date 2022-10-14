@@ -286,7 +286,7 @@ public static class ModelValidationExtensions
         employerInterest.HasMultipleLocations.Should().Be(expected.HasMultipleLocations);
         employerInterest.LocationCount.Should().Be(expected.LocationCount);
         employerInterest.IndustryId.Should().Be(expected.IndustryId);
-        employerInterest.SpecificRequirements.Should().Be(expected.SpecificRequirements);
+        employerInterest.AdditionalInformation.Should().Be(expected.AdditionalInformation);
         employerInterest.ContactPreferenceType.Should().Be(expected.ContactPreferenceType);
 
         return true;

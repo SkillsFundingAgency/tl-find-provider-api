@@ -217,4 +217,26 @@ public class EmployerInterestRepositoryTests
             .QueryAsync<EmployerInterest>(dbConnection,
                 Arg.Is<string>(sql => sql.Contains("FROM dbo.EmployerInterest")));
     }
+
+    [Fact]
+    public async Task GetSummaryList_Returns_Expected_List()
+    {
+        var employerInterestSummaryList = new EmployerInterestSummaryItemBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<EmployerInterestSummaryItem>(dbConnection,
+                "GetAllEmployerInterest",
+                commandType: CommandType.StoredProcedure)
+            .Returns(employerInterestSummaryList);
+
+        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
+
+        var results = (await repository.GetSummaryList()).ToList();
+        results.Should().BeEquivalentTo(employerInterestSummaryList);
+    }
 }
