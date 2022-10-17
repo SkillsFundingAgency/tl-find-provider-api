@@ -2,10 +2,10 @@
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
-public class EmployerInterestSummaryItemBuilder
+public class EmployerInterestSummaryBuilder
 {
-    public IEnumerable<EmployerInterestSummaryItem> BuildList() =>
-        new List<EmployerInterestSummaryItem>
+    public IEnumerable<EmployerInterestSummary> BuildList() =>
+        new List<EmployerInterestSummary>
         {
             new()
             {
@@ -27,9 +27,9 @@ public class EmployerInterestSummaryItemBuilder
             }
         };
 
-    public IList<EmployerInterestSummaryItem> BuildList(int numberToTake) =>
+    public IList<EmployerInterestSummary> BuildList(int numberToTake) =>
         BuildList().Take(numberToTake).ToList();
 
-    public EmployerInterestSummaryItem Build() =>
+    public EmployerInterestSummary Build() =>
         BuildList().First();
 }

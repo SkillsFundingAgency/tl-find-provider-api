@@ -62,6 +62,7 @@ public class EmployerInterestService : IEmployerInterestService
             AdditionalInformation = employerInterest.AdditionalInformation,
             Email = employerInterest.Email,
             Telephone = employerInterest.Telephone,
+            Website = employerInterest.Website,
             ContactPreferenceType = employerInterest.ContactPreferenceType
         };
 
@@ -104,7 +105,7 @@ public class EmployerInterestService : IEmployerInterestService
         return count;
     }
 
-    public Task<IEnumerable<EmployerInterestSummaryItem>> FindEmployerInterest()
+    public Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest()
     {
         //TODO: Create a find method that takes lat/long or location
         return _employerInterestRepository.GetSummaryList();
@@ -140,9 +141,8 @@ public class EmployerInterestService : IEmployerInterestService
             //TODO: Don't use "Other" in the pattern above, and use this:
             //industry = employerInterest.OtherIndustry
         }
-
-
-        //TODO: Add to employer interest table
+        
+        //TODO: Add to employer interest table - this is skill areas/routes
         var placementArea = "(TODO: placement area)";
         
         var tokens = new Dictionary<string, string>
@@ -152,8 +152,7 @@ public class EmployerInterestService : IEmployerInterestService
             { "telephone", employerInterest.Telephone ?? "" },
             { "contact_preference", contactPreference },
             { "organisation_name", employerInterest.OrganisationName },
-            //TODO: Add website
-            { "website", "https://todo.com" }, //employerInterest.Website ?? "" },
+            { "website", employerInterest.Website ?? "" },
             { "primary_industry", industry },
             { "placement_area", placementArea },
             { "postcode", employerInterest.Postcode },

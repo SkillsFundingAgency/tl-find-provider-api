@@ -37,7 +37,15 @@ public class TestServerFactory<TEntryPoint>
         };
 
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+        
         return client;
+    }
+
+    public T GetService<T>()
+    {
+        var service = _server
+            .Services
+            .GetRequiredService<T>();
+        return service;
     }
 }

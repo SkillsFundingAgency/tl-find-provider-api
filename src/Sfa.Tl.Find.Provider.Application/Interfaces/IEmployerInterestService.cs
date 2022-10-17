@@ -9,7 +9,7 @@ public interface IEmployerInterestService
 
     Task<int> RemoveExpiredEmployerInterest();
 
-    Task<IEnumerable<EmployerInterestSummaryItem>> FindEmployerInterest();
+    Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest();
 
     Task<EmployerInterest> GetEmployerInterest(int id);
 

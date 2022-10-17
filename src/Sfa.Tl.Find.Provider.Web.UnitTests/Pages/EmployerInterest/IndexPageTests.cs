@@ -17,7 +17,7 @@ public class IndexPageTests
     [Fact]
     public async Task IndexModel_OnGet_Sets_Expected_Results()
     {
-        var employerInterestSummary = new EmployerInterestSummaryItemBuilder()
+        var employerInterestSummary = new EmployerInterestSummaryBuilder()
             .BuildList()
             .ToList();
 

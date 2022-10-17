@@ -87,6 +87,7 @@ public class EmployerInterestRepositoryTests
     [Fact]
     public async Task Delete_Calls_Database_As_Expected()
     {
+        const int id = 101;
         var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
@@ -94,6 +95,14 @@ public class EmployerInterestRepositoryTests
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper);
+
+        dbContextWrapper
+            .ExecuteScalarAsync<int?>(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("SELECT Id")),
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null))
+            .Returns(id);
 
         await repository.Delete(uniqueId);
 
@@ -119,10 +128,19 @@ public class EmployerInterestRepositoryTests
     public async Task Delete_Returns_Expected_Result()
     {
         const int count = 1;
+        const int id = 101;
         var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .ExecuteScalarAsync<int?>(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("SELECT Id")),
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null))
+            .Returns(id);
 
         dbContextWrapper
             .ExecuteAsync(dbConnection,
@@ -221,7 +239,7 @@ public class EmployerInterestRepositoryTests
     [Fact]
     public async Task GetSummaryList_Returns_Expected_List()
     {
-        var employerInterestSummaryList = new EmployerInterestSummaryItemBuilder()
+        var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
             .BuildList()
             .ToList();
 
@@ -229,7 +247,7 @@ public class EmployerInterestRepositoryTests
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .QueryAsync<EmployerInterestSummaryItem>(dbConnection,
+            .QueryAsync<EmployerInterestSummary>(dbConnection,
                 "GetAllEmployerInterest",
                 commandType: CommandType.StoredProcedure)
             .Returns(employerInterestSummaryList);

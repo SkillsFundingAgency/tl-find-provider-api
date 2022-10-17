@@ -18,29 +18,31 @@ AS
         [Postcode], 
         [HasMultipleLocations], 
         [LocationCount], 
-        [AdditionalInformation], 
+        [OtherIndustry],
         [Email], 
         [Telephone], 
         [Website], 
-        [ContactPreferenceType]) 
+        [ContactPreferenceType],
+        [AdditionalInformation]) 
     SELECT [UniqueId], 
         [OrganisationName], 
         [ContactName], 
         [Postcode], 
         [HasMultipleLocations], 
         [LocationCount], 
-        [AdditionalInformation], 
+        [OtherIndustry],
         [Email], 
         [Telephone], 
         [Website], 
-        [ContactPreferenceType]
+        [ContactPreferenceType],
+        [AdditionalInformation] 
     FROM @data
 
     --This works for one insert - if we have multiple see https://stackoverflow.com/questions/55606203/get-multiple-scope-identity-while-inserting-data-with-table-valued-parameter
     SELECT @newId = SCOPE_IDENTITY();
 
     --Create location record
-    INSERT INTO [dbo].[EmployerLocation] (
+    INSERT INTO [dbo].[EmployerInterestLocation] (
 	    [EmployerInterestId],
 	    [Postcode],
 	    [Latitude],
@@ -52,3 +54,21 @@ AS
 	    [Longitude],
         geography::Point([Latitude], [Longitude], 4326)
     FROM @data
+
+    --Create industry record
+    INSERT INTO [dbo].[EmployerInterestIndustry] (
+        [EmployerInterestId],
+        [IndustryId])
+    SELECT  @newId,
+            [Id]
+    FROM @industryIds
+
+    --Create route mappings
+    INSERT INTO [dbo].[EmployerInterestRoute] (
+        [EmployerInterestId],
+        [RouteId])
+    SELECT  @newId,
+            [Id]
+    FROM @industryIds
+
+    RETURN @newId

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -24,28 +25,6 @@ public class EmployersController : ControllerBase
     }
 
     /// <summary>
-    /// Deletes in Employer Interest record based on it's unique identifier.
-    /// </summary>
-    /// <returns>A status result indicating whether the action succeeded.</returns>
-    [HttpDelete, HttpGet]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // ReSharper disable once StringLiteralTypo
-    [Route("deleteinterest/{*id:guid}")]
-    public async Task<IActionResult> DeleteInterest(Guid id)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug($"{nameof(EmployersController)} {nameof(DeleteInterest)} called.");
-        }
-
-        var deleted = await _employerInterestService.DeleteEmployerInterest(id);
-        return deleted > 0
-            ? NoContent()
-            : NotFound();
-    }
-
-    /// <summary>
     /// Creates an Employer Interest record.
     /// </summary>
     /// <returns>A status result indicating whether the action succeeded.</returns>
@@ -65,6 +44,26 @@ public class EmployersController : ControllerBase
 
         //TODO: Validate the model
 
+        Debug.WriteLine("CreateInterest called with:");
+        Debug.WriteLine($"   Organisation name:\t{employerInterest.OrganisationName}");
+        Debug.WriteLine($"   Contact name:\t{employerInterest.ContactName}");
+        Debug.WriteLine($"   Postcode:\t{employerInterest.Postcode}");
+        Debug.WriteLine($"   Email:\t{employerInterest.Email}");
+        Debug.WriteLine($"   Telephone:\t{employerInterest.Telephone}");
+        Debug.WriteLine($"   Website:\t{employerInterest.Website}");
+        Debug.WriteLine($"   Contact preference:\t{employerInterest.ContactPreferenceType}");
+        Debug.WriteLine($"   Industry:\t{employerInterest.IndustryId}");
+        Debug.WriteLine($"   Other industry:\t{employerInterest.OtherIndustry}");
+        Debug.WriteLine($"   Additional info:\t{employerInterest.AdditionalInformation}");
+        if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
+        {
+            Debug.WriteLine($"   Skill area:\t{employerInterest.AdditionalInformation}");
+            foreach (var skillArea in employerInterest.SkillAreaIds)
+            {
+                Debug.WriteLine($"   Skill area:\t{skillArea}");
+            }
+        }
+
         var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
 
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -72,6 +71,31 @@ public class EmployersController : ControllerBase
             _logger.LogDebug($"{nameof(EmployersController)} {nameof(DeleteInterest)} called.");
         }
 
-        return Ok(uniqueId);
+        return Ok(new
+        {
+            id = uniqueId
+        });
+    }
+
+    /// <summary>
+    /// Deletes an Employer Interest record based on it's unique identifier.
+    /// </summary>
+    /// <returns>A status result indicating whether the action succeeded.</returns>
+    [HttpDelete, HttpGet]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    // ReSharper disable once StringLiteralTypo
+    [Route("deleteinterest/{*id:guid}")]
+    public async Task<IActionResult> DeleteInterest(Guid id)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(EmployersController)} {nameof(DeleteInterest)} called.");
+        }
+
+        var deleted = await _employerInterestService.DeleteEmployerInterest(id);
+        return deleted > 0
+            ? NoContent()
+            : NotFound();
     }
 }

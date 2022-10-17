@@ -48,7 +48,6 @@ public class EmailDeliveryStatusControllerTests
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();
         okResult!.StatusCode.Should().Be(200);
-
         okResult.Value.Should().BeEquivalentTo("1 record(s) updated.");
     }
 

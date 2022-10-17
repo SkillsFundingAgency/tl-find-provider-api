@@ -24,6 +24,7 @@ public class EmployerInterestBuilder
                 AdditionalInformation = "These are my requirements: none",
                 Email = "test.contact1@employer.co.uk",
                 Telephone = "020 555 6666 ext 1",
+                Website = "https://employer-one.co.uk",
                 ContactPreferenceType = 1
             },
             new()
@@ -37,10 +38,12 @@ public class EmployerInterestBuilder
                 Longitude = -1.508122,
                 HasMultipleLocations = false,
                 LocationCount = 1,
-                IndustryId = 10,
+                IndustryId = null,
+                OtherIndustry = "Test Industry",
                 AdditionalInformation = "These are my requirements: a few good people",
                 Email = "test.contact2@employer.co.uk",
                 Telephone = "020 555 6666 ext 2",
+                Website = "https://employer-two.co.uk",
                 ContactPreferenceType = 2
             }
         };

@@ -14,11 +14,13 @@ public class EmployerInterest
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public bool HasMultipleLocations { get; init; }
-    public int LocationCount { get; init; }
-    public int IndustryId { get; init; }
-    public string AdditionalInformation { get; init; }
+    public int? LocationCount { get; init; }
+    public int? IndustryId { get; init; }
+    public string OtherIndustry { get; init; }
     public string Email { get; init; }
     public string Telephone { get; init; }
     public string Website { get; init; }
     public int ContactPreferenceType { get; init; }
+    public string AdditionalInformation { get; init; }
+    public List<int>? SkillAreaIds { get; init; }
 }

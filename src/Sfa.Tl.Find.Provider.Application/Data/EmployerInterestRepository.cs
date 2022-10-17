@@ -51,11 +51,12 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Latitude = employerInterest.Latitude,
                             Longitude = employerInterest.Longitude,
                             HasMultipleLocations = employerInterest.HasMultipleLocations,
-                            LocationCount = employerInterest.LocationCount,
-                            IndustryId = employerInterest.IndustryId,
+                            LocationCount = employerInterest.LocationCount ?? 0,
+                            IndustryId = employerInterest.IndustryId ?? 0,
                             AdditionalInformation = employerInterest.AdditionalInformation,
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,
+                            Website = employerInterest.Website,
                             ContactPreferenceType = employerInterest.ContactPreferenceType
                         }
                     }
@@ -86,22 +87,40 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
+            var result = 0;
+
             using var connection = _dbContextWrapper.CreateConnection();
             connection.Open();
 
-            _dynamicParametersWrapper.CreateParameters(new
-            {
-                uniqueId
-            });
-
             using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
-            var result = await _dbContextWrapper.ExecuteAsync(
+            var id = await _dbContextWrapper.ExecuteScalarAsync<int?>(
                 connection,
-                "DeleteEmployerInterest",
-                _dynamicParametersWrapper.DynamicParameters,
-                transaction,
-                commandType: CommandType.StoredProcedure);
+                "SELECT Id " +
+                "FROM [dbo].[EmployerInterest] " +
+                "WHERE [UniqueId] = @uniqueId",
+                new { uniqueId },
+                transaction
+            );
+
+            if (id.HasValue)
+            {
+                _dynamicParametersWrapper.CreateParameters(new
+                {
+                    idList = new List<int>
+                        {
+                            id.Value
+                        }
+                        .AsTableValuedParameter("dbo.IdListTableType")
+                });
+
+                result = await _dbContextWrapper.ExecuteAsync(
+                    connection,
+                    "DeleteEmployerInterest",
+                    _dynamicParametersWrapper.DynamicParameters,
+                    transaction,
+                    commandType: CommandType.StoredProcedure);
+            }
 
             transaction.Commit();
 
@@ -109,7 +128,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred when deleting employer interest");
+            _logger.LogError(ex, "An error occurred when deleting employer interest with uniqueId '{uniqueId}'", uniqueId);
             throw;
         }
     }
@@ -141,7 +160,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred when deleting employer interest");
+            _logger.LogError(ex, "An error occurred when deleting employer interest before date {date}", date);
             throw;
         }
     }
@@ -200,12 +219,12 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             "ORDER BY OrganisationName");
     }
 
-    public async Task<IEnumerable<EmployerInterestSummaryItem>> GetSummaryList()
+    public async Task<IEnumerable<EmployerInterestSummary>> GetSummaryList()
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         return await _dbContextWrapper
-            .QueryAsync<EmployerInterestSummaryItem>(
+            .QueryAsync<EmployerInterestSummary>(
                 connection,
                 "GetAllEmployerInterest",
                 commandType: CommandType.StoredProcedure);

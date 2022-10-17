@@ -10,7 +10,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class IndexModel : PageModel
 {
-    public IEnumerable<EmployerInterestSummaryItem>? EmployerInterestList { get; private set; }
+    public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
     //public IEnumerable<Application.Models.ProviderLocation>? ProviderLocations { get; private set; }
 
     public int EmployerInterestRetentionDays =>

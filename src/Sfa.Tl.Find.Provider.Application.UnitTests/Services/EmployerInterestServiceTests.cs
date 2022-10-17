@@ -66,10 +66,12 @@ public class EmployerInterestServiceTests
             HasMultipleLocations = employerInterest.HasMultipleLocations,
             LocationCount = employerInterest.LocationCount,
             IndustryId = employerInterest.IndustryId,
-            AdditionalInformation = employerInterest.AdditionalInformation,
+            OtherIndustry = employerInterest.OtherIndustry,
             Email = employerInterest.Email,
             Telephone = employerInterest.Telephone,
-            ContactPreferenceType = employerInterest.ContactPreferenceType
+            Website = employerInterest.Website,
+            ContactPreferenceType = employerInterest.ContactPreferenceType,
+            AdditionalInformation = employerInterest.AdditionalInformation,
         };
 
         await employerInterestRepository
@@ -182,7 +184,7 @@ public class EmployerInterestServiceTests
                             {"contact_name", employerInterest.ContactName},
                             {"email_address", employerInterest.Email},
                             {"telephone", employerInterest.Telephone},
-                            {"website", "https://todo.com"}, //employerInterest.Website },
+                            {"website", employerInterest.Website },
                             {"contact_preference", expectedContactPreference},
                             {"primary_industry", expectedIndustry},
                             {"placement_area", "(TODO: placement area)"},
@@ -284,7 +286,7 @@ public class EmployerInterestServiceTests
     [Fact]
     public async Task FindEmployerInterest_Returns_Expected_List()
     {
-        var employerInterestSummaryList = new EmployerInterestSummaryItemBuilder()
+        var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
             .BuildList()
             .ToList();
 

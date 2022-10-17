@@ -9,9 +9,10 @@
 	[HasMultipleLocations] BIT NOT NULL,
 	[LocationCount] INT NULL,
 	[IndustryId] INT NULL,
-	[AdditionalInformation] NVARCHAR(MAX) NULL,
+	[OtherIndustry] NVARCHAR(400) NULL,
 	[Email] NVARCHAR(320) NULL,
 	[Telephone] NVARCHAR(150) NULL,
 	[Website] NVARCHAR(500) NULL,
-	[ContactPreferenceType] INT NOT NULL
+	[ContactPreferenceType] INT NOT NULL,
+	[AdditionalInformation] NVARCHAR(MAX) NULL
 )

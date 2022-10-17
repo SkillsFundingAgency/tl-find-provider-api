@@ -3,7 +3,7 @@
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("UKPRN {" + nameof(OrganisationName) + ", nq}")]
-public class EmployerInterestSummaryItem
+public class EmployerInterestSummary
 {
     public int Id { get; init; }
     public string OrganisationName { get; init; }

@@ -4,6 +4,7 @@ AS
 
 	--SET NOCOUNT ON;
 	
+	DECLARE @returnCount INT
 	DECLARE @employerInterestIds TABLE (
 		[Id] INT);
 
@@ -17,10 +18,5 @@ AS
 	  )
 	  --OR [ModifiedOn] < @date
 
-	DELETE FROM [dbo].[EmployerInterestLocation]
-	WHERE [EmployerInterestId] IN (SELECT [Id] FROM @employerInterestIds);
-
-	DELETE FROM [dbo].[EmployerInterest]
-	WHERE [Id] IN (SELECT [Id] FROM @employerInterestIds);
-
-	RETURN (SELECT COUNT(*) FROM @employerInterestIds)
+	EXEC @returnCount = [dbo].[DeleteEmployerInterest] @employerInterestIds
+	RETURN @returnCount

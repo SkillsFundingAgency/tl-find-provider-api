@@ -276,18 +276,21 @@ public static class ModelValidationExtensions
         employerInterest.OrganisationName.Should().Be(expected.OrganisationName);
         employerInterest.ContactName.Should().Be(expected.ContactName);
 
+        employerInterest.ContactPreferenceType.Should().Be(expected.ContactPreferenceType);
         employerInterest.Email.Should().Be(expected.Email);
         employerInterest.Telephone.Should().Be(expected.Telephone);
+        employerInterest.Website.Should().Be(expected.Website);
 
         employerInterest.Postcode.Should().Be(expected.Postcode);
         employerInterest.Longitude.Should().BeApproximately(expected.Longitude, DoubleTolerance);
         employerInterest.Latitude.Should().BeApproximately(expected.Latitude, DoubleTolerance);
-        
+
+        employerInterest.IndustryId.Should().Be(expected.IndustryId);
+        employerInterest.OtherIndustry.Should().Be(expected.OtherIndustry);
+
         employerInterest.HasMultipleLocations.Should().Be(expected.HasMultipleLocations);
         employerInterest.LocationCount.Should().Be(expected.LocationCount);
-        employerInterest.IndustryId.Should().Be(expected.IndustryId);
         employerInterest.AdditionalInformation.Should().Be(expected.AdditionalInformation);
-        employerInterest.ContactPreferenceType.Should().Be(expected.ContactPreferenceType);
 
         return true;
     }
