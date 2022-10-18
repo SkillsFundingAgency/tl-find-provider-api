@@ -65,6 +65,6 @@ AS
         [RouteId])
     SELECT  @newId,
             [Id]
-    FROM @industryIds
+    FROM @routeIds
 
     RETURN @newId

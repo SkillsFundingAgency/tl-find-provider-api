@@ -62,7 +62,8 @@ public class EmployerInterestService : IEmployerInterestService
             Email = employerInterest.Email,
             Telephone = employerInterest.Telephone,
             Website = employerInterest.Website,
-            ContactPreferenceType = employerInterest.ContactPreferenceType
+            ContactPreferenceType = employerInterest.ContactPreferenceType,
+            SkillAreaIds = employerInterest.SkillAreaIds
         };
 
         var (_, uniqueId) = await _employerInterestRepository.Create(employerInterest);

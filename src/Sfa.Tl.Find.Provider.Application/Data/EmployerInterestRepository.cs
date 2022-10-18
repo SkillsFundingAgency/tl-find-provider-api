@@ -61,6 +61,20 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                     .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
             });
 
+            if (employerInterest.IndustryId is > 0)
+            {
+                _dynamicParametersWrapper.AddParameter("industryIds",
+                    new List<int> {employerInterest.IndustryId.Value}
+                        .AsTableValuedParameter("dbo.IdListTableType"));
+            }
+
+            if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
+            {
+                _dynamicParametersWrapper.AddParameter("routeIds",
+                    employerInterest.SkillAreaIds
+                        .AsTableValuedParameter("dbo.IdListTableType"));
+            }
+            
             using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
             var result = await _dbContextWrapper.ExecuteAsync(
