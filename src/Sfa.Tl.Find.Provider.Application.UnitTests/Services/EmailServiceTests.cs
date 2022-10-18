@@ -156,7 +156,7 @@ public class EmailServiceTests
         var emailTemplateRepository = new EmailTemplateRepositoryBuilder()
             .BuildSubstitute(TestEmailTemplateId, TestEmailTemplateName);
 
-        var emailAddressList = $"{MainSupportEmailInboxAddress};{SecondarySupportEmailInboxAddress}";
+        const string emailAddressList = $"{MainSupportEmailInboxAddress};{SecondarySupportEmailInboxAddress}";
 
         var emailService = new EmailServiceBuilder()
             .Build(emailTemplateRepository,

@@ -261,7 +261,7 @@ public class ProvidersControllerTests
     [Fact]
     public async Task GetProviders_Returns_Not_Found_Result_For_Invalid_Postcode()
     {
-        var errorMessage = $"Postcode {InvalidPostcode} was not found";
+        const string errorMessage = $"Postcode {InvalidPostcode} was not found";
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.FindProviders(InvalidPostcode)

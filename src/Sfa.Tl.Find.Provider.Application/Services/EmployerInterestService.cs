@@ -65,7 +65,7 @@ public class EmployerInterestService : IEmployerInterestService
             ContactPreferenceType = employerInterest.ContactPreferenceType
         };
 
-        var (count, uniqueId) = await _employerInterestRepository.Create(employerInterest);
+        var (_, uniqueId) = await _employerInterestRepository.Create(employerInterest);
 
         if (uniqueId != Guid.Empty)
         {
@@ -134,13 +134,8 @@ public class EmployerInterestService : IEmployerInterestService
 
         var industry = industries
             .FirstOrDefault(i => i.Id == employerInterest.IndustryId)
-            ?.Name;
-        if (industry is null or "Other")
-        {
-            //TODO: Don't use "Other" in the pattern above, and use this:
-            //industry = employerInterest.OtherIndustry
-        }
-        
+            ?.Name ?? employerInterest.OtherIndustry;
+
         //TODO: Add to employer interest table - this is skill areas/routes
         var placementArea = "(TODO: placement area)";
         

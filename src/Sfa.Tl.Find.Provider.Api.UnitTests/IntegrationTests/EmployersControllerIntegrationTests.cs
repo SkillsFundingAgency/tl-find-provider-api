@@ -40,7 +40,7 @@ public class EmployersControllerIntegrationTests : IClassFixture<TestServerFacto
     [Fact]
     public async Task DeleteEmployerInterest_Returns_Ok_Result_For_Valid_Input()
     {
-        var uniqueIdString = "cf6b9dcc-340b-44b2-acf0-d1dbda70d7f1";
+        const string uniqueIdString = "cf6b9dcc-340b-44b2-acf0-d1dbda70d7f1";
 
         var response = await _fixture
             .CreateClient()
