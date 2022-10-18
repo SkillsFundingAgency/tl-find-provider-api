@@ -70,22 +70,6 @@
                 </div>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Has multiple locations?
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        <span id="tl-multiple-locations"></span>
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row tl-hidden" id="tl-location-count-container">
-                    <dt class="govuk-summary-list__key">
-                        Location count
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        <span id="tl-location-count"></span>
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
                         Industry
                     </dt>
                     <dd class="govuk-summary-list__value">
@@ -172,9 +156,6 @@
                 $("#tl-organisation-name").html(data.organisationName);
                 $("#tl-contact-name").html(data.contactName);
                 $("#tl-postcode").html(data.postcode);
-                $("#tl-multiple-locations").html(data.hasMultipleLocations ? "Yes" : "No");
-                $("#tl-location-count").html(data.locationCount);
-                if (data.hasMultipleLocations) $("#tl-location-count-container").removeClass("tl-hidden")
                 $("#tl-industry").html(data.industryId);
                 $("#tl-additional-information").html(data.additionalInformation);
                 $("#tl-email").html(data.email);

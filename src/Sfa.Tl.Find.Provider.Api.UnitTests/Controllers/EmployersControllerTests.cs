@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -43,7 +44,16 @@ public class EmployersControllerTests
         result.Should().BeOfType(typeof(OkObjectResult));
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();
-        okResult!.Value.Should().Be(uniqueId);
+
+        var jsonString = okResult!.Value?.ToString();
+        Debug.WriteLine(jsonString);
+
+        var temp = new {id = uniqueId};
+        Debug.WriteLine(temp.ToString());
+
+        jsonString.Should().Be(temp.ToString());
+        temp.Should().BeEquivalentTo(okResult.Value);
+        okResult.Value.Should().BeEquivalentTo(temp);
     }
 
     [Fact]

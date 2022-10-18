@@ -6,8 +6,6 @@
 	[Postcode] NVARCHAR(10) NULL,
 	[Latitude] DECIMAL(9, 6) NULL,
 	[Longitude] DECIMAL(9, 6) NULL,
-	[HasMultipleLocations] BIT NOT NULL,
-	[LocationCount] INT NULL,
 	[IndustryId] INT NULL,
 	[OtherIndustry] NVARCHAR(400) NULL,
 	[Email] NVARCHAR(320) NULL,

@@ -79,7 +79,7 @@ public class DbContextWrapper : IDbContextWrapper
                             commandType: commandType),
                 context);
     }
-    
+
     public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
         IDbConnection connection,
         string sql,
@@ -141,14 +141,17 @@ public class DbContextWrapper : IDbContextWrapper
         CommandType? commandType = null)
     {
         var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
-            return await retryPolicy
-                .ExecuteAsync(async _ =>
-                        await connection.ExecuteAsync(
-                            sql, param, transaction,
-                            commandTimeout, commandType),
-                    context);
+        return await retryPolicy
+            .ExecuteAsync(async _ =>
+                    await connection.ExecuteAsync(
+                        sql,
+                        param,
+                        transaction,
+                        commandTimeout,
+                        commandType),
+                context);
     }
-    
+
     public async Task<T> ExecuteScalarAsync<T>(
         IDbConnection connection,
         string sql,
@@ -161,8 +164,11 @@ public class DbContextWrapper : IDbContextWrapper
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection.ExecuteScalarAsync<T>(
-                        sql, param, transaction,
-                        commandTimeout, commandType),
+                        sql,
+                        param,
+                        transaction,
+                        commandTimeout,
+                        commandType),
                 context);
     }
 }

@@ -50,8 +50,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Postcode = employerInterest.Postcode,
                             Latitude = employerInterest.Latitude,
                             Longitude = employerInterest.Longitude,
-                            HasMultipleLocations = employerInterest.HasMultipleLocations,
-                            LocationCount = employerInterest.LocationCount ?? 0,
                             IndustryId = employerInterest.IndustryId ?? 0,
                             AdditionalInformation = employerInterest.AdditionalInformation,
                             Email = employerInterest.Email,
@@ -107,11 +105,9 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             {
                 _dynamicParametersWrapper.CreateParameters(new
                 {
-                    idList = new List<int>
-                        {
-                            id.Value
-                        }
-                        .AsTableValuedParameter("dbo.IdListTableType")
+                    employerInterestIds = 
+                        new List<int> { id.Value }
+                            .AsTableValuedParameter("dbo.IdListTableType")
                 });
 
                 result = await _dbContextWrapper.ExecuteAsync(
@@ -137,22 +133,47 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
+            var result = 0;
+
             using var connection = _dbContextWrapper.CreateConnection();
             connection.Open();
+            
+            using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
             _dynamicParametersWrapper.CreateParameters(new
             {
                 date
             });
 
-            using var transaction = _dbContextWrapper.BeginTransaction(connection);
-
-            var result = await _dbContextWrapper.ExecuteAsync(
+            //TODO: Add logic to allow users to ask for extension on date - 
+            //      Maybe add a flag to the table for use here, together with the ModifiedOn" +
+            //      "WHERE([CreatedOn] < @date ",
+            //    "  --AND [ModifiedOn] IS NULL)" +
+            //    "  --OR [ModifiedOn] < @date";
+            var idsToDelete = (await _dbContextWrapper.QueryAsync<int>(
                 connection,
-                "DeleteEmployerInterestBeforeDate",
-                _dynamicParametersWrapper.DynamicParameters,
-                transaction,
-                commandType: CommandType.StoredProcedure);
+                "SELECT Id " +
+                "FROM [dbo].[EmployerInterest] " +
+                "WHERE [CreatedOn] < @date",
+                 new { date},
+                transaction
+            ))?.ToList();
+            
+            if (idsToDelete != null && idsToDelete.Any())
+            {
+                _dynamicParametersWrapper.CreateParameters(new
+                {
+                    employerInterestIds = idsToDelete
+                        .AsTableValuedParameter("dbo.IdListTableType")
+                });
+
+                result = await _dbContextWrapper.ExecuteAsync(
+                    connection,
+                    "DeleteEmployerInterest",
+                    _dynamicParametersWrapper.DynamicParameters,
+                    transaction,
+                    commandType: CommandType.StoredProcedure);
+            }
 
             transaction.Commit();
 
@@ -182,8 +203,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                     "OrganisationName, " +
                     "ContactName, " +
                     "Postcode, " +
-                    "HasMultipleLocations, " +
-                    "LocationCount, " +
                     "IndustryId, " +
                     "AdditionalInformation, " +
                     "Email, " +

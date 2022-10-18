@@ -168,9 +168,19 @@ public class EmployerInterestRepositoryTests
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
+            .QueryAsync<int>(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("SELECT Id") &&
+                    s.Contains("FROM [dbo].[EmployerInterest]") &&
+                    s.Contains("[CreatedOn] < @date")),
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null))
+            .Returns(Enumerable.Range(1, 10));
+
+        dbContextWrapper
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("DeleteEmployerInterestBeforeDate")),
+                    s.Contains("DeleteEmployerInterest")),
                 Arg.Any<object>(),
                 Arg.Is<IDbTransaction>(t => t != null),
                 commandType: CommandType.StoredProcedure)

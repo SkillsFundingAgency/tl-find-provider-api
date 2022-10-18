@@ -44,6 +44,7 @@ public class EmployersControllerIntegrationTests : IClassFixture<TestServerFacto
 
         var response = await _fixture
             .CreateClient()
+            // ReSharper disable once StringLiteralTypo
             .DeleteAsync($"/api/v3/employers/deleteinterest/{uniqueIdString}");
 
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);

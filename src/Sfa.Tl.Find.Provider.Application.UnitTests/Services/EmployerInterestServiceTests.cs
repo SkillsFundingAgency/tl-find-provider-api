@@ -63,8 +63,6 @@ public class EmployerInterestServiceTests
             Postcode = geoLocation.Location,
             Latitude = geoLocation.Latitude,
             Longitude = geoLocation.Longitude,
-            HasMultipleLocations = employerInterest.HasMultipleLocations,
-            LocationCount = employerInterest.LocationCount,
             IndustryId = employerInterest.IndustryId,
             OtherIndustry = employerInterest.OtherIndustry,
             Email = employerInterest.Email,

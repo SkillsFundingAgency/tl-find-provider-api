@@ -5,8 +5,6 @@
 	[OrganisationName] NVARCHAR(400) NOT NULL,
 	[ContactName] NVARCHAR(400) NOT NULL,
 	[Postcode] NVARCHAR(10) NOT NULL,
-	[HasMultipleLocations] BIT NOT NULL DEFAULT(0),
-	[LocationCount] INT NULL,
 	[OtherIndustry] NVARCHAR(400) NULL,
 	[AdditionalInformation] NVARCHAR(MAX) NULL,
 	[Email] NVARCHAR(320) NULL,

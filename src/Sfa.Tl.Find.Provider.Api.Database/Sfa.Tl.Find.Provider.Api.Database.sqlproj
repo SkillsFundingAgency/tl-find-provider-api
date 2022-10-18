@@ -111,13 +111,11 @@
     <Build Include="Tables\Industry.sql" />
     <None Include="PostDeployment\Seed Industries.sql" />
     <Build Include="Stored Procedures\DeleteEmployerInterest.sql" />
-    <Build Include="Stored Procedures\DeleteEmployerInterestBeforeDate.sql" />
     <Build Include="Tables\EmployerInterestRoute.sql" />
     <Build Include="Indexes\SPATIAL_EmployerInterestLocation_Location.sql" />
     <Build Include="Tables\EmployerInterestIndustry.sql" />
     <Build Include="Stored Procedures\SearchEmployerInterest.sql" />
     <Build Include="Stored Procedures\GetAllEmployerInterest.sql" />
-    <Build Include="Stored Procedures\DeleteEmployerInterestByUniqueId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

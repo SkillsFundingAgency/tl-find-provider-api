@@ -288,8 +288,6 @@ public static class ModelValidationExtensions
         employerInterest.IndustryId.Should().Be(expected.IndustryId);
         employerInterest.OtherIndustry.Should().Be(expected.OtherIndustry);
 
-        employerInterest.HasMultipleLocations.Should().Be(expected.HasMultipleLocations);
-        employerInterest.LocationCount.Should().Be(expected.LocationCount);
         employerInterest.AdditionalInformation.Should().Be(expected.AdditionalInformation);
 
         return true;

@@ -13,8 +13,6 @@ public class EmployerInterest
     public string Postcode { get; init; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }
-    public bool HasMultipleLocations { get; init; }
-    public int? LocationCount { get; init; }
     public int? IndustryId { get; init; }
     public string OtherIndustry { get; init; }
     public string Email { get; init; }

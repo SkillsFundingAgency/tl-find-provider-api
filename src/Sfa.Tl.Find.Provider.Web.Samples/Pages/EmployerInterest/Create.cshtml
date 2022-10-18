@@ -43,7 +43,7 @@
                         <span class="govuk-error-message"></span>
                         <input class="govuk-input govuk-input--width-20" id="tl-telephone" type="tel">
                     </div>
-                    
+
                     <div class="govuk-form-group">
                         <label class="govuk-label">
                             Website
@@ -58,25 +58,6 @@
                         </label>
                         <span class="govuk-error-message"></span>
                         <input class="govuk-input govuk-input--width-20" id="tl-postcode" type="text">
-                    </div>
-
-                    <div class="govuk-form-group">
-                        <div class="govuk-checkboxes govuk-checkboxes--small">
-                            <div class="govuk-checkboxes__item">
-                                <label class="govuk-label govuk-checkboxes__label" for="tl-multiple-locations">
-                                    Multiple locations? <strong><span id="tl-multiple-locations-value"></span></strong>
-                                </label>
-                                <input class="govuk-checkboxes__input" id="tl-multiple-locations" name="multiple-locations" type="checkbox">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="govuk-form-group tl-hidden" id="tl-location-count-container">
-                        <label class="govuk-label">
-                            Location count
-                        </label>
-                        <span class="govuk-error-message"></span>
-                        <input class="govuk-input govuk-input--width-20" id="tl-location-count" type="number">
                     </div>
 
                     <div class="govuk-form-group">
@@ -190,10 +171,6 @@
                 console.log(JSON.parse(dataItem));
                 populateForm(JSON.parse(dataItem));
             }
-            else {
-                console.log("at start - checked is " + $('#tl-multiple-locations').prop('checked'));
-                displayMultipleLocationsValue($('#tl-multiple-locations').prop('checked'));
-            }
 
             $("#tl-industry").change(function () {
                 console.log("tl-industry changed to " + $("#tl-industry").val());
@@ -205,24 +182,6 @@
                 console.log("tl-industries changed to " + industryId);
                 $("#tl-industry").val(industryId);
             });
-
-            $("#tl-multiple-locations").change(function () {
-                if (this.checked) {
-                    console.log('multiple locations checked');
-                    $("#tl-location-count-container").removeClass("tl-hidden");
-                }
-                else {
-                    console.log('multiple locations unchecked');
-                    $("#tl-location-count-container").addClass("tl-hidden")
-                }
-
-                displayMultipleLocationsValue(this.checked);
-            });
-
-            function displayMultipleLocationsValue(checked) {
-                //Workaround for check mark not appearing
-                $("#tl-multiple-locations-value").text(checked ? "(Yes)" : "(No)");
-            }
 
             $("#tl-employer-interest-form").submit(function () {
                 submitEmployerInterest();
@@ -245,8 +204,6 @@
 
             function clearForm() {
                 $("#tl-employer-interest-form").trigger("reset");
-                console.log("after clear - checked is " + $('#tl-multiple-locations').prop('checked'));
-                displayMultipleLocationsValue($('#tl-multiple-locations').prop('checked'));
             }
 
             function getIndustries() {
@@ -274,9 +231,6 @@
                 $("#tl-telephone").val(data.telephone);
                 $("#tl-website").val(data.website);
                 $("#tl-postcode").val(data.postcode);
-                $('#tl-multiple-locations').prop('checked', data.hasMultipleLocations);
-                displayMultipleLocationsValue(data.hasMultipleLocations);
-                $("#tl-location-count").val(data.locationCount);
                 $("#tl-industry").val(data.industryId !== 0 ? data.industryId : "");
                 $("#tl-additional-information").val(data.additionalInformation);
                 $("input[name=tl-contact-preference][value='" + data.contactPreferenceType + "']").prop("checked", true);
@@ -329,8 +283,6 @@
                     telephone: $("#tl-telephone").val(),
                     website: $("#tl-website").val(),
                     postcode: $("#tl-postcode").val(),
-                    hasMultipleLocations: $('#tl-multiple-locations').prop('checked'),
-                    locationCount: parseInt($("#tl-location-count").val()) || 0,
                     industryId: parseInt($("#tl-industry").val()) || 0,
                     AdditionalInformation: $("#tl-additional-information").val(),
                     contactPreferenceType: parseInt($('input[name=tl-contact-preference]:checked').val())
