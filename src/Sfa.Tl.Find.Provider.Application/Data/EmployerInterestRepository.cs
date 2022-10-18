@@ -110,12 +110,14 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             .AsTableValuedParameter("dbo.IdListTableType")
                 });
 
-                result = await _dbContextWrapper.ExecuteAsync(
+                await _dbContextWrapper.ExecuteAsync(
                     connection,
                     "DeleteEmployerInterest",
                     _dynamicParametersWrapper.DynamicParameters,
                     transaction,
                     commandType: CommandType.StoredProcedure);
+                
+                result = 1;
             }
 
             transaction.Commit();
@@ -167,12 +169,14 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                         .AsTableValuedParameter("dbo.IdListTableType")
                 });
 
-                result = await _dbContextWrapper.ExecuteAsync(
+                await _dbContextWrapper.ExecuteAsync(
                     connection,
                     "DeleteEmployerInterest",
                     _dynamicParametersWrapper.DynamicParameters,
                     transaction,
                     commandType: CommandType.StoredProcedure);
+
+                result = idsToDelete.Count;
             }
 
             transaction.Commit();

@@ -16,4 +16,3 @@ AS
 	DELETE FROM [dbo].[EmployerInterest]
 	WHERE [Id] IN (SELECT [Id] FROM @employerInterestIds);
 
-	RETURN (SELECT COUNT(*) FROM @employerInterestIds)
