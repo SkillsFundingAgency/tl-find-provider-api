@@ -142,7 +142,7 @@ public class ProviderRepository : IProviderRepository
                 }
             }
 
-            var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
             await retryPolicy
                 .ExecuteAsync(async _ =>

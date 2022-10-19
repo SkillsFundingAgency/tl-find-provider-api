@@ -94,10 +94,26 @@ public static class PollyRegistryExtensions
         return policyRegistry;
     }
 
+    public static (IAsyncPolicy, Context) GetDapperRetryPolicy(
+        this IReadOnlyPolicyRegistry<string> policyRegistry,
+        ILogger logger) => 
+        GetRetryPolicy(
+            policyRegistry, 
+            Constants.DapperRetryPolicyName, 
+            logger);
+
+    public static (IAsyncPolicy, Context) GetNotifyRetryPolicy(
+        this IReadOnlyPolicyRegistry<string> policyRegistry,
+        ILogger logger) =>
+        GetRetryPolicy(
+            policyRegistry,  
+            Constants.GovNotifyRetryPolicyName, 
+            logger);
+
     public static (IAsyncPolicy, Context) GetRetryPolicy(
         this IReadOnlyPolicyRegistry<string> policyRegistry,
-        ILogger logger,
-        string policyKey = Constants.DapperRetryPolicyName)
+        string policyKey,
+        ILogger logger)
     {
         var retryPolicy =
             policyRegistry

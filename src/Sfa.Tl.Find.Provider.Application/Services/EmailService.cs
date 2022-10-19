@@ -3,7 +3,6 @@ using Notify.Interfaces;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
@@ -63,9 +62,7 @@ public class EmailService : IEmailService
         {
             try
             {
-                var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(
-                    _logger, 
-                    Constants.GovNotifyRetryPolicyName);
+                var (retryPolicy, context) = _policyRegistry.GetNotifyRetryPolicy(_logger);
 
                 var emailResponse =
                     await retryPolicy
