@@ -202,4 +202,64 @@ public class JsonExtensionsTests
 
         result.Should().Be(expectedResult);
     }
+    
+    [Fact]
+    public void JsonElement_SafeGetBoolean_With_Undefined_Element_Returns_False()
+    {
+        var prop = _jsonDocument.RootElement.TryGetProperty("notAnElement", out var el);
+        prop.Should().BeFalse("precondition - TryGetProperty should have failed");
+
+        var result = el.SafeGetBoolean("myTrueBool");
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void JsonElement_SafeGetDouble_With_Undefined_Element_Returns_Zero()
+    {
+        var prop = _jsonDocument.RootElement.TryGetProperty("notAnElement", out var el);
+        prop.Should().BeFalse("precondition - TryGetProperty should have failed");
+        
+        var result = el.SafeGetDouble("myPositiveDouble");
+        result.Should().Be(0);
+    }
+    
+    [Fact]
+    public void JsonElement_SafeGetDecimal_With_Undefined_Element_Returns_Zero()
+    {
+        var prop = _jsonDocument.RootElement.TryGetProperty("notAnElement", out var el);
+        prop.Should().BeFalse("precondition - TryGetProperty should have failed");
+
+        var result = el.SafeGetDecimal("myPositiveDecimal");
+        result.Should().Be(0);
+    }
+
+    [Fact]
+    public void JsonElement_SafeGetInt32_With_Undefined_Element_Returns_Zero()
+    {
+        var prop = _jsonDocument.RootElement.TryGetProperty("notAnElement", out var el);
+        prop.Should().BeFalse("precondition - TryGetProperty should have failed");
+
+        var result = el.SafeGetInt32("myInt32");
+        result.Should().Be(0);
+    }
+
+    [Fact]
+    public void JsonElement_SafeGetInt64_With_Undefined_Element_Returns_Zero()
+    {
+        var prop = _jsonDocument.RootElement.TryGetProperty("notAnElement", out var el);
+        prop.Should().BeFalse("precondition - TryGetProperty should have failed");
+
+        var result = el.SafeGetInt64("myInt64");
+        result.Should().Be(0);
+    }
+
+    [Fact]
+    public void JsonElement_SafeGetString_With_Undefined_Element_Returns_Null()
+    {
+        var prop = _jsonDocument.RootElement.TryGetProperty("notAnElement", out var el);
+        prop.Should().BeFalse("precondition - TryGetProperty should have failed");
+
+        var result = el.SafeGetString("myString");
+        result.Should().Be(null);
+    }
 }
