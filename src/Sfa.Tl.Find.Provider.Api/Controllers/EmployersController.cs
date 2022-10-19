@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,16 +38,14 @@ public class EmployersController : ControllerBase
     // ReSharper disable once StringLiteralTypo
     [Route("createinterest")]
     public async Task<IActionResult> GetCreateInterest(
-        [FromQuery(Name = "employerInterest")]
-        string employerInterestJson)
+        [FromQuery(Name = "data")]
+        string data)
     {
-        if (employerInterestJson is null)
-        {
-            return BadRequest("missing json data");
-        }
+        var base64EncodedBytes = Convert.FromBase64String(data);
+        var json = Encoding.UTF8.GetString(base64EncodedBytes);
 
         var employerInterest = JsonSerializer.Deserialize<EmployerInterest>(
-            employerInterestJson,
+            json,
             new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
