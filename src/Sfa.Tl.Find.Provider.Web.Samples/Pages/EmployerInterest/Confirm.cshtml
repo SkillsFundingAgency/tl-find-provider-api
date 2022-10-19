@@ -192,18 +192,22 @@
 
             function submitEmployerInterest() {
                 console.log('submitting...');
-                const uri = findProviderApiUri + "employers/createinterest";
-                //const method = "GET";
-                const method = "POST";
-                const dataItem = window.localStorage.getItem(employerInterestDataKey);
-                const data = JSON.parse(dataItem);
+                let uri = findProviderApiUri + "employers/createinterest";
+                const method = "GET";
+                //const method = "POST";
+                let data = window.localStorage.getItem(employerInterestDataKey);                
+                if(method === "GET") {
+                    uri += '?employerInterest=' + encodeURIComponent(data);
+                    data = null;
+                }
+                console.log('calling ' + uri);
                 $.ajax({
                     type: method,
                     url: uri,
-                    data: dataItem,
+                    data: data,
                     contentType: "application/json",
                     beforeSend: function (xhr) {
-                        addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method, dataItem);
+                        addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method, data);
                     }
                 }).done(function (response) {
                     console.log('done!');

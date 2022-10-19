@@ -23,11 +23,11 @@ function addHmacAuthHeader(xhr, uri, appId, apiKey, method, data) {
     }
 
     const dataToHash = appId + method + uri.toLowerCase() + ts + nonce + requestContentBase64String;
-
+    console.log('data to be hashed: ' + dataToHash);
     const hash = CryptoJS.HmacSHA256(dataToHash, apiKey);
     const hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
 
-    xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);
+    xhr.setRequestHeader("Authorization", "amx " + appId + ":" + hashInBase64 + ":" + nonce + ":" + ts);    
 }
 
 function urlDecode(str) {
