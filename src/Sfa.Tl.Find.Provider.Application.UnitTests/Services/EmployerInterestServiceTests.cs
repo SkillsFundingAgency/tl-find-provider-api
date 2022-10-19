@@ -124,6 +124,8 @@ public class EmployerInterestServiceTests
     public async Task CreateEmployerInterest_Calls_EmailService_With_Expected_Tokens()
     {
         var employerInterest = new EmployerInterestBuilder().Build();
+        var routes = new RouteBuilder().BuildList().ToList();
+        var industries = new IndustryBuilder().BuildList().ToList();
 
         var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
 
@@ -141,9 +143,9 @@ public class EmployerInterestServiceTests
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.GetIndustries()
-            .Returns(new IndustryBuilder().BuildList());
+            .Returns(industries);
         providerDataService.GetRoutes()
-            .Returns(new RouteBuilder().BuildList());
+            .Returns(routes);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.Create(Arg.Any<EmployerInterest>())
@@ -164,7 +166,11 @@ public class EmployerInterestServiceTests
         result.Should().Be(uniqueId);
 
         const string expectedContactPreference = "Email";
-        const string expectedIndustry = "IT and Communications";
+        var expectedIndustry = 
+            $"{industries.Single(i => i.Id == 9).Name}";
+
+        var expectedSkillAreas = 
+            $"{routes.Single(r => r.Id == 1).Name}, {routes.Single(r => r.Id == 2).Name}";
 
         var expectedUnsubscribeUri =
             $"{settings.UnsubscribeEmployerUri.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
@@ -178,18 +184,19 @@ public class EmployerInterestServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            {"organisation_name", employerInterest.OrganisationName},
-                            {"contact_name", employerInterest.ContactName},
-                            {"email_address", employerInterest.Email},
-                            {"telephone", employerInterest.Telephone},
-                            {"website", employerInterest.Website },
-                            {"contact_preference", expectedContactPreference},
-                            {"primary_industry", expectedIndustry},
-                            {"placement_area", "(TODO: placement area)"},
-                            {"postcode", employerInterest.Postcode},
-                            {"additional_information", employerInterest.AdditionalInformation},
-                            {"employer_support_site", settings.EmployerSupportSiteUri},
-                            {"employer_unsubscribe_uri", expectedUnsubscribeUri}
+                            { "organisation_name", employerInterest.OrganisationName },
+                            { "contact_name", employerInterest.ContactName },
+                            { "email_address", employerInterest.Email },
+                            { "telephone", employerInterest.Telephone },
+                            { "website", employerInterest.Website  },
+                            { "contact_preference", expectedContactPreference },
+                            { "primary_industry", expectedIndustry },
+                            { "placement_area", expectedSkillAreas },
+                            { "has_multiple_placement_areas", "yes" },
+                            { "postcode", employerInterest.Postcode },
+                            { "additional_information", employerInterest.AdditionalInformation },
+                            { "employer_support_site", settings.EmployerSupportSiteUri },
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
                         })));
     }
 

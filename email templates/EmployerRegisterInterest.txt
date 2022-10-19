@@ -9,7 +9,7 @@ Here are the details you shared:
 * Organisation name: ((organisation_name))
 * Website: ((website))
 * Organisation’s primary industry: ((primary_industry))
-* Industry placement area: ((placement_area))
+* Industry placement area((has_multiple_placement_areas??s)): ((placement_area))
 * Postcode:  ((postcode))
 * Additional information: ((additional_information))
 

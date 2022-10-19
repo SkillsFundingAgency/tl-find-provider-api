@@ -122,7 +122,7 @@ public class EmployerInterestService : IEmployerInterestService
             _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
             "id",
             employerInterest.UniqueId.ToString("D").ToLower()));
-        
+
         var contactPreference = employerInterest.ContactPreferenceType switch
         {
             1 => "Email",
@@ -137,9 +137,13 @@ public class EmployerInterestService : IEmployerInterestService
             .FirstOrDefault(i => i.Id == employerInterest.IndustryId)
             ?.Name ?? employerInterest.OtherIndustry;
 
-        //TODO: Add to employer interest table - this is skill areas/routes
-        var placementArea = "(TODO: placement area)";
-        
+        var skillAreas = employerInterest.SkillAreaIds?.ToList() ?? new List<int>();
+        var placementAreas = string.Join(", ", routes
+            .Where(r => skillAreas.Contains(r.Id))
+            .OrderBy(r => r.Name)
+            .Select(r => r.Name)
+        );
+
         var tokens = new Dictionary<string, string>
         {
             { "contact_name", employerInterest.ContactName },
@@ -149,7 +153,8 @@ public class EmployerInterestService : IEmployerInterestService
             { "organisation_name", employerInterest.OrganisationName },
             { "website", employerInterest.Website ?? "" },
             { "primary_industry", industry },
-            { "placement_area", placementArea },
+            { "placement_area", placementAreas },
+            { "has_multiple_placement_areas", skillAreas.Count > 1 ? "yes" : "no" },
             { "postcode", employerInterest.Postcode },
             { "additional_information", employerInterest.AdditionalInformation },
             { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri },
