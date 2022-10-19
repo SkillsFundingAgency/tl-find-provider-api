@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -27,8 +29,48 @@ public class EmployersController : ControllerBase
     /// <summary>
     /// Creates an Employer Interest record.
     /// </summary>
-    /// <returns>A status result indicating whether the action succeeded.</returns>
+    /// <returns>A status result indicating whether the action succeeded, containing the unique id of the created object.</returns>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // ReSharper disable once StringLiteralTypo
+    [Route("createinterest")]
+    public async Task<IActionResult> GetCreateInterest(
+        [FromQuery(Name = "employerInterest")]
+        string employerInterestJson)
+    {
+        if (employerInterestJson is null)
+        {
+            return BadRequest("missing json data");
+        }
+
+        var employerInterest = JsonSerializer.Deserialize<EmployerInterest>(
+            employerInterestJson,
+            new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+        if (employerInterest is null)
+        {
+            return BadRequest("failed to deserialize the json data");
+        }
+
+        return await CreateInterest(employerInterest);
+        //var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
+
+        //return Ok(new
+        //{
+        //    id = uniqueId
+        //});
+    }
+
+    /// <summary>
+    /// Creates an Employer Interest record.
+    /// </summary>
+    /// <returns>A status result indicating whether the action succeeded, containing the unique id of the created object.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -39,7 +81,7 @@ public class EmployersController : ControllerBase
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug($"{nameof(EmployersController)} {nameof(DeleteInterest)} called.");
+            _logger.LogDebug($"{nameof(EmployersController)} {nameof(CreateInterest)} called.");
         }
 
         //TODO: Validate the model
@@ -65,11 +107,6 @@ public class EmployersController : ControllerBase
         }
 
         var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
-
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug($"{nameof(EmployersController)} {nameof(DeleteInterest)} called.");
-        }
 
         return Ok(new
         {

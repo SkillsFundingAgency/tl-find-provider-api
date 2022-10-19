@@ -10,9 +10,31 @@ public class EmployersControllerIntegrationTests : IClassFixture<TestServerFacto
 {
     private readonly TestServerFactory<FakeStartup> _fixture;
 
-    public EmployersControllerIntegrationTests(TestServerFactory<FakeStartup> fixture) 
+    public EmployersControllerIntegrationTests(TestServerFactory<FakeStartup> fixture)
     {
         _fixture = fixture;
+    }
+
+    [Fact]
+    public async Task CreateEmployerInterest_Get_Returns_Ok_Result_For_Valid_Input()
+    {
+        var testConfigurationSettings = _fixture.GetService<TestConfigurationSettings>();
+
+        var json = PayloadJsonBuilder.BuildCreateEmployerInterestPayload();
+
+        var uri = $"/api/v3/employers/createinterest?employerInterest={WebUtility.UrlEncode(json)}";
+
+        var response = await _fixture
+                    .CreateClient()
+                    .GetAsync(uri);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var jsonDocument = JsonDocument.Parse(responseContent);
+        var id = jsonDocument
+            .RootElement.SafeGetString("id");
+        Guid.TryParse(id, out var uniqueId).Should().BeTrue();
+        uniqueId.Should().Be(testConfigurationSettings.EmployerInterestUniqueId);
     }
 
     [Fact]
@@ -24,8 +46,8 @@ public class EmployersControllerIntegrationTests : IClassFixture<TestServerFacto
         var response = await _fixture
             .CreateClient()
             .PostAsync("/api/v3/employers/createinterest",
-                new StringContent(json, 
-                    Encoding.UTF8, 
+                new StringContent(json,
+                    Encoding.UTF8,
                     "application/json"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -36,7 +58,7 @@ public class EmployersControllerIntegrationTests : IClassFixture<TestServerFacto
         Guid.TryParse(id, out var uniqueId).Should().BeTrue();
         uniqueId.Should().Be(testConfigurationSettings.EmployerInterestUniqueId);
     }
-    
+
     [Fact]
     public async Task DeleteEmployerInterest_Returns_Ok_Result_For_Valid_Input()
     {
