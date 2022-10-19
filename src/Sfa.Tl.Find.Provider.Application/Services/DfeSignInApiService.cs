@@ -1,27 +1,24 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 using System.Net;
 using Sfa.Tl.Find.Provider.Application.Models.Authentication;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class DfeSignInApiService : IDfeSignInApiService
 {
     private readonly HttpClient _httpClient;
     private readonly string _clientId;
-    private readonly ILogger<DfeSignInApiService> _logger;
 
     public DfeSignInApiService(
         HttpClient httpClient,
         IDfeSignInTokenService tokenService,
-        IOptions<DfeSignInSettings> signInOptions,
-        ILogger<DfeSignInApiService> logger)
+        IOptions<DfeSignInSettings> signInOptions)
     {
         if (tokenService is null) throw new ArgumentNullException(nameof(tokenService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (signInOptions is null) throw new ArgumentNullException(nameof(signInOptions));
 
         _clientId = signInOptions.Value?.ClientId;
@@ -58,25 +55,14 @@ public class DfeSignInApiService : IDfeSignInApiService
 
         if (response.IsSuccessStatusCode)
         {
-            var responseContent = await response.Content.ReadAsStringAsync();
+            var jsonDocument = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var ukPrn = jsonDocument
+                    .RootElement
+                    .EnumerateArray()
+                    .FirstOrDefault(e => string.Compare(e.SafeGetString("id"), organisationId, StringComparison.OrdinalIgnoreCase) == 0)
+                    .SafeGetString("ukprn");
 
-            var orgToken = Newtonsoft
-                    .Json
-                    .Linq
-                    .JArray
-                    .Parse(responseContent)
-                    .FirstOrDefault(org =>
-                        org.SelectToken("id")
-                            .ToString()
-                        == organisationId);
-
-            //var o = JsonDocument.Parse(responseContent)
-            //        .RootElement
-            //TODO: There will be an array here - get the one matching our organisationId
-            //        .SafeGetString("id"))
-            //    .Where(orgId => orgId == organisationId).ToList();
-
-            return orgToken?["ukprn"].ToObject<long?>();
+            return long.TryParse(ukPrn, out var ukPrnLong) ? ukPrnLong : null;
         }
 
         return null;
@@ -90,10 +76,6 @@ public class DfeSignInApiService : IDfeSignInApiService
 
         if (response.IsSuccessStatusCode)
         {
-            //userClaims = Newtonsoft.Json.JsonConvert
-            //    .DeserializeObject<DfeUserInfo>(
-            //        await response.Content.ReadAsStringAsync());
-
             userClaims = JsonSerializer
                 .Deserialize<DfeUserInfo>(
                     await response.Content.ReadAsStringAsync(),
