@@ -192,25 +192,29 @@
 
             function submitEmployerInterest() {
                 console.log('submitting...');
-                let uri = findProviderApiUri + "employers/createinterest";
-                const method = "GET";
+                let data = window.localStorage.getItem(employerInterestDataKey);
                 //const method = "POST";
-                let data = window.localStorage.getItem(employerInterestDataKey);                
-                if(method === "GET") {
-                    var wordArray = CryptoJS.enc.Utf8.parse(data);
-                    var base64 = CryptoJS.enc.Base64.stringify(wordArray);
-                    uri += '?data=' + base64;
-                    data = null;
-                }
-                console.log('calling ' + uri);
+                //const let uri = findProviderApiUri + "employers/createinterest";
+                //workaround code using GET
+                const method = "GET";
+                const uri = findProviderApiUri + "employers/createinterest?data=" + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(data));
+
+                console.log("calling " + method + " " + uri);
                 $.ajax({
                     type: method,
                     url: uri,
-                    data: data,
                     contentType: "application/json",
                     beforeSend: function (xhr) {
-                        addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method, data);
+                        addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method);
                     }
+                //$.ajax({
+                //     type: method,
+                //     url: uri,
+                //     data: data,
+                //     contentType: "application/json",
+                //     beforeSend: function (xhr) {
+                //         addHmacAuthHeader(xhr, uri, findProviderAppId, findProviderApiKey, method, data);
+                //     }
                 }).done(function (response) {
                     console.log('done!');
                     console.log(response);
@@ -224,6 +228,6 @@
                 });
             }
         });
-        
+
     </script>
 }
