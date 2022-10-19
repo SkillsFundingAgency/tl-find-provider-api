@@ -109,16 +109,7 @@ try
 
     builder.Services.AddHealthChecks()
         .AddSqlServer(siteConfiguration.SqlConnectionString, 
-            tags: new[] { "database" })
-        //.Services
-        //.AddHealthChecksUI(setup =>
-        //{
-        //    setup.SetEvaluationTimeInSeconds(30);
-        //    setup.MaximumHistoryEntriesPerEndpoint(60);
-        //    setup.AddHealthCheckEndpoint("Find Provider API Health Checks", "/health");
-        //})
-        //.AddInMemoryStorage()
-        ;
+            tags: new[] { "database" });
 
     var app = builder.Build();
 
@@ -142,9 +133,7 @@ try
     app.UseHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = HealthCheckResponseWriter.WriteJsonResponse
-        })
-        //.UseHealthChecksUI()
-        ;
+        });
 
     if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
     {

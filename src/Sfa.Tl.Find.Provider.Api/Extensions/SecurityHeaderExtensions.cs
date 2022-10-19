@@ -53,20 +53,15 @@ public static class SecurityHeaderExtensions
             {
                 builder.AddObjectSrc().None();
                 builder.AddBlockAllMixedContent();
-                builder.AddImgSrc()
-                    .Self()
-                    .Data()
-                    .From("https://avatars3.githubusercontent.com/u/25212406");
+                builder.AddImgSrc().None();
                 builder.AddFormAction().None();
-                builder.AddFontSrc().Self();
-                builder.AddStyleSrc().Self().UnsafeInline();
-                builder.AddScriptSrc().Self().UnsafeInline();
+                builder.AddFontSrc().None();
+                builder.AddStyleSrc().None();
+                builder.AddScriptSrc().None();
                 builder.AddBaseUri().Self();
                 builder.AddFrameAncestors().None();
-                //builder.AddCustomDirective("require-trusted-types-for", "'script'");
-            });
-
-            policy
+                builder.AddCustomDirective("require-trusted-types-for", "'script'");
+            })
                 .AddStrictTransportSecurityMaxAgeIncludeSubDomains(
                     maxAgeInSeconds: 60 * 60 * 24 * 365); //one year in seconds
         }
