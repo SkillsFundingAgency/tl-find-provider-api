@@ -156,4 +156,16 @@ public class StringExtensionsTests
 
         result.Should().Be(expectedResult);
     }
+
+    [Theory(DisplayName = nameof(StringExtensions.ToTrimmedOrNullString) + " Data Tests")]
+    [InlineData(null, null)]
+    [InlineData("", null)]
+    [InlineData(" ", null)]
+    [InlineData("Test", "Test")]
+    [InlineData(" Test ", "Test")]
+    public void String_ToTrimmedOrNullString_Data_Tests(string input, string expectedResult)
+    {
+        var result = input.ToTrimmedOrNullString();
+        result.Should().Be(expectedResult);
+    }
 }

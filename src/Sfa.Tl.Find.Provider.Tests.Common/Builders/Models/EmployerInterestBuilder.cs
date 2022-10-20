@@ -54,6 +54,28 @@ public class EmployerInterestBuilder
     public EmployerInterest Build() =>
         BuildList().First();
 
+    public EmployerInterest BuildWithGeoLocation(GeoLocation geoLocation, bool includeIds = false)
+    {
+        var employerInterest = Build();
+        return new EmployerInterest
+        {
+            Id = includeIds ? employerInterest.Id : default,
+            UniqueId = includeIds ? employerInterest.UniqueId : default,
+            OrganisationName = employerInterest.OrganisationName,
+            ContactName = employerInterest.ContactName,
+            Postcode = geoLocation.Location,
+            Latitude = geoLocation.Latitude,
+            Longitude = geoLocation.Longitude,
+            IndustryId = employerInterest.IndustryId,
+            OtherIndustry = employerInterest.OtherIndustry,
+            Email = employerInterest.Email,
+            Telephone = employerInterest.Telephone,
+            Website = employerInterest.Website,
+            ContactPreferenceType = employerInterest.ContactPreferenceType,
+            AdditionalInformation = employerInterest.AdditionalInformation,
+        };
+    }
+            
     public EmployerInterestBuilder WithUniqueId(Guid uniqueId)
     {
         _uniqueIds.Clear();

@@ -213,6 +213,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             id
         });
 
+        //TODO: add joins or use sproc, and build full result as EmployerInterest
         return (await _dbContextWrapper
                 .QueryAsync<EmployerInterest>(
                     connection,
@@ -221,7 +222,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                     "OrganisationName, " +
                     "ContactName, " +
                     "Postcode, " +
-                    "IndustryId, " +
+                    "OtherIndustry, " +
                     "AdditionalInformation, " +
                     "Email, " +
                     "Telephone, " +

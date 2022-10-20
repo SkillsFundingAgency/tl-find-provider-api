@@ -28,11 +28,13 @@ public class EmployerInterestServiceTests
     [Fact]
     public async Task CreateEmployerInterest_Calls_Repository()
     {
+        var employerInterestBuilder = new EmployerInterestBuilder();
         var employerInterest = new EmployerInterestBuilder().Build();
 
         var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
 
         var geoLocation = GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode);
+        var expectedEmployerInterest = employerInterestBuilder.BuildWithGeoLocation(geoLocation);
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
         postcodeLookupService.GetPostcode(
@@ -55,29 +57,13 @@ public class EmployerInterestServiceTests
         await employerInterestRepository
             .Received(1)
             .Create(Arg.Any<EmployerInterest>());
-
-        var expectedEmployerInterest = new EmployerInterest
-        {
-            OrganisationName = employerInterest.OrganisationName,
-            ContactName = employerInterest.ContactName,
-            Postcode = geoLocation.Location,
-            Latitude = geoLocation.Latitude,
-            Longitude = geoLocation.Longitude,
-            IndustryId = employerInterest.IndustryId,
-            OtherIndustry = employerInterest.OtherIndustry,
-            Email = employerInterest.Email,
-            Telephone = employerInterest.Telephone,
-            Website = employerInterest.Website,
-            ContactPreferenceType = employerInterest.ContactPreferenceType,
-            AdditionalInformation = employerInterest.AdditionalInformation,
-        };
-
+        
         await employerInterestRepository
             .Received(1)
             .Create(Arg.Is<EmployerInterest>(e =>
                 e.Validate(expectedEmployerInterest, false, false)));
     }
-
+    
     [Fact]
     public async Task CreateEmployerInterest_Calls_EmailService()
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -44,34 +45,35 @@ public class EmployerInterestService : IEmployerInterestService
 
     public int RetentionDays => _employerInterestSettings.RetentionDays;
 
+
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
 
         //Create a copy - will find a cleaner way to do this later
-        employerInterest = new EmployerInterest
+        var cleanEmployerInterest = new EmployerInterest
         {
-            OrganisationName = employerInterest.OrganisationName,
-            ContactName = employerInterest.ContactName,
+            OrganisationName = employerInterest.OrganisationName?.Trim(),
+            ContactName = employerInterest.ContactName?.Trim(),
             Postcode = geoLocation.Location,
             Latitude = geoLocation.Latitude,
             Longitude = geoLocation.Longitude,
             IndustryId = employerInterest.IndustryId,
-            OtherIndustry = employerInterest.OtherIndustry,
-            AdditionalInformation = employerInterest.AdditionalInformation,
-            Email = employerInterest.Email,
-            Telephone = employerInterest.Telephone,
-            Website = employerInterest.Website,
+            OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString(),
+            AdditionalInformation = employerInterest.AdditionalInformation?.ToTrimmedOrNullString(),
+            Email = employerInterest.Email?.ToTrimmedOrNullString(),
+            Telephone = employerInterest.Telephone?.ToTrimmedOrNullString(),
+            Website = employerInterest.Website?.ToTrimmedOrNullString(),
             ContactPreferenceType = employerInterest.ContactPreferenceType,
             SkillAreaIds = employerInterest.SkillAreaIds
         };
 
-        var (_, uniqueId) = await _employerInterestRepository.Create(employerInterest);
+        var (_, uniqueId) = await _employerInterestRepository.Create(cleanEmployerInterest);
 
         if (uniqueId != Guid.Empty)
         {
-            employerInterest.UniqueId = uniqueId;
-            await SendEmployerRegisterInterestEmail(employerInterest);
+            cleanEmployerInterest.UniqueId = uniqueId;
+            await SendEmployerRegisterInterestEmail(cleanEmployerInterest);
         }
 
         return uniqueId;

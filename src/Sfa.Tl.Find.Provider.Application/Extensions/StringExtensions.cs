@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Sfa.Tl.Find.Provider.Application.Models;
 
@@ -119,5 +120,13 @@ public static class StringExtensions
         result = Regex.Replace(result, @"(['’])S(\s|$)", "$1s$2");
 
         return result.Trim();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ToTrimmedOrNullString(this string input)
+    {
+        return input is null || input.Length == 0 || string.IsNullOrWhiteSpace(input) 
+            ? null 
+            : input.Trim();
     }
 }
