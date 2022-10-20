@@ -1,0 +1,23 @@
+﻿@using Sfa.Tl.Find.Provider.Web.Authorization
+
+<div class="govuk-width-container">
+    <div >
+        @if (Context.User.Identity!.IsAuthenticated)
+        {
+            <span>@Context.User.GetClaim(CustomClaimTypes.OrganisationName)</span>
+            var ukPrn = Context.User.GetClaim(CustomClaimTypes.UkPrn);
+            if (!string.IsNullOrEmpty(ukPrn))
+            {
+                <span>[UKPRN:@ukPrn]</span>
+            }
+
+            @*This bit isn't displaying - signout button is also shown in top *@
+            @*<button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>*@
+            <ul id="navigation" class="govuk-header__navigation tl-float-right">
+                <li class="govuk-header__navigation-item">
+                    <a class="govuk-header__link" asp-controller="Account" asp-action="SignOut">Sign out</a>
+                </li>
+            </ul>
+        }
+    </div>
+</div>
