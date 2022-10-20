@@ -12,6 +12,7 @@ public class DashboardModel : PageModel
 
     public string? OrganisationName { get; private set; }
     public string? UkPrn { get; private set; }
+    public string? Urn { get; private set; }
 
     public DashboardModel(
         ILogger<DashboardModel> logger)
@@ -27,6 +28,7 @@ public class DashboardModel : PageModel
         }
 
         UkPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
+        Urn = HttpContext.User.GetClaim(CustomClaimTypes.Urn);
         OrganisationName = HttpContext.User.GetClaim(CustomClaimTypes.OrganisationName);
 
         return Page();
