@@ -27,38 +27,6 @@ public class DfeSignInApiServiceTests
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
 
-    //[Fact]
-    //public async Task GetDfeSignInUserInfo_Returns_Expected_Value()
-    //{
-    //    var serviceBuilder = new DfeSignInApiServiceBuilder();
-    //    var settings = new SettingsBuilder().BuildDfeSignInSettings();
-
-    //    var responses = new Dictionary<string, string>
-    //    {
-    //        {
-    //            serviceBuilder.BuildGetOrganisationsUriFragment(TestUserId),
-    //            DfeSignInApiJsonBuilder.BuildOrganisationsResponse()
-    //        },
-    //        {
-    //            //$"/services/{settings.ClientId}/organisations/{TestOrganisationId}/users/{TestUserId}",
-    //            serviceBuilder.BuildGetUserUriFragment(TestOrganisationId, TestUserId, settings),
-    //            DfeSignInApiJsonBuilder.BuildUserResponse()
-    //        }
-    //    };
-    //    var service = serviceBuilder.Build(responses, settings);
-
-    //    var result = await service
-    //        .GetDfeSignInUserInfo(TestOrganisationId, TestUserId);
-
-    //    result.Should().NotBeNull();
-    //    result.UserId.Should().Be(TestUserId);
-    //    result.UkPrn.Should().Be(TestUkPrn);
-    //    result.HasAccessToService = true;
-    //    //result.Urn.Should().Be(TestUrn);
-    //    result.Roles.Should().NotBeNullOrEmpty();
-    //    result.Roles.Count().Should().Be(1);
-    //    result.Roles.First().Name.Should().Be(TestRoleName);
-    //}
     [Fact]
     public async Task GetDfeSignInInfo_Returns_Expected_Value()
     {

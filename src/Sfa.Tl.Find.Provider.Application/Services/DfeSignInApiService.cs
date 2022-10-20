@@ -30,30 +30,7 @@ public class DfeSignInApiService : IDfeSignInApiService
                 "Bearer",
                 tokenService.GetApiToken());
     }
-
-    //public async Task<DfeUserInfo> GetDfeSignInUserInfo(string organisationId, string userId)
-    //{
-    //    var organisationInfoTask = GetOrganisationInfo(organisationId, userId);
-    //    var userInfoTask = GetUserInfo(organisationId, userId);
-
-    //    await Task.WhenAll(organisationInfoTask, userInfoTask);
-
-    //    var user = userInfoTask.Result;
-    //    var organisation = organisationInfoTask.Result;
-    //    var ukPrn = organisation.UkPrn;
-
-    //    if (ukPrn.HasValue)
-    //    {
-    //        user.UkPrn = ukPrn;
-    //    }
-    //    else
-    //    {
-    //        user.HasAccessToService = false;
-    //    }
-
-    //    //TODO: return (user, organisation)
-    //    return user;
-    //}
+    
     public async Task<(DfeOrganisationInfo OrganisationInfo, DfeUserInfo UserInfo)> GetDfeSignInInfo(string organisationId, string userId)
     {
         var organisationInfoTask = GetOrganisationInfo(organisationId, userId);

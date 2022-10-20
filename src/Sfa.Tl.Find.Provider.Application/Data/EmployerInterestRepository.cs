@@ -213,7 +213,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             id
         });
 
-        //TODO: add joins or use sproc, and build full result as EmployerInterest
+        //TODO: add joins or use stored proc, and build full result as EmployerInterest
         return (await _dbContextWrapper
                 .QueryAsync<EmployerInterest>(
                     connection,

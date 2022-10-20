@@ -25,7 +25,6 @@ public class EmployersControllerIntegrationTests : IClassFixture<TestServerFacto
         var bytes = Encoding.UTF8.GetBytes(json);
         var base64String = Convert.ToBase64String(bytes);
 
-        //var uri = $"/api/v3/employers/createinterest?employerInterest={WebUtility.UrlEncode(json)}";
         // ReSharper disable once StringLiteralTypo
         var uri = $"/api/v3/employers/createinterest?data={base64String}";
 
