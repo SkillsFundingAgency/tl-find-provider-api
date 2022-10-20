@@ -156,12 +156,7 @@ public static class ProviderAuthenticationExtensions
                         var userId = ctx.Principal.FindFirst("sub").Value;
 
                         var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
-                        var userInfo = await dfeSignInApiClient.GetDfeSignInUserInfo(organisationId, userId);
-                        //TODO: If we want this name, it should come from the GetDfeSignInUserInfo above
-                        var organisationName = JsonDocument
-                            .Parse(organisation.Value)
-                            .RootElement
-                            .SafeGetString("name");
+                        var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
 
                         //TODO: probably don't need this check - we have a policy to look after everything
                         if (userInfo.HasAccessToService)
@@ -170,8 +165,9 @@ public static class ProviderAuthenticationExtensions
                             {
                                 new(CustomClaimTypes.UserId, userId),
                                 new(CustomClaimTypes.OrganisationId, organisationId),
-                                new(CustomClaimTypes.OrganisationName, organisationName),
-                                new(CustomClaimTypes.UkPrn, userInfo.UkPrn.HasValue ? userInfo.UkPrn.Value.ToString() : string.Empty),
+                                new(CustomClaimTypes.OrganisationName, organisationInfo != null ? organisationInfo.Name : string.Empty),
+                                new(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn != null ? organisationInfo.UkPrn.Value.ToString() : string.Empty),
+                                new(CustomClaimTypes.Urn, organisationInfo?.Urn != null ? organisationInfo.Urn.Value.ToString() : string.Empty),
                                 new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name").Value),
                                 new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name").Value),
                                 new(ClaimTypes.Email, ctx.Principal.FindFirst("email").Value),

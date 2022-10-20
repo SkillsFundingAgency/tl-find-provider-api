@@ -4,5 +4,5 @@ namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface IDfeSignInApiService
 {
-    Task<DfeUserInfo> GetDfeSignInUserInfo(string organisationId, string userId);
+    Task<(DfeOrganisationInfo OrganisationInfo, DfeUserInfo UserInfo)> GetDfeSignInInfo(string organisationId, string userId);
 }

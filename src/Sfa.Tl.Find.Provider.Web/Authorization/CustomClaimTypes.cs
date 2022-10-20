@@ -10,6 +10,8 @@ public static class CustomClaimTypes
 
     public const string UkPrn = "http://schemas.microsoft.com/ws/2008/06/identity/claims/ukprn"; 
 
+    public const string Urn = "http://schemas.microsoft.com/ws/2008/06/identity/claims/urn"; 
+
     public const string OrganisationId = "http://schemas.microsoft.com/ws/2008/06/identity/claims/organisationid";
     
     public const string OrganisationName = "http://schemas.microsoft.com/ws/2008/06/identity/claims/organisationname";

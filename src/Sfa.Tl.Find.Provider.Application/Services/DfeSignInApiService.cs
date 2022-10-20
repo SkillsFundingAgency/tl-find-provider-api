@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class DfeSignInApiService : IDfeSignInApiService
@@ -30,25 +31,48 @@ public class DfeSignInApiService : IDfeSignInApiService
                 tokenService.GetApiToken());
     }
 
-    public async Task<DfeUserInfo> GetDfeSignInUserInfo(string organisationId, string userId)
+    //public async Task<DfeUserInfo> GetDfeSignInUserInfo(string organisationId, string userId)
+    //{
+    //    var organisationInfoTask = GetOrganisationInfo(organisationId, userId);
+    //    var userInfoTask = GetUserInfo(organisationId, userId);
+
+    //    await Task.WhenAll(organisationInfoTask, userInfoTask);
+
+    //    var user = userInfoTask.Result;
+    //    var organisation = organisationInfoTask.Result;
+    //    var ukPrn = organisation.UkPrn;
+
+    //    if (ukPrn.HasValue)
+    //    {
+    //        user.UkPrn = ukPrn;
+    //    }
+    //    else
+    //    {
+    //        user.HasAccessToService = false;
+    //    }
+
+    //    //TODO: return (user, organisation)
+    //    return user;
+    //}
+    public async Task<(DfeOrganisationInfo OrganisationInfo, DfeUserInfo UserInfo)> GetDfeSignInInfo(string organisationId, string userId)
     {
-        var organisationUkPrn = GetOrganisationUkprn(organisationId, userId);
-        var userInfo = GetUserInfo(organisationId, userId);
+        var organisationInfoTask = GetOrganisationInfo(organisationId, userId);
+        var userInfoTask = GetUserInfo(organisationId, userId);
 
-        await Task.WhenAll(organisationUkPrn, userInfo);
+        await Task.WhenAll(organisationInfoTask, userInfoTask);
 
-        var userInfoResult = userInfo.Result;
-        var ukPrn = organisationUkPrn.Result;
+        var user = userInfoTask.Result;
+        var organisation = organisationInfoTask.Result;
 
-        if (ukPrn.HasValue)
-            userInfoResult.UkPrn = ukPrn;
-        else
-            userInfoResult.HasAccessToService = false;
+        if (organisation?.UkPrn == null)
+        {
+            user.HasAccessToService = false;
+        }
 
-        return userInfoResult;
+        return (organisation, user);
     }
 
-    private async Task<long?> GetOrganisationUkprn(string organisationId, string userId)
+    private async Task<DfeOrganisationInfo> GetOrganisationInfo(string organisationId, string userId)
     {
         var requestUri = $"/users/{userId}/organisations";
         var response = await _httpClient.GetAsync(requestUri);
@@ -56,13 +80,21 @@ public class DfeSignInApiService : IDfeSignInApiService
         if (response.IsSuccessStatusCode)
         {
             var jsonDocument = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-            var ukPrn = jsonDocument
-                    .RootElement
-                    .EnumerateArray()
-                    .FirstOrDefault(e => string.Compare(e.SafeGetString("id"), organisationId, StringComparison.OrdinalIgnoreCase) == 0)
-                    .SafeGetString("ukprn");
+            var organisation = jsonDocument
+                .RootElement
+                .EnumerateArray()
+                .Where(e =>
+                    string.Compare(e.SafeGetString("id"), organisationId, StringComparison.OrdinalIgnoreCase) == 0)
+                .Select(o => new DfeOrganisationInfo
+                {
+                    Id = Guid.Parse(o.SafeGetString("id")),
+                    Name = o.SafeGetString("name").ParseTLevelDefinitionName(Constants.QualificationNameMaxLength),
+                    UkPrn = long.TryParse(o.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
+                    Urn = long.TryParse(o.SafeGetString("urn"), out var urnLong) ? urnLong : null
+                })
+                .FirstOrDefault();
 
-            return long.TryParse(ukPrn, out var ukPrnLong) ? ukPrnLong : null;
+            return organisation;
         }
 
         return null;
