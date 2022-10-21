@@ -233,6 +233,17 @@ public class ProviderDataService : IProviderDataService
         return stream.ToArray();
     }
 
+    public async Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(long ukPrn)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting location postcodes for UKPRN {ukPrn}", ukPrn);
+        }
+
+        return await _providerRepository
+            .GetLocationPostcodes(ukPrn, _mergeAdditionalProviderData);
+    }
+
     public async Task ImportProviderContacts(Stream stream)
     {
         using var reader = new StreamReader(stream);
@@ -286,7 +297,7 @@ public class ProviderDataService : IProviderDataService
 
         _logger.LogInformation("Loaded {count} providers from stream.", count);
     }
-    
+
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
     {
         try

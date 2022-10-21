@@ -1,5 +1,6 @@
 ﻿@page
-@using Sfa.Tl.Find.Provider.Application.Models
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Sfa.Tl.Find.Provider.Application.Extensions
 @model Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest.IndexModel
 @{
     ViewData["Title"] = "Employer Interest";
@@ -10,12 +11,21 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+        
+        <h3>Postcodes</h3>
+        <ul>
+            @foreach (var location in Model.ProviderLocations)
+            {
+                <li>@location.Postcode</li>
+            }
+        </ul>
 
         <table class="govuk-table">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th class="govuk-table__header" scope="col">Organisation</th>
                     <th class="govuk-table__header" scope="col">Industry</th>
+                    <th class="govuk-table__header" scope="col">Skill Areas</th>
                     <th class="govuk-table__header" scope="col">Distance</th>
                     <th class="govuk-table__header" scope="col">Data available until</th>
                 </tr>
@@ -27,26 +37,20 @@
                     {
                         var availabilityDate =
                         employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
-                        var employerInterest2 = new EmployerInterestSummary
-                        {
-                            Distance = 1.002,
-                        };
-                        //TODO: Make this an extension
-                        var formattedDistance = default(string);
-                        if (employerInterest2.Distance.HasValue)
-                        {
-                            var roundedDistance = Math.Round(employerInterest2.Distance.Value, 1);
-                            if (Math.Abs(roundedDistance) >= 0.01)
-                            {
-                                formattedDistance = $"{employerInterest2.Distance:#.0}";
-                                formattedDistance += formattedDistance == "1.0" ? " mile" : " miles";
-                            }
-                        }
-
+                        
                         <tr class="govuk-table__row">
                             <th class="govuk-table__header" scope="row">@employerInterest.OrganisationName</th>
                             <td class="govuk-table__cell">@employerInterest.Industry</td>
-                            <td class="govuk-table__cell">@formattedDistance</td>
+                            <td class="govuk-table__cell">@employerInterest.Industry</td>
+                            <td class="govuk-table__cell">
+                                @if (employerInterest.SkillAreas is not null)
+                                {
+                                    @foreach (var skillArea in employerInterest.SkillAreas)
+                                    {
+                                        <p>skillArea</p>
+                                    }
+                                }
+                            </td>
                             <td class="govuk-table__cell">
                                 @($"{availabilityDate:d MMM yyyy}")
                             </td>

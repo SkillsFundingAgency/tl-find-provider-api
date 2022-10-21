@@ -16,20 +16,6 @@ public static class StringExtensions
             @"((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))))$"
         ;
 
-    public static string FormatPostcodeForUri(this string postcode)
-    {
-        return Uri.EscapeDataString(postcode.Trim().ToUpper());
-    }
-
-    public static string FormatTownName(this Town town)
-    {
-        if (!string.IsNullOrWhiteSpace(town.County))
-            return $"{town.Name}, {town.County}";
-        else if (!string.IsNullOrWhiteSpace(town.LocalAuthority))
-            return $"{town.Name}, {town.LocalAuthority}";
-        return $"{town.Name}";
-    }
-
     public static bool IsPostcode(this string postcode)
     {
         return CheckPostcode(postcode, PostcodeRegex);

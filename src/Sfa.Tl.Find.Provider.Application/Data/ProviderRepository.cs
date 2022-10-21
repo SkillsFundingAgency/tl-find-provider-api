@@ -109,6 +109,26 @@ public class ProviderRepository : IProviderRepository
                 commandType: CommandType.StoredProcedure);
     }
 
+    public async Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(
+        long ukPrn,
+        bool includeAdditionalData)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            ukPrn,
+            includeAdditionalData
+        });
+
+        return await _dbContextWrapper
+            .QueryAsync<LocationPostcode>(
+                connection,
+                "GetProviderLocations",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+    }
+
     public async Task<bool> HasAny(bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -307,7 +327,6 @@ public class ProviderRepository : IProviderRepository
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
 
-        //@
         var resultCount = 0;
         foreach (var contact in contacts)
         {

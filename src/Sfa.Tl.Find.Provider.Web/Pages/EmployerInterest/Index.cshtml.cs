@@ -11,7 +11,8 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 public class IndexModel : PageModel
 {
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
-    //public IEnumerable<Application.Models.ProviderLocation>? ProviderLocations { get; private set; }
+
+    public IEnumerable<LocationPostcode>? ProviderLocations { get; private set; }
 
     public int EmployerInterestRetentionDays =>
         _employerInterestService.RetentionDays;
@@ -25,21 +26,21 @@ public class IndexModel : PageModel
         IProviderDataService providerDataService,
         ILogger<IndexModel> logger)
     {
-        _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
+        _employerInterestService =
+            employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task OnGet()
     {
-        var ukPrn = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
-        if (ukPrn is null)
+        var ukPrnClaim = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
+        if (ukPrnClaim is not null &&
+            long.TryParse(ukPrnClaim, out var ukPrn))
         {
-            //Something went wrong
+            ProviderLocations = await _providerDataService.GetLocationPostcodes(ukPrn);
+            //Need to pass the currently selected location into the find, so it can get by distance
+            EmployerInterestList = await _employerInterestService.FindEmployerInterest();
         }
-        //call provider data to get details - location postcodes and lat/long
-        //var ProviderLocations = await _providerDataService.GetLocations();
-        //Need to pass the currently selected location into the find, so it can get by distance
-        EmployerInterestList = await _employerInterestService.FindEmployerInterest();
     }
 }

@@ -8,6 +8,7 @@ public class EmployerInterestSummary
     public int Id { get; init; }
     public string OrganisationName { get; init; }
     public string Industry { get; init; }
+    public IEnumerable<string> SkillAreas { get; init; }
     public double? Distance { get; init; }
     public DateTime CreatedOn { get; init; }
     public DateTime? ModifiedOn { get; init; }

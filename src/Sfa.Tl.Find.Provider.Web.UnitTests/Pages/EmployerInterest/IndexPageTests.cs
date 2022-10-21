@@ -15,7 +15,7 @@ public class IndexPageTests
     }
 
     [Fact]
-    public async Task IndexModel_OnGet_Sets_Expected_Results()
+    public async Task IndexModel_OnGet_Sets_Expected_EmployerInterest_List()
     {
         var employerInterestSummary = new EmployerInterestSummaryBuilder()
             .BuildList()
@@ -34,5 +34,28 @@ public class IndexPageTests
         indexModel.EmployerInterestList
             .Should()
             .BeEquivalentTo(employerInterestSummary);
+    }
+
+    [Fact]
+    public async Task IndexModel_OnGet_Sets_Expected_Provider_Locations_List()
+    {
+        var locationPostcodes = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var ukPrn = long.Parse(PageContextBuilder.DefaultUkPrn);
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetLocationPostcodes(ukPrn)
+            .Returns(locationPostcodes);
+
+        var indexModel = new EmployerInterestIndexModelBuilder()
+            .Build(providerDataService: providerDataService);
+
+        await indexModel.OnGet();
+
+        indexModel.ProviderLocations
+            .Should()
+            .BeEquivalentTo(locationPostcodes);
     }
 }

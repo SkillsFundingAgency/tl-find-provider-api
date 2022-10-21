@@ -5,35 +5,6 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;
 
 public class StringExtensionsTests
 {
-    [Theory(DisplayName = nameof(StringExtensions.FormatPostcodeForUri) + " Data Tests")]
-    [InlineData("CV1 2WT", "CV1%202WT")]
-    [InlineData("cv1 2wt", "CV1%202WT")]
-    [InlineData(" CV1 2WT ", "CV1%202WT")]
-    public void String_FormatPostcodeForUri_Data_Tests(string input, string expectedResult)
-    {
-        var result = input.FormatPostcodeForUri();
-        result.Should().Be(expectedResult);
-    }
-
-    [Theory(DisplayName = nameof(StringExtensions.FormatTownName) + " Data Tests")]
-    [InlineData("Oxford", "Oxfordshire", "Oxfordshire", "Oxford, Oxfordshire")]
-    [InlineData("Bristol", null, "Gloucestershire", "Bristol, Gloucestershire")]
-    [InlineData("Coventry", "West Midlands", "West Midlands", "Coventry, West Midlands")]
-    [InlineData("Coventry", "", "", "Coventry")]
-    [InlineData("Some Town (Somewhere)", "Some County", null, "Some Town (Somewhere), Some County")]
-    public void String_FormatTownName_Data_Tests(string name, string county, string localAuthority, string expectedResult)
-    {
-        var town = new Town
-        {
-            Name = name,
-            County = county,
-            LocalAuthority = localAuthority
-        };
-
-        var result = town.FormatTownName();
-        result.Should().Be(expectedResult);
-    }
-
     [Theory(DisplayName = nameof(StringExtensions.IsPostcode) + " Data Tests")]
     [InlineData("CV1 2WT", true)]
     [InlineData("cv1 2wt", true)]

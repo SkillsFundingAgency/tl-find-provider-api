@@ -380,8 +380,8 @@ public class ProviderDataServiceTests
                     // ReSharper disable CompareOfFloatsByEqualityOperator
                     p.Latitude == fromGeoLocation.Latitude &&
                     p.Longitude == fromGeoLocation.Longitude),
-                    // ReSharper restore CompareOfFloatsByEqualityOperator
-                    Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
+                // ReSharper restore CompareOfFloatsByEqualityOperator
+                Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
                 Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
                 Arg.Is<int>(p => p == TestPage),
                 Arg.Is<int>(s => s == TestPageSize),
@@ -604,7 +604,8 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task FindProviders_Returns_Expected_Error_Details_For_Valid_Town_With_Dot_And_Partial_Search_Term_Lower_Case()
+    public async Task
+        FindProviders_Returns_Expected_Error_Details_For_Valid_Town_With_Dot_And_Partial_Search_Term_Lower_Case()
     {
         const string searchTerms = "st. agnes";
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
@@ -738,6 +739,30 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task GetLocationPostcodes_Returns_Expected_List()
+    {
+        const long ukPrn = 12345678;
+
+        var locationPostcodes = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerRepository = Substitute.For<IProviderRepository>();
+        providerRepository.GetLocationPostcodes(ukPrn, Arg.Any<bool>())
+            .Returns(locationPostcodes);
+
+        var service = new ProviderDataServiceBuilder().Build(
+            providerRepository: providerRepository);
+
+        var response = (await service
+            .GetLocationPostcodes(ukPrn))
+            ?.ToList();
+
+        response.Should().NotBeNull();
+        response.Should().BeEquivalentTo(locationPostcodes);
+    }
+
+    [Fact]
     public async Task HasQualifications_Calls_Repository()
     {
         var qualificationRepository = Substitute.For<IQualificationRepository>();
@@ -774,7 +799,7 @@ public class ProviderDataServiceTests
             .Received(1)
             .HasAny();
     }
-    
+
     [Fact]
     public async Task ImportProviderData_Calls_Repository_To_Save_Data()
     {
@@ -898,7 +923,7 @@ public class ProviderDataServiceTests
             .Build(cache: cache);
 
         await service.ImportProviderData(stream, true);
-        
+
         cache
             .Received(1)
             .Remove(CacheKeys.QualificationsKey);

@@ -116,6 +116,7 @@
     <Build Include="Tables\EmployerInterestIndustry.sql" />
     <Build Include="Stored Procedures\SearchEmployerInterest.sql" />
     <Build Include="Stored Procedures\GetAllEmployerInterest.sql" />
+    <Build Include="Stored Procedures\GetProviderLocations.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

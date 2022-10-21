@@ -70,7 +70,6 @@ public class ProviderRepositoryBuilder
                         var r = routesPart[callIndex];
                         var q = qualificationsPart[callIndex];
                         x.Invoke(p, d, r, q);
-
                         callIndex++;
                     }),
                 Arg.Any<object>(),
@@ -133,7 +132,6 @@ public class ProviderRepositoryBuilder
                         var r = routesPart[callIndex];
                         var q = qualificationsPart[callIndex];
                         x.Invoke(p, l, d, r, q);
-
                         callIndex++;
                     }),
                 Arg.Any<object>(),
