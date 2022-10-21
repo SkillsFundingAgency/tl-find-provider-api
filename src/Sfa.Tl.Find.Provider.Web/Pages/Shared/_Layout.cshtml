@@ -5,30 +5,29 @@
 
 <body class="govuk-template__body ">
     <script>
-    document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
-
+        document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
     </script>
-        <partial name="_CookieBanner" />
+    <partial name="_CookieBanner" />
 
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 
     <partial name="_Header" />
     <partial name="_Header_Nav" />
 
-    <div class="govuk-width-container ">
-        <main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-width-container">
+        <main class="govuk-main-wrapper" id="main-content" role="main">
             @RenderBody()
         </main>
     </div>
     <partial name="_Footer" />
-   
+
     <script src="~/js/jquery.min.js"></script>
     <script src="~/js/tlevels.min.js" asp-append-version="true"></script>
     <script src="~/js/all.js"></script>
 
-  <script>
-    window.GOVUKFrontend.initAll()
-  </script>
+    <script>
+        window.GOVUKFrontend.initAll()
+    </script>
 
 </body>
 

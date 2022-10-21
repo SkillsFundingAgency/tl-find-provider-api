@@ -21,10 +21,10 @@ public class PageExtensionsTests
     [InlineData(false, "", "Error: " + DefaultServiceName + " - GOV.UK")]
     [InlineData(false, DefaultServiceName + "", "Error: " + DefaultServiceName + " - GOV.UK")]
     [InlineData(false, "Page Title", "Error: Page Title - " + DefaultServiceName + " - GOV.UK")]
-    public void DataTests(bool isValid, string title, string result)
+    public void DataTests(bool isValid, string title, string expectedResult)
     {
         var generatedTitle = PageExtensions.GenerateTitle(title, isValid);
-        generatedTitle.Should().Be(result);
+        generatedTitle.Should().Be(expectedResult);
     }
 
     [Theory(DisplayName = "PageExtensions Data Tests")]
@@ -32,10 +32,10 @@ public class PageExtensionsTests
     [InlineData("", DefaultServiceName + " - GOV.UK")]
     [InlineData(DefaultServiceName + "", DefaultServiceName + " - GOV.UK")]
     [InlineData("Page Title", "Page Title - " + DefaultServiceName + " - GOV.UK")]
-    public void DataTestsWithDefaultValue(string title, string result)
+    public void DataTestsWithDefaultValue(string title, string expectedResult)
     {
         var generatedTitle = PageExtensions.GenerateTitle(title);
 
-        generatedTitle.Should().Be(result);
+        generatedTitle.Should().Be(expectedResult);
     }
 }

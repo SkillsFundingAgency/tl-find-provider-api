@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Web.Pages;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
 public class IndexPageTests
@@ -22,10 +22,9 @@ public class IndexPageTests
 
         var result = indexModel.OnGet();
 
-        result.Should().NotBeNull();
-
-        var pageResult = result as PageResult;
-        pageResult.Should().NotBeNull();
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Start");
         indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeFalse();
     }
 
@@ -35,11 +34,10 @@ public class IndexPageTests
         var indexModel = new IndexModelBuilder().Build();
 
         var result = indexModel.OnGet();
-        
-        result.Should().NotBeNull();
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
         indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeTrue();
     }
 }

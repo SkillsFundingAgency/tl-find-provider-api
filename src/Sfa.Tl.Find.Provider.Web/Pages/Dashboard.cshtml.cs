@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
+[Authorize]
 public class DashboardModel : PageModel
 {
     private readonly ILogger<DashboardModel> _logger;

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Controllers;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
@@ -40,7 +41,7 @@ public class AccountControllerTests
             .ChallengeAsync(controller.ControllerContext.HttpContext,
                 null,
                 Arg.Is<AuthenticationProperties>(
-                    p => p.RedirectUri == "/dashboard"));
+                    p => p.RedirectUri == ProviderAuthenticationExtensions.AuthenticatedUserStartPage));
 
         controller.ControllerContext.HttpContext
             .Response
@@ -86,7 +87,7 @@ public class AccountControllerTests
             .Response
             .Headers["Location"].ToString()
             .Should()
-            .Be("/dashboard");
+            .Be(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
     }
 
     [Fact]
@@ -98,7 +99,7 @@ public class AccountControllerTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/dashboard");
+        redirectResult!.PageName.Should().Be(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
     }
 
     [Fact]

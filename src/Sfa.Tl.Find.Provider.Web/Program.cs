@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -6,6 +7,7 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
+using Sfa.Tl.Find.Provider.Web.ParameterTransformers;
 using Sfa.Tl.Find.Provider.Web.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,11 +40,28 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 builder.Services.AddResponseCaching();
 
+builder.Services.Configure<RouteOptions>(option =>
+{
+    //https://bytes.com/topic/asp-net/insights/973888-how-make-url-lowercase-asp-net-razor-pages
+    //https://stackoverflow.com/questions/36358751/how-do-you-enforce-lowercase-routing-in-asp-net-core
+    //option.LowercaseUrls = true;
+    //option.LowercaseQueryStrings = true;
+});
+
 builder.Services.AddRazorPages(options =>
 {
+    options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
+    //options.Conventions.AddPageRoute("/", "/start");
+    //options.Conventions.AddPageRoute("/Index", "/start");
+    //options.Conventions.AddPageRoute("/", "/start");
+    //options.Conventions.AddPageRoute("/Start", "");
+    //options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
+    //options.Conventions.AddPageRoute("/EmployerDetails", "/employer-details");
     //options.Conventions.AddPageRoute("/SignedOut", "/signout/complete");
+
     options.Conventions.AllowAnonymousToPage("/Index");
-    options.Conventions.AuthorizePage("/Dashboard");
+    options.Conventions.AllowAnonymousToPage("/Start");
+    //options.Conventions.AuthorizePage("/Dashboard");
     //options.Conventions.AuthorizeFolder("/Error");
 });
 builder.Services.AddControllers();

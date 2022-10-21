@@ -1,18 +1,14 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Start";
+    ViewData["Title"] = "Home";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
-
-        <h2 class="govuk-heading-s govuk-!-margin-bottom-0">You need to sign in to use this service</h2>
-        <p class="govuk-body">Click continue.</p>
-
-        <div class="govuk-form-group">
-            <a asp-action="SignIn" asp-controller="Account" id="tl-login" class="govuk-button" id="tl-login">Continue</a>
-        </div>
+        
+        @*This should not be displayed - page should redirect to start page automatically*@
+        <p class="govuk-body"><a class="govuk-link" asp-page="/Start">Go to the start page</a></p>
     </div>
 </div>

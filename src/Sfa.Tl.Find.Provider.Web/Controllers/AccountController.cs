@@ -38,14 +38,14 @@ public class AccountController : Controller
             isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
-            Response.Redirect("/dashboard");
+            Response.Redirect(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
         }
         else
         {
             await HttpContext.ChallengeAsync(
                 new AuthenticationProperties
                 {
-                    RedirectUri = "/dashboard"
+                    RedirectUri = ProviderAuthenticationExtensions.AuthenticatedUserStartPage
                 });
         }
     }
@@ -53,14 +53,10 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult PostSignIn()
     {
-        if (User.Identity.IsAuthenticated)
-        {
-            return RedirectToPage("/dashboard");
-            //return !HttpContext.User.HasAccessToService()
-            //    ? RedirectToAction("/errorController.ServiceAccessDenied), Constants.ErrorController)
-            //    : RedirectToAction("/dashboard");
-        }
-        return RedirectToPage("/");
+        return RedirectToPage(
+            User.Identity is {IsAuthenticated: true} 
+                ? ProviderAuthenticationExtensions.AuthenticatedUserStartPage 
+                : "/Start");
     }
 
     [HttpGet]

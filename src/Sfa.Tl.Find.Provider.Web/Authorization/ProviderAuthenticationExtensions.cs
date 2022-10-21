@@ -14,6 +14,7 @@ public static class ProviderAuthenticationExtensions
 {
     public const string AuthenticationCookieName = "tl-provider-auth-cookie";
     public const string AuthenticationTypeName = "DfE-SignIn";
+    public const string AuthenticatedUserStartPage = "/dashboard";
 
     public static void AddProviderAuthentication(
         this IServiceCollection services,
@@ -79,11 +80,7 @@ public static class ProviderAuthenticationExtensions
             options.Scope.Add("openid");
             options.Scope.Add("email");
             options.Scope.Add("profile");
-            options.Scope.Add("organisationid");
             options.Scope.Add("organisation");
-            //options.Scope.Add("organisation.id");
-
-            //options.Scope.Add("offline_access");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In
             options.MaxAge = overallSessionTimeout;
@@ -91,7 +88,6 @@ public static class ProviderAuthenticationExtensions
             options.SaveTokens = true;
             options.CallbackPath = new PathString("/auth/cb");
             options.SignedOutCallbackPath = "/signout/complete";
-            //options.SignedOutRedirectUri = "/signout/complete";
             options.SecurityTokenValidator = new JwtSecurityTokenHandler
             {
                 InboundClaimTypeMap = new Dictionary<string, string>(),
