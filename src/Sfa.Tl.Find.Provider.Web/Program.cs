@@ -45,6 +45,9 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
+    options.Conventions.AllowAnonymousToPage("/Accessibility");
+    options.Conventions.AllowAnonymousToPage("/Cookies");
+    options.Conventions.AllowAnonymousToPage("/Privacy");
 });
 builder.Services.AddControllers();
 
