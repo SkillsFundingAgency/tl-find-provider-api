@@ -18,16 +18,14 @@ public class StartModel : PageModel
     {
         if (User.Identity is { IsAuthenticated: true })
         {
-            var authenticatedUserStartPage = ProviderAuthenticationExtensions.AuthenticatedUserStartPage;
-
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("User is already signed in at {currentPage}. Redirecting to  {redirectUrl}.",
                     nameof(StartModel),
-                    authenticatedUserStartPage);
+                    ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
             }
 
-            return RedirectToPage(authenticatedUserStartPage);
+            return RedirectToPage(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
         }
 
         return Page();
