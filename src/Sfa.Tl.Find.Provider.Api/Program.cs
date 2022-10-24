@@ -43,7 +43,10 @@ try
         $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
     builder.Services
-        .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins)
+        .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins);
+
+    builder.Services
+
         .AddPolicyRegistry()
         .AddDapperRetryPolicy()
         .AddGovNotifyRetryPolicy();
