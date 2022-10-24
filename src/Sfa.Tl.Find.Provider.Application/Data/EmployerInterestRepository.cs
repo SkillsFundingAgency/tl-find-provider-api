@@ -279,7 +279,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         var summaryList = new Dictionary<int, EmployerInterestSummary>();
 
         await _dbContextWrapper
-            .QueryAsync<EmployerInterestSummary, RouteDto, EmployerInterestSummary>(
+            .QueryAsync<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>(
                 connection,
                 "GetAllEmployerInterest",
                 (e, r) =>

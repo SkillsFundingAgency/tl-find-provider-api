@@ -5,7 +5,6 @@ using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
@@ -324,22 +323,48 @@ public class EmployerInterestRepositoryTests
     [Fact]
     public async Task GetSummaryList_Returns_Expected_List()
     {
-        var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
+        var employerInterestSummaryDtoList = new EmployerInterestSummaryDtoBuilder()
+            .BuildList()
+            .ToList();
+        var routeDtoList = new RouteDtoBuilder()
             .BuildList()
             .ToList();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
-        dbContextWrapper
-            .QueryAsync<EmployerInterestSummary>(dbConnection,
-                "GetAllEmployerInterest",
-                commandType: CommandType.StoredProcedure)
-            .Returns(employerInterestSummaryList);
+        var callIndex = 0;
 
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
+                "GetAllEmployerInterest",
+                Arg.Do<Func<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>>(
+                    x =>
+                    {
+                        var e = employerInterestSummaryDtoList[callIndex];
+                        var r = routeDtoList[callIndex];
+                        x.Invoke(e, r);
+
+                        callIndex++;
+                    }),
+                Arg.Any<object>(),
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
+        
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
 
         var results = (await repository.GetSummaryList()).ToList();
-        results.Should().BeEquivalentTo(employerInterestSummaryList);
+        results.Should().NotBeNullOrEmpty();
+        results.Count.Should().Be(1);
+
+        results[0].Id.Should().Be(employerInterestSummaryDtoList[0].Id);
+        results[0].OrganisationName.Should().Be(employerInterestSummaryDtoList[0].OrganisationName);
+        results[0].Industry.Should().Be(employerInterestSummaryDtoList[0].Industry);
+        results[0].Distance.Should().Be(employerInterestSummaryDtoList[0].Distance);
+        results[0].CreatedOn.Should().Be(employerInterestSummaryDtoList[0].CreatedOn);
+        results[0].ModifiedOn.Should().Be(employerInterestSummaryDtoList[0].ModifiedOn);
+        results[0].SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+
     }
 }
