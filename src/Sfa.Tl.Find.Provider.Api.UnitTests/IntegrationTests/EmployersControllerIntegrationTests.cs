@@ -14,33 +14,7 @@ public class EmployersControllerIntegrationTests : IClassFixture<TestServerFacto
     {
         _fixture = fixture;
     }
-
-    [Fact]
-    public async Task CreateEmployerInterest_Get_Returns_Ok_Result_For_Valid_Input()
-    {
-        var testConfigurationSettings = _fixture.GetService<TestConfigurationSettings>();
-
-        var json = PayloadJsonBuilder.BuildCreateEmployerInterestPayload();
-        
-        var bytes = Encoding.UTF8.GetBytes(json);
-        var base64String = Convert.ToBase64String(bytes);
-
-        // ReSharper disable once StringLiteralTypo
-        var uri = $"/api/v3/employers/createinterest?data={base64String}";
-
-        var response = await _fixture
-                    .CreateClient()
-                    .GetAsync(uri);
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var jsonDocument = JsonDocument.Parse(responseContent);
-        var id = jsonDocument
-            .RootElement.SafeGetString("id");
-        Guid.TryParse(id, out var uniqueId).Should().BeTrue();
-        uniqueId.Should().Be(testConfigurationSettings.EmployerInterestUniqueId);
-    }
-
+    
     [Fact]
     public async Task CreateEmployerInterest_Returns_Ok_Result_For_Valid_Input()
     {
