@@ -24,7 +24,7 @@ public class IndexPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/Start");
+        redirectResult!.PageName.Should().Be(ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
         indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeFalse();
     }
 

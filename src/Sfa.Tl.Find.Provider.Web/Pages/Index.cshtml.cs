@@ -32,6 +32,6 @@ public class IndexModel : PageModel
             _logger.LogDebug("Index page redirecting to start page.");
         }
 
-        return RedirectToPage("/Start");
+        return RedirectToPage(ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 }

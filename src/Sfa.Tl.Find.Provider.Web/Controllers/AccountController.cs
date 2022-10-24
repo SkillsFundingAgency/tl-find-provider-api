@@ -13,19 +13,14 @@ namespace Sfa.Tl.Find.Provider.Web.Controllers;
 public class AccountController : Controller
 {
     private readonly IConfiguration _configuration;
-    private readonly DfeSignInSettings _signInSettings;
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         IConfiguration configuration,
-        IOptions<DfeSignInSettings> signInOptions,
         ILogger<AccountController> logger)
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        if (signInOptions is null) throw new ArgumentNullException(nameof(signInOptions));
-
-        _signInSettings = signInOptions.Value;
     }
 
     [AllowAnonymous]
@@ -56,7 +51,7 @@ public class AccountController : Controller
         return RedirectToPage(
             User.Identity is {IsAuthenticated: true} 
                 ? ProviderAuthenticationExtensions.AuthenticatedUserStartPage 
-                : "/Start");
+                : ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 
     [HttpGet]
@@ -74,7 +69,16 @@ public class AccountController : Controller
         }
 
         return SignOut(
+            new AuthenticationProperties { RedirectUri = "/start" },
             OpenIdConnectDefaults.AuthenticationScheme,
             CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("signout-complete", Name = "SignOutComplete")]
+    public IActionResult SignoutComplete()
+    {
+        return Redirect(ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 }

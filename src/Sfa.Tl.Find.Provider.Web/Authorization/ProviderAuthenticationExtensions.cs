@@ -14,7 +14,8 @@ public static class ProviderAuthenticationExtensions
 {
     public const string AuthenticationCookieName = "tl-provider-auth-cookie";
     public const string AuthenticationTypeName = "DfE-SignIn";
-    public const string AuthenticatedUserStartPage = "/dashboard";
+    public const string AuthenticatedUserStartPage = "/dashboard";//"/employer-list";
+    public const string UnauthenticatedUserStartPage = "/start";
 
     public static void AddProviderAuthentication(
         this IServiceCollection services,
@@ -181,11 +182,8 @@ public static class ProviderAuthenticationExtensions
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
 
                     // so that we don't issue a session cookie but one with a fixed expiration
-                    if (ctx.Properties != null)
-                    {
-                        ctx.Properties.IsPersistent = true;
-                        ctx.Properties.ExpiresUtc = DateTime.UtcNow.Add(overallSessionTimeout);
-                    }
+                    ctx.Properties.IsPersistent = true;
+                    ctx.Properties.ExpiresUtc = DateTime.UtcNow.Add(overallSessionTimeout);
                 }
             };
         });

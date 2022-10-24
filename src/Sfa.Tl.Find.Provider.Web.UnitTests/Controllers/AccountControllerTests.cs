@@ -130,4 +130,19 @@ public class AccountControllerTests
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/SignedOut");
     }
+    [Fact]
+    public void AccountController_SignOutComplete_Returns_RedirectToPageResult()
+    {
+        var configuration = Substitute.For<IConfiguration>();
+        configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
+
+        var controller = new AccountControllerBuilder()
+            .Build(configuration);
+
+        var result = controller.SignoutComplete();
+
+        var redirectResult = result as RedirectResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.Url.Should().Be(ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
+    }
 }
