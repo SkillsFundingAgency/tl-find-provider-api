@@ -1,4 +1,3 @@
-
 namespace Sfa.Tl.Find.Provider.Web.Samples.Pages.EmployerInterest;
 
 public class CreateModel : ApiPageModel
