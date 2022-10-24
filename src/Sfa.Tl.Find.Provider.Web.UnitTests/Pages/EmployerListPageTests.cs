@@ -2,7 +2,6 @@
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages;
-using Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;

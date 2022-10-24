@@ -13,6 +13,10 @@ public class EmployerInterestSummaryBuilder
                 OrganisationName = "Test Employer",
                 Distance = 1.0,
                 Industry = "",
+                SkillAreas = new List<string>
+                {
+                    "Digital and IT"
+                },
                 CreatedOn = DateTime.Parse("2022-10-01 12:00"),
                 ModifiedOn = null
             },
@@ -22,6 +26,11 @@ public class EmployerInterestSummaryBuilder
                 OrganisationName = "Test Employer 2",
                 Distance = 1.0,
                 Industry = "",
+                SkillAreas = new List<string>
+                {
+                    "Creative and design",
+                    "Digital and IT"
+                },
                 CreatedOn = DateTime.Parse("2022-10-01 12:00"),
                 ModifiedOn = null
             }

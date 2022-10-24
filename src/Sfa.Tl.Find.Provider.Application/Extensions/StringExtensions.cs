@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
@@ -9,12 +8,9 @@ public static class StringExtensions
 {
     // adapted from http://stackoverflow.com/a/164994/1882637
     private const string PostcodeRegex =
-            @"(GIR 0AA)|((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX‌​]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY]))))\s?[0-9][A-Z-[C‌​IKMOV]]{2})(\w)*$"
-        ;
+            @"(GIR 0AA)|((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX‌​]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY]))))\s?[0-9][A-Z-[C‌​IKMOV]]{2})(\w)*$";
 
-    private const string PartialPostcodeRegex =
-            @"((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))))$"
-        ;
+    private const string PartialPostcodeRegex = @"((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))))$";
 
     public static bool IsPostcode(this string postcode)
     {
@@ -111,8 +107,8 @@ public static class StringExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ToTrimmedOrNullString(this string input)
     {
-        return input is null || input.Length == 0 || string.IsNullOrWhiteSpace(input) 
-            ? null 
+        return input is null || input.Length == 0 || string.IsNullOrWhiteSpace(input)
+            ? null
             : input.Trim();
     }
 }

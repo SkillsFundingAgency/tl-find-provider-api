@@ -35,10 +35,10 @@ public class ProviderAuthorizationHandler : AuthorizationHandler<ProviderUkPrnRe
         if (_httpContextAccessor.HttpContext != null 
             && _httpContextAccessor.HttpContext.Request.RouteValues.ContainsKey(UkPrnRootValue))
         {
-            var ukPrnFromUrl = _httpContextAccessor.HttpContext.Request.RouteValues[UkPrnRootValue].ToString();
-            var ukPrn = context.User.FindFirst(c => c.Type.Equals(CustomClaimTypes.UkPrn)).Value;
+            var ukPrnFromUrl = _httpContextAccessor.HttpContext.Request.RouteValues[UkPrnRootValue]!.ToString();
+            var ukPrn = context.User.FindFirst(c => c.Type.Equals(CustomClaimTypes.UkPrn))?.Value;
 
-            return ukPrn.Equals(ukPrnFromUrl);
+            return ukPrn != null && ukPrn.Equals(ukPrnFromUrl);
         }
 
         return true;

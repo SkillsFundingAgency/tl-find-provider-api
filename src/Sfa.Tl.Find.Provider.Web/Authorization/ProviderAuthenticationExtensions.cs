@@ -164,9 +164,9 @@ public static class ProviderAuthenticationExtensions
                                 new(CustomClaimTypes.OrganisationName, organisationInfo != null ? organisationInfo.Name : string.Empty),
                                 new(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn != null ? organisationInfo.UkPrn.Value.ToString() : string.Empty),
                                 new(CustomClaimTypes.Urn, organisationInfo?.Urn != null ? organisationInfo.Urn.Value.ToString() : string.Empty),
-                                new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name").Value),
-                                new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name").Value),
-                                new(ClaimTypes.Email, ctx.Principal.FindFirst("email").Value),
+                                new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
+                                new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name")?.Value ?? string.Empty),
+                                new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty),
                                 new(CustomClaimTypes.HasAccessToService, userInfo.HasAccessToService.ToString()),
                                 //new Claim(CustomClaimTypes.LoginUserType, ((int)loggedInUserTypeResponse.UserType).ToString())
                             });
@@ -181,8 +181,11 @@ public static class ProviderAuthenticationExtensions
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
 
                     // so that we don't issue a session cookie but one with a fixed expiration
-                    ctx.Properties.IsPersistent = true;
-                    ctx.Properties.ExpiresUtc = DateTime.UtcNow.Add(overallSessionTimeout);
+                    if (ctx.Properties != null)
+                    {
+                        ctx.Properties.IsPersistent = true;
+                        ctx.Properties.ExpiresUtc = DateTime.UtcNow.Add(overallSessionTimeout);
+                    }
                 }
             };
         });
