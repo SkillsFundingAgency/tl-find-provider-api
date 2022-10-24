@@ -1,6 +1,7 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Sfa.Tl.Find.Provider.Application.Extensions
+@using Sfa.Tl.Find.Provider.Application.Models
 @model Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest.IndexModel
 @{
     ViewData["Title"] = "Employer Interest";
@@ -14,7 +15,7 @@
         
         <h3>Postcodes</h3>
         <ul>
-            @foreach (var location in Model.ProviderLocations)
+            @foreach (var location in Model.ProviderLocations ?? Enumerable.Empty<LocationPostcode>())
             {
                 <li>@location.Postcode</li>
             }
@@ -35,24 +36,22 @@
                 {
                     foreach (var employerInterest in Model.EmployerInterestList)
                     {
-                        var availabilityDate =
-                        employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
+                        var availableUntil = employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
                         
                         <tr class="govuk-table__row">
                             <th class="govuk-table__header" scope="row">@employerInterest.OrganisationName</th>
-                            <td class="govuk-table__cell">@employerInterest.Industry</td>
                             <td class="govuk-table__cell">@employerInterest.Industry</td>
                             <td class="govuk-table__cell">
                                 @if (employerInterest.SkillAreas is not null)
                                 {
                                     @foreach (var skillArea in employerInterest.SkillAreas)
                                     {
-                                        <p>skillArea</p>
+                                        <p>@skillArea</p>
                                     }
                                 }
                             </td>
                             <td class="govuk-table__cell">
-                                @($"{availabilityDate:d MMM yyyy}")
+                                @($"{availableUntil:d MMM yyyy}")
                             </td>
                             <td class="govuk-table__cell">
                                 <a asp-page="Detail" asp-route-id="@employerInterest.Id" class="govuk-link" id="tl-change-link">View</a>

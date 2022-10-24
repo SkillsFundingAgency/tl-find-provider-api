@@ -1,9 +1,13 @@
 ﻿using System.Data;
 using Dapper;
+using Microsoft.Extensions.Logging;
+using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
+using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -18,6 +22,32 @@ public class EmployerInterestRepositoryTests
         typeof(EmployerInterestRepository)
             .ShouldNotAcceptNullConstructorArguments();
     }
+    
+    [Fact]
+    public async Task Create_Calls_Retry_Policy()
+    {
+        var employerInterest = new EmployerInterestBuilder()
+            .Build();
+
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<(int, Guid)>();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var logger = Substitute.For<ILogger<EmployerInterestRepository>>();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(
+                policyRegistry: pollyPolicyRegistry,
+                logger: logger);
+
+        await repository.Create(employerInterest);
+
+        await pollyPolicy.Received(1).ExecuteAsync(
+            Arg.Any<Func<Context, Task<(int, Guid)>>> (),
+            Arg.Is<Context>(ctx =>
+                ctx.ContainsKey(PolicyContextItems.Logger) &&
+                ctx[PolicyContextItems.Logger] == logger
+            ));
+    }
 
     [Fact]
     public async Task Create_Calls_Database_As_Expected()
@@ -28,8 +58,12 @@ public class EmployerInterestRepositoryTests
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
 
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<(int, Guid)>();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
         var repository = new EmployerInterestRepositoryBuilder()
-            .Build(dbContextWrapper);
+            .Build(dbContextWrapper,
+                policyRegistry: pollyPolicyRegistry);
 
         await repository.Create(employerInterest);
 
@@ -74,14 +108,43 @@ public class EmployerInterestRepositoryTests
                 commandType: CommandType.StoredProcedure)
             .Returns(1);
 
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<(int, Guid) >();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
+                policyRegistry: pollyPolicyRegistry,
                 guidService: guidService);
 
         var result = await repository.Create(employerInterest);
 
         result.Count.Should().Be(1);
         result.UniqueId.Should().Be(uniqueId);
+    }
+    
+    [Fact]
+    public async Task Delete_Calls_Retry_Policy()
+    {
+        var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
+
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var logger = Substitute.For<ILogger<EmployerInterestRepository>>();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(
+                policyRegistry: pollyPolicyRegistry,
+                logger: logger);
+
+        await repository.Delete(uniqueId);
+
+        await pollyPolicy.Received(1).ExecuteAsync(
+            Arg.Any<Func<Context, Task<int>>>(),
+            Arg.Is<Context>(ctx =>
+                ctx.ContainsKey(PolicyContextItems.Logger) &&
+                ctx[PolicyContextItems.Logger] == logger
+            ));
     }
 
     [Fact]
@@ -93,9 +156,6 @@ public class EmployerInterestRepositoryTests
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
 
-        var repository = new EmployerInterestRepositoryBuilder()
-            .Build(dbContextWrapper);
-
         dbContextWrapper
             .ExecuteScalarAsync<int?>(dbConnection,
                 Arg.Is<string>(s =>
@@ -103,6 +163,13 @@ public class EmployerInterestRepositoryTests
                 Arg.Any<object>(),
                 Arg.Is<IDbTransaction>(t => t != null))
             .Returns(id);
+
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<int>();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                policyRegistry: pollyPolicyRegistry);
 
         await repository.Delete(uniqueId);
 
@@ -151,7 +218,15 @@ public class EmployerInterestRepositoryTests
                 commandType: CommandType.StoredProcedure)
         .Returns(count);
 
-        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<int>();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        
+        var logger = Substitute.For<ILogger<EmployerInterestRepository>>();
+
+        var repository = new EmployerInterestRepositoryBuilder().Build(
+            dbContextWrapper,
+            policyRegistry: pollyPolicyRegistry,
+            logger: logger);
 
         var result = await repository.Delete(uniqueId);
 

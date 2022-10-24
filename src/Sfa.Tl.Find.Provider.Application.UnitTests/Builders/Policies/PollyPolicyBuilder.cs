@@ -10,7 +10,6 @@ public static class PollyPolicyBuilder
     public static IAsyncPolicy BuildPolicy()
     {
         var policy = Substitute.For<IAsyncPolicy>();
-
         policy
             .When(x =>
                 x.ExecuteAsync(
@@ -23,27 +22,25 @@ public static class PollyPolicyBuilder
                 var context = x.Arg<Context>();
                 func.Invoke(context);
             });
-
+        
         return policy;
     }
 
     public static IAsyncPolicy BuildPolicy<TResult>()
     {
         var policy = Substitute.For<IAsyncPolicy>();
-
         policy
-            .When(x =>
-                x.ExecuteAsync(
-                Arg.Any<Func<Context, Task<TResult>>>(),
-                Arg.Any<Context>()
-            ))
-            .Do(x =>
+            .ExecuteAsync(
+                    Arg.Any<Func<Context, Task<TResult>>>(),
+                    Arg.Any<Context>()
+                )
+            .Returns(x =>
             {
                 var func = x.Arg<Func<Context, Task<TResult>>>();
                 var context = x.Arg<Context>();
-                func.Invoke(context);
+                var r = func.Invoke(context);
+                return r.Result;
             });
-
         return policy;
     }
 

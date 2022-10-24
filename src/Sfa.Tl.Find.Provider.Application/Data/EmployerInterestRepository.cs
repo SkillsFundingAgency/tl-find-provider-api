@@ -33,60 +33,69 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
-            using var connection = _dbContextWrapper.CreateConnection();
-            connection.Open();
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
-            var uniqueId = _guidService.NewGuid();
+            return await retryPolicy
+                .ExecuteAsync(async _ =>
+                {
+                    using var connection = _dbContextWrapper.CreateConnection();
+                    connection.Open();
 
-            _dynamicParametersWrapper.CreateParameters(new
-            {
-                data = new List<EmployerInterestDto>
+                    var uniqueId = _guidService.NewGuid();
+
+                    _dynamicParametersWrapper.CreateParameters(new
                     {
-                        new()
-                        {
-                            UniqueId = uniqueId,
-                            OrganisationName = employerInterest.OrganisationName,
-                            ContactName = employerInterest.ContactName,
-                            Postcode = employerInterest.Postcode,
-                            Latitude = employerInterest.Latitude,
-                            Longitude = employerInterest.Longitude,
-                            IndustryId = employerInterest.IndustryId ?? 0,
-                            AdditionalInformation = employerInterest.AdditionalInformation,
-                            Email = employerInterest.Email,
-                            Telephone = employerInterest.Telephone,
-                            Website = employerInterest.Website,
-                            ContactPreferenceType = employerInterest.ContactPreferenceType
-                        }
+                        data = new List<EmployerInterestDto>
+                            {
+                                new()
+                                {
+                                    //TODO: Check lengths
+                                    //      Move this outside retry code
+                                    UniqueId = uniqueId,
+                                    OrganisationName = employerInterest.OrganisationName,
+                                    ContactName = employerInterest.ContactName,
+                                    Postcode = employerInterest.Postcode,
+                                    Latitude = employerInterest.Latitude,
+                                    Longitude = employerInterest.Longitude,
+                                    IndustryId = employerInterest.IndustryId ?? 0,
+                                    AdditionalInformation = employerInterest.AdditionalInformation,
+                                    Email = employerInterest.Email,
+                                    Telephone = employerInterest.Telephone,
+                                    Website = employerInterest.Website,
+                                    ContactPreferenceType = employerInterest.ContactPreferenceType
+                                }
+                            }
+                            .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
+                    });
+
+                    if (employerInterest.IndustryId is > 0)
+                    {
+                        _dynamicParametersWrapper.AddParameter("industryIds",
+                            new List<int> { employerInterest.IndustryId.Value }
+                                .AsTableValuedParameter("dbo.IdListTableType"));
                     }
-                    .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
-            });
 
-            if (employerInterest.IndustryId is > 0)
-            {
-                _dynamicParametersWrapper.AddParameter("industryIds",
-                    new List<int> {employerInterest.IndustryId.Value}
-                        .AsTableValuedParameter("dbo.IdListTableType"));
-            }
+                    if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
+                    {
+                        _dynamicParametersWrapper.AddParameter("routeIds",
+                            employerInterest.SkillAreaIds
+                                .AsTableValuedParameter("dbo.IdListTableType"));
+                    }
 
-            if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
-            {
-                _dynamicParametersWrapper.AddParameter("routeIds",
-                    employerInterest.SkillAreaIds
-                        .AsTableValuedParameter("dbo.IdListTableType"));
-            }
-            
-            using var transaction = _dbContextWrapper.BeginTransaction(connection);
+                    using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
-            var result = await _dbContextWrapper.ExecuteAsync(
-                connection,
-                "CreateEmployerInterest",
-                _dynamicParametersWrapper.DynamicParameters,
-                transaction,
-                commandType: CommandType.StoredProcedure);
+                    var result = await _dbContextWrapper.ExecuteAsync(
+                        connection,
+                        "CreateEmployerInterest",
+                        _dynamicParametersWrapper.DynamicParameters,
+                        transaction,
+                        commandType: CommandType.StoredProcedure);
 
-            transaction.Commit();
+                    transaction.Commit();
 
-            return (result, uniqueId);
+                    return (result, uniqueId);
+                },
+            context);
         }
         catch (Exception ex)
         {
@@ -101,42 +110,48 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         {
             var result = 0;
 
-            using var connection = _dbContextWrapper.CreateConnection();
-            connection.Open();
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
-            using var transaction = _dbContextWrapper.BeginTransaction(connection);
+            return await retryPolicy
+                .ExecuteAsync(async _ =>
+                    {
+                        using var connection = _dbContextWrapper.CreateConnection();
+                        connection.Open();
 
-            var id = await _dbContextWrapper.ExecuteScalarAsync<int?>(
-                connection,
-                "SELECT Id " +
-                "FROM [dbo].[EmployerInterest] " +
-                "WHERE [UniqueId] = @uniqueId",
-                new { uniqueId },
-                transaction
-            );
+                        using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
-            if (id.HasValue)
-            {
-                _dynamicParametersWrapper.CreateParameters(new
-                {
-                    employerInterestIds = 
-                        new List<int> { id.Value }
-                            .AsTableValuedParameter("dbo.IdListTableType")
-                });
+                        var id = await _dbContextWrapper.ExecuteScalarAsync<int?>(
+                            connection,
+                            "SELECT Id " +
+                            "FROM [dbo].[EmployerInterest] " +
+                            "WHERE [UniqueId] = @uniqueId",
+                            new { uniqueId },
+                            transaction
+                        );
 
-                await _dbContextWrapper.ExecuteAsync(
-                    connection,
-                    "DeleteEmployerInterest",
-                    _dynamicParametersWrapper.DynamicParameters,
-                    transaction,
-                    commandType: CommandType.StoredProcedure);
-                
-                result = 1;
-            }
+                        if (id.HasValue)
+                        {
+                            _dynamicParametersWrapper.CreateParameters(new
+                            {
+                                employerInterestIds =
+                                    new List<int> { id.Value }
+                                        .AsTableValuedParameter("dbo.IdListTableType")
+                            });
 
-            transaction.Commit();
+                            await _dbContextWrapper.ExecuteAsync(
+                                connection,
+                                "DeleteEmployerInterest",
+                                _dynamicParametersWrapper.DynamicParameters,
+                                transaction,
+                                commandType: CommandType.StoredProcedure);
 
-            return result;
+                            result = 1;
+                        }
+
+                        transaction.Commit();
+                        return result;
+                    },
+                    context);
         }
         catch (Exception ex)
         {
@@ -153,7 +168,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
             using var connection = _dbContextWrapper.CreateConnection();
             connection.Open();
-            
+
             using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
             _dynamicParametersWrapper.CreateParameters(new
@@ -171,10 +186,10 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                 "SELECT Id " +
                 "FROM [dbo].[EmployerInterest] " +
                 "WHERE [CreatedOn] < @date",
-                 new { date},
+                 new { date },
                 transaction
             ))?.ToList();
-            
+
             if (idsToDelete != null && idsToDelete.Any())
             {
                 _dynamicParametersWrapper.CreateParameters(new
@@ -261,10 +276,43 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
-        return await _dbContextWrapper
-            .QueryAsync<EmployerInterestSummary>(
+        var summaryList = new Dictionary<int, EmployerInterestSummary>();
+
+        await _dbContextWrapper
+            .QueryAsync<EmployerInterestSummary, RouteDto, EmployerInterestSummary>(
                 connection,
                 "GetAllEmployerInterest",
+                (e, r) =>
+                {
+                    if (!summaryList.TryGetValue(e.Id, out var summaryItem))
+                    {
+                        summaryList.Add(e.Id,
+                            summaryItem = new EmployerInterestSummary
+                            {
+                                Id = e.Id,
+                                OrganisationName = e.OrganisationName,
+                                Distance = e.Distance,
+                                Industry = e.Industry,
+                                CreatedOn = e.CreatedOn,
+                                ModifiedOn = e.ModifiedOn,
+                                SkillAreas = new List<string>()
+                            });
+                    }
+
+                    if (r is not null)
+                    {
+                        summaryItem.SkillAreas.Add(r.RouteName);
+                    }
+
+                    return summaryItem;
+                },
+                splitOn: "Id, RouteId",
                 commandType: CommandType.StoredProcedure);
+
+        return summaryList
+            .Values
+            .OrderByDescending(e => e.CreatedOn)
+            .ThenBy(e => e.OrganisationName)
+            .ToList();
     }
 }
