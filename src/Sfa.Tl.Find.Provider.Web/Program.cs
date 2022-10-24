@@ -60,6 +60,12 @@ if (!builder.Environment.IsDevelopment())
 }
 
 builder.Services
+    .AddCorsPolicy(Constants.CorsPolicyName,
+        siteConfiguration.AllowedCorsOrigins,
+        HttpMethod.Get.Method,
+        HttpMethod.Post.Method);
+
+builder.Services
     .AddPolicyRegistry()
     .AddDapperRetryPolicy()
     .AddGovNotifyRetryPolicy();
@@ -121,6 +127,11 @@ app.UseWhen(ctx =>
                     await next.Invoke();
                 })
     );
+
+if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
+{
+    app.UseCors(Constants.CorsPolicyName);
+}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

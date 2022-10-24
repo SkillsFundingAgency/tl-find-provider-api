@@ -3,6 +3,11 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
+    "AllowedCorsOrigins": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "AllowedCorsOrigins"
+    },
     "DfeSignInSettings": {
       "properties": {
         "MetadataAddress": {
@@ -86,6 +91,10 @@
         "EmployerSupportSiteUri": {
           "type": "string",
           "environmentVariable": "EmployerInterestSettings_EmployerSupportSiteUri"
+        },
+        "UnsubscribeEmployerUri": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_UnsubscribeEmployerUri"
         },
         "RetentionDays": {
           "type": "integer",

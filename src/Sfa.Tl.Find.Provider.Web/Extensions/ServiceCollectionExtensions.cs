@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
                 x.EmployerSupportSiteUri = siteConfiguration.EmployerInterestSettings.EmployerSupportSiteUri;
                 x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
                 x.SearchRadius = siteConfiguration.EmployerInterestSettings.SearchRadius;
+                x.UnsubscribeEmployerUri = siteConfiguration.EmployerInterestSettings.UnsubscribeEmployerUri;
             })
             .Configure<PostcodeApiSettings>(x =>
             {
@@ -44,6 +45,33 @@ public static class ServiceCollectionExtensions
             {
                 x.SqlConnectionString = siteConfiguration.SqlConnectionString;
             });
+
+        return services;
+    }
+
+    public static IServiceCollection AddCorsPolicy(
+        this IServiceCollection services,
+        string policyName,
+        string allowedOrigins,
+        params string[]? allowedMethods)
+    {
+        if (!string.IsNullOrWhiteSpace(allowedOrigins) && 
+            allowedMethods != null && 
+            allowedMethods.Any())
+        {
+            var corsOrigins = allowedOrigins
+                .Split(';', ',')
+                .Select(s => s.TrimEnd('/'))
+                .ToArray();
+
+            services.AddCors(options =>
+                options
+                    .AddPolicy(policyName, builder =>
+                        builder
+                            .WithMethods(allowedMethods)
+                            .AllowAnyHeader()
+                            .WithOrigins(corsOrigins)));
+        }
 
         return services;
     }
