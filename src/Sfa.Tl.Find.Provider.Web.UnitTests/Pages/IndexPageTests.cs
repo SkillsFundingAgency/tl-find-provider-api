@@ -24,7 +24,7 @@ public class IndexPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be(ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
+        redirectResult!.PageName.Should().Be(AuthenticationExtensions.UnauthenticatedUserStartPage);
         indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeFalse();
     }
 
@@ -37,7 +37,7 @@ public class IndexPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
+        redirectResult!.PageName.Should().Be(AuthenticationExtensions.AuthenticatedUserStartPage);
         indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeTrue();
     }
 }

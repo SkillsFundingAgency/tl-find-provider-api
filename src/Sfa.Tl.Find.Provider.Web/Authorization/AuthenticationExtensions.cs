@@ -10,7 +10,7 @@ using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Web.Authorization;
 
-public static class ProviderAuthenticationExtensions
+public static class AuthenticationExtensions
 {
     public const string AuthenticationCookieName = "tl-provider-auth-cookie";
     public const string AuthenticationTypeName = "DfE-SignIn";

@@ -12,6 +12,6 @@ public static class ProviderStubAuthentication
                 "Provider-stub",
                 options => { })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(ProviderAuthenticationExtensions.AuthenticationCookieName);
+            .AddCookie(AuthenticationExtensions.AuthenticationCookieName);
     }
 }

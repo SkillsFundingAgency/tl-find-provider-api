@@ -58,7 +58,7 @@ public class AccountControllerBuilder
         {
             httpContext.User = new ClaimsPrincipal(
                 new ClaimsIdentity(claims,
-                    ProviderAuthenticationExtensions.AuthenticationTypeName));
+                    AuthenticationExtensions.AuthenticationTypeName));
         }
 
         var controller = new AccountController(

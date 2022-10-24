@@ -31,14 +31,14 @@ public class AccountController : Controller
             isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
-            Response.Redirect(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
+            Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPage);
         }
         else
         {
             await HttpContext.ChallengeAsync(
                 new AuthenticationProperties
                 {
-                    RedirectUri = ProviderAuthenticationExtensions.AuthenticatedUserStartPage
+                    RedirectUri = AuthenticationExtensions.AuthenticatedUserStartPage
                 });
         }
     }
@@ -48,8 +48,8 @@ public class AccountController : Controller
     {
         return RedirectToPage(
             User.Identity is {IsAuthenticated: true} 
-                ? ProviderAuthenticationExtensions.AuthenticatedUserStartPage 
-                : ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
+                ? AuthenticationExtensions.AuthenticatedUserStartPage 
+                : AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 
     [HttpGet]
@@ -62,7 +62,7 @@ public class AccountController : Controller
             _logger.LogInformation("DfE Sign-in was not used. Signing out of fake authentication.");
 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignOutAsync(ProviderAuthenticationExtensions.AuthenticationCookieName);
+            await HttpContext.SignOutAsync(AuthenticationExtensions.AuthenticationCookieName);
             return RedirectToPage("/SignedOut");
         }
 
@@ -77,6 +77,6 @@ public class AccountController : Controller
     [Route("signout-complete", Name = "SignOutComplete")]
     public IActionResult SignoutComplete()
     {
-        return Redirect(ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
+        return Redirect(AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 }

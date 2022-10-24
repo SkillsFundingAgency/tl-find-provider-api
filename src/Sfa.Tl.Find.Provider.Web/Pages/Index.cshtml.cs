@@ -21,10 +21,10 @@ public class IndexModel : PageModel
             {
                 _logger.LogDebug("User is already signed in at {currentPage}. Redirecting to  {redirectUrl}.",
                     nameof(IndexModel),
-                    ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
+                    AuthenticationExtensions.AuthenticatedUserStartPage);
             }
 
-            return RedirectToPage(ProviderAuthenticationExtensions.AuthenticatedUserStartPage);
+            return RedirectToPage(AuthenticationExtensions.AuthenticatedUserStartPage);
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -32,6 +32,6 @@ public class IndexModel : PageModel
             _logger.LogDebug("Index page redirecting to start page.");
         }
 
-        return RedirectToPage(ProviderAuthenticationExtensions.UnauthenticatedUserStartPage);
+        return RedirectToPage(AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 }

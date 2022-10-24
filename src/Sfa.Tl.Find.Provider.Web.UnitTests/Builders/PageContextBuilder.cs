@@ -35,7 +35,7 @@ public class PageContextBuilder
 
             httpContext.User = new ClaimsPrincipal(
                 new ClaimsIdentity(claims,
-                    ProviderAuthenticationExtensions.AuthenticationTypeName));
+                    AuthenticationExtensions.AuthenticationTypeName));
         }
 
         var modelState = new ModelStateDictionary();
