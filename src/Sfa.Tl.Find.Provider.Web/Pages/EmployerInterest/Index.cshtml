@@ -12,7 +12,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
-        
+
         <h3>Postcodes</h3>
         <ul>
             @foreach (var location in Model.ProviderLocations ?? Enumerable.Empty<LocationPostcode>())
@@ -37,17 +37,19 @@
                     foreach (var employerInterest in Model.EmployerInterestList)
                     {
                         var availableUntil = employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
-                        
+
                         <tr class="govuk-table__row">
                             <th class="govuk-table__header" scope="row">@employerInterest.OrganisationName</th>
                             <td class="govuk-table__cell">@employerInterest.Industry</td>
                             <td class="govuk-table__cell">
-                                @if (employerInterest.SkillAreas is not null)
+                                @if (employerInterest.SkillAreas is not null && employerInterest.SkillAreas.Any())
                                 {
-                                    @foreach (var skillArea in employerInterest.SkillAreas)
-                                    {
-                                        <p>@skillArea</p>
-                                    }
+                                    <ul>
+                                        @foreach (var skillArea in employerInterest.SkillAreas)
+                                        {
+                                            <li>@skillArea</li>
+                                        }
+                                    </ul>
                                 }
                             </td>
                             <td class="govuk-table__cell">@employerInterest.Distance.FormatDistance()</td>

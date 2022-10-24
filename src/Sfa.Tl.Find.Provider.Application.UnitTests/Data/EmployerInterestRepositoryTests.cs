@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using Dapper;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
@@ -21,7 +20,7 @@ public class EmployerInterestRepositoryTests
         typeof(EmployerInterestRepository)
             .ShouldNotAcceptNullConstructorArguments();
     }
-    
+
     [Fact]
     public async Task Create_Calls_Retry_Policy()
     {
@@ -41,7 +40,7 @@ public class EmployerInterestRepositoryTests
         await repository.Create(employerInterest);
 
         await pollyPolicy.Received(1).ExecuteAsync(
-            Arg.Any<Func<Context, Task<(int, Guid)>>> (),
+            Arg.Any<Func<Context, Task<(int, Guid)>>>(),
             Arg.Is<Context>(ctx =>
                 ctx.ContainsKey(PolicyContextItems.Logger) &&
                 ctx[PolicyContextItems.Logger] == logger
@@ -107,9 +106,9 @@ public class EmployerInterestRepositoryTests
                 commandType: CommandType.StoredProcedure)
             .Returns(1);
 
-        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<(int, Guid) >();
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<(int, Guid)>();
         var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
-        
+
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
                 policyRegistry: pollyPolicyRegistry,
@@ -120,7 +119,7 @@ public class EmployerInterestRepositoryTests
         result.Count.Should().Be(1);
         result.UniqueId.Should().Be(uniqueId);
     }
-    
+
     [Fact]
     public async Task Delete_Calls_Retry_Policy()
     {
@@ -219,7 +218,7 @@ public class EmployerInterestRepositoryTests
 
         var pollyPolicy = PollyPolicyBuilder.BuildPolicy<int>();
         var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
-        
+
         var logger = Substitute.For<ILogger<EmployerInterestRepository>>();
 
         var repository = new EmployerInterestRepositoryBuilder().Build(
@@ -268,30 +267,57 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task Get_Returns_Expected_Item()
+    public async Task GetDetail_Returns_Expected_Item()
     {
-        var employerInterest = new EmployerInterestBuilder()
+        var uniqueId = Guid.Parse("69e33e1f-2dc3-40bf-a1a7-52493025d3d1");
+
+        var employerInterestDetailDto = new EmployerInterestDetailDtoBuilder()
+            .WithUniqueId(uniqueId)
             .Build();
-        var id = employerInterest.Id;
+        var routeDtoList = new RouteDtoBuilder()
+            .BuildList()
+            .Where(r => r.RouteName is "Digital and IT")
+            .ToList();
+
+        var expectedEmployerInterestDetail = new EmployerInterestDetailBuilder()
+            .WithUniqueId(uniqueId)
+            .WithSkillAreas(routeDtoList
+                .Select(r => r.RouteName)
+                .ToList())
+            .Build();
+
+        var id = employerInterestDetailDto.Id;
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
-        dbContextWrapper
-            .QueryAsync<EmployerInterest>(dbConnection,
-                Arg.Any<string>(),
-                Arg.Any<DynamicParameters>())
-            .Returns(new List<EmployerInterest> { employerInterest });
+        var callIndex = 0;
+
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
+                "GetEmployerInterestDetail",
+                Arg.Do<Func<EmployerInterestDetailDto, RouteDto, EmployerInterestDetail>>(
+                    x =>
+                    {
+                        var e = employerInterestDetailDto;
+                        var r = routeDtoList[callIndex];
+                        x.Invoke(e, r);
+
+                        callIndex++;
+                    }),
+                Arg.Any<object>(),
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
 
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
 
-        var result = await repository.Get(id);
-        result.Should().BeEquivalentTo(employerInterest);
+        var result = await repository.GetDetail(id);
 
-        await dbContextWrapper
-            .Received(1)
-            .QueryAsync<EmployerInterest>(dbConnection,
-                Arg.Is<string>(sql => sql.Contains("FROM dbo.EmployerInterest")));
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(expectedEmployerInterestDetail);
+
+        callIndex.Should().Be(1);
     }
 
     [Fact]
@@ -337,7 +363,7 @@ public class EmployerInterestRepositoryTests
 
         await dbContextWrapper
             .QueryAsync(dbConnection,
-                "GetAllEmployerInterest",
+                "GetEmployerInterestSummary",
                 Arg.Do<Func<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>>(
                     x =>
                     {
@@ -351,7 +377,7 @@ public class EmployerInterestRepositoryTests
                 splitOn: Arg.Any<string>(),
                 commandType: CommandType.StoredProcedure
             );
-        
+
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
 
         var results = (await repository.GetSummaryList()).ToList();
@@ -365,6 +391,5 @@ public class EmployerInterestRepositoryTests
         results[0].CreatedOn.Should().Be(employerInterestSummaryDtoList[0].CreatedOn);
         results[0].ModifiedOn.Should().Be(employerInterestSummaryDtoList[0].ModifiedOn);
         results[0].SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
-
     }
 }

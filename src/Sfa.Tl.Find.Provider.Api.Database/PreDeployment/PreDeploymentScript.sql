@@ -10,3 +10,6 @@
 --------------------------------------------------------------------------------------
 */
 
+--Clean up recently removed stored procedures
+DROP PROCEDURE IF EXISTS [dbo].[DeleteEmployerInterestBeforeDate]
+DROP PROCEDURE IF EXISTS [dbo].[GetAllEmployerInterest]

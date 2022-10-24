@@ -11,7 +11,7 @@ public interface IEmployerInterestService
 
     Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest();
 
-    Task<EmployerInterest> GetEmployerInterest(int id);
+    Task<EmployerInterestDetail> GetEmployerInterestDetail(int id);
 
     int RetentionDays { get; }
 }

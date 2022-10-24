@@ -1,5 +1,6 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;
 
@@ -53,6 +54,22 @@ public class FormattingExtensionsTests
         };
 
         var result = town.FormatTownName();
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory(DisplayName = nameof(FormattingExtensions.GetContactPreferenceDisplayName) + " Data Tests")]
+    [InlineData(null, "")]
+    [InlineData(ContactPreference.Email, "Email")]
+    [InlineData(ContactPreference.Telephone, "Telephone")]
+    [InlineData(ContactPreference.NoPreference, "No preference")]
+    [InlineData((ContactPreference)4, "Unknown")]
+    [InlineData((ContactPreference)5, "No idea", "No idea")]
+    public void GetContactPreferenceDisplayName_Data_Tests(ContactPreference? contactPreference, string expectedResult, string defaultValue = null)
+    {
+        var result = defaultValue is null 
+            ? contactPreference.GetContactPreferenceDisplayName()
+            : contactPreference.GetContactPreferenceDisplayName(defaultValue);
+
         result.Should().Be(expectedResult);
     }
 }

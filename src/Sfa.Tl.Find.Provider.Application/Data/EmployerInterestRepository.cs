@@ -219,7 +219,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
     }
 
-    public async Task<EmployerInterest> Get(int id)
+    public async Task<EmployerInterestDetail> GetDetail(int id)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -228,24 +228,46 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             id
         });
 
-        //TODO: add joins or use stored proc, and build full result as EmployerInterest
-        return (await _dbContextWrapper
-                .QueryAsync<EmployerInterest>(
+        EmployerInterestDetail detailItem = null;
+
+        await _dbContextWrapper
+                .QueryAsync<EmployerInterestDetailDto, RouteDto, EmployerInterestDetail>(
                     connection,
-                    "SELECT Id," +
-                    "UniqueId, " +
-                    "OrganisationName, " +
-                    "ContactName, " +
-                    "Postcode, " +
-                    "OtherIndustry, " +
-                    "AdditionalInformation, " +
-                    "Email, " +
-                    "Telephone, " +
-                    "ContactPreferenceType " +
-                    "FROM dbo.EmployerInterest " +
-                    "WHERE Id = @id",
-                    _dynamicParametersWrapper.DynamicParameters))
-            .SingleOrDefault();
+                    "GetEmployerInterestDetail",
+                    (e, r) =>
+                    {
+                        detailItem ??= new EmployerInterestDetail
+                        {
+                            Id = e.Id,
+                            UniqueId = e.UniqueId,
+                            OrganisationName = e.OrganisationName,
+                            ContactName = e.ContactName,
+                            Postcode = e.Postcode,
+                            Latitude = e.Latitude,
+                            Longitude = e.Longitude,
+                            Industry = e.Industry,
+                            AdditionalInformation = e.AdditionalInformation,
+                            Email = e.Email,
+                            Telephone = e.Telephone,
+                            Website = e.Website,
+                            ContactPreferenceType = e.ContactPreferenceType,
+                            CreatedOn = e.CreatedOn,
+                            ModifiedOn = e.ModifiedOn,
+                            SkillAreas = new List<string>()
+                        };
+
+                        if (r is not null)
+                        {
+                            detailItem.SkillAreas.Add(r.RouteName);
+                        }
+
+                        return detailItem;
+                    },
+                    _dynamicParametersWrapper.DynamicParameters,
+                    splitOn: "Id, RouteId",
+                    commandType: CommandType.StoredProcedure);
+
+        return detailItem;
     }
 
     public async Task<IEnumerable<EmployerInterest>> GetAll()
@@ -281,7 +303,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         await _dbContextWrapper
             .QueryAsync<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>(
                 connection,
-                "GetAllEmployerInterest",
+                "GetEmployerInterestSummary",
                 (e, r) =>
                 {
                     if (!summaryList.TryGetValue(e.Id, out var summaryItem))

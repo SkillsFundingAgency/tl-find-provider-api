@@ -8,32 +8,76 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
+        <h1 class="govuk-heading-l">@Model.EmployerInterest?.OrganisationName</h1>
 
-        <div id="tl-confirm-employer-interest">
-            <dl class="govuk-summary-list govuk-!-margin-bottom-9" id="tl-employer-interest-detail-table">
+        <h2 class="govuk-heading-m">Organisation details</h2>
+        <div>
+            <dl class="govuk-summary-list govuk-!-margin-bottom-9">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Organisation name
+                        Website
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.EmployerInterest?.OrganisationName
+                        @Model.EmployerInterest?.Website
                     </dd>
                 </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Industry
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.EmployerInterest?.Industry
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @{
+                            var skillAreaTitle = Model.EmployerInterest?.SkillAreas is { Count: > 1 }
+                            ? "Skill Areas"
+                            : "Skill Area";
+                        }
+                        @skillAreaTitle;
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @if (Model.EmployerInterest?.SkillAreas is { Count: > 1 } s)
+                        {
+                            <ul>
+                                @foreach (var skillArea in Model.EmployerInterest.SkillAreas)
+                                {
+                                    <li>@skillArea</li>
+                                }
+                            </ul>
+                        }
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Location
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.EmployerInterest?.Postcode
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Additional details
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.EmployerInterest?.AdditionalInformation
+                    </dd>
+                </div>
+            </dl>
+        </div>
+
+        <h2 class="govuk-heading-m">Contact details</h2>
+        <div>
+            <dl class="govuk-summary-list govuk-!-margin-bottom-9">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
                         Contact name
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @Model.EmployerInterest?.ContactName
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        Postcode
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        @Model.EmployerInterest?.OrganisationName
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row">
@@ -54,34 +98,11 @@
                 </div>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Website
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        @Model.EmployerInterest?.Website
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
                         Contact preference
                     </dt>
                     <dd class="govuk-summary-list__value">
+                        //TODO: Add an enum and extension to get contact preference description
                         @Model.EmployerInterest?.ContactPreferenceType
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        Industry
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        @Model.EmployerInterest?.OtherIndustry
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        Additional information
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        @Model.EmployerInterest?.AdditionalInformation
                     </dd>
                 </div>
             </dl>

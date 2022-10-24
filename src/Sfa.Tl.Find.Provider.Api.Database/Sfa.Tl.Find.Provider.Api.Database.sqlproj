@@ -115,7 +115,7 @@
     <Build Include="Indexes\SPATIAL_EmployerInterestLocation_Location.sql" />
     <Build Include="Tables\EmployerInterestIndustry.sql" />
     <Build Include="Stored Procedures\SearchEmployerInterest.sql" />
-    <Build Include="Stored Procedures\GetAllEmployerInterest.sql" />
+    <Build Include="Stored Procedures\GetEmployerInterestSummary.sql" />
     <Build Include="Stored Procedures\GetProviderLocations.sql" />
     <Build Include="Indexes\IX_Location_ProviderId.sql" />
     <Build Include="Indexes\IX_EmployerInterestRoute_RouteId.sql" />
@@ -123,6 +123,7 @@
     <Build Include="Indexes\IX_EmployerInterestLocation_EmployerInterestId.sql" />
     <Build Include="Indexes\IX_EmployerInterestIndustry_EmployerInterestId.sql" />
     <Build Include="Indexes\IX_EmployerInterestIndustry_IndustryId.sql" />
+    <Build Include="Stored Procedures\GetEmployerInterestDetail.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

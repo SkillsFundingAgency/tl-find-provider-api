@@ -4,14 +4,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
-using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
-using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class AccountControllerBuilder
@@ -21,14 +17,10 @@ public class AccountControllerBuilder
 
     public AccountController Build(
         IConfiguration? configuration = null,
-        DfeSignInSettings? signInSettings = null,
         ILogger<AccountController>? logger = null,
         bool userIsAuthenticated = true)
     {
         configuration ??= Substitute.For<IConfiguration>();
-
-        signInSettings ??= new SettingsBuilder().BuildDfeSignInSettings();
-        var signInOptions = signInSettings.ToOptions();
 
         logger ??= Substitute.For<ILogger<AccountController>>();
 

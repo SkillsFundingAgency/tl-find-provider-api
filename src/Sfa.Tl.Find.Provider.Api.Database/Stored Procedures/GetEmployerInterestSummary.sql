@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[GetAllEmployerInterest]
+﻿CREATE PROCEDURE [dbo].[GetEmployerInterestSummary]
 	--@page INT,
 	--@pageSize INT,
 	--@totalEmployerInterestsCount INT OUTPUT

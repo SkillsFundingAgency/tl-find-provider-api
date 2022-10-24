@@ -17,15 +17,15 @@ public class DetailPageTests
     [Fact]
     public async Task DetailModel_OnGet_Sets_Expected_Results()
     {
-        var employerInterest = new EmployerInterestBuilder()
+        var employerInterestDetail = new EmployerInterestDetailBuilder()
             .Build();
 
-        var id = employerInterest.Id;
+        var id = employerInterestDetail.Id;
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
         employerInterestService
-            .GetEmployerInterest(id)
-            .Returns(employerInterest);
+            .GetEmployerInterestDetail(id)
+            .Returns(employerInterestDetail);
 
         var detailModel = new EmployerInterestDetailModelBuilder()
             .Build(employerInterestService);
@@ -34,6 +34,6 @@ public class DetailPageTests
 
         detailModel.EmployerInterest
             .Should()
-            .BeEquivalentTo(employerInterest);
+            .BeEquivalentTo(employerInterestDetail);
     }
 }

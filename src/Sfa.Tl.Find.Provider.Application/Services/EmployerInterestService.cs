@@ -112,9 +112,9 @@ public class EmployerInterestService : IEmployerInterestService
         return _employerInterestRepository.GetSummaryList();
     }
 
-    public Task<EmployerInterest> GetEmployerInterest(int id)
+    public Task<EmployerInterestDetail> GetEmployerInterestDetail(int id)
     {
-        return _employerInterestRepository.Get(id);
+        return _employerInterestRepository.GetDetail(id);
     }
 
     private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest)

@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class DetailModel : PageModel
 {
-    public Application.Models.EmployerInterest? EmployerInterest { get; private set; }
+    public Application.Models.EmployerInterestDetail? EmployerInterest { get; private set; }
 
     private readonly ILogger<DetailModel> _logger;
     private IEmployerInterestService _employerInterestService;
@@ -23,6 +23,6 @@ public class DetailModel : PageModel
 
     public async Task OnGet(int id)
     {
-        EmployerInterest = await _employerInterestService.GetEmployerInterest(id);
+        EmployerInterest = await _employerInterestService.GetEmployerInterestDetail(id);
     }
 }
