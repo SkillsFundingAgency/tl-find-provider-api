@@ -20,27 +20,15 @@ public class RouteRepositoryTests
     [Fact]
     public async Task GetAll_Returns_Expected_List()
     {
-        var routes = new RouteBuilder()
+        var routeDtoList = new RouteDtoBuilder()
+            .BuildList()
+            .ToList();
+        var qualificationDtoList = new QualificationDtoBuilder()
             .BuildList()
             .ToList();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
-
-        var routeDtoList =
-            routes.Select(r => new RouteDto
-            {
-                RouteId = r.Id,
-                RouteName = r.Name
-            }).ToList();
-
-        var qualificationDtoList =
-            routes.Select(r => new QualificationDto
-            {
-                QualificationId = r.Id,
-                QualificationName = r.Name,
-                NumberOfQualificationsOffered = r.Qualifications.Count
-            }).ToList();
 
         var callIndex = 0;
 
@@ -67,8 +55,8 @@ public class RouteRepositoryTests
             .GetAll(true))
             .ToList();
 
-        results.Should().NotBeNullOrEmpty();
         results[0].Id.Should().Be(routeDtoList[0].RouteId);
+        results.Count.Should().Be(1);
         results[0].Name.Should().Be(routeDtoList[0].RouteName);
         results[0].NumberOfQualifications.Should().Be(1);
         results[0].NumberOfQualificationsOffered.Should().Be(1);

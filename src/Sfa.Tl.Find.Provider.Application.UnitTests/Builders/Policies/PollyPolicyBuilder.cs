@@ -69,6 +69,31 @@ public static class PollyPolicyBuilder
         return (policy, policyRegistry);
     }
 
+    public static (IAsyncPolicy, IReadOnlyPolicyRegistry<string>) BuildDapperPolicyAndRegistry(
+        IAsyncPolicy policy = null)
+    {
+        policy ??= BuildPolicy();
+
+        var policyRegistry = BuildPolicyRegistry(policy);
+
+        return (policy, policyRegistry);
+    }
+
+    //public static (IAsyncPolicy<T>, IReadOnlyPolicyRegistry<string>) BuildDapperPolicyAndRegistry<T>(
+    //    IAsyncPolicy<T> policy = null)
+    //{
+    //    policy ??= BuildPolicy<T>();
+    //    //var innerPolicy = policy != null 
+    //    //    ? policy
+    //    //    : BuildPolicy<T>();
+
+    //    var policyRegistry = BuildPolicyRegistry(
+    //        policy,
+    //        policyKey: Constants.DapperRetryPolicyName);
+
+    //    return (policy, policyRegistry);
+    //}
+
     public static (IAsyncPolicy Policy, IReadOnlyPolicyRegistry<string> Registry) BuildGovNotifyPolicyAndRegistry(
         IAsyncPolicy policy = null)
     {
