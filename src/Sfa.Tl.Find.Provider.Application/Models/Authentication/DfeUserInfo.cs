@@ -19,6 +19,4 @@ public class DfeUserInfo
     public long? Urn { get; set; }
 
     public IEnumerable<Role> Roles { get; set; }
-
-    public bool HasAccessToService { get; set; } = true;
 }

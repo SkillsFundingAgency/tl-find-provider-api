@@ -58,7 +58,6 @@ public class DfeSignInApiServiceTests
 
         user.Should().NotBeNull();
         user.UserId.Should().Be(TestUserId);
-        user.HasAccessToService = true;
         user.Roles.Should().NotBeNullOrEmpty();
         user.Roles.Count().Should().Be(1);
         user.Roles.First().Name.Should().Be(TestRoleName);

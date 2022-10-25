@@ -1,7 +1,7 @@
 ﻿@using Sfa.Tl.Find.Provider.Web.Authorization
 
 <div class="govuk-width-container">
-    <div >
+    <div>
         @if (Context.User.Identity!.IsAuthenticated)
         {
             <span>@Context.User.GetClaim(CustomClaimTypes.OrganisationName)</span>
@@ -14,8 +14,12 @@
             @*<button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>*@
             <ul id="navigation" class="govuk-header__navigation tl-float-right">
                 <li class="govuk-header__navigation-item">
-                    <a class="govuk-link" asp-page="/EmployerDetail">Employer detail</a>
+                    <a class="govuk-link" asp-page="/EmployerDetails">Employer detail</a>
+                </li>
+                <li class="govuk-header__navigation-item">
                     <a class="govuk-link" asp-page="/EmployerInterest/Index">Old employer list</a>
+                </li>
+                <li class="govuk-header__navigation-item">
                     <a class="govuk-link" asp-controller="Account" asp-action="SignOut">Sign out</a>
                 </li>
             </ul>

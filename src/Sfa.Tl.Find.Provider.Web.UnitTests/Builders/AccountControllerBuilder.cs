@@ -43,7 +43,7 @@ public class AccountControllerBuilder
         services.AddSingleton(systemClock);
         services.AddSingleton(authSchemaProvider);
 
-            var claims = new List<Claim>
+        var claims = new List<Claim>
         {
             new(CustomClaimTypes.UkPrn, DefaultUkPrn),
             new(CustomClaimTypes.OrganisationName, DefaultOrganisationName),

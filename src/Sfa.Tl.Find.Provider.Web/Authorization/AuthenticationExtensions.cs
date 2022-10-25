@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Web.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.Authorization;
 
@@ -155,46 +156,33 @@ public static class AuthenticationExtensions
                         var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
                         var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
 
-                        //TODO: probably don't need this check - we have a policy to look after everything
-                        //if (userInfo.HasAccessToService)
+                        claims.AddRange(new List<Claim>
                         {
-                            claims.AddRange(new List<Claim>
-                            {
-                                new(CustomClaimTypes.UserId, userId),
-                                new(CustomClaimTypes.OrganisationId, organisationId),
-                                new(CustomClaimTypes.OrganisationName, organisationInfo != null ? organisationInfo.Name : string.Empty),
-                                new(CustomClaimTypes.OrganisationCategory, organisationInfo != null ? organisationInfo.Category.ToString() : string.Empty),
-                                new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
-                                new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name")?.Value ?? string.Empty),
-                                new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
-                                //new(CustomClaimTypes.HasAccessToService, userInfo.HasAccessToService.ToString()),
-                                //new Claim(CustomClaimTypes.LoginUserType, ((int)loggedInUserTypeResponse.UserType).ToString())
-                            });
+                            new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
+                            new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name")?.Value ?? string.Empty),
+                            new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
+                        });
 
-                            if (organisationInfo?.UkPrn != null)
-                            {
-                                claims.Add(new Claim(CustomClaimTypes.UkPrn, organisationInfo.UkPrn.Value.ToString()));
-                            }
+                        claims.AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
+                            .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationId, organisationId)
+                            .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationName, organisationInfo?.Name)
+                            .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationCategory, organisationInfo?.Category.ToString())
+                            .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn?.ToString())
+                            .AddIfNotNullOrEmpty(CustomClaimTypes.Urn, organisationInfo?.Urn?.ToString());
 
-                            if (organisationInfo?.Urn != null)
-                            {
-                                claims.Add(new Claim(CustomClaimTypes.Urn, organisationInfo.Urn.Value.ToString()));
-                            }
-
-                            if (userInfo.Roles != null && userInfo.Roles.Any())
-                            {
-                                claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
-                            }
+                        if (userInfo.Roles != null && userInfo.Roles.Any())
+                        {
+                            claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
                         }
                     }
 
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
 
-                    // so that we don't issue a session cookie but one with a fixed expiration
-                    ctx.Properties.IsPersistent = true;
-                    ctx.Properties.ExpiresUtc = DateTime.UtcNow.Add(overallSessionTimeout);
-                }
+            // so that we don't issue a session cookie but one with a fixed expiration
+            ctx.Properties.IsPersistent = true;
+            ctx.Properties.ExpiresUtc = DateTime.UtcNow.Add(overallSessionTimeout);
+        }
             };
-        });
+});
     }
 }

@@ -1,4 +1,5 @@
-﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
@@ -10,10 +11,14 @@ public class DfeSignInApiServiceBuilder
 {
     public IDfeSignInApiService Build(
         HttpClient httpClient = null,
-        DfeSignInSettings signInSettings = null)
+        IDfeSignInTokenService tokenService = null,
+        DfeSignInSettings signInSettings = null,
+        ILogger<DfeSignInApiService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
-        var tokenService = new DfeSignInTokenServiceBuilder()
+        logger ??= Substitute.For<ILogger<DfeSignInApiService>>();
+
+        tokenService ??= new DfeSignInTokenServiceBuilder()
             .Build();
 
         signInSettings ??= new SettingsBuilder().BuildDfeSignInSettings();
@@ -22,7 +27,8 @@ public class DfeSignInApiServiceBuilder
         return new DfeSignInApiService(
             httpClient,
             tokenService,
-            signInOptions);
+            signInOptions,
+            logger);
     }
 
     public IDfeSignInApiService Build(
@@ -39,7 +45,9 @@ public class DfeSignInApiServiceBuilder
         var httpClient = new TestHttpClientFactory()
             .CreateHttpClientWithBaseUri(apiBaseUri, responsesWithUri);
 
-        return Build(httpClient, dfeSignInSettings);
+        return Build(
+            httpClient, 
+            signInSettings: dfeSignInSettings);
     }
 
     public string BuildGetUserUriFragment(

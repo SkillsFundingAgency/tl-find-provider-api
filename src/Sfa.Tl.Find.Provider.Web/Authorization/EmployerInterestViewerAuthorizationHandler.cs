@@ -4,13 +4,6 @@ namespace Sfa.Tl.Find.Provider.Web.Authorization;
 
 public class EmployerInterestViewerAuthorizationHandler : AuthorizationHandler<EmployerInterestViewerRequirement>
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public EmployerInterestViewerAuthorizationHandler(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, EmployerInterestViewerRequirement requirement)
     {
         if (!IsAuthorized(context))
@@ -24,7 +17,7 @@ public class EmployerInterestViewerAuthorizationHandler : AuthorizationHandler<E
         return Task.CompletedTask;
     }
 
-    private bool IsAuthorized(AuthorizationHandlerContext context)
+    private static bool IsAuthorized(AuthorizationHandlerContext context)
     {
         var organisationCategory = context.User.Claims.FirstOrDefault(c => c.Type.Equals(CustomClaimTypes.OrganisationCategory));
         var ukPrn = context.User.FindFirst(c => c.Type.Equals(CustomClaimTypes.UkPrn))?.Value;
