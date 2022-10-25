@@ -67,7 +67,7 @@ public class AccountController : Controller
         }
 
         return SignOut(
-            new AuthenticationProperties { RedirectUri = "/start" },
+            new AuthenticationProperties { RedirectUri = AuthenticationExtensions.UnauthenticatedUserStartPage },
             OpenIdConnectDefaults.AuthenticationScheme,
             CookieAuthenticationDefaults.AuthenticationScheme);
     }

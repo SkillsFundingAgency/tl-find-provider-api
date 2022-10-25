@@ -5,7 +5,7 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 
-[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[Authorize(nameof(PolicyNames.EmployerInterestViewer))]
 public class DetailModel : PageModel
 {
     public Application.Models.EmployerInterestDetail? EmployerInterest { get; private set; }

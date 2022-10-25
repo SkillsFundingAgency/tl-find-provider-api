@@ -9,7 +9,9 @@ public class DfeOrganisationInfo
     public Guid Id { get; set; }
 
     public string Name { get; set; }
-   
+
+    public int Category { get; set; }
+
     public long? UkPrn { get; set; }
 
     public long? Urn { get; set; }

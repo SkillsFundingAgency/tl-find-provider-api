@@ -7,7 +7,7 @@ using Sfa.Tl.Find.Provider.Web.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 
-[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[Authorize(nameof(PolicyNames.EmployerInterestViewer))]
 public class IndexModel : PageModel
 {
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
@@ -40,6 +40,11 @@ public class IndexModel : PageModel
         {
             ProviderLocations = await _providerDataService.GetLocationPostcodes(ukPrn);
             //Need to pass the currently selected location into the find, so it can get by distance
+            EmployerInterestList = await _employerInterestService.FindEmployerInterest();
+        }
+        else
+        {
+            //Non-provider organisation
             EmployerInterestList = await _employerInterestService.FindEmployerInterest();
         }
     }

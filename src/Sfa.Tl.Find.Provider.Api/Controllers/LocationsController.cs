@@ -51,8 +51,24 @@ public class LocationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> ValidatePostcode(string postcode)
     {
-        return !string.IsNullOrEmpty(postcode) 
-               && await _postcodeLookupService.IsValid(postcode)
+        _logger.LogInformation($"{nameof(LocationsController)} {nameof(ValidatePostcode)} called.");
+
+        var result = false;
+
+        try
+        {
+            result = !string.IsNullOrEmpty(postcode)
+                     && await _postcodeLookupService.IsValid(postcode);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in ValidatePostcode");
+        }
+
+        _logger.LogInformation("ValidatePostcode result is {result}.",
+            result);
+
+        return result 
             ? Ok()
             : new StatusCodeResult(StatusCodes.Status422UnprocessableEntity);
     }

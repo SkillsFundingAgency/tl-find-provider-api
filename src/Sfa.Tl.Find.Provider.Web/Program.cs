@@ -19,6 +19,7 @@ var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
 builder.Services.AddConfigurationOptions(siteConfiguration);
 
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, EmployerInterestViewerAuthorizationHandler>();
 builder.Services.AddAuthorizationServicePolicies();
 
 if (bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
@@ -40,14 +41,24 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 builder.Services.AddResponseCaching();
 
+builder.Services.Configure<RouteOptions>(option =>
+{
+    option.LowercaseUrls = true;
+    option.LowercaseQueryStrings = true;
+});
+
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
+    //options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
+    //options.Conventions.AddPageRoute("/EmployerDetail", "/employer-detail");
+
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/Accessibility");
     options.Conventions.AllowAnonymousToPage("/Cookies");
     options.Conventions.AllowAnonymousToPage("/Privacy");
+    options.Conventions.AllowAnonymousToPage("/TermsAndConditions");
 });
 builder.Services.AddControllers();
 
@@ -103,14 +114,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseXContentTypeOptions()
-    .UseReferrerPolicy(opts => opts.NoReferrer())
-    ;
+    .UseReferrerPolicy(opts => opts.NoReferrer());
 
 app.UseWhen(ctx =>
         ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern, Constants.FontsPathPattern),
         appBuilder =>
             appBuilder
-            .UseCsp(options => options
+                .UseCsp(options => options
                     .FrameAncestors(s => s.None())
                     .ObjectSources(s => s.None())
                     .ScriptSources(s => s
@@ -124,7 +134,15 @@ app.UseWhen(ctx =>
                 {
                     context.Response.Headers.Add("Expect-CT", "max-age=0, enforce");
                     context.Response.Headers.Add("Permissions-Policy", SecurityPolicies.PermissionsList);
-                    await next.Invoke();
+                    try
+                    {
+                        await next.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
                 })
     );
 

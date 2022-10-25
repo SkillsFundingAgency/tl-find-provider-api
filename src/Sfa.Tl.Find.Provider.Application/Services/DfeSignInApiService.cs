@@ -67,7 +67,11 @@ public class DfeSignInApiService : IDfeSignInApiService
                     Id = Guid.Parse(o.SafeGetString("id")),
                     Name = o.SafeGetString("name").ParseTLevelDefinitionName(Constants.QualificationNameMaxLength),
                     UkPrn = long.TryParse(o.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
-                    Urn = long.TryParse(o.SafeGetString("urn"), out var urnLong) ? urnLong : null
+                    Urn = long.TryParse(o.SafeGetString("urn"), out var urnLong) ? urnLong : null,
+                    Category = int.TryParse(
+                        o.GetProperty("category")
+                            .SafeGetString("id"), out var category) 
+                        ? category : 0
                 })
                 .FirstOrDefault();
 

@@ -14,7 +14,7 @@ public static class AuthenticationExtensions
 {
     public const string AuthenticationCookieName = "tl-provider-auth-cookie";
     public const string AuthenticationTypeName = "DfE-SignIn";
-    public const string AuthenticatedUserStartPage = "/dashboard";//"/employer-list";
+    public const string AuthenticatedUserStartPage = "/employer-list";
     public const string UnauthenticatedUserStartPage = "/start";
 
     public static void AddProviderAuthentication(
@@ -144,7 +144,7 @@ public static class AuthenticationExtensions
 
                     var organisation = ctx.Principal
                         .FindFirst("Organisation");
-                    if(organisation != null )
+                    if (organisation != null)
                     {
                         var organisationId = JsonDocument
                                 .Parse(organisation.Value)
@@ -156,21 +156,30 @@ public static class AuthenticationExtensions
                         var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
 
                         //TODO: probably don't need this check - we have a policy to look after everything
-                        if (userInfo.HasAccessToService)
+                        //if (userInfo.HasAccessToService)
                         {
                             claims.AddRange(new List<Claim>
                             {
                                 new(CustomClaimTypes.UserId, userId),
                                 new(CustomClaimTypes.OrganisationId, organisationId),
                                 new(CustomClaimTypes.OrganisationName, organisationInfo != null ? organisationInfo.Name : string.Empty),
-                                new(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn != null ? organisationInfo.UkPrn.Value.ToString() : string.Empty),
-                                new(CustomClaimTypes.Urn, organisationInfo?.Urn != null ? organisationInfo.Urn.Value.ToString() : string.Empty),
+                                new(CustomClaimTypes.OrganisationCategory, organisationInfo != null ? organisationInfo.Category.ToString() : string.Empty),
                                 new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
                                 new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name")?.Value ?? string.Empty),
-                                new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty),
-                                new(CustomClaimTypes.HasAccessToService, userInfo.HasAccessToService.ToString()),
+                                new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
+                                //new(CustomClaimTypes.HasAccessToService, userInfo.HasAccessToService.ToString()),
                                 //new Claim(CustomClaimTypes.LoginUserType, ((int)loggedInUserTypeResponse.UserType).ToString())
                             });
+
+                            if (organisationInfo?.UkPrn != null)
+                            {
+                                claims.Add(new Claim(CustomClaimTypes.UkPrn, organisationInfo.UkPrn.Value.ToString()));
+                            }
+
+                            if (organisationInfo?.Urn != null)
+                            {
+                                claims.Add(new Claim(CustomClaimTypes.Urn, organisationInfo.Urn.Value.ToString()));
+                            }
 
                             if (userInfo.Roles != null && userInfo.Roles.Any())
                             {
