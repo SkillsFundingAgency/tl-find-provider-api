@@ -7,7 +7,7 @@ using Sfa.Tl.Find.Provider.Web.Extensions;
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
 //TODO: add security
-//[AllowAnonymous]
+[AllowAnonymous]
 //[Authorize(nameof(PolicyNames.EmployerInterestViewer))]
 public class EmployerListModel : PageModel
 {

@@ -50,9 +50,6 @@ builder.Services.Configure<RouteOptions>(option =>
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
-    //options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
-    //options.Conventions.AddPageRoute("/EmployerDetail", "/employer-detail");
-
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/Accessibility");
@@ -134,15 +131,7 @@ app.UseWhen(ctx =>
                 {
                     context.Response.Headers.Add("Expect-CT", "max-age=0, enforce");
                     context.Response.Headers.Add("Permissions-Policy", SecurityPolicies.PermissionsList);
-                    try
-                    {
-                        await next.Invoke();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        throw;
-                    }
+                    await next.Invoke();
                 })
     );
 

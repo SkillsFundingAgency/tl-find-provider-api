@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 public class EmployerInterestDetailBuilder
 {
     private Guid _uniqueId;
-    private List<string> _skillAreas = new List<string>();
+    private readonly List<string> _skillAreas = new();
 
     public EmployerInterestDetail Build() => new()
     {
