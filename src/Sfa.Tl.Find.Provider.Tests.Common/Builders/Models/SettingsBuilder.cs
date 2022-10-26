@@ -23,6 +23,7 @@ public class SettingsBuilder
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
     private const int EmployerInterestRetentionDays = 10;
+    private static readonly DateTime EmployerInterestServiceStartDate = DateTime.Parse("2022-11-18");
     private const int EmployerInterestSearchRadius = 30;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
     private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
@@ -93,10 +94,12 @@ public class SettingsBuilder
         string employerSupportSiteUri = EmployerSupportSiteUri,
         string unsubscribeEmployerUri = UnsubscribeEmployerUri,
         int retentionDays = EmployerInterestRetentionDays,
+        DateTime? serviceStartDate = null,
         int searchRadius = EmployerInterestSearchRadius) => new()
         {
             EmployerSupportSiteUri = employerSupportSiteUri,
             RetentionDays = retentionDays,
+            ServiceStartDate = serviceStartDate ?? EmployerInterestServiceStartDate,
             SearchRadius = searchRadius,
             UnsubscribeEmployerUri = unsubscribeEmployerUri
         };
@@ -124,18 +127,22 @@ public class SettingsBuilder
     public SiteConfiguration BuildConfigurationOptions(
         ApiSettings apiSettings = null,
         CourseDirectoryApiSettings courseDirectoryApiSettings = null,
+        DfeSignInSettings dfeSignInSettings = null,
         EmailSettings emailSettings = null,
         EmployerInterestSettings employerInterestSettings = null,
+        GoogleMapsApiSettings googleMapsApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
         SearchSettings searchSettings = null,
-        string sqlConnectionString = "TestConnection",
+        string sqlConnectionString = ConnectionString,
         string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI",
         string townDataImportSchedule = "0 0 10 * * MON-FRI") => new()
         {
             ApiSettings = apiSettings ?? BuildApiSettings(),
             CourseDirectoryApiSettings = courseDirectoryApiSettings ?? BuildCourseDirectoryApiSettings(),
+            DfeSignInSettings = dfeSignInSettings ?? BuildDfeSignInSettings(),
             EmailSettings = emailSettings ?? BuildEmailSettings(),
             EmployerInterestSettings = employerInterestSettings ?? BuildEmployerInterestSettings(),
+            GoogleMapsApiSettings = googleMapsApiSettings ?? BuildGoogleMapsApiSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             SqlConnectionString = sqlConnectionString,

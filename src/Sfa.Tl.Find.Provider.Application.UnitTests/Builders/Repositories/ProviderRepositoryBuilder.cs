@@ -34,7 +34,7 @@ public class ProviderRepositoryBuilder
             logger);
     }
 
-    public async Task<IProviderRepository> BuildRepositoryWithDataToSearchProviders()
+    public async Task<IProviderRepository> BuildRepositoryWithDataToSearchProviders(int totalLocationsCountToReturn)
     {
         var builder = new ProviderSearchResultBuilder();
         var providersPart = builder
@@ -82,7 +82,7 @@ public class ProviderRepositoryBuilder
 
         var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
         var parameters = new DynamicParameters();
-        parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
+        parameters.Add("totalLocationsCount", totalLocationsCountToReturn, DbType.Int32, ParameterDirection.Output);
         dynamicParametersWrapper.DynamicParameters.Returns(parameters);
 
         return Build(

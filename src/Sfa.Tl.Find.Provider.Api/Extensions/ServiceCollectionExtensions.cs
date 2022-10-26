@@ -47,43 +47,35 @@ public static class ServiceCollectionExtensions
         services
             .Configure<ApiSettings>(x =>
             {
-                x.AppId = siteConfiguration.ApiSettings.AppId;
-                x.ApiKey = siteConfiguration.ApiSettings.ApiKey;
+                x.ConfigureApiSettings(siteConfiguration);
             })
             .Configure<CourseDirectoryApiSettings>(x =>
             {
-                x.BaseUri = siteConfiguration.CourseDirectoryApiSettings.BaseUri;
-                x.ApiKey = siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+                x.ConfigureCourseDirectoryApiSettings(siteConfiguration);
             })
             .Configure<EmailSettings>(x =>
             {
-                x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
-                x.DeliveryStatusToken = siteConfiguration.EmailSettings.DeliveryStatusToken;
-                x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
+                x.ConfigureEmailSettings(siteConfiguration);
             })
             .Configure<EmployerInterestSettings>(x =>
             {
-                x.EmployerSupportSiteUri = siteConfiguration.EmployerInterestSettings.EmployerSupportSiteUri;
-                x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
-                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
-                x.UnsubscribeEmployerUri = siteConfiguration.EmployerInterestSettings.UnsubscribeEmployerUri;
+                x.ConfigureEmployerInterestSettings(siteConfiguration);
             })
             .Configure<GoogleMapsApiSettings>(x =>
             {
-                x.ApiKey = siteConfiguration.GoogleMapsApiSettings.ApiKey;
-                x.BaseUri = siteConfiguration.GoogleMapsApiSettings.BaseUri;
+                x.ConfigureGoogleMapsApiSettings(siteConfiguration);
             })
             .Configure<PostcodeApiSettings>(x =>
             {
-                x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+                x.ConfigurePostcodeApiSettings(siteConfiguration);
             })
             .Configure<SearchSettings>(x =>
             {
-                x.MergeAdditionalProviderData = siteConfiguration.SearchSettings?.MergeAdditionalProviderData ?? false;
+                x.ConfigureSearchSettings(siteConfiguration);
             })
             .Configure<ConnectionStringSettings>(x =>
             {
-                x.SqlConnectionString = siteConfiguration.SqlConnectionString;
+                x.ConfigureConnectionStringSettings(siteConfiguration);
             });
 
         return services;

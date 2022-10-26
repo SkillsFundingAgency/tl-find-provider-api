@@ -70,8 +70,8 @@ public static class GeoLocationBuilder
 
     public static GeoLocation BuildGeoLocation(
         string location,
-        double latitude = 50.0,
-        double longitude = -1.0) =>
+        double latitude = Constants.DefaultLatitude,
+        double longitude = Constants.DefaultLongitude) =>
         new()
         {
             Location = location,

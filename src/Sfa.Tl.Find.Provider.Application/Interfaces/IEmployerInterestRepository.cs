@@ -16,4 +16,9 @@ public interface IEmployerInterestRepository
     Task<IEnumerable<EmployerInterest>> GetAll();
 
     Task<IEnumerable<EmployerInterestSummary>> GetSummaryList();
+
+    Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> Search(
+        double latitude, 
+        double longitude, 
+        int searchRadius);
 }

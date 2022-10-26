@@ -9,9 +9,17 @@ public interface IEmployerInterestService
 
     Task<int> RemoveExpiredEmployerInterest();
 
-    Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest();
+    Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(
+        double latitude,
+        double longitude);
+
+    Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(string postcode);
 
     Task<EmployerInterestDetail> GetEmployerInterestDetail(int id);
 
+    Task<IEnumerable<EmployerInterestSummary>> GetSummaryList();
+
     int RetentionDays { get; }
+    
+    DateOnly ServiceStartDate { get; }
 }

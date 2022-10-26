@@ -337,4 +337,71 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             .ThenBy(e => e.OrganisationName)
             .ToList();
     }
+
+    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> Search(
+        double latitude,
+        double longitude,
+        int searchRadius)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            fromLatitude = latitude,
+            fromLongitude = longitude,
+            searchRadius
+        })
+            .AddOutputParameter("@totalEmployerInterestsCount", DbType.Int32);
+
+        var summaryList = new Dictionary<int, EmployerInterestSummary>();
+
+        await _dbContextWrapper
+            .QueryAsync<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>(
+                connection,
+                "SearchEmployerInterest",
+                (e, r) =>
+                {
+                    if (!summaryList.TryGetValue(e.Id, out var summaryItem))
+                    {
+                        summaryList.Add(e.Id,
+                            summaryItem = new EmployerInterestSummary
+                            {
+                                Id = e.Id,
+                                OrganisationName = e.OrganisationName,
+                                Distance = e.Distance,
+                                Industry = e.Industry,
+                                CreatedOn = e.CreatedOn,
+                                ModifiedOn = e.ModifiedOn,
+                                SkillAreas = new List<string>()
+                            });
+                    }
+
+                    if (r is not null)
+                    {
+                        summaryItem.SkillAreas.Add(r.RouteName);
+                    }
+
+                    return summaryItem;
+                },
+                _dynamicParametersWrapper.DynamicParameters,
+                splitOn: "Id, RouteId",
+                commandType: CommandType.StoredProcedure);
+
+        var totalEmployerInterestsCount = _dynamicParametersWrapper
+            .DynamicParameters
+            .Get<int>("@totalEmployerInterestsCount");
+
+        _logger.LogInformation("{class}.{method} search with radius {searchRadius} found {resultsCount} of {resultsCount} results.",
+            nameof(EmployerInterestRepository), nameof(Search),
+            searchRadius, summaryList.Count, totalEmployerInterestsCount);
+
+        var searchResults = summaryList
+            .Values
+            .OrderBy(e => e.Distance)
+            .ThenByDescending(e => e.CreatedOn)
+            .ThenBy(e => e.OrganisationName)
+            .ToList();
+
+        return (searchResults, totalEmployerInterestsCount);
+    }
 }

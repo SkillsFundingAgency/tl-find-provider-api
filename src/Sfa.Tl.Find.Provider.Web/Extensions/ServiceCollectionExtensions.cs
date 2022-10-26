@@ -18,32 +18,23 @@ public static class ServiceCollectionExtensions
         services
             .Configure<DfeSignInSettings>(x =>
             {
-                x.ApiUri = siteConfiguration.DfeSignInSettings.ApiUri;
-                x.ClientId = siteConfiguration.DfeSignInSettings.ClientId;
-                x.ApiSecret = siteConfiguration.DfeSignInSettings.ApiSecret;
-                x.Audience = siteConfiguration.DfeSignInSettings.Audience;
-                x.Issuer = siteConfiguration.DfeSignInSettings.Issuer;
+                x.ConfigureDfeSignInSettings(siteConfiguration);
             })
             .Configure<EmailSettings>(x =>
             {
-                x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
-                x.DeliveryStatusToken = siteConfiguration.EmailSettings.DeliveryStatusToken;
-                x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
+                x.ConfigureEmailSettings(siteConfiguration);
             })
             .Configure<EmployerInterestSettings>(x =>
             {
-                x.EmployerSupportSiteUri = siteConfiguration.EmployerInterestSettings.EmployerSupportSiteUri;
-                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
-                x.SearchRadius = siteConfiguration.EmployerInterestSettings.SearchRadius;
-                x.UnsubscribeEmployerUri = siteConfiguration.EmployerInterestSettings.UnsubscribeEmployerUri;
+                x.ConfigureEmployerInterestSettings(siteConfiguration);
             })
             .Configure<PostcodeApiSettings>(x =>
             {
-                x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+                x.ConfigurePostcodeApiSettings(siteConfiguration);
             })
             .Configure<ConnectionStringSettings>(x =>
             {
-                x.SqlConnectionString = siteConfiguration.SqlConnectionString;
+                x.ConfigureConnectionStringSettings(siteConfiguration);
             });
 
         return services;

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Api.Controllers;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
@@ -36,21 +37,19 @@ public class FakeStartup
         services
             .Configure<ApiSettings>(x =>
             {
-                x.AppId = _siteConfiguration.ApiSettings.AppId;
-                x.ApiKey = _siteConfiguration.ApiSettings.ApiKey;
+                x.ConfigureApiSettings(_siteConfiguration);
             })
             .Configure<CourseDirectoryApiSettings>(x =>
             {
-                x.BaseUri = _siteConfiguration.CourseDirectoryApiSettings.BaseUri;
-                x.ApiKey = _siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+                x.ConfigureCourseDirectoryApiSettings(_siteConfiguration);
             })
             .Configure<PostcodeApiSettings>(x =>
             {
-                x.BaseUri = _siteConfiguration.PostcodeApiSettings.BaseUri;
+                x.ConfigurePostcodeApiSettings(_siteConfiguration);
             })
             .Configure<ConnectionStringSettings>(x =>
             {
-                x.SqlConnectionString = _siteConfiguration.SqlConnectionString;
+                x.ConfigureConnectionStringSettings(_siteConfiguration);
             });
 
         services.AddApiVersioning(config =>

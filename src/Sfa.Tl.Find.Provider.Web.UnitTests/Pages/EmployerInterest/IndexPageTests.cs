@@ -15,6 +15,19 @@ public class IndexPageTests
     }
 
     [Fact]
+    public async Task IndexModel_OnGet_Sets_UkPrn()
+    {
+        var indexModel = new EmployerInterestIndexModelBuilder()
+            .Build();
+
+        await indexModel.OnGet();
+
+        indexModel.UkPrn
+            .Should()
+            .Be(long.Parse(PageContextBuilder.DefaultUkPrn));
+    }
+
+    [Fact]
     public async Task IndexModel_OnGet_Sets_Expected_EmployerInterest_List()
     {
         var employerInterestSummary = new EmployerInterestSummaryBuilder()
@@ -23,7 +36,7 @@ public class IndexPageTests
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
         employerInterestService
-            .FindEmployerInterest()
+            .GetSummaryList()
             .Returns(employerInterestSummary);
 
         var indexModel = new EmployerInterestIndexModelBuilder()

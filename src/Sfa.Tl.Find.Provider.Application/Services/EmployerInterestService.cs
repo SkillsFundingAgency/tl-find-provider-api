@@ -44,6 +44,10 @@ public class EmployerInterestService : IEmployerInterestService
 
     public int RetentionDays => _employerInterestSettings.RetentionDays;
 
+    public DateOnly ServiceStartDate => 
+        _employerInterestSettings?.ServiceStartDate is not null 
+            ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
+            : DateOnly.MinValue;
 
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
@@ -106,10 +110,35 @@ public class EmployerInterestService : IEmployerInterestService
         return count;
     }
 
-    public Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest()
+    public async Task<IEnumerable<EmployerInterestSummary>> GetSummaryList()
     {
-        //TODO: Create a find method that takes lat/long or location
-        return _employerInterestRepository.GetSummaryList();
+        return await _employerInterestRepository.GetSummaryList();
+    }
+
+    public async Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(string postcode)
+    {
+        var postcodeLocation = postcode.Length <= 4
+            ? await _postcodeLookupService.GetOutcode(postcode)
+            : await _postcodeLookupService.GetPostcode(postcode);
+
+        if (postcodeLocation is not null)
+        {
+            var searchRadius = _employerInterestSettings.SearchRadius;
+            return (await _employerInterestRepository
+                    .Search(postcodeLocation.Latitude, postcodeLocation.Longitude, searchRadius)
+                ).SearchResults;
+        }
+
+        return await _employerInterestRepository.GetSummaryList();
+    }
+
+    public async Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(double latitude,
+        double longitude)
+    {
+        var searchRadius = _employerInterestSettings.SearchRadius;
+        return (await _employerInterestRepository
+                .Search(latitude, longitude, searchRadius)
+            ).SearchResults;
     }
 
     public Task<EmployerInterestDetail> GetEmployerInterestDetail(int id)

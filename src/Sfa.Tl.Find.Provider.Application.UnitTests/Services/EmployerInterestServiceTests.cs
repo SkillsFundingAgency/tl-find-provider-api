@@ -56,14 +56,10 @@ public class EmployerInterestServiceTests
 
         await employerInterestRepository
             .Received(1)
-            .Create(Arg.Any<EmployerInterest>());
-        
-        await employerInterestRepository
-            .Received(1)
             .Create(Arg.Is<EmployerInterest>(e =>
                 e.Validate(expectedEmployerInterest, false, false)));
     }
-    
+
     [Fact]
     public async Task CreateEmployerInterest_Calls_EmailService()
     {
@@ -152,10 +148,10 @@ public class EmployerInterestServiceTests
         result.Should().Be(uniqueId);
 
         const string expectedContactPreference = "Email";
-        var expectedIndustry = 
+        var expectedIndustry =
             $"{industries.Single(i => i.Id == 9).Name}";
 
-        var expectedSkillAreas = 
+        var expectedSkillAreas =
             $"{routes.Single(r => r.Id == 1).Name}, {routes.Single(r => r.Id == 2).Name}";
 
         var expectedUnsubscribeUri =
@@ -275,25 +271,78 @@ public class EmployerInterestServiceTests
     }
 
     [Fact]
-    public async Task FindEmployerInterest_Returns_Expected_List()
+    public async Task FindEmployerInterest_By_Lat_Long_Returns_Expected_List()
     {
+        const double latitude = 52.400997;
+        const double longitude = -1.508122;
+        const int employerInterestsCount = 1000;
+
+        var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
+        .BuildList()
+        .ToList();
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository
+            .Search(
+                latitude,
+                longitude,
+                settings.SearchRadius
+            )
+            .Returns((employerInterestSummaryList, employerInterestsCount));
+
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var results =
+            (await service.FindEmployerInterest(latitude, longitude))
+            .ToList();
+
+        results.Should().BeEquivalentTo(employerInterestSummaryList);
+    }
+
+    [Fact]
+    public async Task FindEmployerInterest_By_Postcode_Returns_Expected_List()
+    {
+        const string postcode = "CV1 2WT";
+        const int employerInterestsCount = 1000;
+
         var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
             .BuildList()
             .ToList();
 
+        var geoLocation = GeoLocationBuilder.BuildGeoLocation(postcode);
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                postcode)
+            .Returns(geoLocation);
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.GetSummaryList()
-            .Returns(employerInterestSummaryList);
+        employerInterestRepository
+            .Search(
+                geoLocation.Latitude,
+                geoLocation.Longitude,
+                settings.SearchRadius
+                )
+            .Returns((employerInterestSummaryList, employerInterestsCount));
 
         var service = new EmployerInterestServiceBuilder()
-            .Build(employerInterestRepository: employerInterestRepository);
+            .Build(
+                postcodeLookupService: postcodeLookupService,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
 
-        var results = (await service.FindEmployerInterest()).ToList();
+        var results =
+            (await service.FindEmployerInterest(postcode))
+            .ToList();
+
         results.Should().BeEquivalentTo(employerInterestSummaryList);
-
-        await employerInterestRepository
-            .Received(1)
-            .GetSummaryList();
     }
 
     [Fact]
@@ -312,10 +361,26 @@ public class EmployerInterestServiceTests
 
         var result = await service.GetEmployerInterestDetail(id);
         result.Should().Be(employerInterest);
+    }
 
-        await employerInterestRepository
-            .Received(1)
-            .GetDetail(id);
+    [Fact]
+    public async Task GetSummaryList_Returns_Expected_List()
+    {
+        var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
+            .BuildList()
+            .ToList();
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.GetSummaryList()
+            .Returns(employerInterestSummaryList);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository);
+
+        var results =
+            (await service.GetSummaryList())
+            .ToList();
+        results.Should().BeEquivalentTo(employerInterestSummaryList);
     }
 
     [Fact]
@@ -323,13 +388,27 @@ public class EmployerInterestServiceTests
     {
         const int retentionDays = 99;
 
-        var settings = new SettingsBuilder()
-            .BuildEmployerInterestSettings(
-                retentionDays: retentionDays);
-
         var service = new EmployerInterestServiceBuilder()
-            .Build(employerInterestSettings: settings);
+            .Build(employerInterestSettings:
+                new SettingsBuilder()
+                    .BuildEmployerInterestSettings(
+                        retentionDays: retentionDays));
 
         service.RetentionDays.Should().Be(retentionDays);
+    }
+
+    [Fact]
+    public void ServiceStartDate_Returns_Expected_Value()
+    {
+        var serviceStartDate = DateTime.Parse("2022-11-11");
+        var expectedServiceStartDate = DateOnly.FromDateTime(serviceStartDate);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestSettings:
+                new SettingsBuilder()
+                    .BuildEmployerInterestSettings(
+                        serviceStartDate: serviceStartDate));
+
+        service.ServiceStartDate.Should().Be(expectedServiceStartDate);
     }
 }

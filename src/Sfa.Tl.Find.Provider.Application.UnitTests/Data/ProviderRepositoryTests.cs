@@ -287,12 +287,13 @@ public class ProviderRepositoryTests
     public async Task Search_Returns_Expected_List_For_Single_Result_Row()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        const int totalLocationsCount = 1234;
 
         var expectedResult = new ProviderSearchResultBuilder()
             .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
         var repository = await new ProviderRepositoryBuilder()
-            .BuildRepositoryWithDataToSearchProviders();
+            .BuildRepositoryWithDataToSearchProviders(totalLocationsCount);
 
         var searchResults = await repository.Search(fromGeoLocation, null, null, 0, 5, false);
 
@@ -300,6 +301,7 @@ public class ProviderRepositoryTests
         var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
+        searchResults.TotalResultsCount.Should().Be(totalLocationsCount);
 
         searchResultsList.First().Validate(expectedResult);
     }
@@ -308,12 +310,13 @@ public class ProviderRepositoryTests
     public async Task Search_Merges_Additional_Data()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        const int totalLocationsCount = 1234;
 
         var expectedResult = new ProviderSearchResultBuilder()
              .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
         var repository = await new ProviderRepositoryBuilder()
-            .BuildRepositoryWithDataToSearchProviders();
+            .BuildRepositoryWithDataToSearchProviders(totalLocationsCount);
 
         var searchResults = await repository
             .Search(
@@ -328,6 +331,7 @@ public class ProviderRepositoryTests
         var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
+        searchResults.TotalResultsCount.Should().Be(totalLocationsCount);
 
         searchResultsList.First().Validate(expectedResult);
     }

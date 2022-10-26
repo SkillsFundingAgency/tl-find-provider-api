@@ -260,7 +260,8 @@ public class ProviderRepository : IProviderRepository
             page,
             pageSize,
             includeAdditionalData
-        }).AddOutputParameter("totalLocationsCount", DbType.Int32);
+        })
+            .AddOutputParameter("totalLocationsCount", DbType.Int32);
 
         await _dbContextWrapper
             .QueryAsync<ProviderSearchResult, DeliveryYearSearchResult, RouteDto, QualificationDto, ProviderSearchResult>(

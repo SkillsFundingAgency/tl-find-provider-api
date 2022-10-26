@@ -100,6 +100,10 @@
           "type": "integer",
           "environmentVariable": "EmployerInterestSettings_RetentionDays"
         },
+        "ServiceStartDate": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_ServiceStartDate"
+        },
         "SearchRadius": {
           "type": "integer",
           "environmentVariable": "EmployerInterestSettings_SearchRadius"

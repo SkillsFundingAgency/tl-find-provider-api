@@ -50,6 +50,7 @@ builder.Services.Configure<RouteOptions>(option =>
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
+    options.Conventions.AddPageRoute("/EmployerInterest/Index", "/test-employer-list");
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/Accessibility");

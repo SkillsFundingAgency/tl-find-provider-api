@@ -11,13 +11,28 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
-        <h3>Postcodes</h3>
-        <ul>
-            @foreach (var location in Model.ProviderLocations ?? Enumerable.Empty<LocationPostcode>())
-            {
-                <li>@location.Postcode</li>
-            }
-        </ul>
+        <form novalidate method="POST">
+            <div>
+                <h3>Postcodes</h3>
+                <ul>
+                    @foreach (var location in Model.ProviderLocations ?? Enumerable.Empty<LocationPostcode>())
+                    {
+                        <li>@location.Postcode</li>
+                    }
+                </ul>
+
+                <div class="govuk-form-group">
+                    <label class="govuk-label">
+                        Postcode
+                    </label>
+                    <span class="govuk-error-message"></span>
+                    <input class="govuk-input govuk-input--width-20" asp-for="Postcode" id="tl-postcode" type="text">
+                </div>
+
+            </div>
+
+            <button type="submit" class="govuk-button" id="tl-search">Search</button>
+        </form>
 
         <table class="govuk-table">
             <thead class="govuk-table__head">

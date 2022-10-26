@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -13,6 +14,15 @@ public class IndexModel : PageModel
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
 
     public IEnumerable<LocationPostcode>? ProviderLocations { get; private set; }
+
+    public bool IsProvider => UkPrn.HasValue;
+
+    public long? UkPrn { get; private set; }
+
+    [BindProperty]
+    public string? Postcode { get; set; }
+
+    //public string Name { get; set; }
 
     public int EmployerInterestRetentionDays =>
         _employerInterestService.RetentionDays;
@@ -34,18 +44,53 @@ public class IndexModel : PageModel
 
     public async Task OnGet()
     {
-        var ukPrnClaim = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
-        if (ukPrnClaim is not null &&
-            long.TryParse(ukPrnClaim, out var ukPrn))
+        GetValuesFromClaims();
+        
+        if (UkPrn.HasValue)
         {
-            ProviderLocations = await _providerDataService.GetLocationPostcodes(ukPrn);
-            //Need to pass the currently selected location into the find, so it can get by distance
-            EmployerInterestList = await _employerInterestService.FindEmployerInterest();
+            await LoadProviderPostcodes(UkPrn.Value);
+            EmployerInterestList = await _employerInterestService.GetSummaryList();
         }
         else
         {
             //Non-provider organisation
-            EmployerInterestList = await _employerInterestService.FindEmployerInterest();
+            EmployerInterestList = await _employerInterestService.GetSummaryList();
         }
+    }
+
+    public async Task OnPost()
+    {
+        GetValuesFromClaims();
+        if (UkPrn.HasValue)
+        {
+            await LoadProviderPostcodes(UkPrn.Value);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return;// Page();
+        }
+
+        //Will need to reload providers as well - 
+        if (!string.IsNullOrEmpty(Postcode))
+        {
+            EmployerInterestList = await _employerInterestService.FindEmployerInterest(Postcode);
+        }
+
+        //return Page();
+    }
+
+    private void GetValuesFromClaims()
+    {
+        var ukPrnClaim = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
+        UkPrn = ukPrnClaim is not null && long.TryParse(ukPrnClaim, out var ukPrn)
+            ? ukPrn
+            : default;
+    }
+
+    private async Task LoadProviderPostcodes(long ukPrn)
+    {
+        ProviderLocations = await _providerDataService.GetLocationPostcodes(ukPrn);
+
     }
 }
