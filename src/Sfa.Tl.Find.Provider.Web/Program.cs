@@ -51,11 +51,13 @@ builder.Services.AddRazorPages(options =>
 {
     options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
     options.Conventions.AddPageRoute("/EmployerInterest/Index", "/test-employer-list");
+    options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
+    options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/Accessibility");
-    options.Conventions.AllowAnonymousToPage("/Cookies");
-    options.Conventions.AllowAnonymousToPage("/Privacy");
+    options.Conventions.AllowAnonymousToPage("/Help/Cookies");
+    options.Conventions.AllowAnonymousToPage("/Help/Privacy");
     options.Conventions.AllowAnonymousToPage("/TermsAndConditions");
 });
 builder.Services.AddControllers();
