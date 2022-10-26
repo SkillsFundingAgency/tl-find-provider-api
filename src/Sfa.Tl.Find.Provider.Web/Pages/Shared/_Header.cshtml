@@ -22,9 +22,7 @@
         <div class="govuk-header__content">
             @if (Context.User.Identity!.IsAuthenticated)
             {
-                <a asp-page="/EmployerList" class="govuk-header__link govuk-header__link--service-name">
-                    @PageExtensions.GetServiceName()
-                </a>
+
                 <button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
                 @*<ul id="navigation" class="govuk-header__navigation tl-float-right">
                     <li class="govuk-header__navigation-item">
@@ -37,9 +35,7 @@
             }
             else
             {
-                <a asp-page="/Start" class="govuk-header__link govuk-header__link--service-name">
-                    @PageExtensions.GetServiceName()
-                </a>
+
             }
         </div>
     </div>
