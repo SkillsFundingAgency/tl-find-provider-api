@@ -28,7 +28,10 @@
                     <span class="govuk-error-message"></span>
                     <input class="govuk-input govuk-input--width-20" asp-for="Postcode" id="tl-postcode" type="text">
                 </div>
+            </div>
 
+            <div>
+                <p class="govuk-body">Search radius: @Model.SearchRadius</p>
             </div>
 
             <button type="submit" class="govuk-button" id="tl-search">Search</button>
@@ -77,5 +80,10 @@
                 }
             </tbody>
         </table>
+        <div>
+            <p class="govuk-body">Total available items: @Model.TotalEmployerInterestItems</p>
+            <p class="govuk-body">Service start date: @Model.ServiceStartDate?.ToString("d MMM yyyy")</p>
+            <p class="govuk-body">Data will be retained for @Model.EmployerInterestRetentionWeeks weeks</p>
+        </div>
     </div>
 </div>

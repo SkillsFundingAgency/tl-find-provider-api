@@ -13,7 +13,8 @@ public interface IEmployerInterestService
         double latitude,
         double longitude);
 
-    Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(string postcode);
+    Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> 
+        FindEmployerInterest(string postcode);
 
     Task<EmployerInterestDetail> GetEmployerInterestDetail(int id);
 

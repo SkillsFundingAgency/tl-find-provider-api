@@ -30,5 +30,4 @@ public class StartModel : PageModel
 
         return Page();
     }
-
 }

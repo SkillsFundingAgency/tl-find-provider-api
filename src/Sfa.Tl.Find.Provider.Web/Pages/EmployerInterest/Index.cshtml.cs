@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 
@@ -13,6 +15,8 @@ public class IndexModel : PageModel
 {
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
 
+    public int? TotalEmployerInterestItems { get; private set; }
+
     public IEnumerable<LocationPostcode>? ProviderLocations { get; private set; }
 
     public bool IsProvider => UkPrn.HasValue;
@@ -22,24 +26,38 @@ public class IndexModel : PageModel
     [BindProperty]
     public string? Postcode { get; set; }
 
-    //public string Name { get; set; }
-
     public int EmployerInterestRetentionDays =>
-        _employerInterestService.RetentionDays;
+        _employerInterestSettings.RetentionDays;
+
+    public int EmployerInterestRetentionWeeks =>
+        (int)Math.Ceiling(_employerInterestSettings.RetentionDays / 7d);
+
+    public int SearchRadius =>
+        _employerInterestSettings.SearchRadius;
+    
+    public DateOnly? ServiceStartDate =>
+        _employerInterestSettings?.ServiceStartDate is not null
+            ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
+            : DateOnly.MinValue;
 
     private IEmployerInterestService _employerInterestService;
     private IProviderDataService _providerDataService;
+    private readonly EmployerInterestSettings _employerInterestSettings;
     private readonly ILogger<IndexModel> _logger;
 
     public IndexModel(
         IEmployerInterestService employerInterestService,
         IProviderDataService providerDataService,
+        IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<IndexModel> logger)
     {
         _employerInterestService =
             employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        _employerInterestSettings = employerInterestOptions?.Value
+                                    ?? throw new ArgumentNullException(nameof(employerInterestOptions));
     }
 
     public async Task OnGet()
@@ -74,7 +92,7 @@ public class IndexModel : PageModel
         //Will need to reload providers as well - 
         if (!string.IsNullOrEmpty(Postcode))
         {
-            EmployerInterestList = await _employerInterestService.FindEmployerInterest(Postcode);
+            (EmployerInterestList, TotalEmployerInterestItems) = await _employerInterestService.FindEmployerInterest(Postcode);
         }
 
         //return Page();

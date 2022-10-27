@@ -418,11 +418,11 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var results =
-            (await service.FindEmployerInterest(postcode))
-            .ToList();
-
-        results.Should().BeEquivalentTo(employerInterestSummaryList);
+        var results = await service.FindEmployerInterest(postcode);
+        
+        results.Should().NotBeNull();
+        results.SearchResults.Should().BeEquivalentTo(employerInterestSummaryList);
+        results.TotalResultsCount.Should().Be(employerInterestsCount);
     }
 
     [Fact]
