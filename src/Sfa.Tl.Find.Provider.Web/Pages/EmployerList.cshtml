@@ -2,5 +2,56 @@
 @model EmployerListModel
 @{
 }
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">@PageExtensions.GetServiceName()</h1>
+        <p class="govuk-body">
+            Employers have agreed for their details to be shared for 12 weeks.<br />
+            After 12 weeks, <strong>their details will expire</strong> unless they agree to extend their interest. 
+        </p>
+        <div class="govuk-form-group tl-inline-form-group">
+          <label class="govuk-label govuk-!-margin-bottom-4" for="postcode">
+            Select or enter a postcode to see contact details for employers within 20 miles:
+          </label>
+          <select class="govuk-select govuk-!-margin-right-4" id="postcode" name="postcode">
+                <option value="Select postcode" selected>Select postcode</option>
+                <option value="SW1A 2AA">SW1A 2AA</option>
+                <option value="CV11 1AB">CV11 1AB</option>
+                <option value="Enter postcode">Enter postcode</option>
+          </select>
 
-<h1>Employer list</h1>
+            <label class="govuk-label govuk-visually-hidden" for="postcode-manual">
+            Enter postcode
+            </label>
+            <input class="govuk-input govuk-input--width-10" placeholder="Enter postcode" id="postcode-manual" name="postcode-manual" type="text">
+            <button class="govuk-button">Search</button>
+        </div>
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <table class="govuk-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Months and rates</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Organisation</th>
+      <th scope="col" class="govuk-table__header">Placement areas</th>
+      <th scope="col" class="govuk-table__header">Distance</th>
+       <th scope="col" class="govuk-table__header">Details expire</th>
+        <th scope="col" class="govuk-table__header"></th>
+
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Lloyds Banking Group</th>
+        <td class="govuk-table__cell tl-table__cell__list"><p>Digital and IT</p><p>Legal, Finance and Accounting</p></td>      
+        <td class="govuk-table__cell">22 miles</td>
+        <td class="govuk-table__cell">2 Jan 2023</td>
+        <td class="govuk-table__cell"><a href="#" class="govuk-link">View</a></td>
+
+    </tr>
+  </tbody>
+</table>
+    </div>
+</div>
