@@ -19,7 +19,7 @@ public static class AuthenticationExtensions
     public const string AuthenticatedUserStartPageExact = "/EmployerList";
     public const string UnauthenticatedUserStartPage = "/start";
 
-    public static void AddProviderAuthentication(
+    public static IServiceCollection AddProviderAuthentication(
         this IServiceCollection services,
         DfeSignInSettings signInSettings,
         IWebHostEnvironment environment)
@@ -49,25 +49,25 @@ public static class AuthenticationExtensions
             options.Cookie.SecurePolicy = cookieSecurePolicy;
             options.SlidingExpiration = true;
             options.ExpireTimeSpan = overallSessionTimeout;
-            //options.LogoutPath = signInSettings.LogoutPath;
+            options.LogoutPath = "/signout";
             options.AccessDeniedPath = "/Error/403";
-            options.Events = new CookieAuthenticationEvents
-            {
-                OnValidatePrincipal = async x =>
-                {
-                    // since our cookie lifetime is based on the access token one,
-                    // check if we're more than halfway of the cookie lifetime
-                    // assume a timeout of 20 minutes.
-                    var timeElapsed = DateTimeOffset.UtcNow.Subtract(x.Properties.IssuedUtc.Value);
+            //options.Events = new CookieAuthenticationEvents
+            //{
+            //    OnValidatePrincipal = async x =>
+            //    {
+            //        // since our cookie lifetime is based on the access token one,
+            //        // check if we're more than halfway of the cookie lifetime
+            //        // assume a timeout of 20 minutes.
+            //        var timeElapsed = DateTimeOffset.UtcNow.Subtract(x.Properties.IssuedUtc.Value);
 
-                    if (timeElapsed > TimeSpan.FromMinutes(19.5))
-                    {
-                        var identity = (ClaimsIdentity)x.Principal.Identity;
-                        var accessTokenClaim = identity.FindFirst("access_token");
-                        var refreshTokenClaim = identity.FindFirst("refresh_token");
-                    }
-                }
-            };
+            //        if (timeElapsed > TimeSpan.FromMinutes(19.5))
+            //        {
+            //            var identity = (ClaimsIdentity)x.Principal.Identity;
+            //            var accessTokenClaim = identity.FindFirst("access_token");
+            //            var refreshTokenClaim = identity.FindFirst("refresh_token");
+            //        }
+            //    }
+            //};
         })
         .AddOpenIdConnect(options =>
         {
@@ -84,6 +84,8 @@ public static class AuthenticationExtensions
             options.Scope.Add("email");
             options.Scope.Add("profile");
             options.Scope.Add("organisation");
+            //TODO: What does this get us?
+            options.Scope.Add("organisationid");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In
             options.MaxAge = overallSessionTimeout;
@@ -185,17 +187,19 @@ public static class AuthenticationExtensions
                 }
 
                 //Additional events for testing
-                ,
-                OnRemoteSignOut = async ctx =>
-                {
-                },
+                //,
+                //OnRemoteSignOut = async ctx =>
+                //{
+                //},
 
-                OnRedirectToIdentityProvider = context =>
-                {
-                    context.ProtocolMessage.Prompt = "consent";
-                    return Task.CompletedTask;
-                },
+                //OnRedirectToIdentityProvider = context =>
+                //{
+                //    context.ProtocolMessage.Prompt = "consent";
+                //    return Task.CompletedTask;
+                //},
             };
         });
+
+        return services;
     }
 }
