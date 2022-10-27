@@ -35,12 +35,12 @@ USING (VALUES
   (7, 38),  -- Education and Childcare
 
   -- Engineering and manufacturing
-  (8, 48),  --Design and Development for Engineering and Manufacturing
-  (8, 49),  --Maintenance, Installation and Repair for Engineering and Manufacturing
-  (8, 50),  --Engineering, Manufacturing, Processing and Control
+  (8, 48),  -- Design and Development for Engineering and Manufacturing
+  (8, 49),  -- Maintenance, Installation and Repair for Engineering and Manufacturing
+  (8, 50),  -- Engineering, Manufacturing, Processing and Control
 
   -- Hair and beauty
-  (9, 53),  -- Hair, Beauty and Aesthetics
+  (9, 53),  -- Hairdressing, Barbering and Beauty Therapy
 
   -- Health and science
   (10, 41), -- Health
@@ -50,7 +50,7 @@ USING (VALUES
   --Legal, finance and accounting
   (11, 46), -- Finance
   (11, 47), -- Accounting
-  (11, 52) -- Legal Services
+  (11, 52)  -- Legal Services
   )
   AS Source ([RouteId], [QualificationId])
 ON Target.[RouteId] = Source.[RouteId] 
