@@ -1,7 +1,6 @@
 ﻿/*
 Insert initial data for Routes.
 The values below group the qualifications with ids (framework codes) within routes.
-Qualifications that don't exist yet are commented ouyt.
 As new qualifications are created, the mapping can be set here.
 */
 
