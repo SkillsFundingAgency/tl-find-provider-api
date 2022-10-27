@@ -63,6 +63,7 @@ public static class ConfigurationExtensions
             DfeSignInSettings = configuration.GetSection(Constants.DfeSignInSettingsConfigKey).Get<DfeSignInSettings>(),
             EmailSettings = configuration.GetSection(Constants.EmailSettingsConfigKey).Get<EmailSettings>(),
             EmployerInterestSettings = configuration.GetSection(Constants.EmployerInterestSettingsConfigKey).Get<EmployerInterestSettings>(),
+            GoogleMapsApiSettings = configuration.GetSection(Constants.GoogleMapsApiSettingsConfigKey).Get<GoogleMapsApiSettings>(),
             PostcodeApiSettings = configuration.GetSection(Constants.PostcodeApiSettingsConfigKey).Get<PostcodeApiSettings>(),
             SearchSettings = configuration.GetSection(Constants.SearchSettingsConfigKey).Get<SearchSettings>(),
             SqlConnectionString = configuration[Constants.SqlConnectionStringConfigKey],

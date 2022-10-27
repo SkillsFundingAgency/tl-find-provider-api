@@ -24,7 +24,7 @@ public class LocationsController : ControllerBase
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     /// <summary>
     /// Search for locations by partial name.
     /// </summary>
@@ -68,7 +68,7 @@ public class LocationsController : ControllerBase
         _logger.LogInformation("ValidatePostcode result is {result}.",
             result);
 
-        return result 
+        return result
             ? Ok()
             : new StatusCodeResult(StatusCodes.Status422UnprocessableEntity);
     }

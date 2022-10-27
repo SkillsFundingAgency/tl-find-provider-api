@@ -53,6 +53,27 @@ public class EmployerInterestBuilder
     public EmployerInterest Build() =>
         BuildList().First();
 
+    public EmployerInterest BuildWithEmptyNonMandatoryProperties()
+    {
+        var employerInterest = Build();
+        return new EmployerInterest
+        {
+            Id = default,
+            UniqueId = default,
+            OrganisationName = null,
+            ContactName = null,
+            Postcode = "CV1 2WT",
+            IndustryId = null,
+            OtherIndustry = null,
+            Email = null,
+            Telephone = null,
+            Website = null,
+            ContactPreferenceType = default,
+            AdditionalInformation = null,
+            SkillAreaIds = null
+        };
+    }
+
     public EmployerInterest BuildWithGeoLocation(GeoLocation geoLocation, bool includeIds = false)
     {
         var employerInterest = Build();
@@ -71,10 +92,10 @@ public class EmployerInterestBuilder
             Telephone = employerInterest.Telephone,
             Website = employerInterest.Website,
             ContactPreferenceType = employerInterest.ContactPreferenceType,
-            AdditionalInformation = employerInterest.AdditionalInformation,
+            AdditionalInformation = employerInterest.AdditionalInformation
         };
     }
-            
+
     public EmployerInterestBuilder WithUniqueId(Guid uniqueId)
     {
         _uniqueIds.Clear();

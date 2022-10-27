@@ -44,8 +44,8 @@ public class EmployerInterestService : IEmployerInterestService
 
     public int RetentionDays => _employerInterestSettings.RetentionDays;
 
-    public DateOnly ServiceStartDate => 
-        _employerInterestSettings?.ServiceStartDate is not null 
+    public DateOnly ServiceStartDate =>
+        _employerInterestSettings?.ServiceStartDate is not null
             ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
             : DateOnly.MinValue;
 
@@ -176,19 +176,19 @@ public class EmployerInterestService : IEmployerInterestService
 
         var tokens = new Dictionary<string, string>
         {
-            { "contact_name", employerInterest.ContactName },
+            { "contact_name", employerInterest.ContactName ?? "" },
             { "email_address", employerInterest.Email ?? "" },
             { "telephone", employerInterest.Telephone ?? "" },
-            { "contact_preference", contactPreference },
-            { "organisation_name", employerInterest.OrganisationName },
+            { "contact_preference", contactPreference ?? "" },
+            { "organisation_name", employerInterest.OrganisationName ?? "" },
             { "website", employerInterest.Website ?? "" },
-            { "primary_industry", industry },
-            { "placement_area", placementAreas },
+            { "primary_industry", industry ?? "" },
+            { "placement_area", placementAreas ?? "" },
             { "has_multiple_placement_areas", skillAreas.Count > 1 ? "yes" : "no" },
-            { "postcode", employerInterest.Postcode },
-            { "additional_information", employerInterest.AdditionalInformation },
-            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri },
-            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
+            { "postcode", employerInterest.Postcode ?? "" },
+            { "additional_information", employerInterest.AdditionalInformation ?? "" },
+            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
+            { "employer_unsubscribe_uri", unsubscribeUri.ToString() ?? "" }
         };
 
         return await _emailService.SendEmail(
@@ -199,23 +199,13 @@ public class EmployerInterestService : IEmployerInterestService
 
     private async Task<GeoLocation> GetPostcode(string postcode)
     {
-        var key = CacheKeys.PostcodeKey(postcode);
+        var geoLocation = postcode.Length <= 4
+            ? await _postcodeLookupService.GetOutcode(postcode)
+            : await _postcodeLookupService.GetPostcode(postcode);
 
-        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
+        if (geoLocation is null)
         {
-            geoLocation = postcode.Length <= 4
-                ? await _postcodeLookupService.GetOutcode(postcode)
-                : await _postcodeLookupService.GetPostcode(postcode);
-
-            if (geoLocation is null)
-            {
-                throw new PostcodeNotFoundException(postcode);
-            }
-
-            _cache.Set(key, geoLocation,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(
-                    _dateTimeService,
-                    _logger));
+            throw new PostcodeNotFoundException(postcode);
         }
 
         return geoLocation;

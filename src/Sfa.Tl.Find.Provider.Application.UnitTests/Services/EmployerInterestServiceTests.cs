@@ -183,6 +183,86 @@ public class EmployerInterestServiceTests
     }
 
     [Fact]
+    public async Task CreateEmployerInterest_Calls_EmailService_With_Null_Non_Mandatory_Properties()
+    {
+        var employerInterest = new EmployerInterestBuilder().BuildWithEmptyNonMandatoryProperties();
+        var routes = new RouteBuilder().BuildList().ToList();
+        var industries = new IndustryBuilder().BuildList().ToList();
+
+        var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>())
+            .Returns(true);
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetIndustries()
+            .Returns(industries);
+        providerDataService.GetRoutes()
+            .Returns(routes);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
+            .Returns((1, uniqueId));
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                emailService: emailService,
+                postcodeLookupService: postcodeLookupService,
+                providerDataService: providerDataService,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.CreateEmployerInterest(employerInterest);
+
+        result.Should().Be(uniqueId);
+
+        const string expectedContactPreference = "No preference";
+        var expectedIndustry =
+            $"{industries.Single(i => i.Id == 9).Name}";
+
+        var expectedSkillAreas =
+            $"{routes.Single(r => r.Id == 1).Name}, {routes.Single(r => r.Id == 2).Name}";
+
+        var expectedUnsubscribeUri =
+            $"{settings.UnsubscribeEmployerUri.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+
+        await emailService
+            .Received(1)
+            .SendEmail(
+                employerInterest.Email,
+                EmailTemplateNames.EmployerRegisterInterest,
+                Arg.Is<IDictionary<string, string>>(tokens =>
+                    tokens.ValidateTokens(
+                        new Dictionary<string, string>
+                        {
+                            { "organisation_name", string.Empty },
+                            { "contact_name", string.Empty },
+                            { "email_address", string.Empty },
+                            { "telephone", string.Empty },
+                            { "website", string.Empty },
+                            { "contact_preference", expectedContactPreference },
+                            { "primary_industry", string.Empty },
+                            { "placement_area", string.Empty },
+                            { "has_multiple_placement_areas", "no" },
+                            { "postcode", employerInterest.Postcode },
+                            { "additional_information", string.Empty },
+                            { "employer_support_site", settings.EmployerSupportSiteUri },
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
+                        })));
+    }
+
+    [Fact]
     public async Task CreateEmployerInterest_Calls_PostcodeLookupService()
     {
         var employerInterest = new EmployerInterestBuilder().Build();

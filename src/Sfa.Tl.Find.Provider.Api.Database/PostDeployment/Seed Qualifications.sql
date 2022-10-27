@@ -1,8 +1,5 @@
 ﻿/*
 Insert initial data for Qualifications
-
-This is an insert-only script - the nightly import will manage any changes
-
 */
 
 MERGE INTO [dbo].[Qualification] AS Target 

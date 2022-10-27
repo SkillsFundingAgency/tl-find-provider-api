@@ -364,23 +364,13 @@ public class ProviderDataService : IProviderDataService
 
     private async Task<GeoLocation> GetPostcode(string postcode)
     {
-        var key = CacheKeys.PostcodeKey(postcode);
-
-        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
-        {
-            geoLocation = postcode.Length <= 4
+        var geoLocation = postcode.Length <= 4
                 ? await _postcodeLookupService.GetOutcode(postcode)
                 : await _postcodeLookupService.GetPostcode(postcode);
 
-            if (geoLocation is null)
-            {
-                throw new PostcodeNotFoundException(postcode);
-            }
-
-            _cache.Set(key, geoLocation,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(
-                    _dateTimeService,
-                    _logger));
+        if (geoLocation is null)
+        {
+            throw new PostcodeNotFoundException(postcode);
         }
 
         return geoLocation;
