@@ -6,6 +6,9 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
+using Microsoft.Extensions.Caching.Memory;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -279,7 +282,7 @@ public class PostcodeLookupServiceTests
 
         result.Should().BeTrue();
     }
-    
+
     [Fact]
     public async Task IsValid_Returns_False_For_Invalid_Postcode()
     {
@@ -299,7 +302,7 @@ public class PostcodeLookupServiceTests
 
         result.Should().BeFalse();
     }
-    
+
     [Fact]
     public async Task IsValidOutcode_Returns_True_For_Valid_Outcode()
     {
@@ -322,7 +325,7 @@ public class PostcodeLookupServiceTests
     }
 
     [Fact]
-    public async Task IsValidout_Returns_True_For_Invalid_Outcode()
+    public async Task IsValidOutCode_Returns_True_For_Invalid_Outcode()
     {
         var invalidOutcodeLocation = GeoLocationBuilder.BuildInvalidOutcodeLocation();
 
@@ -342,5 +345,57 @@ public class PostcodeLookupServiceTests
         var result = await service.IsValidOutcode(invalidOutcodeLocation.Location);
 
         result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetPostcode_For_Valid_Postcode_Returns_Expected_ResultFrom_Cache()
+    {
+        var validPostcodeLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+
+        var cache = Substitute.For<IMemoryCache>();
+        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
+            .Returns(x =>
+            {
+                if (((string)x[0]).Contains(validPostcodeLocation.Location.Replace(" ", "")))
+                {
+                    x[1] = validPostcodeLocation;
+                    return true;
+                }
+
+                return false;
+            });
+
+        var service = new PostcodeLookupServiceBuilder()
+            .Build(cache: cache);
+
+        var result = await service.GetPostcode(validPostcodeLocation.Location);
+
+        result.Validate(validPostcodeLocation);
+    }
+
+    [Fact]
+    public async Task GetOutcode_For_Valid_Outcode_Returns_Expected_ResultFrom_Cache()
+    {
+        var validOutcodeLocation = GeoLocationBuilder.BuildValidOutcodeLocation();
+
+        var cache = Substitute.For<IMemoryCache>();
+        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
+            .Returns(x =>
+            {
+                if (((string)x[0]).Contains(validOutcodeLocation.Location.Replace(" ", "")))
+                {
+                    x[1] = validOutcodeLocation;
+                    return true;
+                }
+
+                return false;
+            });
+
+        var service = new PostcodeLookupServiceBuilder()
+            .Build(cache: cache);
+
+        var result = await service.GetOutcode(validOutcodeLocation.Location);
+
+        result.Validate(validOutcodeLocation);
     }
 }

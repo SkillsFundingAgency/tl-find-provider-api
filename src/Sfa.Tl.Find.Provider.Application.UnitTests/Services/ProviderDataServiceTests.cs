@@ -426,54 +426,6 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task FindProviders_Returns_Expected_List_For_Valid_Postcode_From_Cache()
-    {
-        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
-        var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
-        const int totalSearchResults = 10;
-
-        var providerRepository = Substitute.For<IProviderRepository>();
-        providerRepository.Search(
-                Arg.Is<GeoLocation>(p => p.Location == fromGeoLocation.Location),
-                Arg.Any<List<int>>(),
-                Arg.Any<List<int>>(),
-                Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
-            .Returns((searchResults, totalSearchResults));
-
-        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
-
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
-            .Returns(x =>
-            {
-                if (((string)x[0]).Contains(fromGeoLocation.Location.Replace(" ", "")))
-                {
-                    x[1] = GeoLocationBuilder.BuildGeoLocation(fromGeoLocation.Location);
-                    return true;
-                }
-
-                return false;
-            });
-
-        var service = new ProviderDataServiceBuilder().Build(
-            postcodeLookupService: postcodeLookupService,
-            providerRepository: providerRepository,
-            cache: cache);
-
-        var results = await service.FindProviders(fromGeoLocation.Location);
-        results.Should().NotBeNull();
-        results.Error.Should().BeNull();
-        results.SearchTerm.Should().Be(fromGeoLocation.Location);
-        results.SearchResults.Should().BeEquivalentTo(searchResults);
-
-        await postcodeLookupService
-            .DidNotReceive()
-            .GetPostcode(Arg.Any<string>());
-    }
-
-    [Fact]
     public async Task FindProviders_Returns_Expected_List_For_Valid_Outcode()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidOutcodeLocation();

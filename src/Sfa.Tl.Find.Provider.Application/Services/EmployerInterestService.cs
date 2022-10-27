@@ -44,8 +44,8 @@ public class EmployerInterestService : IEmployerInterestService
 
     public int RetentionDays => _employerInterestSettings.RetentionDays;
 
-    public DateOnly ServiceStartDate => 
-        _employerInterestSettings?.ServiceStartDate is not null 
+    public DateOnly ServiceStartDate =>
+        _employerInterestSettings?.ServiceStartDate is not null
             ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
             : DateOnly.MinValue;
 
@@ -199,23 +199,13 @@ public class EmployerInterestService : IEmployerInterestService
 
     private async Task<GeoLocation> GetPostcode(string postcode)
     {
-        var key = CacheKeys.PostcodeKey(postcode);
+        var geoLocation = postcode.Length <= 4
+            ? await _postcodeLookupService.GetOutcode(postcode)
+            : await _postcodeLookupService.GetPostcode(postcode);
 
-        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
+        if (geoLocation is null)
         {
-            geoLocation = postcode.Length <= 4
-                ? await _postcodeLookupService.GetOutcode(postcode)
-                : await _postcodeLookupService.GetPostcode(postcode);
-
-            if (geoLocation is null)
-            {
-                throw new PostcodeNotFoundException(postcode);
-            }
-
-            _cache.Set(key, geoLocation,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(
-                    _dateTimeService,
-                    _logger));
+            throw new PostcodeNotFoundException(postcode);
         }
 
         return geoLocation;
