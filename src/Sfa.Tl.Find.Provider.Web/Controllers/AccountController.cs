@@ -66,6 +66,9 @@ public class AccountController : Controller
             return RedirectToPage("/SignedOut");
         }
 
+        //TODO: Remove logging - just here for initial testing purposes
+        _logger.LogInformation("User signed out of DfE Sign-in.");
+
         return SignOut(
             new AuthenticationProperties { RedirectUri = AuthenticationExtensions.UnauthenticatedUserStartPage },
             OpenIdConnectDefaults.AuthenticationScheme,
@@ -77,6 +80,8 @@ public class AccountController : Controller
     [Route("signout-complete", Name = "SignOutComplete")]
     public IActionResult SignoutComplete()
     {
+        //TODO: Remove logging - just here for initial testing purposes
+        _logger.LogInformation("Signout complete from DfE Sign-in.");
         return Redirect(AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 }
