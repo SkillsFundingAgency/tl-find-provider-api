@@ -21,6 +21,7 @@
     <None Remove="Builders\Json\Assets\Postcodes\invalidpostcoderesponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\nearestpostcoderesponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\nullpostcoderesponse.json" />
+    <None Remove="Builders\Json\Assets\Postcodes\outcodenotfoundresponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\postcodenotfoundresponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\postcodevalidationfailresponse.json" />
     <None Remove="Builders\Json\Assets\Postcodes\postcodevalidationsuccessresponse.json" />
@@ -44,6 +45,7 @@
     <EmbeddedResource Include="Builders\Json\Assets\GoogleApi\GooglePlacesZeroResults.json" />
     <EmbeddedResource Include="Builders\Json\Assets\NationalStatistics\nationalstatisticslocationsresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\invalidpostcoderesponse.json" />
+    <EmbeddedResource Include="Builders\Json\Assets\Postcodes\outcodenotfoundresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\postcodevalidationfailresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\postcodevalidationsuccessresponse.json" />
     <EmbeddedResource Include="Builders\Json\Assets\Postcodes\nearestpostcoderesponse.json" />
@@ -62,7 +64,7 @@
 	<PackageReference Include="AutoFixture" Version="4.17.0" />
 	<PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.17.0" />
 	<PackageReference Include="AutoFixture.Idioms" Version="4.17.0" />
-	<PackageReference Include="FluentAssertions" Version="6.7.0" />
+	<PackageReference Include="FluentAssertions" Version="6.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
 	<PackageReference Include="NSubstitute" Version="4.4.0" />
     <PackageReference Include="xunit" Version="2.4.2" />

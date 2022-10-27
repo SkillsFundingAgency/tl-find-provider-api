@@ -32,8 +32,8 @@ public class ProviderDataServiceBuilder
         cache ??= Substitute.For<IMemoryCache>();
         logger ??= Substitute.For<ILogger<ProviderDataService>>();
 
-        var searchOptions = new SettingsBuilder()
-            .BuildSearchSettings()
+        searchSettings ??= new SettingsBuilder().BuildSearchSettings();
+        var searchOptions = searchSettings
             .ToOptions();
 
         return new ProviderDataService(

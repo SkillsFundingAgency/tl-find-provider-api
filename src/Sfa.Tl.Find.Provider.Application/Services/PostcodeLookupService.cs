@@ -1,5 +1,8 @@
 ﻿using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -9,68 +12,79 @@ namespace Sfa.Tl.Find.Provider.Application.Services;
 public class PostcodeLookupService : IPostcodeLookupService
 {
     private readonly HttpClient _httpClient;
+    private readonly IMemoryCache _cache;
+    private readonly IDateTimeService _dateTimeService;
+    private readonly ILogger<PostcodeLookupService> _logger;
 
     public PostcodeLookupService(
-        HttpClient httpClient)
+        HttpClient httpClient,
+        IDateTimeService dateTimeService,
+        IMemoryCache cache,
+        ILogger<PostcodeLookupService> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<GeoLocation> GetPostcode(string postcode)
     {
-        var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
+        var key = CacheKeys.PostcodeKey(postcode);
 
-        if (responseMessage.StatusCode != HttpStatusCode.OK)
+        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
         {
-            //Fallback to terminated postcode search
-            responseMessage = await _httpClient.GetAsync($"terminated_postcodes/{postcode.FormatPostcodeForUri()}");
+            var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
 
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
-                return null;
+                //Fallback to terminated postcode search
+                responseMessage = await _httpClient.GetAsync($"terminated_postcodes/{postcode.FormatPostcodeForUri()}");
             }
+
+            geoLocation = responseMessage.StatusCode == HttpStatusCode.OK
+                ? await ReadPostcodeLocationFromResponse(responseMessage)
+                : null;
+
+            Cache(geoLocation, key);
         }
 
-        return await ReadPostcodeLocationFromResponse(responseMessage);
+        return geoLocation;
     }
 
     public async Task<GeoLocation> GetOutcode(string outcode)
     {
-        var responseMessage = await _httpClient.GetAsync($"outcodes/{outcode}");
+        var key = CacheKeys.PostcodeKey(outcode);
 
-        return responseMessage.StatusCode != HttpStatusCode.OK
-            ? null
-            : await ReadPostcodeLocationFromResponse(responseMessage,
-                "outcode");
+        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
+        {
+            var responseMessage = await _httpClient.GetAsync($"outcodes/{outcode}");
+
+            geoLocation = responseMessage.StatusCode == HttpStatusCode.OK
+                ? await ReadPostcodeLocationFromResponse(responseMessage,
+                    "outcode")
+                : null;
+
+            Cache(geoLocation, key);
+        }
+
+        return geoLocation;
     }
 
     public async Task<GeoLocation> GetNearestPostcode(double latitude, double longitude)
     {
         var responseMessage = await _httpClient.GetAsync($"postcodes?lon={longitude}&lat={latitude}");
 
-        return responseMessage.StatusCode != HttpStatusCode.OK
-            ? null
-            : await ReadPostcodeLocationFromResponse(responseMessage);
+        return responseMessage.StatusCode == HttpStatusCode.OK
+            ? await ReadPostcodeLocationFromResponse(responseMessage)
+            : null;
     }
 
-    public async Task<bool> IsValid(string postcode)
-    {
-        var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}/validate");
+    public async Task<bool> IsValid(string postcode) =>
+        await GetPostcode(postcode) is not null;
 
-        if (responseMessage.IsSuccessStatusCode)
-        {
-            (await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync()))
-            //var resultElement = jsonDocument
-                .RootElement
-                .TryGetProperty("result", out var result);
-
-            if (result.ValueKind is JsonValueKind.True)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    public async Task<bool> IsValidOutcode(string outcode) =>
+        await GetOutcode(outcode) is not null;
 
     private static async Task<GeoLocation> ReadPostcodeLocationFromResponse(
         HttpResponseMessage responseMessage,
@@ -109,5 +123,19 @@ public class PostcodeLookupService : IPostcodeLookupService
             default:
                 throw new InvalidOperationException();
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Cache(GeoLocation geoLocation, string key)
+    {
+        if (geoLocation is null)
+        {
+            return;
+        }
+
+        _cache.Set(key, geoLocation,
+            CacheUtilities.DefaultMemoryCacheEntryOptions(
+                _dateTimeService,
+                _logger));
     }
 }

@@ -15,8 +15,11 @@ public class DbContextWrapperBuilder
         IReadOnlyPolicyRegistry<string> policyRegistry = null,
         ILogger<DbContextWrapper> logger = null)
     {
-        var connectionStringOptions = new SettingsBuilder()
-            .BuildConnectionStringSettings()
+        var connectionStringSettings = connectionString is null 
+            ? new SettingsBuilder().BuildConnectionStringSettings()
+            : new SettingsBuilder().BuildConnectionStringSettings(connectionString);
+
+        var connectionStringOptions = connectionStringSettings
             .ToOptions();
 
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();

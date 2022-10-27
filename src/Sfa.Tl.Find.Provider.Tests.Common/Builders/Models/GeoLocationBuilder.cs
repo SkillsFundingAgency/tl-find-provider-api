@@ -12,7 +12,7 @@ public static class GeoLocationBuilder
             Longitude = -1.508122
         };
 
-    public static GeoLocation BuildValidOutwardPostcodeLocation() =>
+    public static GeoLocation BuildValidOutcodeLocation() =>
         new()
         {
             Location = "CV1",
@@ -36,6 +36,15 @@ public static class GeoLocationBuilder
             Longitude = double.NaN
         };
 
+    public static GeoLocation BuildInvalidOutcodeLocation() =>
+        new()
+        {
+            Location = "L99",
+            Latitude = double.NaN,
+            Longitude = double.NaN
+        };
+
+
     public static GeoLocation BuildTerminatedPostcodeLocation() =>
         new()
         {
@@ -52,7 +61,7 @@ public static class GeoLocationBuilder
             Longitude = Constants.DefaultLongitude
         };
 
-    public static GeoLocation BuildOutwardPostcodeLocationWithDefaultLatLong() =>
+    public static GeoLocation BuildOutcodeLocationWithDefaultLatLong() =>
         new()
         {
             Location = "IM4",

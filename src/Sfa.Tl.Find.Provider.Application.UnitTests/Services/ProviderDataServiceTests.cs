@@ -476,7 +476,7 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task FindProviders_Returns_Expected_List_For_Valid_Outcode()
     {
-        var fromGeoLocation = GeoLocationBuilder.BuildValidOutwardPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidOutcodeLocation();
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
         const int totalSearchResults = 10;
 
