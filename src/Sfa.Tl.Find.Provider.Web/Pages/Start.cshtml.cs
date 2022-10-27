@@ -22,10 +22,10 @@ public class StartModel : PageModel
             {
                 _logger.LogDebug("User is already signed in at {currentPage}. Redirecting to  {redirectUrl}.",
                     nameof(StartModel),
-                    AuthenticationExtensions.AuthenticatedUserStartPage);
+                    AuthenticationExtensions.AuthenticatedUserStartPageExact);
             }
 
-            return RedirectToPage(AuthenticationExtensions.AuthenticatedUserStartPage);
+            return RedirectToPage(AuthenticationExtensions.AuthenticatedUserStartPageExact);
         }
 
         return Page();

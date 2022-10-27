@@ -176,19 +176,19 @@ public class EmployerInterestService : IEmployerInterestService
 
         var tokens = new Dictionary<string, string>
         {
-            { "contact_name", employerInterest.ContactName },
+            { "contact_name", employerInterest.ContactName ?? "" },
             { "email_address", employerInterest.Email ?? "" },
             { "telephone", employerInterest.Telephone ?? "" },
-            { "contact_preference", contactPreference },
-            { "organisation_name", employerInterest.OrganisationName },
+            { "contact_preference", contactPreference ?? "" },
+            { "organisation_name", employerInterest.OrganisationName ?? "" },
             { "website", employerInterest.Website ?? "" },
-            { "primary_industry", industry },
-            { "placement_area", placementAreas },
+            { "primary_industry", industry ?? "" },
+            { "placement_area", placementAreas ?? "" },
             { "has_multiple_placement_areas", skillAreas.Count > 1 ? "yes" : "no" },
-            { "postcode", employerInterest.Postcode },
-            { "additional_information", employerInterest.AdditionalInformation },
-            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri },
-            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
+            { "postcode", employerInterest.Postcode ?? "" },
+            { "additional_information", employerInterest.AdditionalInformation ?? "" },
+            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
+            { "employer_unsubscribe_uri", unsubscribeUri.ToString() ?? "" }
         };
 
         return await _emailService.SendEmail(
