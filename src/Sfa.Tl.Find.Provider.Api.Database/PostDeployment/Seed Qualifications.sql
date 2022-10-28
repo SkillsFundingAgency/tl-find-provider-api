@@ -30,7 +30,7 @@ USING (VALUES
   (50, N'Engineering, Manufacturing, Processing and Control', 0),
   (51, N'Management and Administration', 0),
   (52, N'Legal Services', 0),
-  (53, N'Hair, Beauty and Aesthetics', 0),
+  (53, N'Hairdressing, Barbering and Beauty Therapy', 0),
   (54, N'Craft and Design', 0),
   (55, N'Media, Broadcast and Production', 0),
   (56, N'Catering', 0),
