@@ -16,8 +16,4 @@ Post-Deployment Script
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
 
---Below code can be removed later
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EmployerLocation]') AND type in (N'U'))
-	PRINT 'This should cause a merge conflict - all this code can be removed'
-GO
 	
