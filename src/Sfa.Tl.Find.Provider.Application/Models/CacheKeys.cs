@@ -6,6 +6,7 @@ public static class CacheKeys
     public const string QualificationsKey = "QUALIFICATIONS";
     public const string RoutesKey = "ROUTES";
     public const string ProviderDataDownloadInfoKey = "PROVIDER_DATA_DOWNLOAD_INFO";
+    public const string UserSessionActivityKey = "USER_SESSION_ACTIVITY";
 
     public static string PostcodeKey(string postcode)
     {
@@ -18,8 +19,9 @@ public static class CacheKeys
         return $"POSTCODE__{postcode.Replace(" ", "").ToUpper()}";
     }
 
-    public static string LatLongKey(double latitude, double longitude)
-    {
-        return $"LAT_LONG__{latitude}_{longitude}";
-    }
+    public static string LatLongKey(double latitude, double longitude) =>
+        $"LAT_LONG__{latitude}_{longitude}";
+
+    public static string UserCacheKey(string userId, string key) => 
+        $"USERID:{userId}:{key}";
 }

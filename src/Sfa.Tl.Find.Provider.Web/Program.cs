@@ -7,6 +7,7 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
+using Sfa.Tl.Find.Provider.Web.Filters;
 using Sfa.Tl.Find.Provider.Web.ParameterTransformers;
 using Sfa.Tl.Find.Provider.Web.Security;
 
@@ -60,7 +61,12 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToPage("/Help/Cookies");
     options.Conventions.AllowAnonymousToPage("/Help/Privacy");
     options.Conventions.AllowAnonymousToPage("/TermsAndConditions");
-});
+})
+    .AddMvcOptions(options =>
+    {
+        options.Filters.Add<SessionPageActivityFilter>();
+    });
+
 builder.Services.AddControllers();
 
 if (!builder.Environment.IsDevelopment())

@@ -24,7 +24,6 @@ public class EmailDeliveryStatusController : ControllerBase
     {
         _emailDeliveryStatusService = emailDeliveryStatusService ?? throw new ArgumentNullException(nameof(emailDeliveryStatusService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
         _emailSettings = emailOptions?.Value
                          ?? throw new ArgumentNullException(nameof(emailOptions));
     }

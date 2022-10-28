@@ -2,30 +2,36 @@
 using Sfa.Tl.Find.Provider.Web.Controllers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Caching.Memory;
+using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
-public class AccountControllerBuilder
+public class TimeoutControllerBuilder
 {
     private const string DefaultUkPrn = "12345678";
     private const string DefaultOrganisationName = "Test Organisation";
 
-    public AccountController Build(
+    public TimeoutController Build(
         IMemoryCache? cache = null,
-        IConfiguration? configuration = null,
-        ILogger<AccountController>? logger = null,
+        DfeSignInSettings? signInSettings = null,
+        ILogger<TimeoutController>? logger = null,
         bool userIsAuthenticated = true)
     {
         cache ??= Substitute.For<IMemoryCache>();
-        configuration ??= Substitute.For<IConfiguration>();
 
-        logger ??= Substitute.For<ILogger<AccountController>>();
+        var signInOptions = Options.Create(
+            signInSettings
+            ?? new SettingsBuilder()
+                .BuildDfeSignInSettings());
+
+        logger ??= Substitute.For<ILogger<TimeoutController>>();
 
         var authenticationService = Substitute.For<IAuthenticationService>();
         authenticationService
@@ -64,9 +70,9 @@ public class AccountControllerBuilder
                     AuthenticationExtensions.AuthenticationTypeName));
         }
 
-        var controller = new AccountController(
+        var controller = new TimeoutController(
             cache,
-            configuration,
+            signInOptions,
             logger)
         {
             ControllerContext = new ControllerContext

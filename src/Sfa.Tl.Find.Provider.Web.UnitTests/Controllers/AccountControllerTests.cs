@@ -57,7 +57,7 @@ public class AccountControllerTests
         configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
-            .Build(configuration);
+            .Build(configuration: configuration);
 
         await controller.SignIn();
 
@@ -122,7 +122,7 @@ public class AccountControllerTests
         configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
-            .Build(configuration);
+            .Build(configuration: configuration);
 
         var result = await controller.SignOut();
 
@@ -130,6 +130,7 @@ public class AccountControllerTests
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/SignedOut");
     }
+
     [Fact]
     public void AccountController_SignOutComplete_Returns_RedirectToPageResult()
     {
@@ -137,7 +138,7 @@ public class AccountControllerTests
         configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
-            .Build(configuration);
+            .Build(configuration: configuration);
 
         var result = controller.SignoutComplete();
 

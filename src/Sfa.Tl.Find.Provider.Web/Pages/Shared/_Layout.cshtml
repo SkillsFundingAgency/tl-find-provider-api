@@ -7,13 +7,19 @@
     <script>
         document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
     </script>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <partial name="_TimeoutModal" />
+    }
+
     <partial name="_CookieBanner" />
 
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
     <partial name="_Header" />
     <div class="govuk-width-container">
-    <partial name="_PhaseBanner" />
-    <partial name="_Header_Nav" />
+        <partial name="_PhaseBanner" />
+        <partial name="_Header_Nav" />
     </div>
     <div class="govuk-width-container">
         <main class="govuk-main-wrapper" id="main-content" role="main">
@@ -31,6 +37,11 @@
         window.GOVUKFrontend.initAll()
     </script>
 
+    @if (User.Identity.IsAuthenticated)
+    {
+        @*<script nws-csp-add-nonce="true" src="~/js/session-timeout.min.js"></script>*@
+        <script nws-csp-add-nonce="true" src="~/js/session-timeout.js"></script>
+    }
 </body>
 
 </html>

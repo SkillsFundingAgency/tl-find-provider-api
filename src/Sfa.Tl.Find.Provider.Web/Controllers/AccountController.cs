@@ -5,18 +5,24 @@ using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Sfa.Tl.Find.Provider.Web.Extensions;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
+[Authorize]
 public class AccountController : Controller
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<AccountController> _logger;
+    private readonly IMemoryCache _cache;
 
     public AccountController(
+        IMemoryCache cache,
         IConfiguration configuration,
         ILogger<AccountController> logger)
     {
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -46,6 +52,9 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult PostSignIn()
     {
+        //TODO: Move this into a filter
+        _cache.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
+
         return RedirectToPage(
             User.Identity is {IsAuthenticated: true} 
                 ? AuthenticationExtensions.AuthenticatedUserStartPage 
@@ -57,6 +66,8 @@ public class AccountController : Controller
     [Route("signout")]
     public new async Task<IActionResult> SignOut()
     {
+        _cache.Remove(User.GetUserSessionCacheKey());
+
         if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Signing out of fake authentication.");

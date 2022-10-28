@@ -43,14 +43,4 @@ public static class EnumerableExtensions
 
         return dataTable;
     }
-
-    public static TAttribute GetCustomAttribute<TAttribute>(this Enum value)
-        where TAttribute : Attribute
-    {
-        var type = value.GetType();
-        var name = Enum.GetName(type, value);
-        return name != null ? type.GetField(name!)!
-            .GetCustomAttribute<TAttribute>()
-                : null;
-    }
 }

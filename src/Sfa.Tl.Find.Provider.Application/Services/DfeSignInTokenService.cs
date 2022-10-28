@@ -12,9 +12,8 @@ public class DfeSignInTokenService : IDfeSignInTokenService
     public DfeSignInTokenService(
         IOptions<DfeSignInSettings> signInOptions)
     {
-        if (signInOptions is null) throw new ArgumentNullException(nameof(signInOptions));
-
-        _signInSettings = signInOptions.Value;
+        _signInSettings = signInOptions?.Value
+                          ?? throw new ArgumentNullException(nameof(signInOptions));
     }
 
     public string GetApiToken() =>

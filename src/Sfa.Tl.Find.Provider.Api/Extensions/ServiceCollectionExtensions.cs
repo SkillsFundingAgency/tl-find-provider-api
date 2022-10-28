@@ -215,11 +215,11 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
-                var courseImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
+                var courseDataImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
                 q.AddJob<CourseDataImportJob>(opts =>
-                        opts.WithIdentity(courseImportJobKey))
+                        opts.WithIdentity(courseDataImportJobKey))
                     .AddTrigger(opts => opts
-                        .ForJob(courseImportJobKey)
+                        .ForJob(courseDataImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
                                 .CronSchedule(courseDirectoryImportCronSchedule)));
@@ -227,11 +227,11 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(townDataImportCronSchedule))
             {
-                var townImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
+                var townDataImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
                 q.AddJob<TownDataImportJob>(opts =>
-                        opts.WithIdentity(townImportJobKey))
+                        opts.WithIdentity(townDataImportJobKey))
                     .AddTrigger(opts => opts
-                        .ForJob(townImportJobKey)
+                        .ForJob(townDataImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
                                 .CronSchedule(townDataImportCronSchedule)));
