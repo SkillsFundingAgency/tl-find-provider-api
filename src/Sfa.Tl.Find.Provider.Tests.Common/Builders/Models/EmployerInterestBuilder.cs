@@ -1,4 +1,5 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
@@ -24,7 +25,7 @@ public class EmployerInterestBuilder
                 Email = "test.contact1@employer.co.uk",
                 Telephone = "020 555 6666 ext 1",
                 Website = "https://employer-one.co.uk",
-                ContactPreferenceType = 1,
+                ContactPreferenceType = ContactPreference.Email,
                 SkillAreaIds = new List<int>{ 1, 2 }
             },
             new()
@@ -42,7 +43,7 @@ public class EmployerInterestBuilder
                 Email = "test.contact2@employer.co.uk",
                 Telephone = "020 555 6666 ext 2",
                 Website = "https://employer-two.co.uk",
-                ContactPreferenceType = 2,
+                ContactPreferenceType = ContactPreference.Telephone,
                 SkillAreaIds = new List<int>{ 1 }
             }
         };

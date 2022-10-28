@@ -1,4 +1,5 @@
 ﻿@page
+@using Sfa.Tl.Find.Provider.Application.Extensions
 @model Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest.DetailModel
 @{
     ViewData["Title"] = "Employer Interest Detail";
@@ -101,8 +102,10 @@
                         Contact preference
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        //TODO: Add an enum and extension to get contact preference description
-                        @Model.EmployerInterest?.ContactPreferenceType
+                        @{
+                            var contactPreference = (Model.EmployerInterest?.ContactPreferenceType).GetContactPreferenceDisplayName();
+                        }
+                        @contactPreference
                     </dd>
                 </div>
             </dl>

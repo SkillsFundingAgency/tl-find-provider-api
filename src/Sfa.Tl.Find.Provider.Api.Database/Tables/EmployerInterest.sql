@@ -11,9 +11,6 @@
 	[Telephone] NVARCHAR(150) NULL,
 	[Website] NVARCHAR(500) NULL,
 	[ContactPreferenceType] INT NOT NULL DEFAULT (0),
-		-- 0 = No preference
-		-- 1 = Email
-		-- 2 = Telephone
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
 	[ModifiedOn] DATETIME2(7) NULL
     CONSTRAINT [PK_EmployerInterest] PRIMARY KEY ([Id])

@@ -53,7 +53,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,
                             Website = employerInterest.Website,
-                            ContactPreferenceType = employerInterest.ContactPreferenceType
+                            ContactPreferenceType = (int)employerInterest.ContactPreferenceType
                         }
                     }
                     .AsTableValuedParameter("dbo.EmployerInterestDataTableType")

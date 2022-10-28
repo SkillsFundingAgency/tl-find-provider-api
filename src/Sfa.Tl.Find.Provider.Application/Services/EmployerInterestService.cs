@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
@@ -142,8 +143,8 @@ public class EmployerInterestService : IEmployerInterestService
 
         var contactPreference = employerInterest.ContactPreferenceType switch
         {
-            1 => "Email",
-            2 => "Telephone",
+            ContactPreference.Email => "Email",
+            ContactPreference.Telephone => "Telephone",
             _ => "No preference"
         };
 

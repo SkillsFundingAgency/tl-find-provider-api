@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
@@ -18,7 +19,7 @@ public class EmployerInterest
     public string Email { get; init; }
     public string Telephone { get; init; }
     public string Website { get; init; }
-    public int ContactPreferenceType { get; init; }
+    public ContactPreference ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
     public List<int>? SkillAreaIds { get; init; }
 }
