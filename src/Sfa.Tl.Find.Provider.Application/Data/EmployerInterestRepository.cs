@@ -29,58 +29,56 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<(int, Guid)> Create(EmployerInterest employerInterest)
+    public async Task<(int, Guid)> Create(
+        EmployerInterest employerInterest,
+        GeoLocation geoLocation)
     {
         try
         {
-            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
+            var uniqueId = _guidService.NewGuid();
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                data = new List<EmployerInterestDto>
+                    {
+                        new()
+                        {
+                            UniqueId = uniqueId,
+                            OrganisationName = employerInterest.OrganisationName,
+                            ContactName = employerInterest.ContactName,
+                            Postcode = geoLocation.Location,
+                            Latitude = geoLocation.Latitude,
+                            Longitude = geoLocation.Longitude,
+                            IndustryId = employerInterest.IndustryId ?? 0,
+                            AdditionalInformation = employerInterest.AdditionalInformation,
+                            Email = employerInterest.Email,
+                            Telephone = employerInterest.Telephone,
+                            Website = employerInterest.Website,
+                            ContactPreferenceType = employerInterest.ContactPreferenceType
+                        }
+                    }
+                    .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
+            });
 
+            if (employerInterest.IndustryId is > 0)
+            {
+                _dynamicParametersWrapper.AddParameter("industryIds",
+                    new List<int> { employerInterest.IndustryId.Value }
+                        .AsTableValuedParameter("dbo.IdListTableType"));
+            }
+
+            if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
+            {
+                _dynamicParametersWrapper.AddParameter("routeIds",
+                    employerInterest.SkillAreaIds
+                        .AsTableValuedParameter("dbo.IdListTableType"));
+            }
+
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
             return await retryPolicy
                 .ExecuteAsync(async _ =>
                 {
                     using var connection = _dbContextWrapper.CreateConnection();
                     connection.Open();
-
-                    var uniqueId = _guidService.NewGuid();
-
-                    _dynamicParametersWrapper.CreateParameters(new
-                    {
-                        data = new List<EmployerInterestDto>
-                            {
-                                new()
-                                {
-                                    //TODO: Check lengths
-                                    //      Move this outside retry code
-                                    UniqueId = uniqueId,
-                                    OrganisationName = employerInterest.OrganisationName,
-                                    ContactName = employerInterest.ContactName,
-                                    Postcode = employerInterest.Postcode,
-                                    Latitude = employerInterest.Latitude,
-                                    Longitude = employerInterest.Longitude,
-                                    IndustryId = employerInterest.IndustryId ?? 0,
-                                    AdditionalInformation = employerInterest.AdditionalInformation,
-                                    Email = employerInterest.Email,
-                                    Telephone = employerInterest.Telephone,
-                                    Website = employerInterest.Website,
-                                    ContactPreferenceType = employerInterest.ContactPreferenceType
-                                }
-                            }
-                            .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
-                    });
-
-                    if (employerInterest.IndustryId is > 0)
-                    {
-                        _dynamicParametersWrapper.AddParameter("industryIds",
-                            new List<int> { employerInterest.IndustryId.Value }
-                                .AsTableValuedParameter("dbo.IdListTableType"));
-                    }
-
-                    if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
-                    {
-                        _dynamicParametersWrapper.AddParameter("routeIds",
-                            employerInterest.SkillAreaIds
-                                .AsTableValuedParameter("dbo.IdListTableType"));
-                    }
 
                     using var transaction = _dbContextWrapper.BeginTransaction(connection);
 

@@ -12,15 +12,26 @@ using Sfa.Tl.Find.Provider.Web.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
-    .AddApplicationInsightsTelemetry();
-
 var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
 builder.Services.AddConfigurationOptions(siteConfiguration);
 
-builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, EmployerInterestViewerAuthorizationHandler>();
-builder.Services.AddAuthorizationServicePolicies();
+builder.Services
+    .AddApplicationInsightsTelemetry();
+
+//var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
+//builder.Services.AddConfigurationOptions(siteConfiguration);
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+    options.CheckConsentNeeded = _ => true;
+    options.Secure = CookieSecurePolicy.Always;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+
+//builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
+//builder.Services.AddSingleton<IAuthorizationHandler, EmployerInterestViewerAuthorizationHandler>();
+//builder.Services.AddAuthorizationServicePolicies();
 
 if (bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
 {
@@ -31,13 +42,18 @@ else
     builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment);
 }
 
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-    options.CheckConsentNeeded = _ => true;
-    options.Secure = CookieSecurePolicy.Always;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-});
+builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, EmployerInterestViewerAuthorizationHandler>();
+builder.Services.AddAuthorizationServicePolicies();
+
+
+//builder.Services.Configure<CookiePolicyOptions>(options =>
+//{
+//    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+//    options.CheckConsentNeeded = _ => true;
+//    options.Secure = CookieSecurePolicy.Always;
+//    options.MinimumSameSitePolicy = SameSiteMode.None;
+//});
 
 builder.Services.AddResponseCaching();
 

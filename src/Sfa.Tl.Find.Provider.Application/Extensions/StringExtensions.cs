@@ -111,4 +111,12 @@ public static class StringExtensions
             ? null
             : input.Trim();
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string Truncate(this string input, int maxLength)
+    {
+        return input is null || input.Length <= maxLength
+            ? input
+            : input[..maxLength];
+    }
 }

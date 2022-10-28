@@ -83,8 +83,6 @@ public static class AuthenticationExtensions
             options.Scope.Add("openid");
             options.Scope.Add("email");
             options.Scope.Add("profile");
-            options.Scope.Add("organisation");
-            //TODO: What does this get us?
             options.Scope.Add("organisationid");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In

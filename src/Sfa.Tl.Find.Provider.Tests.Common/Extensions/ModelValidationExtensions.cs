@@ -4,7 +4,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 public static class ModelValidationExtensions
 {
-    public const double DoubleTolerance = 0.0001;
+    public const double DoubleTolerance = 0.00001;
 
     public static void Validate(this Application.Models.Provider provider,
         long ukPrn,
@@ -276,7 +276,7 @@ public static class ModelValidationExtensions
         qualification.Name.Should().Be(expected.Name);
     }
 
-    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected, bool validateId = false, bool validateUniqueId = false)
+    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected, bool validateId = false, bool validateUniqueId = false, bool validatePostcode = true, bool validateLatLong = true)
     {
         if(validateId) employerInterest.Id.Should().Be(expected.Id);
         if (validateUniqueId) employerInterest.UniqueId.Should().Be(expected.UniqueId);
@@ -289,9 +289,16 @@ public static class ModelValidationExtensions
         employerInterest.Telephone.Should().Be(expected.Telephone);
         employerInterest.Website.Should().Be(expected.Website);
 
-        employerInterest.Postcode.Should().Be(expected.Postcode);
-        employerInterest.Longitude.Should().BeApproximately(expected.Longitude, DoubleTolerance);
-        employerInterest.Latitude.Should().BeApproximately(expected.Latitude, DoubleTolerance);
+        if (validatePostcode)
+        {
+            employerInterest.Postcode.Should().Be(expected.Postcode);
+        }
+
+        if (validateLatLong)
+        {
+            employerInterest.Longitude.Should().BeApproximately(expected.Longitude, DoubleTolerance);
+            employerInterest.Latitude.Should().BeApproximately(expected.Latitude, DoubleTolerance);
+        }
 
         employerInterest.IndustryId.Should().Be(expected.IndustryId);
         employerInterest.OtherIndustry.Should().Be(expected.OtherIndustry);
@@ -301,4 +308,12 @@ public static class ModelValidationExtensions
         return true;
     }
 
+    public static bool Validate(this GeoLocation geoLocation, GeoLocation expected)
+    {
+        geoLocation.Location.Should().Be(expected.Location);
+        geoLocation.Longitude.Should().BeApproximately(expected.Longitude, DoubleTolerance);
+        geoLocation.Latitude.Should().BeApproximately(expected.Latitude, DoubleTolerance);
+
+        return true;
+    }
 }

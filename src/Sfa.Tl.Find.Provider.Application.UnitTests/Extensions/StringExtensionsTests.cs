@@ -139,4 +139,17 @@ public class StringExtensionsTests
         var result = input.ToTrimmedOrNullString();
         result.Should().Be(expectedResult);
     }
+
+    [Theory(DisplayName = nameof(StringExtensions.Truncate) + " Data Tests")]
+    [InlineData(null, 10, null)]
+    [InlineData("", 10, "")]
+    [InlineData(" ", 10, " ")]
+    [InlineData("Test", 3, "Tes")]
+    [InlineData("Test", 4, "Test")]
+    [InlineData("Test", 5, "Test")]
+    public void String_Truncate_Data_Tests(string input, int length, string expectedResult)
+    {
+        var result = input.Truncate(length);
+        result.Should().Be(expectedResult);
+    }
 }

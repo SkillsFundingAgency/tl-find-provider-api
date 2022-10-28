@@ -52,31 +52,16 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
-
-        //Create a copy - will find a cleaner way to do this later
-        var cleanEmployerInterest = new EmployerInterest
-        {
-            OrganisationName = employerInterest.OrganisationName?.Trim(),
-            ContactName = employerInterest.ContactName?.Trim(),
-            Postcode = geoLocation.Location,
-            Latitude = geoLocation.Latitude,
-            Longitude = geoLocation.Longitude,
-            IndustryId = employerInterest.IndustryId,
-            OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString(),
-            AdditionalInformation = employerInterest.AdditionalInformation?.ToTrimmedOrNullString(),
-            Email = employerInterest.Email?.ToTrimmedOrNullString(),
-            Telephone = employerInterest.Telephone?.ToTrimmedOrNullString(),
-            Website = employerInterest.Website?.ToTrimmedOrNullString(),
-            ContactPreferenceType = employerInterest.ContactPreferenceType,
-            SkillAreaIds = employerInterest.SkillAreaIds
-        };
-
-        var (_, uniqueId) = await _employerInterestRepository.Create(cleanEmployerInterest);
+        
+        var (_, uniqueId) = await _employerInterestRepository
+            .Create(
+                employerInterest,
+                geoLocation);
 
         if (uniqueId != Guid.Empty)
         {
-            cleanEmployerInterest.UniqueId = uniqueId;
-            await SendEmployerRegisterInterestEmail(cleanEmployerInterest);
+            employerInterest.UniqueId = uniqueId;
+            await SendEmployerRegisterInterestEmail(employerInterest);
         }
 
         return uniqueId;

@@ -5,7 +5,9 @@ namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface IEmployerInterestRepository
 {
-    Task<(int Count, Guid UniqueId)> Create(EmployerInterest employerInterest);
+    Task<(int Count, Guid UniqueId)> Create(
+        EmployerInterest employerInterest,
+        GeoLocation geoLocation);
 
     Task<int> Delete(Guid uniqueId);
 

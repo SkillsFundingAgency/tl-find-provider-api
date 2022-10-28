@@ -24,7 +24,6 @@ public class EmployerInterestServiceTests
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
 
-
     [Fact]
     public async Task CreateEmployerInterest_Calls_Repository()
     {
@@ -42,7 +41,9 @@ public class EmployerInterestServiceTests
             .Returns(geoLocation);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
+        employerInterestRepository.Create(
+                Arg.Any<EmployerInterest>(),
+                Arg.Any<GeoLocation>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
@@ -56,8 +57,39 @@ public class EmployerInterestServiceTests
 
         await employerInterestRepository
             .Received(1)
+            .Create(Arg.Any<EmployerInterest>(),
+                Arg.Any<GeoLocation>()
+            );
+
+        await employerInterestRepository
+            .Received(1)
             .Create(Arg.Is<EmployerInterest>(e =>
-                e.Validate(expectedEmployerInterest, false, false)));
+                    e.Validate(expectedEmployerInterest,
+                        false,
+                        false,
+                        false,
+                        false)),
+                Arg.Any<GeoLocation>()
+            );
+
+        await employerInterestRepository
+            .Received(1)
+            .Create(Arg.Any<EmployerInterest>(),
+                Arg.Is<GeoLocation>(g =>
+                    g.Validate(geoLocation))
+            );
+
+        await employerInterestRepository
+            .Received(1)
+            .Create(Arg.Is<EmployerInterest>(e =>
+                e.Validate(expectedEmployerInterest,
+                    false,
+                    false,
+                    false,
+                    false)),
+                Arg.Is<GeoLocation>(g =>
+                    g.Validate(geoLocation))
+                );
     }
 
     [Fact]
@@ -80,7 +112,9 @@ public class EmployerInterestServiceTests
             .Returns(true);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
+        employerInterestRepository.Create(
+                Arg.Any<EmployerInterest>(),
+                Arg.Any<GeoLocation>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
@@ -130,7 +164,9 @@ public class EmployerInterestServiceTests
             .Returns(routes);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
+        employerInterestRepository.Create(
+                Arg.Any<EmployerInterest>(),
+                Arg.Any<GeoLocation>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -210,7 +246,9 @@ public class EmployerInterestServiceTests
             .Returns(routes);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.Create(Arg.Any<EmployerInterest>())
+        employerInterestRepository.Create(
+                Arg.Any<EmployerInterest>(),
+                Arg.Any<GeoLocation>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -228,14 +266,8 @@ public class EmployerInterestServiceTests
         result.Should().Be(uniqueId);
 
         const string expectedContactPreference = "No preference";
-        var expectedIndustry =
-            $"{industries.Single(i => i.Id == 9).Name}";
-
-        var expectedSkillAreas =
-            $"{routes.Single(r => r.Id == 1).Name}, {routes.Single(r => r.Id == 2).Name}";
-
         var expectedUnsubscribeUri =
-            $"{settings.UnsubscribeEmployerUri.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+             $"{settings.UnsubscribeEmployerUri.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
 
         await emailService
             .Received(1)
@@ -419,7 +451,7 @@ public class EmployerInterestServiceTests
                 employerInterestSettings: settings);
 
         var results = await service.FindEmployerInterest(postcode);
-        
+
         results.Should().NotBeNull();
         results.SearchResults.Should().BeEquivalentTo(employerInterestSummaryList);
         results.TotalResultsCount.Should().Be(employerInterestsCount);

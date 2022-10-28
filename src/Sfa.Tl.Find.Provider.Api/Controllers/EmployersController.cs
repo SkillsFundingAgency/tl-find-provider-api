@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Attributes;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 
@@ -41,29 +41,24 @@ public class EmployersController : ControllerBase
             _logger.LogDebug($"{nameof(EmployersController)} {nameof(CreateInterest)} called.");
         }
 
-        //TODO: Validate the model
-
-        Debug.WriteLine("CreateInterest called with:");
-        Debug.WriteLine($"   Organisation name:\t{employerInterest.OrganisationName}");
-        Debug.WriteLine($"   Contact name:\t{employerInterest.ContactName}");
-        Debug.WriteLine($"   Postcode:\t{employerInterest.Postcode}");
-        Debug.WriteLine($"   Email:\t{employerInterest.Email}");
-        Debug.WriteLine($"   Telephone:\t{employerInterest.Telephone}");
-        Debug.WriteLine($"   Website:\t{employerInterest.Website}");
-        Debug.WriteLine($"   Contact preference:\t{employerInterest.ContactPreferenceType}");
-        Debug.WriteLine($"   Industry:\t{employerInterest.IndustryId}");
-        Debug.WriteLine($"   Other industry:\t{employerInterest.OtherIndustry}");
-        Debug.WriteLine($"   Additional info:\t{employerInterest.AdditionalInformation}");
-        if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
+        //TODO: Validate the model - for now, just enforce max lengths
+        var cleanEmployerInterest = new EmployerInterest
         {
-            Debug.WriteLine($"   Skill area:\t{employerInterest.AdditionalInformation}");
-            foreach (var skillArea in employerInterest.SkillAreaIds)
-            {
-                Debug.WriteLine($"   Skill area:\t{skillArea}");
-            }
-        }
+            OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
+            ContactName = employerInterest.ContactName?.Trim().Truncate(400),
+            Postcode = employerInterest.Postcode,
+            IndustryId = employerInterest.IndustryId,
+            OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
+            AdditionalInformation = employerInterest.AdditionalInformation?.ToTrimmedOrNullString(),
+            Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
+            Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
+            Website = employerInterest.Website?.ToTrimmedOrNullString().Truncate(500),
+            ContactPreferenceType = employerInterest.ContactPreferenceType,
+            SkillAreaIds = employerInterest.SkillAreaIds
+        };
 
-        var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
+        var uniqueId = await _employerInterestService
+            .CreateEmployerInterest(cleanEmployerInterest);
 
         return Ok(new
         {

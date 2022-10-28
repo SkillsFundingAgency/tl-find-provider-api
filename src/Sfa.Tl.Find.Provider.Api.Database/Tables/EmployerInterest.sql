@@ -8,8 +8,8 @@
 	[OtherIndustry] NVARCHAR(400) NULL,
 	[AdditionalInformation] NVARCHAR(MAX) NULL,
 	[Email] NVARCHAR(320) NULL,
-	[Website] NVARCHAR(500) NULL,
 	[Telephone] NVARCHAR(150) NULL,
+	[Website] NVARCHAR(500) NULL,
 	[ContactPreferenceType] INT NOT NULL DEFAULT (0),
 		-- 0 = No preference
 		-- 1 = Email

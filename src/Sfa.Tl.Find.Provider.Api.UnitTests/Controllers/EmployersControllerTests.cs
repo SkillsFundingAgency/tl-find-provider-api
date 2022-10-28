@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -33,11 +33,11 @@ public class EmployersControllerTests
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
         employerInterestService
-            .CreateEmployerInterest(employerInterest)
+            .CreateEmployerInterest(Arg.Any<EmployerInterest>())
             .Returns(uniqueId);
 
         var controller = new EmployersControllerBuilder()
-        .Build(employerInterestService);
+            .Build(employerInterestService);
 
         var result = await controller.CreateInterest(employerInterest);
 
@@ -46,14 +46,11 @@ public class EmployersControllerTests
         okResult.Should().NotBeNull();
 
         var jsonString = okResult!.Value?.ToString();
-        Debug.WriteLine(jsonString);
+        var expectedJson = new { id = uniqueId };
 
-        var temp = new {id = uniqueId};
-        Debug.WriteLine(temp.ToString());
-
-        jsonString.Should().Be(temp.ToString());
-        temp.Should().BeEquivalentTo(okResult.Value);
-        okResult.Value.Should().BeEquivalentTo(temp);
+        jsonString.Should().Be(expectedJson.ToString());
+        expectedJson.Should().BeEquivalentTo(okResult.Value);
+        okResult.Value.Should().BeEquivalentTo(expectedJson);
     }
 
     [Fact]

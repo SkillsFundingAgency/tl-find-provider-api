@@ -25,8 +25,8 @@ public class EmployerInterestRepositoryTests
     [Fact]
     public async Task Create_Calls_Retry_Policy()
     {
-        var employerInterest = new EmployerInterestBuilder()
-            .Build();
+        var employerInterest = new EmployerInterestBuilder().Build();
+        var geoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var pollyPolicy = PollyPolicyBuilder.BuildPolicy<(int, Guid)>();
         var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
@@ -38,7 +38,7 @@ public class EmployerInterestRepositoryTests
                 policyRegistry: pollyPolicyRegistry,
                 logger: logger);
 
-        await repository.Create(employerInterest);
+        await repository.Create(employerInterest, geoLocation);
 
         await pollyPolicy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task<(int, Guid)>>>(),
@@ -51,8 +51,8 @@ public class EmployerInterestRepositoryTests
     [Fact]
     public async Task Create_Calls_Database_As_Expected()
     {
-        var employerInterest = new EmployerInterestBuilder()
-            .Build();
+        var employerInterest = new EmployerInterestBuilder().Build();
+        var geoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
@@ -64,7 +64,7 @@ public class EmployerInterestRepositoryTests
             .Build(dbContextWrapper,
                 policyRegistry: pollyPolicyRegistry);
 
-        await repository.Create(employerInterest);
+        await repository.Create(employerInterest, geoLocation);
 
         dbContextWrapper
             .Received(1)
@@ -92,8 +92,8 @@ public class EmployerInterestRepositoryTests
             .NewGuid()
             .Returns(uniqueId);
 
-        var employerInterest = new EmployerInterestBuilder()
-            .Build();
+        var employerInterest = new EmployerInterestBuilder().Build();
+        var geoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
@@ -115,7 +115,7 @@ public class EmployerInterestRepositoryTests
                 policyRegistry: pollyPolicyRegistry,
                 guidService: guidService);
 
-        var result = await repository.Create(employerInterest);
+        var result = await repository.Create(employerInterest, geoLocation);
 
         result.Count.Should().Be(1);
         result.UniqueId.Should().Be(uniqueId);
