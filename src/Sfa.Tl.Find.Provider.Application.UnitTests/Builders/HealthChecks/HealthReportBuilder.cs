@@ -12,8 +12,7 @@ public class HealthReportBuilder
         var testData = new Dictionary<string, object>
         {
             {"test int", 1},
-            {"test str", "hello"},
-            //{"test obj", new {i = 1, s = "x"}},
+            {"test str", "hello"}
         };
 
         var result = new HealthReport(

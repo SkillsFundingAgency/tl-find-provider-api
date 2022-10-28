@@ -17,7 +17,7 @@ public static class GeoLocationBuilder
         {
             Location = "CV1",
             Latitude = 52.4093942342931,
-            Longitude = -1.50652551178011,
+            Longitude = -1.50652551178011
         };
 
     public static GeoLocation BuildNotFoundPostcodeLocation() =>
@@ -66,7 +66,7 @@ public static class GeoLocationBuilder
         {
             Location = "IM4",
             Latitude = Constants.DefaultLatitude,
-            Longitude = Constants.DefaultLongitude,
+            Longitude = Constants.DefaultLongitude
         };
 
     public static GeoLocation BuildTerminatedPostcodeLocationWithDefaultLatLong() =>
@@ -74,7 +74,7 @@ public static class GeoLocationBuilder
         {
             Location = "IM4 4AQ",
             Latitude = Constants.DefaultLatitude,
-            Longitude = Constants.DefaultLongitude,
+            Longitude = Constants.DefaultLongitude
         };
 
     public static GeoLocation BuildGeoLocation(

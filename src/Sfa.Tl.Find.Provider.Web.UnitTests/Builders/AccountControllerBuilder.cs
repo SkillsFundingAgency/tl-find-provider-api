@@ -46,7 +46,7 @@ public class AccountControllerBuilder
         var claims = new List<Claim>
         {
             new(CustomClaimTypes.UkPrn, DefaultUkPrn),
-            new(CustomClaimTypes.OrganisationName, DefaultOrganisationName),
+            new(CustomClaimTypes.OrganisationName, DefaultOrganisationName)
         };
 
         var httpContext = new DefaultHttpContext

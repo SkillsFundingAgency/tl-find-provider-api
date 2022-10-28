@@ -95,7 +95,7 @@ public static class AuthenticationExtensions
             {
                 InboundClaimTypeMap = new Dictionary<string, string>(),
                 TokenLifetimeInMinutes = cookieAndSessionTimeout,
-                SetDefaultTimesOnTokenCreation = true,
+                SetDefaultTimesOnTokenCreation = true
             };
             options.ProtocolValidator = new OpenIdConnectProtocolValidator
             {

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;
@@ -167,16 +166,16 @@ public class EmployerInterestService : IEmployerInterestService
             { "contact_name", employerInterest.ContactName ?? "" },
             { "email_address", employerInterest.Email ?? "" },
             { "telephone", employerInterest.Telephone ?? "" },
-            { "contact_preference", contactPreference ?? "" },
+            { "contact_preference", contactPreference },
             { "organisation_name", employerInterest.OrganisationName ?? "" },
             { "website", employerInterest.Website ?? "" },
             { "primary_industry", industry ?? "" },
-            { "placement_area", placementAreas ?? "" },
+            { "placement_area", placementAreas },
             { "has_multiple_placement_areas", skillAreas.Count > 1 ? "yes" : "no" },
             { "postcode", employerInterest.Postcode ?? "" },
             { "additional_information", employerInterest.AdditionalInformation ?? "" },
             { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
-            { "employer_unsubscribe_uri", unsubscribeUri.ToString() ?? "" }
+            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
         };
 
         return await _emailService.SendEmail(

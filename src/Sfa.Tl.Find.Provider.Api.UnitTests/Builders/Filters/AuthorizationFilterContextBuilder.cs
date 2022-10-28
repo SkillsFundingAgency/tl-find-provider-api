@@ -55,7 +55,7 @@ public class AuthorizationFilterContextBuilder
         {
             HttpContext = httpContext,
             RouteData = new RouteData(),
-            ActionDescriptor = new ActionDescriptor(),
+            ActionDescriptor = new ActionDescriptor()
         };
 
         return new AuthorizationFilterContext(

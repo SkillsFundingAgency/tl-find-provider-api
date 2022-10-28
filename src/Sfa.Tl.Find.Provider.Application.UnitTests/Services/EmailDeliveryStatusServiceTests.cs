@@ -89,7 +89,7 @@ public class EmailDeliveryStatusServiceTests
                             { "email_type", TestEmailTemplateNameHumanized },
                             { "reference", emailDeliveryReceipt.Reference },
                             { "reason", "permanent failure" },
-                            { "sender_username", emailDeliveryReceipt.To },
+                            { "sender_username", emailDeliveryReceipt.To }
                         }
                     )));
     }
@@ -128,7 +128,7 @@ public class EmailDeliveryStatusServiceTests
                             { "email_type", TestEmailTemplateNameHumanized },
                             { "reference", emailDeliveryReceipt.Reference },
                             { "reason", "temporary failure" },
-                            { "sender_username", emailDeliveryReceipt.To },
+                            { "sender_username", emailDeliveryReceipt.To }
                         }
                     )));
     }
@@ -167,7 +167,7 @@ public class EmailDeliveryStatusServiceTests
                             { "email_type", TestEmailTemplateNameHumanized },
                             { "reference", emailDeliveryReceipt.Reference },
                             { "reason", "technical failure" },
-                            { "sender_username", emailDeliveryReceipt.To },
+                            { "sender_username", emailDeliveryReceipt.To }
                         }
                     )));
     }
@@ -204,7 +204,7 @@ public class EmailDeliveryStatusServiceTests
                             { "email_type", $"Unknown template {emailDeliveryReceipt.TemplateId}" },
                             { "reference", emailDeliveryReceipt.Reference },
                             { "reason", "technical failure" },
-                            { "sender_username", emailDeliveryReceipt.To },
+                            { "sender_username", emailDeliveryReceipt.To }
                         }
                     )));
     }
@@ -244,7 +244,7 @@ public class EmailDeliveryStatusServiceTests
                             { "email_type", TestEmailTemplateNameHumanized },
                             { "reference", "none" },
                             { "reason", "permanent failure" },
-                            { "sender_username", emailDeliveryReceipt.To },
+                            { "sender_username", emailDeliveryReceipt.To }
                         }
                     )));
     }

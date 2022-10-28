@@ -23,7 +23,7 @@ public class LocationPostcodeBuilder
                 Postcode = "BB1 1BB",
                 Name = "Test Location B",
                 Latitude = 51.0,
-                Longitude = -1.0,
+                Longitude = -1.0
             }
         };
 }
