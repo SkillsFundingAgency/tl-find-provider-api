@@ -37,6 +37,7 @@ public class SettingsBuilder
     private const string SignInIssuer = "testissuer";
     private const string SignInClientSecret = "secretsecret";
     private const string SignInMetadataAddress = "https://test.signin.oidc.com/metadata";
+    private const int SignInTimeout = 30;
 
     public ApiSettings BuildApiSettings(
         string appId = AppId,
@@ -68,7 +69,8 @@ public class SettingsBuilder
         string clientSecret = SignInClientSecret,
         string apiUri = SignInApiUri,
         string apiSecret = SignInApiSecret,
-        string issuer = SignInIssuer) => new()
+        string issuer = SignInIssuer,
+        int timeout = SignInTimeout) => new()
     {
         Audience = audience,
         Authority = authority,
@@ -78,6 +80,7 @@ public class SettingsBuilder
         ApiSecret = apiSecret,
         MetadataAddress = metadataAddress,
         Issuer = issuer,
+        Timeout = timeout
     };
 
     public EmailSettings BuildEmailSettings(

@@ -42,6 +42,7 @@ public static class SettingsExtensions
         settings.ClientSecret = configuration.DfeSignInSettings?.ClientSecret;
         settings.Issuer = configuration.DfeSignInSettings?.Issuer;
         settings.MetadataAddress = configuration.DfeSignInSettings?.MetadataAddress;
+        settings.Timeout = configuration.DfeSignInSettings?.Timeout ?? 0;
     }
 
     public static void ConfigureEmailSettings(this EmailSettings settings, SiteConfiguration configuration)
