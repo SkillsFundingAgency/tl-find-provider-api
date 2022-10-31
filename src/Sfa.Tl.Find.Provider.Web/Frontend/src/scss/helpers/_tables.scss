@@ -2,3 +2,163 @@
     float: left;
     display: inline-block;
 }
+
+.tl-employers--table {
+    p {
+        @include govuk-responsive-margin(0);
+        @include govuk-responsive-padding(2, "top");
+        @include govuk-responsive-padding(2, "bottom");
+        border-bottom: 1px solid govuk-colour("light-grey");
+
+        &:first-child {
+            @include govuk-responsive-padding(0, "top");
+        }
+
+        &:last-child {
+            border-bottom: none;
+            @include govuk-responsive-padding(0, "bottom");
+        }
+    }
+}
+
+
+.tl-employers--table {
+    thead {
+        display: none;
+    }
+
+    tr {
+        margin-bottom: 10px;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        @include govuk-responsive-padding(4);
+        @include govuk-responsive-padding(2, "bottom");
+        @include govuk-responsive-padding(2, "top");
+        @include govuk-responsive-margin(5, "bottom");
+        border: 2px solid $govuk-border-colour;
+
+        th {
+            display: block;
+            clear: left;
+            width: 100%;
+            padding: 0;
+            box-sizing: border-box;
+            border: none;
+            @extend .govuk-table__header;
+            @include govuk-font($size: 24, $weight: 900);
+            @include govuk-responsive-margin(2, "bottom");
+            @include govuk-responsive-margin(1, "top");
+        }
+
+        td {
+            border-top: 2px solid $govuk-border-colour;
+            border-left: 2px solid $govuk-border-colour;
+            border-right: 2px solid $govuk-border-colour;
+            border-bottom: none;
+            @include govuk-responsive-padding(2);
+            display: block;
+            clear: left;
+            width: 100%;
+            box-sizing: border-box;
+
+            &:last-child {
+                border: none;
+                text-align: right;
+            }
+
+            &:nth-child(4) {
+                border-bottom: 2px solid $govuk-border-colour;
+            }
+        }
+    }
+
+    &--inline-header, &--inline-cell {
+        display: inline-block;
+        width: 40%;
+        vertical-align: top;
+    }
+
+    &--inline-cell {
+        width: 60%;
+    }
+}
+
+@include govuk-media-query(desktop) {
+    .tl-employers--table {
+        thead {
+            display: table-header-group;
+        }
+
+        &--inline-header {
+            display: none;
+        }
+
+        tr {
+            display: table-row;
+            border: none;
+            float: none;
+            margin: 0;
+
+            &:hover {
+                background-color: govuk-colour("light-grey");
+            }
+
+            th, td {
+                display: table-cell;
+                text-align: left;
+                float: none;
+                clear: none;
+                padding: 0.6em 1em 0.5em;
+                border-bottom: 1px solid $govuk-border-colour;
+                width: auto;
+                border-left: none;
+                border-top: none;
+                border-right: none;
+                border-bottom: 1px solid $govuk-border-colour !important;
+
+
+                &:first-child {
+                    padding-left: 0;
+                }
+
+                &:last-child {
+                    padding-right: 0;
+                }
+
+                &:before {
+                    display: none;
+                }
+
+                &:last-child {
+                    border-bottom: 1px solid $govuk-border-colour;
+                }
+            }
+
+            th {
+                @include govuk-font($size: 19, $weight: 900);
+                @include govuk-responsive-margin(0);
+                @include govuk-responsive-margin(0);
+            }
+        }
+
+        &--inline-header, &--inline-cell {
+            width: 100%;
+        }
+    }
+
+    @for $i from 1 through 14 {
+        .tl-employers--table tr th.tw-#{$i * 5} {
+            width: $i * 5%;
+        }
+    }
+
+    .break-line-desktop::before {
+        content: "\A";
+        white-space: pre;
+    }
+
+    .visually-hidden-desktop {
+        display: none;
+    }
+}
