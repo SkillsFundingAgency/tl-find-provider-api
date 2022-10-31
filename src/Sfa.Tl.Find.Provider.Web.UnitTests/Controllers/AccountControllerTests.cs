@@ -4,13 +4,15 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Controllers;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Controllers;
 public class AccountControllerTests
@@ -54,7 +56,7 @@ public class AccountControllerTests
     public async Task AccountController_SignIn_Redirects_When_DfeSignIn_Skipped()
     {
         var configuration = Substitute.For<IConfiguration>();
-        configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
+        configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
             .Build(configuration: configuration);
@@ -119,7 +121,7 @@ public class AccountControllerTests
     public async Task AccountController_SignOut_Returns_PageResult_When_DfeSignIn_Skipped()
     {
         var configuration = Substitute.For<IConfiguration>();
-        configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
+        configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
             .Build(configuration: configuration);
@@ -132,10 +134,28 @@ public class AccountControllerTests
     }
 
     [Fact]
+    public async Task AccountController_SignOut_Clears_User_Session_Cache()
+    {
+        var cache = Substitute.For<IMemoryCache>();
+
+        var controller = new AccountControllerBuilder()
+            .Build(cache);
+
+        await controller.SignOut();
+
+        cache
+            .Received(1)
+        .Remove(Arg.Any<string>());
+        cache
+            .Received(1)
+            .Remove(Arg.Is<string>(k => k.StartsWith("USERID")));
+    }
+
+    [Fact]
     public void AccountController_SignOutComplete_Returns_RedirectToPageResult()
     {
         var configuration = Substitute.For<IConfiguration>();
-        configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
+        configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
             .Build(configuration: configuration);

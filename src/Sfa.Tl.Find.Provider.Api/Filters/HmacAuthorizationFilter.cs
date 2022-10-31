@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.Filters;
 

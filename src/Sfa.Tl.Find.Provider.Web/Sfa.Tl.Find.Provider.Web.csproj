@@ -17,6 +17,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj" />
+    <ProjectReference Include="..\Sfa.Tl.Find.Provider.Infrastructure\Sfa.Tl.Find.Provider.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

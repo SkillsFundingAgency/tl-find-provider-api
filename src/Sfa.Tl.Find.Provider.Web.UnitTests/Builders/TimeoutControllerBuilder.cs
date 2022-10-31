@@ -8,8 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Caching.Memory;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;

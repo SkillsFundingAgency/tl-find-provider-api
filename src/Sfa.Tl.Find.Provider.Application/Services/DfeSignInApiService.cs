@@ -2,12 +2,12 @@
 using System.Net;
 using Sfa.Tl.Find.Provider.Application.Models.Authentication;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Extensions;
-using Sfa.Tl.Find.Provider.Application.Models;
+using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class DfeSignInApiService : IDfeSignInApiService

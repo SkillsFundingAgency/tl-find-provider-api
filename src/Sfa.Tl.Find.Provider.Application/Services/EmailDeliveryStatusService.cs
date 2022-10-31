@@ -1,7 +1,7 @@
 ﻿using Humanizer;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Microsoft.Extensions.Logging;
 

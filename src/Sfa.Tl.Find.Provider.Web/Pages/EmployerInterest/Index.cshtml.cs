@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Web.Authorization;
-using Sfa.Tl.Find.Provider.Web.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 

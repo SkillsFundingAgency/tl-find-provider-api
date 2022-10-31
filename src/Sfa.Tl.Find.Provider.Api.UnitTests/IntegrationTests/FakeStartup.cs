@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Api.Controllers;
-using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
-using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using RouteBuilder = Sfa.Tl.Find.Provider.Tests.Common.Builders.Models.RouteBuilder;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;

@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Sfa.Tl.Find.Provider.Web.Extensions;
 using Microsoft.Extensions.Caching.Memory;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -33,7 +33,7 @@ public class AccountController : Controller
     [Route("signin")]
     public async Task SignIn()
     {
-        if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
+        if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
             isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
@@ -53,7 +53,7 @@ public class AccountController : Controller
     public IActionResult PostSignIn()
     {
         //TODO: Move this into a filter
-        _cache.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
+        //_cache.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
 
         return RedirectToPage(
             User.Identity is {IsAuthenticated: true} 
@@ -68,7 +68,7 @@ public class AccountController : Controller
     {
         _cache.Remove(User.GetUserSessionCacheKey());
 
-        if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
+        if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Signing out of fake authentication.");
 

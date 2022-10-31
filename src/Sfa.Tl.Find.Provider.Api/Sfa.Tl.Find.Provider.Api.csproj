@@ -7,7 +7,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.2" />
-		<PackageReference Include="Aspose.Zip" Version="22.9.0" />
+		<PackageReference Include="Aspose.Zip" Version="22.10.0" />
 		<PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj" />
+		<ProjectReference Include="..\Sfa.Tl.Find.Provider.Infrastructure\Sfa.Tl.Find.Provider.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup>

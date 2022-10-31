@@ -2,6 +2,7 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Authorization;
 

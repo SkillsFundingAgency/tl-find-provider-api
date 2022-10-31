@@ -1,11 +1,12 @@
 ﻿using System.Security.Claims;
-using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class PageContextBuilder

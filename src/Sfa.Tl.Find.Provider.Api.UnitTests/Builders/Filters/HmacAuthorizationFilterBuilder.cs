@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.Filters;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Filters;

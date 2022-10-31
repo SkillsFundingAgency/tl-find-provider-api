@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Web.Authorization;
-using Sfa.Tl.Find.Provider.Web.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 

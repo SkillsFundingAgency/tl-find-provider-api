@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;

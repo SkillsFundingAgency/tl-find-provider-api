@@ -1,4 +1,4 @@
-﻿using Sfa.Tl.Find.Provider.Application.Services;
+﻿using Sfa.Tl.Find.Provider.Infrastructure.Services;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 

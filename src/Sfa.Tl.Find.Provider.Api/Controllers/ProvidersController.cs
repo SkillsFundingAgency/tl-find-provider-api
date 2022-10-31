@@ -3,10 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using Quartz.Util;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Microsoft.Extensions.Caching.Memory;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 

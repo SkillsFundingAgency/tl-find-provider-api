@@ -13,6 +13,9 @@ using Sfa.Tl.Find.Provider.Application.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Services;
 
 try
 {

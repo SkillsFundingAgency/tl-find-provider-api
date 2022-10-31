@@ -9,8 +9,11 @@ using Sfa.Tl.Find.Provider.Application.ClassMaps;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
@@ -118,7 +121,7 @@ public class ProviderDataService : IProviderDataService
         IList<int> routeIds = null,
         IList<int> qualificationIds = null,
         int page = 0,
-        int pageSize = Constants.DefaultPageSize)
+        int pageSize = Models.Constants.DefaultPageSize)
     {
         try
         {
@@ -184,7 +187,7 @@ public class ProviderDataService : IProviderDataService
         IList<int> routeIds = null,
         IList<int> qualificationIds = null,
         int page = 0,
-        int pageSize = Constants.DefaultPageSize)
+        int pageSize = Models.Constants.DefaultPageSize)
     {
         try
         {

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Caching.Memory;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class AccountControllerBuilder

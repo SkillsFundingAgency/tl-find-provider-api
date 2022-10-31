@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -14,13 +16,16 @@ namespace Sfa.Tl.Find.Provider.Web.Controllers;
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class EmployersApiController : ControllerBase
 {
+    private readonly IMemoryCache _cache;
     private readonly IEmployerInterestService _employerInterestService;
     private readonly ILogger<EmployersApiController> _logger;
 
     public EmployersApiController(
+        IMemoryCache cache,
         IEmployerInterestService employerInterestService,
         ILogger<EmployersApiController> logger)
     {
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -40,33 +45,24 @@ public class EmployersApiController : ControllerBase
     {
         _logger.LogInformation($"{nameof(EmployersApiController)} {nameof(CreateInterest)} called.");
 
-        //TODO: Validate the model
-
-        Debug.WriteLine("CreateInterest called with:");
-        Debug.WriteLine($"   Organisation name:\t{employerInterest.OrganisationName}");
-        Debug.WriteLine($"   Contact name:\t{employerInterest.ContactName}");
-        Debug.WriteLine($"   Postcode:\t{employerInterest.Postcode}");
-        Debug.WriteLine($"   Email:\t{employerInterest.Email}");
-        Debug.WriteLine($"   Telephone:\t{employerInterest.Telephone}");
-        Debug.WriteLine($"   Website:\t{employerInterest.Website}");
-        Debug.WriteLine($"   Contact preference:\t{employerInterest.ContactPreferenceType}");
-        Debug.WriteLine($"   Industry:\t{employerInterest.IndustryId}");
-        Debug.WriteLine($"   Other industry:\t{employerInterest.OtherIndustry}");
-        Debug.WriteLine($"   Additional info:\t{employerInterest.AdditionalInformation}");
-        if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
-        {
-            Debug.WriteLine($"   Skill area:\t{employerInterest.AdditionalInformation}");
-            foreach (var skillArea in employerInterest.SkillAreaIds)
-            {
-                Debug.WriteLine($"   Skill area:\t{skillArea}");
-            }
-        }
-
         var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
 
         return Ok(new
         {
             id = uniqueId
         });
+    }
+
+    [HttpDelete]
+    [AllowAnonymous]
+    // ReSharper disable once StringLiteralTypo
+    [Route("deletecacheduser")]
+    public async Task<IActionResult> DeleteCachedUser()
+    {
+        _logger.LogInformation($"{nameof(EmployersApiController)} {nameof(DeleteCachedUser)} called.");
+
+        _cache.Remove(User.GetUserSessionCacheKey());
+
+        return NoContent();
     }
 }

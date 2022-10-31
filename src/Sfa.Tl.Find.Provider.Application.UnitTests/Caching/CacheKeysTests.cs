@@ -1,4 +1,4 @@
-﻿using Sfa.Tl.Find.Provider.Application.Models;
+﻿using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Caching;
 

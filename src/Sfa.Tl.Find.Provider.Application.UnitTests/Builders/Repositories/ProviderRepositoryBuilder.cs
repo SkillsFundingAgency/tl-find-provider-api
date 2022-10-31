@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
