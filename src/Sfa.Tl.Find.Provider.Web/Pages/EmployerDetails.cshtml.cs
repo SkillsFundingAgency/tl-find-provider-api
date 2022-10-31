@@ -9,10 +9,10 @@ namespace Sfa.Tl.Find.Provider.Web.Pages;
 //[Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class EmployerDetailsModel : PageModel
 {
-    public Application.Models.EmployerInterest? EmployerInterest { get; private set; }
+    public Application.Models.EmployerInterestDetail? EmployerInterest { get; private set; }
 
     private readonly ILogger<EmployerDetailsModel> _logger;
-    private IEmployerInterestService _employerInterestService;
+    private readonly IEmployerInterestService _employerInterestService;
 
     public EmployerDetailsModel(
         IEmployerInterestService employerInterestService,
@@ -22,12 +22,8 @@ public class EmployerDetailsModel : PageModel
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public void OnGet()
+    public async Task OnGet(int id)
     {
+        EmployerInterest = await _employerInterestService.GetEmployerInterestDetail(id);
     }
-
-    //public async Task OnGet(int id)
-    //{
-    //    EmployerInterest = await _employerInterestService.GetEmployerInterest(id);
-    //}
 }

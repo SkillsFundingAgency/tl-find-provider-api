@@ -37,14 +37,14 @@ public class AccountController : Controller
             isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
-            Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPage);
+            Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs);
         }
         else
         {
             await HttpContext.ChallengeAsync(
                 new AuthenticationProperties
                 {
-                    RedirectUri = AuthenticationExtensions.AuthenticatedUserStartPage
+                    RedirectUri = AuthenticationExtensions.AuthenticatedUserStartPageWithSlugs
                 });
         }
     }
@@ -54,7 +54,7 @@ public class AccountController : Controller
     {
         return RedirectToPage(
             User.Identity is {IsAuthenticated: true} 
-                ? AuthenticationExtensions.AuthenticatedUserStartPage 
+                ? AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs 
                 : AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 
@@ -74,9 +74,6 @@ public class AccountController : Controller
             return RedirectToPage("/SignedOut");
         }
 
-        //TODO: Remove logging - just here for initial testing purposes
-        _logger.LogInformation("User signed out of DfE Sign-in.");
-
         return SignOut(
             new AuthenticationProperties { RedirectUri = AuthenticationExtensions.UnauthenticatedUserStartPage },
             OpenIdConnectDefaults.AuthenticationScheme,
@@ -88,8 +85,6 @@ public class AccountController : Controller
     [Route("signout-complete", Name = "SignOutComplete")]
     public IActionResult SignoutComplete()
     {
-        //TODO: Remove logging - just here for initial testing purposes
-        _logger.LogInformation("Signout complete from DfE Sign-in.");
         return Redirect(AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 }

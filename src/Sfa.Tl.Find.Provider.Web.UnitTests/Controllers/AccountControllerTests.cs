@@ -29,10 +29,8 @@ public class AccountControllerTests
         var controller = new AccountControllerBuilder()
             .Build(userIsAuthenticated: false);
 
-        //controller.ControllerContext.HttpContext.User.Should().BeNull();
         await controller.SignIn();
 
-        //controller.ControllerContext.HttpContext.User.Should().NotBeNull();
         var authService = controller.ControllerContext.HttpContext.RequestServices
             .GetRequiredService<IAuthenticationService>();
         authService.Should().NotBeNull();
@@ -42,7 +40,8 @@ public class AccountControllerTests
             .ChallengeAsync(controller.ControllerContext.HttpContext,
                 null,
                 Arg.Is<AuthenticationProperties>(
-                    p => p.RedirectUri == AuthenticationExtensions.AuthenticatedUserStartPage));
+                    p => p.RedirectUri == 
+                         AuthenticationExtensions.AuthenticatedUserStartPageWithSlugs));
 
         controller.ControllerContext.HttpContext
             .Response
@@ -88,7 +87,7 @@ public class AccountControllerTests
             .Response
             .Headers["Location"].ToString()
             .Should()
-            .Be(AuthenticationExtensions.AuthenticatedUserStartPage);
+            .Be(AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs);
     }
 
     [Fact]
@@ -100,7 +99,10 @@ public class AccountControllerTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be(AuthenticationExtensions.AuthenticatedUserStartPage);
+        redirectResult!
+            .PageName
+            .Should()
+            .Be(AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs);
     }
 
     [Fact]

@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
@@ -45,7 +47,23 @@ public class EmployersApiController : ControllerBase
     {
         _logger.LogInformation($"{nameof(EmployersApiController)} {nameof(CreateInterest)} called.");
 
-        var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
+        //TODO: Validate the model - for now, just enforce max lengths
+        var cleanEmployerInterest = new EmployerInterest
+        {
+            OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
+            ContactName = employerInterest.ContactName?.Trim().Truncate(400),
+            Postcode = employerInterest.Postcode,
+            IndustryId = employerInterest.IndustryId,
+            OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
+            AdditionalInformation = employerInterest.AdditionalInformation?.ToTrimmedOrNullString(),
+            Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
+            Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
+            Website = employerInterest.Website?.ToTrimmedOrNullString().Truncate(500),
+            ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
+            SkillAreaIds = employerInterest.SkillAreaIds
+        };
+
+        var uniqueId = await _employerInterestService.CreateEmployerInterest(cleanEmployerInterest);
 
         return Ok(new
         {
