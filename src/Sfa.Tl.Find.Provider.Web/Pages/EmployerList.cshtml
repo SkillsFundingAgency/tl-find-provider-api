@@ -10,21 +10,20 @@
             After 12 weeks, <strong>their details will expire</strong> unless they agree to extend their interest. 
         </p>
         <div class="govuk-form-group tl-inline-form-group">
-          <label class="govuk-label govuk-!-margin-bottom-4" for="postcode">
+          <label class="govuk-label govuk-!-margin-bottom-4" for="postcode-select">
             Select or enter a postcode to see contact details for employers within 20 miles:
           </label>
-          <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" id="postcode" name="postcode">
+          <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" id="postcode-select" name="postcode">
                 <option value="Select postcode" selected>Select postcode</option>
                 <option value="SW1A 2AA">SW1A 2AA</option>
                 <option value="CV11 1AB">CV11 1AB</option>
                 <option value="Enter postcode">Enter postcode</option>
           </select>
-
-            <label class="govuk-label govuk-visually-hidden" for="postcode-manual">
-            Enter postcode
-            </label>
-            <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" id="postcode-manual" name="postcode-manual" type="text">
-            <button class="govuk-button">Search</button>
+            <div class="tl-employers--search tl-hidden">
+                <label class="govuk-label govuk-visually-hidden" for="postcode-manual">Enter postcode</label>
+                <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" id="postcode-manual" name="postcode-manual" type="text">
+                <button class="govuk-button govuk-!-margin-bottom-2">Search</button>
+            </div>
         </div>
     </div>
 </div>
@@ -43,11 +42,19 @@
   </thead>
   <tbody class="govuk-table__body">
     <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Lloyds Banking Group</th>
+        <th scope="row" class="govuk-table__header">Lloyds Banking Group <strong class="govuk-tag govuk-tag--blue">New</strong></th>
         <td class="govuk-table__cell tl-table__cell__list"><div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div><div class="tl-employers--table--inline-cell"><p>Digital and IT</p><p>Legal, Finance and Accounting</p></div></td>      
         <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Distance</strong></div><div class="tl-employers--table--inline-cell">22 miles</div></td>
         <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Details expire</strong></div><div class="tl-employers--table--inline-cell">2 Jan 2023</div></td>
-        <td class="govuk-table__cell"><a href="#" class="govuk-link govuk-link--no-visited-state">View</a></td>
+        <td class="govuk-table__cell"><a href="/employer-details" class="govuk-link govuk-link--no-visited-state">View</a></td>
+    </tr>
+
+    <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Lloyds Banking Group <strong class="govuk-tag govuk-tag--red">Expiring</strong></th>
+        <td class="govuk-table__cell tl-table__cell__list"><div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div><div class="tl-employers--table--inline-cell"><p>Digital and IT</p><p>Legal, Finance and Accounting</p></div></td>      
+        <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Distance</strong></div><div class="tl-employers--table--inline-cell">22 miles</div></td>
+        <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Details expire</strong></div><div class="tl-employers--table--inline-cell">2 Jan 2023</div></td>
+        <td class="govuk-table__cell"><a href="/employer-details" class="govuk-link govuk-link--no-visited-state">View</a></td>
     </tr>
 
     <tr class="govuk-table__row">
@@ -55,17 +62,18 @@
         <td class="govuk-table__cell tl-table__cell__list"><div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div><div class="tl-employers--table--inline-cell"><p>Digital and IT</p><p>Legal, Finance and Accounting</p></div></td>      
         <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Distance</strong></div><div class="tl-employers--table--inline-cell">22 miles</div></td>
         <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Details expire</strong></div><div class="tl-employers--table--inline-cell">2 Jan 2023</div></td>
-        <td class="govuk-table__cell"><a href="#" class="govuk-link govuk-link--no-visited-state">View</a></td>
-    </tr>
-
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Lloyds Banking Group</th>
-        <td class="govuk-table__cell tl-table__cell__list"><div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div><div class="tl-employers--table--inline-cell"><p>Digital and IT</p><p>Legal, Finance and Accounting</p></div></td>      
-        <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Distance</strong></div><div class="tl-employers--table--inline-cell">22 miles</div></td>
-        <td class="govuk-table__cell"><div class="tl-employers--table--inline-header"><strong>Details expire</strong></div><div class="tl-employers--table--inline-cell">2 Jan 2023</div></td>
-        <td class="govuk-table__cell"><a href="#" class="govuk-link govuk-link--no-visited-state">View</a></td>
+        <td class="govuk-table__cell"><a href="/employer-details" class="govuk-link govuk-link--no-visited-state">View</a></td>
     </tr>
   </tbody>
 </table>
     </div>
 </div>
+
+@section scripts {
+    <script>
+$("#postcode-select").change(function() {
+    let inputval = $(this).val()
+    $(".tl-employers--search").toggleClass('active', inputval === "Enter postcode");
+})
+</script>
+}

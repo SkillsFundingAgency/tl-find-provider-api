@@ -45,8 +45,7 @@
             padding: 0;
             box-sizing: border-box;
             border: none;
-            @extend .govuk-table__header;
-            @include govuk-font($size: 24, $weight: 900);
+            font-size: 20px;
             @include govuk-responsive-margin(2, "bottom");
             @include govuk-responsive-margin(1, "top");
         }
@@ -77,10 +76,20 @@
         display: inline-block;
         width: 40%;
         vertical-align: top;
+        box-sizing: border-box;
+    }
+
+
+    &--inline-header {
+        @include govuk-responsive-padding(2, "right");
     }
 
     &--inline-cell {
         width: 60%;
+    }
+
+    .govuk-tag {
+        float: right;
     }
 }
 
@@ -145,17 +154,6 @@
         &--inline-header, &--inline-cell {
             width: 100%;
         }
-    }
-
-    @for $i from 1 through 14 {
-        .tl-employers--table tr th.tw-#{$i * 5} {
-            width: $i * 5%;
-        }
-    }
-
-    .break-line-desktop::before {
-        content: "\A";
-        white-space: pre;
     }
 
     .visually-hidden-desktop {
