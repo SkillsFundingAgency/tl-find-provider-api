@@ -12,7 +12,6 @@ public class EmployerInterestDto
     public string Postcode { get; init; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }
-    public int IndustryId { get; init; }
     public string OtherIndustry { get; init; }
     public string Email { get; init; }
     public string Telephone { get; init; }

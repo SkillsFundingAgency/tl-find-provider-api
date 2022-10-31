@@ -49,7 +49,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Postcode = geoLocation.Location,
                             Latitude = geoLocation.Latitude,
                             Longitude = geoLocation.Longitude,
-                            IndustryId = employerInterest.IndustryId ?? 0,
+                            OtherIndustry = employerInterest.OtherIndustry,
                             AdditionalInformation = employerInterest.AdditionalInformation,
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,
