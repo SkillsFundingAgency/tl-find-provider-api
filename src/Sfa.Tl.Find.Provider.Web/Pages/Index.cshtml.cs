@@ -24,7 +24,9 @@ public class IndexModel : PageModel
                     AuthenticationExtensions.AuthenticatedUserStartPage);
             }
 
-            return RedirectToPage(AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs);
+            //Not sure why this doesn't work with the slug url - for now just remove the -
+            return RedirectToPage(AuthenticationExtensions.AuthenticatedUserStartPage
+                .Replace("-", ""));
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))

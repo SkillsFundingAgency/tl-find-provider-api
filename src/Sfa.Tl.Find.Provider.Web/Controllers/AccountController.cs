@@ -37,24 +37,29 @@ public class AccountController : Controller
             isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
-            Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs);
+            Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPage);
         }
         else
         {
             await HttpContext.ChallengeAsync(
                 new AuthenticationProperties
                 {
-                    RedirectUri = AuthenticationExtensions.AuthenticatedUserStartPageWithSlugs
+                    //RedirectUri = "/Account/PostSignIn"
+                    RedirectUri = "/post-signin"
+                    // "/"
+                    // //AuthenticationExtensions.AuthenticatedUserStartPageExact
+                    //.Replace("-", "")
                 });
         }
     }
 
     [HttpGet]
+    [Route("post-signin")]
     public IActionResult PostSignIn()
     {
         return RedirectToPage(
-            User.Identity is {IsAuthenticated: true} 
-                ? AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs 
+            User.Identity is { IsAuthenticated: true }
+                ? AuthenticationExtensions.AuthenticatedUserStartPageExact
                 : AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 

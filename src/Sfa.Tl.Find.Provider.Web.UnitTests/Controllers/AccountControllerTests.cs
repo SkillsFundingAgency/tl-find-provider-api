@@ -41,7 +41,7 @@ public class AccountControllerTests
                 null,
                 Arg.Is<AuthenticationProperties>(
                     p => p.RedirectUri == 
-                         AuthenticationExtensions.AuthenticatedUserStartPageWithSlugs));
+                         "/post-signin"));
 
         controller.ControllerContext.HttpContext
             .Response
@@ -87,7 +87,7 @@ public class AccountControllerTests
             .Response
             .Headers["Location"].ToString()
             .Should()
-            .Be(AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs);
+            .Be(AuthenticationExtensions.AuthenticatedUserStartPage);
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class AccountControllerTests
         redirectResult!
             .PageName
             .Should()
-            .Be(AuthenticationExtensions.AuthenticatedUserStartPageWithNoSlugs);
+            .Be(AuthenticationExtensions.AuthenticatedUserStartPageExact);
     }
 
     [Fact]
