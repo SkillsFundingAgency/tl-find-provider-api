@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -16,16 +16,16 @@ namespace Sfa.Tl.Find.Provider.Web.Controllers;
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class EmployersApiController : ControllerBase
 {
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
     private readonly IEmployerInterestService _employerInterestService;
     private readonly ILogger<EmployersApiController> _logger;
 
     public EmployersApiController(
-        IMemoryCache cache,
+        ICacheService cacheService,
         IEmployerInterestService employerInterestService,
         ILogger<EmployersApiController> logger)
     {
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -61,7 +61,7 @@ public class EmployersApiController : ControllerBase
     {
         _logger.LogInformation($"{nameof(EmployersApiController)} {nameof(DeleteCachedUser)} called.");
 
-        _cache.Remove(User.GetUserSessionCacheKey());
+        _cacheService.Remove(User.GetUserSessionCacheKey());
 
         return NoContent();
     }

@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
@@ -15,20 +15,20 @@ public class CourseDirectoryServiceBuilder
         HttpClient httpClient = null, 
         IProviderRepository providerRepository = null,
         IQualificationRepository qualificationRepository = null,
-        IMemoryCache cache = null,
+        ICacheService cacheService = null,
         ILogger<CourseDirectoryService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
         providerRepository ??= Substitute.For<IProviderRepository>();
         qualificationRepository ??= Substitute.For<IQualificationRepository>();
-        cache ??= Substitute.For<IMemoryCache>();
+        cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<CourseDirectoryService>>();
 
         return new CourseDirectoryService(
             httpClient, 
             providerRepository, 
-            qualificationRepository, 
-            cache, 
+            qualificationRepository,
+            cacheService, 
             logger);
     }
         
@@ -36,7 +36,7 @@ public class CourseDirectoryServiceBuilder
         IDictionary<string, string> responseMessages,
         IProviderRepository providerRepository = null,
         IQualificationRepository qualificationRepository = null,
-        IMemoryCache cache = null,
+        ICacheService cacheService = null,
         ILogger<CourseDirectoryService> logger = null)
     {
         var responsesWithUri = responseMessages?
@@ -50,8 +50,8 @@ public class CourseDirectoryServiceBuilder
         return Build(
             httpClient, 
             providerRepository, 
-            qualificationRepository, 
-            cache, 
+            qualificationRepository,
+            cacheService, 
             logger);
     }
 }

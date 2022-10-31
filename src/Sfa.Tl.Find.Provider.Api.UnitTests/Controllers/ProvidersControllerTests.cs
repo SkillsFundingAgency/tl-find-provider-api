@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using NSubstitute.ExceptionExtensions;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
@@ -588,8 +587,8 @@ public class ProvidersControllerTests
                 FileSize = fileSize
             };
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<ProviderDataDownloadInfoResponse>())
             .Returns(x =>
             {
                 if ((string)x[0] == CacheKeys.ProviderDataDownloadInfoKey)
@@ -609,7 +608,7 @@ public class ProvidersControllerTests
         var controller = new ProvidersControllerBuilder()
             .Build(providerDataService,
                 dateTimeService,
-                cache);
+                cacheService);
 
         var result = await controller.GetProviderDataCsvFileInfo();
 

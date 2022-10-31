@@ -6,8 +6,8 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
-using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -351,8 +351,8 @@ public class PostcodeLookupServiceTests
     {
         var validPostcodeLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
             .Returns(x =>
             {
                 if (((string)x[0]).Contains(validPostcodeLocation.Location.Replace(" ", "")))
@@ -365,7 +365,7 @@ public class PostcodeLookupServiceTests
             });
 
         var service = new PostcodeLookupServiceBuilder()
-            .Build(cache: cache);
+            .Build(cacheService: cacheService);
 
         var result = await service.GetPostcode(validPostcodeLocation.Location);
 
@@ -377,8 +377,8 @@ public class PostcodeLookupServiceTests
     {
         var validOutcodeLocation = GeoLocationBuilder.BuildValidOutcodeLocation();
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
             .Returns(x =>
             {
                 if (((string)x[0]).Contains(validOutcodeLocation.Location.Replace(" ", "")))
@@ -391,7 +391,7 @@ public class PostcodeLookupServiceTests
             });
 
         var service = new PostcodeLookupServiceBuilder()
-            .Build(cache: cache);
+            .Build(cacheService: cacheService);
 
         var result = await service.GetOutcode(validOutcodeLocation.Location);
 

@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -15,14 +15,14 @@ public class AccountController : Controller
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<AccountController> _logger;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
 
     public AccountController(
-        IMemoryCache cache,
+        ICacheService cacheService,
         IConfiguration configuration,
         ILogger<AccountController> logger)
     {
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -52,9 +52,6 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult PostSignIn()
     {
-        //TODO: Move this into a filter
-        //_cache.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
-
         return RedirectToPage(
             User.Identity is {IsAuthenticated: true} 
                 ? AuthenticationExtensions.AuthenticatedUserStartPage 
@@ -66,7 +63,7 @@ public class AccountController : Controller
     [Route("signout")]
     public new async Task<IActionResult> SignOut()
     {
-        _cache.Remove(User.GetUserSessionCacheKey());
+        _cacheService.Remove(User.GetUserSessionCacheKey());
 
         if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
         {

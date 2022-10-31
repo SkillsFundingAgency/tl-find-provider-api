@@ -16,6 +16,12 @@ public class MemoryCacheService : ICacheService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public T Get<T>(object key)
+    {
+        TryGetValue(key, out T value);
+        return value;
+    }
+
     public bool TryGetValue<T>(object key, out T value)
     {
         return _cache.TryGetValue(key, out value);
@@ -24,6 +30,16 @@ public class MemoryCacheService : ICacheService
     public T Set<T>(string key, T value)
     {
         return _cache.Set(key, value);
+    }
+
+    public T Set<T>(string key, T value, DateTimeOffset absoluteExpiration)
+    {
+        return _cache.Set(key, value, absoluteExpiration);
+    }
+
+    public T Set<T>(string key, T value, MemoryCacheEntryOptions options)
+    {
+        return _cache.Set(key, value, options);
     }
 
     public void Remove(object key)

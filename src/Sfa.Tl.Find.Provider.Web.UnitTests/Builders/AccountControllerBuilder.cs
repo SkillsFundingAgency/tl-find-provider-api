@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class AccountControllerBuilder
@@ -18,12 +18,12 @@ public class AccountControllerBuilder
     private const string DefaultOrganisationName = "Test Organisation";
 
     public AccountController Build(
-        IMemoryCache? cache = null,
+        ICacheService? cacheService = null,
         IConfiguration? configuration = null,
         ILogger<AccountController>? logger = null,
         bool userIsAuthenticated = true)
     {
-        cache ??= Substitute.For<IMemoryCache>();
+        cacheService ??= Substitute.For<ICacheService>();
         configuration ??= Substitute.For<IConfiguration>();
 
         logger ??= Substitute.For<ILogger<AccountController>>();
@@ -66,7 +66,7 @@ public class AccountControllerBuilder
         }
 
         var controller = new AccountController(
-            cache,
+            cacheService,
             configuration,
             logger)
         {

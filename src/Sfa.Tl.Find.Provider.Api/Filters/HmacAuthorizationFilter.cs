@@ -5,10 +5,10 @@ using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.Filters;
 
@@ -19,16 +19,16 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
     private const string AuthenticationScheme = "amx";
     private const ulong RequestMaxAgeInSeconds = 300;
 
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<HmacAuthorizationFilter> _logger;
 
     public HmacAuthorizationFilter(
         IOptions<ApiSettings> apiOptions,
-        IMemoryCache cache,
+        ICacheService cacheService,
         ILogger<HmacAuthorizationFilter> logger)
     {
         if (apiOptions is null) throw new ArgumentNullException(nameof(apiOptions));
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         if (AllowedApps.IsEmpty)
@@ -113,7 +113,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
 
     private bool IsReplayRequest(string nonce, string requestTimeStamp)
     {
-        if (_cache.TryGetValue(nonce, out _))
+        if (_cacheService.TryGetValue<string>(nonce, out _))
         {
             _logger.LogWarning("Replay request detected - nonce found in cache.");
             return true;
@@ -139,7 +139,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
             return true;
         }
 
-        _cache.Set(nonce, requestTimeStamp,
+        _cacheService.Set(nonce, requestTimeStamp,
             DateTimeOffset.UtcNow.AddSeconds(RequestMaxAgeInSeconds));
 
         return false;

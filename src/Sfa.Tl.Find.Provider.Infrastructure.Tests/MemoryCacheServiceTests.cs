@@ -22,7 +22,7 @@ public class MemoryCacheServiceTests
         typeof(MemoryCacheService)
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
-    
+
     [Fact]
     public void Get_Calls_Inner_Cache_And_Returns_Expected_Result()
     {
@@ -33,7 +33,32 @@ public class MemoryCacheServiceTests
                 x[1] = "value";
                 return true;
             });
-            
+
+        var service = new MemoryCacheServiceBuilder().Build(memoryCache);
+
+        var result = service.Get<string>(TestKey);
+
+        result.Should().BeEquivalentTo(TestValue);
+
+        memoryCache
+            .Received(1)
+            .TryGetValue(Arg.Any<string>(), out Arg.Any<string>());
+        memoryCache
+            .Received(1)
+            .TryGetValue(TestKey, out Arg.Any<string>());
+    }
+
+    [Fact]
+    public void TryGetValue_Calls_Inner_Cache_And_Returns_Expected_Result()
+    {
+        var memoryCache = Substitute.For<IMemoryCache>();
+        memoryCache.TryGetValue(TestKey, out Arg.Any<string>())
+            .Returns(x =>
+            {
+                x[1] = "value";
+                return true;
+            });
+
         var service = new MemoryCacheServiceBuilder().Build(memoryCache);
 
         var result = service.TryGetValue(TestKey, out string returnedValue);
@@ -71,6 +96,27 @@ public class MemoryCacheServiceTests
             .CreateEntry(Arg.Is<string>(k => k == TestKey));
     }
 
+
+    [Fact]
+    public void Set_With_Absolute_Expiration_Calls_Inner_Cache()
+    {
+        var expiration = new DateTimeOffset();
+
+        var memoryCache = Substitute.For<IMemoryCache>();
+
+        var service = new MemoryCacheServiceBuilder().Build(memoryCache);
+
+        var result = service.Set(TestKey, TestValue, expiration);
+
+        result.Should().Be(TestValue);
+
+        memoryCache
+            .Received(1)
+            .CreateEntry(Arg.Any<string>());
+        memoryCache
+            .Received(1)
+            .CreateEntry(Arg.Is<string>(k => k == TestKey));
+    }
 
     [Fact]
     public void Remove_Calls_Inner_Cache()

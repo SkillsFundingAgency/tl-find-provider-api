@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Models.Session;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -17,15 +17,15 @@ namespace Sfa.Tl.Find.Provider.Web.Controllers;
 public class TimeoutController : Controller
 {
     private readonly DfeSignInSettings _signInSettings;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<TimeoutController> _logger;
 
     public TimeoutController(
-        IMemoryCache cache,
+        ICacheService cacheService,
         IOptions<DfeSignInSettings> signInOptions,
         ILogger<TimeoutController> logger)
     {
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _signInSettings = signInOptions?.Value
                           ?? throw new ArgumentNullException(nameof(signInOptions));
@@ -35,7 +35,7 @@ public class TimeoutController : Controller
     [Route("active-duration", Name = "ActiveDuration")]
     public async Task<IActionResult> GetActiveDuration()
     {
-        var registeredSessionTime = _cache.Get<DateTime?>(User.GetUserSessionCacheKey());
+        var registeredSessionTime = _cacheService.Get<DateTime?>(User.GetUserSessionCacheKey());
         var remainingActiveDuration = 
             registeredSessionTime != null && registeredSessionTime != DateTime.MinValue 
                 ? (registeredSessionTime.Value.AddMinutes(_signInSettings.Timeout) - DateTime.UtcNow) : new TimeSpan(0, 0, 0);
@@ -46,7 +46,7 @@ public class TimeoutController : Controller
     [Route("renew-activity", Name = "RenewSessionActivity")]
     public async Task<IActionResult> RenewSessionActivity()
     {
-        _cache.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
+        _cacheService.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
         return Json(new SessionActivityData { Minutes = _signInSettings.Timeout, Seconds = 0 });
     }
 
@@ -56,7 +56,7 @@ public class TimeoutController : Controller
     {
         var userId = User.GetClaim(CustomClaimTypes.UserId);
         //TempData.Set(Constants.UserSessionActivityId, userId);
-        _cache.Remove(User.GetUserSessionCacheKey());
+        _cacheService.Remove(User.GetUserSessionCacheKey());
         //TODO: Any redirect here?
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

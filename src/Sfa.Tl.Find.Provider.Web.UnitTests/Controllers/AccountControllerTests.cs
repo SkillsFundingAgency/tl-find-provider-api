@@ -4,14 +4,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Controllers;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Controllers;
@@ -136,17 +135,17 @@ public class AccountControllerTests
     [Fact]
     public async Task AccountController_SignOut_Clears_User_Session_Cache()
     {
-        var cache = Substitute.For<IMemoryCache>();
+        var cacheService = Substitute.For<ICacheService>();
 
         var controller = new AccountControllerBuilder()
-            .Build(cache);
+            .Build(cacheService);
 
         await controller.SignOut();
 
-        cache
+        cacheService
             .Received(1)
         .Remove(Arg.Any<string>());
-        cache
+        cacheService
             .Received(1)
             .Remove(Arg.Is<string>(k => k.StartsWith("USERID")));
     }

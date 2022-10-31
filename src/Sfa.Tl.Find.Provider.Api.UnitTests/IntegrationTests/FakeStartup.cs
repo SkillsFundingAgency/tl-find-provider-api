@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
@@ -166,6 +167,7 @@ public class FakeStartup
             })
             .AddTransient(_ => Substitute.For<IProviderRepository>())
             .AddTransient(_ => Substitute.For<IQualificationRepository>())
-            .AddTransient(_ => Substitute.For<ITownRepository>());
+            .AddTransient(_ => Substitute.For<ITownRepository>())
+            .AddTransient<ICacheService, MemoryCacheService>();
     }
 }

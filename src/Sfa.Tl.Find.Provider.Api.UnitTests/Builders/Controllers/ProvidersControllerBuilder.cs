@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -13,18 +12,18 @@ public class ProvidersControllerBuilder
     public ProvidersController Build(
         IProviderDataService providerDataService = null,
         IDateTimeService dateTimeService = null,
-        IMemoryCache cache = null,
+        ICacheService cacheService = null,
         ILogger<ProvidersController> logger = null)
     {
         providerDataService ??= Substitute.For<IProviderDataService>();
         dateTimeService ??= Substitute.For<IDateTimeService>();
-        cache ??= Substitute.For<IMemoryCache>();
+        cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<ProvidersController>>();
 
         var controller = new ProvidersController(
             providerDataService,
-            dateTimeService, 
-            cache,
+            dateTimeService,
+            cacheService,
             logger)
         {
             ControllerContext = new ControllerContext

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
-using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Filters;
@@ -22,14 +21,14 @@ public class UserSessionActivityPageFilterTests
     {
         var timeNowUtc = new DateTime(2022, 11, 01, 10, 11, 12, 0, DateTimeKind.Utc);
 
-        var cache = Substitute.For<IMemoryCache>();
+        var cacheService = Substitute.For<ICacheService>();
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService
             .UtcNow
             .Returns(timeNowUtc);
 
         var pageContext = new PageContextBuilder()
-            .Build(true);
+            .Build();
 
         var context = new PageHandlerExecutingContext(
             pageContext,
@@ -46,29 +45,69 @@ public class UserSessionActivityPageFilterTests
             new HandlerMethodDescriptor(),
             new object());
 
-        PageHandlerExecutionDelegate next = () =>
+        Task<PageHandlerExecutedContext> Next()
         {
             wasNextCalled = true;
-            return Task.FromResult(pageHandlerExecutedContext); 
-
-        };
+            return Task.FromResult(pageHandlerExecutedContext);
+        }
 
         var filter = new UserSessionActivityPageFilterBuilder()
-            .Build(cache, dateTimeService);
+            .Build(cacheService, dateTimeService);
 
-        await filter.OnPageHandlerExecutionAsync(context,
-            next);
+        await filter.OnPageHandlerExecutionAsync(context, Next);
 
-        //cache
-        //    .Received(1)
-        //    .Set(Arg.Any<object>(),
-        //        Arg.Any<object>()); //timeNowUtc
-        cache
+        cacheService
             .Received(1)
-            .CreateEntry(Arg.Any<string>());
-        cache
-            .Received(1)
-            .CreateEntry(Arg.Is<string>(k => k.StartsWith("USER")));
+            .Set(Arg.Is<string>(k => k.StartsWith("USER")),
+                timeNowUtc);
+
+        wasNextCalled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task OnPageHandlerExecution_Does_Not_Call_Cache_For_Unauthenticated_User()
+    {
+        var timeNowUtc = new DateTime(2022, 11, 01, 10, 11, 12, 0, DateTimeKind.Utc);
+
+        var cacheService = Substitute.For<ICacheService>();
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService
+            .UtcNow
+            .Returns(timeNowUtc);
+
+        var pageContext = new PageContextBuilder()
+            .Build(false);
+
+        var context = new PageHandlerExecutingContext(
+            pageContext,
+            Array.Empty<IFilterMetadata>(),
+            new HandlerMethodDescriptor(),
+            new Dictionary<string, object?>(),
+            new object());
+
+        var wasNextCalled = false;
+
+        var pageHandlerExecutedContext = new PageHandlerExecutedContext(
+            pageContext,
+            Array.Empty<IFilterMetadata>(),
+            new HandlerMethodDescriptor(),
+            new object());
+
+        Task<PageHandlerExecutedContext> Next()
+        {
+            wasNextCalled = true;
+            return Task.FromResult(pageHandlerExecutedContext);
+        }
+
+        var filter = new UserSessionActivityPageFilterBuilder()
+            .Build(cacheService, dateTimeService);
+
+        await filter.OnPageHandlerExecutionAsync(context, Next);
+
+        cacheService
+            .DidNotReceive()
+            .Set(Arg.Any<string>(),
+                Arg.Any<object>());
 
         wasNextCalled.Should().BeTrue();
     }
