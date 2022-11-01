@@ -46,7 +46,7 @@ else
                         <td class="govuk-table__cell">
                             @if (Model.EmployerInterest != null && Model.EmployerInterest.SkillAreas.Any())
                             {
-                                <ul>
+                                <ul class="govuk-list">
                                     @foreach (var skillArea in Model.EmployerInterest.SkillAreas)
                                     {
                                         <li>@skillArea</li>
