@@ -60,10 +60,10 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddPageRoute("/EmployerInterest/Index", "/test-employer-list");
     options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
     options.Conventions.AddPageRoute("/EmployerDetails", "/employer-detail");
-    options.Conventions.AddPageRoute("/AccessibilityStatement", "/accessibility-statement");
+    options.Conventions.AddPageRoute("/Help/AccessibilityStatement", "/accessibility-statement");
     options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
     options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
-    options.Conventions.AddPageRoute("/TermsAndConditions", "/terms-and-conditions");
+    options.Conventions.AddPageRoute("/Help/TermsAndConditions", "/terms-and-conditions");
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/AccessibilityStatement");
