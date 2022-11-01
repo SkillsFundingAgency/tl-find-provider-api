@@ -1,5 +1,5 @@
 ﻿@using Microsoft.Extensions.Options
-@using Sfa.Tl.Find.Provider.Application.Models.Configuration
+@using Sfa.Tl.Find.Provider.Infrastructure.Configuration
 @inject IOptions<DfeSignInSettings> SignInOptions
 
 <div id="timeout-message-container" class="tl-timeout-message--container hidden" data-timeout="@SignInOptions.Value.Timeout">

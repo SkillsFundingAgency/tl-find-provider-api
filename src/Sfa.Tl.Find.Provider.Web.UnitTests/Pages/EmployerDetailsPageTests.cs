@@ -1,7 +1,9 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages;
+using Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
@@ -17,23 +19,23 @@ public class EmployerDetailsPageTests
     [Fact]
     public async Task EmployerDetailsModel_OnGet_Sets_Expected_Results()
     {
-        var employerInterest = new EmployerInterestBuilder()
+        var employerInterestDetail = new EmployerInterestDetailBuilder()
             .Build();
 
-        var id = employerInterest.Id;
+        var id = employerInterestDetail.Id;
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
-        //employerInterestService
-        //    .GetEmployerInterest(id)
-        //    .Returns(employerInterest);
+        employerInterestService
+        .GetEmployerInterestDetail(id)
+            .Returns(employerInterestDetail);
 
         var detailsModel = new EmployerDetailsModelBuilder()
             .Build(employerInterestService);
 
-        //await detailsModel.OnGet(id);
+        await detailsModel.OnGet(id);
 
-        //detailsModel.EmployerInterest
-        //    .Should()
-        //    .BeEquivalentTo(employerInterest);
+        detailsModel.EmployerInterest
+            .Should()
+            .BeEquivalentTo(employerInterestDetail);
     }
 }

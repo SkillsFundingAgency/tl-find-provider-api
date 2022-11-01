@@ -3,13 +3,18 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Filters;
 using Sfa.Tl.Find.Provider.Web.ParameterTransformers;
 using Sfa.Tl.Find.Provider.Web.Security;
+using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
+using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +33,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
-if (bool.TryParse(builder.Configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
+if (bool.TryParse(builder.Configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
 {
     builder.Services.AddProviderStubAuthentication();
 }
@@ -51,20 +56,24 @@ builder.Services.Configure<RouteOptions>(option =>
 
 builder.Services.AddRazorPages(options =>
 {
-    options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
+    //options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
     options.Conventions.AddPageRoute("/EmployerInterest/Index", "/test-employer-list");
+    options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
+    options.Conventions.AddPageRoute("/EmployerDetails", "/employer-detail");
+    options.Conventions.AddPageRoute("/AccessibilityStatement", "/accessibility-statement");
     options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
     options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
+    options.Conventions.AddPageRoute("/TermsAndConditions", "/terms-and-conditions");
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
-    options.Conventions.AllowAnonymousToPage("/Accessibility");
+    options.Conventions.AllowAnonymousToPage("/AccessibilityStatement");
     options.Conventions.AllowAnonymousToPage("/Help/Cookies");
     options.Conventions.AllowAnonymousToPage("/Help/Privacy");
     options.Conventions.AllowAnonymousToPage("/TermsAndConditions");
 })
     .AddMvcOptions(options =>
     {
-        options.Filters.Add<SessionPageActivityFilter>();
+        options.Filters.Add<UserSessionActivityPageFilter>();
     });
 
 builder.Services.AddControllers();
@@ -108,6 +117,9 @@ builder.Services
     .AddTransient<IQualificationRepository, QualificationRepository>()
     .AddTransient<IRouteRepository, RouteRepository>()
     .AddTransient<ITownRepository, TownRepository>();
+
+builder.Services
+    .AddTransient<ICacheService, MemoryCacheService>();
 
 builder.Services.AddNotifyService(
     siteConfiguration.EmailSettings?.GovNotifyApiKey);

@@ -30,7 +30,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="3.1.2">
+    <PackageReference Include="coverlet.collector" Version="3.2.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -39,6 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Api\Sfa.Tl.Find.Provider.Api.csproj" />
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Application\Sfa.Tl.Find.Provider.Application.csproj" />
+    <ProjectReference Include="..\Sfa.Tl.Find.Provider.Infrastructure\Sfa.Tl.Find.Provider.Infrastructure.csproj" />
     <ProjectReference Include="..\Sfa.Tl.Find.Provider.Tests.Common\Sfa.Tl.Find.Provider.Tests.Common.csproj" />
   </ItemGroup>
 

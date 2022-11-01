@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
@@ -12,7 +13,7 @@ public class CourseDirectoryService : ICourseDirectoryService
 {
     private readonly HttpClient _httpClient;
 
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
     private readonly IProviderRepository _providerRepository;
     private readonly IQualificationRepository _qualificationRepository;
     private readonly ILogger<CourseDirectoryService> _logger;
@@ -24,13 +25,13 @@ public class CourseDirectoryService : ICourseDirectoryService
         HttpClient httpClient,
         IProviderRepository providerRepository,
         IQualificationRepository qualificationRepository,
-        IMemoryCache cache,
+        ICacheService cacheService,
         ILogger<CourseDirectoryService> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -218,8 +219,8 @@ public class CourseDirectoryService : ICourseDirectoryService
 
     private void ClearCaches()
     {
-        _cache.Remove(CacheKeys.QualificationsKey);
-        _cache.Remove(CacheKeys.RoutesKey);
-        _cache.Remove(CacheKeys.ProviderDataDownloadInfoKey);
+        _cacheService.Remove(CacheKeys.QualificationsKey);
+        _cacheService.Remove(CacheKeys.RoutesKey);
+        _cacheService.Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

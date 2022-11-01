@@ -2,15 +2,17 @@
 using System.Text.Json;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.ClassMaps;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
@@ -23,7 +25,7 @@ public class ProviderDataService : IProviderDataService
     private readonly IQualificationRepository _qualificationRepository;
     private readonly IRouteRepository _routeRepository;
     private readonly IIndustryRepository _industryRepository;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<ProviderDataService> _logger;
     private readonly bool _mergeAdditionalProviderData;
 
@@ -35,7 +37,7 @@ public class ProviderDataService : IProviderDataService
         IRouteRepository routeRepository,
         IIndustryRepository industryRepository,
         ITownDataService townDataService,
-        IMemoryCache cache,
+        ICacheService cacheService,
         IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
     {
@@ -46,7 +48,7 @@ public class ProviderDataService : IProviderDataService
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
         _industryRepository = industryRepository ?? throw new ArgumentNullException(nameof(industryRepository));
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
@@ -61,12 +63,12 @@ public class ProviderDataService : IProviderDataService
         }
 
         const string key = CacheKeys.IndustriesKey;
-        if (!_cache.TryGetValue(key, out IList<Industry> industries))
+        if (!_cacheService.TryGetValue(key, out IList<Industry> industries))
         {
             industries = (await _industryRepository
                     .GetAll())
                 .ToList();
-            _cache.Set(key, industries,
+            _cacheService.Set(key, industries,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
         }
 
@@ -81,12 +83,12 @@ public class ProviderDataService : IProviderDataService
         }
 
         const string key = CacheKeys.QualificationsKey;
-        if (!_cache.TryGetValue(key, out IList<Qualification> qualifications))
+        if (!_cacheService.TryGetValue(key, out IList<Qualification> qualifications))
         {
             qualifications = (await _qualificationRepository
                 .GetAll())
                 .ToList();
-            _cache.Set(key, qualifications,
+            _cacheService.Set(key, qualifications,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
         }
 
@@ -101,12 +103,12 @@ public class ProviderDataService : IProviderDataService
         }
 
         const string key = CacheKeys.RoutesKey;
-        if (!_cache.TryGetValue(key, out IList<Route> routes))
+        if (!_cacheService.TryGetValue(key, out IList<Route> routes))
         {
             routes = (await _routeRepository
                 .GetAll(_mergeAdditionalProviderData))
                 .ToList();
-            _cache.Set(key, routes,
+            _cacheService.Set(key, routes,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
         }
 
@@ -118,7 +120,7 @@ public class ProviderDataService : IProviderDataService
         IList<int> routeIds = null,
         IList<int> qualificationIds = null,
         int page = 0,
-        int pageSize = Constants.DefaultPageSize)
+        int pageSize = Models.Constants.DefaultPageSize)
     {
         try
         {
@@ -184,7 +186,7 @@ public class ProviderDataService : IProviderDataService
         IList<int> routeIds = null,
         IList<int> qualificationIds = null,
         int page = 0,
-        int pageSize = Constants.DefaultPageSize)
+        int pageSize = Models.Constants.DefaultPageSize)
     {
         try
         {
@@ -380,11 +382,11 @@ public class ProviderDataService : IProviderDataService
     {
         var key = CacheKeys.LatLongKey(latitude, longitude);
 
-        if (!_cache.TryGetValue(key, out GeoLocation geoLocation))
+        if (!_cacheService.TryGetValue(key, out GeoLocation geoLocation))
         {
             geoLocation = await _postcodeLookupService.GetNearestPostcode(latitude, longitude);
 
-            _cache.Set(key, geoLocation,
+            _cacheService.Set(key, geoLocation,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(
                     _dateTimeService,
                     _logger));
@@ -414,8 +416,8 @@ public class ProviderDataService : IProviderDataService
 
     private void ClearCaches()
     {
-        _cache.Remove(CacheKeys.QualificationsKey);
-        _cache.Remove(CacheKeys.RoutesKey);
-        _cache.Remove(CacheKeys.ProviderDataDownloadInfoKey);
+        _cacheService.Remove(CacheKeys.QualificationsKey);
+        _cacheService.Remove(CacheKeys.RoutesKey);
+        _cacheService.Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

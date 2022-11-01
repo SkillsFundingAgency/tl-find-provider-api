@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Sfa.Tl.Find.Provider.Web.Extensions;
-using Microsoft.Extensions.Caching.Memory;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -15,14 +15,14 @@ public class AccountController : Controller
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<AccountController> _logger;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
 
     public AccountController(
-        IMemoryCache cache,
+        ICacheService cacheService,
         IConfiguration configuration,
         ILogger<AccountController> logger)
     {
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -33,7 +33,7 @@ public class AccountController : Controller
     [Route("signin")]
     public async Task SignIn()
     {
-        if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
+        if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
             isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
@@ -44,20 +44,22 @@ public class AccountController : Controller
             await HttpContext.ChallengeAsync(
                 new AuthenticationProperties
                 {
-                    RedirectUri = AuthenticationExtensions.AuthenticatedUserStartPage
+                    //RedirectUri = "/Account/PostSignIn"
+                    RedirectUri = "/post-signin"
+                    // "/"
+                    // //AuthenticationExtensions.AuthenticatedUserStartPageExact
+                    //.Replace("-", "")
                 });
         }
     }
 
     [HttpGet]
+    [Route("post-signin")]
     public IActionResult PostSignIn()
     {
-        //TODO: Move this into a filter
-        _cache.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
-
         return RedirectToPage(
-            User.Identity is {IsAuthenticated: true} 
-                ? AuthenticationExtensions.AuthenticatedUserStartPage 
+            User.Identity is { IsAuthenticated: true }
+                ? AuthenticationExtensions.AuthenticatedUserStartPageExact
                 : AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 
@@ -66,9 +68,9 @@ public class AccountController : Controller
     [Route("signout")]
     public new async Task<IActionResult> SignOut()
     {
-        _cache.Remove(User.GetUserSessionCacheKey());
+        _cacheService.Remove(User.GetUserSessionCacheKey());
 
-        if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
+        if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
         {
             _logger.LogInformation("DfE Sign-in was not used. Signing out of fake authentication.");
 
@@ -76,9 +78,6 @@ public class AccountController : Controller
             await HttpContext.SignOutAsync(AuthenticationExtensions.AuthenticationCookieName);
             return RedirectToPage("/SignedOut");
         }
-
-        //TODO: Remove logging - just here for initial testing purposes
-        _logger.LogInformation("User signed out of DfE Sign-in.");
 
         return SignOut(
             new AuthenticationProperties { RedirectUri = AuthenticationExtensions.UnauthenticatedUserStartPage },
@@ -91,8 +90,6 @@ public class AccountController : Controller
     [Route("signout-complete", Name = "SignOutComplete")]
     public IActionResult SignoutComplete()
     {
-        //TODO: Remove logging - just here for initial testing purposes
-        _logger.LogInformation("Signout complete from DfE Sign-in.");
         return Redirect(AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 }

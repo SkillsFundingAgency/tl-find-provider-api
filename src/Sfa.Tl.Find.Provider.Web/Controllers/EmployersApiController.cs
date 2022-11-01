@@ -1,8 +1,12 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -14,13 +18,16 @@ namespace Sfa.Tl.Find.Provider.Web.Controllers;
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class EmployersApiController : ControllerBase
 {
+    private readonly ICacheService _cacheService;
     private readonly IEmployerInterestService _employerInterestService;
     private readonly ILogger<EmployersApiController> _logger;
 
     public EmployersApiController(
+        ICacheService cacheService,
         IEmployerInterestService employerInterestService,
         ILogger<EmployersApiController> logger)
     {
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -40,33 +47,40 @@ public class EmployersApiController : ControllerBase
     {
         _logger.LogInformation($"{nameof(EmployersApiController)} {nameof(CreateInterest)} called.");
 
-        //TODO: Validate the model
-
-        Debug.WriteLine("CreateInterest called with:");
-        Debug.WriteLine($"   Organisation name:\t{employerInterest.OrganisationName}");
-        Debug.WriteLine($"   Contact name:\t{employerInterest.ContactName}");
-        Debug.WriteLine($"   Postcode:\t{employerInterest.Postcode}");
-        Debug.WriteLine($"   Email:\t{employerInterest.Email}");
-        Debug.WriteLine($"   Telephone:\t{employerInterest.Telephone}");
-        Debug.WriteLine($"   Website:\t{employerInterest.Website}");
-        Debug.WriteLine($"   Contact preference:\t{employerInterest.ContactPreferenceType}");
-        Debug.WriteLine($"   Industry:\t{employerInterest.IndustryId}");
-        Debug.WriteLine($"   Other industry:\t{employerInterest.OtherIndustry}");
-        Debug.WriteLine($"   Additional info:\t{employerInterest.AdditionalInformation}");
-        if (employerInterest.SkillAreaIds != null && employerInterest.SkillAreaIds.Any())
+        //TODO: Validate the model - for now, just enforce max lengths
+        var cleanEmployerInterest = new EmployerInterest
         {
-            Debug.WriteLine($"   Skill area:\t{employerInterest.AdditionalInformation}");
-            foreach (var skillArea in employerInterest.SkillAreaIds)
-            {
-                Debug.WriteLine($"   Skill area:\t{skillArea}");
-            }
-        }
+            OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
+            ContactName = employerInterest.ContactName?.Trim().Truncate(400),
+            Postcode = employerInterest.Postcode,
+            IndustryId = employerInterest.IndustryId,
+            OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
+            AdditionalInformation = employerInterest.AdditionalInformation?.ToTrimmedOrNullString(),
+            Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
+            Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
+            Website = employerInterest.Website?.ToTrimmedOrNullString().Truncate(500),
+            ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
+            SkillAreaIds = employerInterest.SkillAreaIds
+        };
 
-        var uniqueId = await _employerInterestService.CreateEmployerInterest(employerInterest);
+        var uniqueId = await _employerInterestService.CreateEmployerInterest(cleanEmployerInterest);
 
         return Ok(new
         {
             id = uniqueId
         });
+    }
+
+    [HttpDelete]
+    [AllowAnonymous]
+    // ReSharper disable once StringLiteralTypo
+    [Route("deletecacheduser")]
+    public async Task<IActionResult> DeleteCachedUser()
+    {
+        _logger.LogInformation($"{nameof(EmployersApiController)} {nameof(DeleteCachedUser)} called.");
+
+        _cacheService.Remove(User.GetUserSessionCacheKey());
+
+        return NoContent();
     }
 }

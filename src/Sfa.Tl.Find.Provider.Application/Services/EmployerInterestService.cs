@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class EmployerInterestService : IEmployerInterestService
@@ -16,7 +16,7 @@ public class EmployerInterestService : IEmployerInterestService
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmployerInterestRepository _employerInterestRepository;
     private readonly IProviderDataService _providerDataService;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<EmployerInterestService> _logger;
     private readonly EmployerInterestSettings _employerInterestSettings;
 
@@ -26,7 +26,7 @@ public class EmployerInterestService : IEmployerInterestService
         IPostcodeLookupService postcodeLookupService,
         IProviderDataService providerDataService,
         IEmployerInterestRepository employerInterestRepository,
-        IMemoryCache cache,
+        ICacheService cacheService,
         IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<EmployerInterestService> logger)
     {
@@ -35,7 +35,7 @@ public class EmployerInterestService : IEmployerInterestService
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _employerInterestRepository = employerInterestRepository ?? throw new ArgumentNullException(nameof(employerInterestRepository));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _employerInterestSettings = employerInterestOptions?.Value

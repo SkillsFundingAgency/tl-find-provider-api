@@ -4,6 +4,7 @@ using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Data;
 
@@ -48,7 +49,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Postcode = geoLocation.Location,
                             Latitude = geoLocation.Latitude,
                             Longitude = geoLocation.Longitude,
-                            IndustryId = employerInterest.IndustryId ?? 0,
+                            OtherIndustry = employerInterest.OtherIndustry,
                             AdditionalInformation = employerInterest.AdditionalInformation,
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,

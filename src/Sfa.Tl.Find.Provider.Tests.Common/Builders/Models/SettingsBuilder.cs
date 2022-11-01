@@ -1,4 +1,4 @@
-﻿using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+﻿using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 
 // ReSharper disable UnusedMember.Global
 
@@ -9,7 +9,10 @@ public class SettingsBuilder
 {
     private const string AppId = "2b1c1371f07a4add85a54b1812b2b0de";
     private const string ApiKey = "be1a8d303ea04e10810eed67f5cf174a";
-    private const string ConnectionString = "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
+    
+    private const string SqlConnectionString = "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
+    private const string RedisConnectionString = "test.redis.cache.windows.net:6380,password='Test1',ssl=True,abortConnect=False";
+
     private const string FindCourseApiKey = "0f608e5d437f4baabc04a0bc2dabbc1b";
     private const string FindCourseApiBaseAbsoluteUri = "https://test.com/findacourse/api";
     public static readonly Uri FindCourseApiBaseUri = new(FindCourseApiBaseAbsoluteUri);
@@ -48,9 +51,11 @@ public class SettingsBuilder
         };
 
     public ConnectionStringSettings BuildConnectionStringSettings(
-        string connectionString = ConnectionString) => new()
+        string sqlConnectionString = SqlConnectionString,
+        string redisConnectionString = RedisConnectionString) => new()
         {
-            SqlConnectionString = connectionString
+            SqlConnectionString = sqlConnectionString,
+            RedisConnectionString = redisConnectionString
         };
 
     public CourseDirectoryApiSettings BuildCourseDirectoryApiSettings(
@@ -136,7 +141,8 @@ public class SettingsBuilder
         GoogleMapsApiSettings googleMapsApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
         SearchSettings searchSettings = null,
-        string sqlConnectionString = ConnectionString,
+        string sqlConnectionString = SqlConnectionString,
+        string redisConnectionString = RedisConnectionString,
         string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI",
         string townDataImportSchedule = "0 0 10 * * MON-FRI") => new()
         {
@@ -149,6 +155,7 @@ public class SettingsBuilder
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             SqlConnectionString = sqlConnectionString,
+            RedisConnectionString = redisConnectionString,
             CourseDirectoryImportSchedule = courseDirectoryImportSchedule,
             TownDataImportSchedule = townDataImportSchedule
         };

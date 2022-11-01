@@ -19,7 +19,7 @@ public class EmployerInterest
     public string Email { get; init; }
     public string Telephone { get; init; }
     public string Website { get; init; }
-    public ContactPreference ContactPreferenceType { get; init; }
+    public ContactPreference? ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
     public List<int>? SkillAreaIds { get; init; }
 }

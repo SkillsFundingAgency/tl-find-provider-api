@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using System.Security.Claims;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Extensions;
 

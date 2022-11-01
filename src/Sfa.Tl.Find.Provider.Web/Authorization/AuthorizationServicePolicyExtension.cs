@@ -1,4 +1,6 @@
-﻿namespace Sfa.Tl.Find.Provider.Web.Authorization;
+﻿using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+
+namespace Sfa.Tl.Find.Provider.Web.Authorization;
 
 public static class AuthorizationServicePolicyExtension
 {

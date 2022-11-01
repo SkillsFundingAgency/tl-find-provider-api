@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
-using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models.Session;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -17,15 +17,15 @@ namespace Sfa.Tl.Find.Provider.Web.Controllers;
 public class TimeoutController : Controller
 {
     private readonly DfeSignInSettings _signInSettings;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<TimeoutController> _logger;
 
     public TimeoutController(
-        IMemoryCache cache,
+        ICacheService cacheService,
         IOptions<DfeSignInSettings> signInOptions,
         ILogger<TimeoutController> logger)
     {
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _signInSettings = signInOptions?.Value
                           ?? throw new ArgumentNullException(nameof(signInOptions));
@@ -33,9 +33,9 @@ public class TimeoutController : Controller
 
     [HttpGet]
     [Route("active-duration", Name = "ActiveDuration")]
-    public async Task<IActionResult> GetActiveDurationAsync()
+    public async Task<IActionResult> GetActiveDuration()
     {
-        var registeredSessionTime = _cache.Get<DateTime?>(User.GetUserSessionCacheKey());
+        var registeredSessionTime = _cacheService.Get<DateTime?>(User.GetUserSessionCacheKey());
         var remainingActiveDuration = 
             registeredSessionTime != null && registeredSessionTime != DateTime.MinValue 
                 ? (registeredSessionTime.Value.AddMinutes(_signInSettings.Timeout) - DateTime.UtcNow) : new TimeSpan(0, 0, 0);
@@ -44,9 +44,9 @@ public class TimeoutController : Controller
 
     [HttpGet]
     [Route("renew-activity", Name = "RenewSessionActivity")]
-    public async Task<IActionResult> RenewSessionActivityAsync()
+    public async Task<IActionResult> RenewSessionActivity()
     {
-        _cache.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
+        _cacheService.Set(User.GetUserSessionCacheKey(), DateTime.UtcNow);
         return Json(new SessionActivityData { Minutes = _signInSettings.Timeout, Seconds = 0 });
     }
 
@@ -56,7 +56,7 @@ public class TimeoutController : Controller
     {
         var userId = User.GetClaim(CustomClaimTypes.UserId);
         //TempData.Set(Constants.UserSessionActivityId, userId);
-        _cache.Remove(User.GetUserSessionCacheKey());
+        _cacheService.Remove(User.GetUserSessionCacheKey());
         //TODO: Any redirect here?
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -67,71 +67,6 @@ public class TimeoutController : Controller
     [Route("timeout", Name = "Timeout")]
     public IActionResult TimeoutConfirmation()
     {
-        //TODO: Do we want a separate Timeout page?
         return RedirectToPage(AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
-
-    //[AllowAnonymous]
-    //[HttpGet]
-    //[ActionName("SignIn")]
-    //[Route("signin")]
-    //public async Task SignIn()
-    //{
-    //    if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
-    //        isStubProviderAuth)
-    //    {
-    //        _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
-    //        Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPage);
-    //    }
-    //    else
-    //    {
-    //        await HttpContext.ChallengeAsync(
-    //            new AuthenticationProperties
-    //            {
-    //                RedirectUri = AuthenticationExtensions.AuthenticatedUserStartPage
-    //            });
-    //    }
-    //}
-
-    //[HttpGet]
-    //public IActionResult PostSignIn()
-    //{
-    //    return RedirectToPage(
-    //        User.Identity is {IsAuthenticated: true} 
-    //            ? AuthenticationExtensions.AuthenticatedUserStartPage 
-    //            : AuthenticationExtensions.UnauthenticatedUserStartPage);
-    //}
-
-    //[HttpGet]
-    //[ActionName("SignOut")]
-    //[Route("signout")]
-    //public new async Task<IActionResult> SignOut()
-    //{
-    //    if (bool.TryParse(_configuration[Constants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
-    //    {
-    //        _logger.LogInformation("DfE Sign-in was not used. Signing out of fake authentication.");
-
-    //        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    //        await HttpContext.SignOutAsync(AuthenticationExtensions.AuthenticationCookieName);
-    //        return RedirectToPage("/SignedOut");
-    //    }
-
-    //    //TODO: Remove logging - just here for initial testing purposes
-    //    _logger.LogInformation("User signed out of DfE Sign-in.");
-
-    //    return SignOut(
-    //        new AuthenticationProperties { RedirectUri = AuthenticationExtensions.UnauthenticatedUserStartPage },
-    //        OpenIdConnectDefaults.AuthenticationScheme,
-    //        CookieAuthenticationDefaults.AuthenticationScheme);
-    //}
-
-    //[AllowAnonymous]
-    //[HttpGet]
-    //[Route("signout-complete", Name = "SignOutComplete")]
-    //public IActionResult SignoutComplete()
-    //{
-    //    //TODO: Remove logging - just here for initial testing purposes
-    //    _logger.LogInformation("Signout complete from DfE Sign-in.");
-    //    return Redirect(AuthenticationExtensions.UnauthenticatedUserStartPage);
-    //}
 }

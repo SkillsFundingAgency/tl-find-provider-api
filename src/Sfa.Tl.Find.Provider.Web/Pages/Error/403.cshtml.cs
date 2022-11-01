@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sfa.Tl.Find.Provider.Web.Authorization;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using System.Security.Claims;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Error;

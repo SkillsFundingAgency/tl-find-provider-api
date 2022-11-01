@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
@@ -16,7 +16,7 @@ public class EmployerInterestServiceBuilder
         IPostcodeLookupService postcodeLookupService = null,
         IProviderDataService providerDataService = null,
         IEmployerInterestRepository employerInterestRepository = null,
-        IMemoryCache cache = null,
+        ICacheService cacheService = null,
         EmployerInterestSettings employerInterestSettings = null,
         ILogger<EmployerInterestService> logger = null)
     {
@@ -25,7 +25,7 @@ public class EmployerInterestServiceBuilder
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         employerInterestRepository ??= Substitute.For<IEmployerInterestRepository>();
         providerDataService ??= Substitute.For<IProviderDataService>();
-        cache ??= Substitute.For<IMemoryCache>();
+        cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<EmployerInterestService>>();
 
         var employerInterestOptions = Options.Create(
@@ -39,7 +39,7 @@ public class EmployerInterestServiceBuilder
             postcodeLookupService,
             providerDataService,
             employerInterestRepository,
-            cache,
+            cacheService,
             employerInterestOptions,
             logger);
     }

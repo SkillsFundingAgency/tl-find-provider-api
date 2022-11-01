@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.VisualBasic.FileIO;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Microsoft.VisualBasic.FileIO;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -63,8 +64,8 @@ public class ProviderDataServiceTests
 
         var industryRepository = Substitute.For<IIndustryRepository>();
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Industry>>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Industry>>())
             .Returns(x =>
             {
                 if ((string)x[0] == CacheKeys.IndustriesKey)
@@ -78,7 +79,7 @@ public class ProviderDataServiceTests
 
         var service = new ProviderDataServiceBuilder()
             .Build(industryRepository: industryRepository,
-                cache: cache);
+                cacheService: cacheService);
 
         var results = await service.GetIndustries();
         results.Should().BeEquivalentTo(industries);
@@ -117,8 +118,8 @@ public class ProviderDataServiceTests
 
         var qualificationRepository = Substitute.For<IQualificationRepository>();
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
             .Returns(x =>
             {
                 if ((string)x[0] == CacheKeys.QualificationsKey)
@@ -132,7 +133,7 @@ public class ProviderDataServiceTests
 
         var service = new ProviderDataServiceBuilder()
             .Build(qualificationRepository: qualificationRepository,
-                cache: cache);
+                cacheService: cacheService);
 
         var results = await service.GetQualifications();
         results.Should().BeEquivalentTo(qualifications);
@@ -171,8 +172,8 @@ public class ProviderDataServiceTests
 
         var routeRepository = Substitute.For<IRouteRepository>();
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Route>>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Route>>())
             .Returns(x =>
             {
                 if ((string)x[0] == CacheKeys.RoutesKey)
@@ -186,7 +187,7 @@ public class ProviderDataServiceTests
 
         var service = new ProviderDataServiceBuilder()
             .Build(routeRepository: routeRepository,
-                cache: cache);
+                cacheService: cacheService);
 
         var results = await service.GetRoutes();
         results.Should().BeEquivalentTo(routes);
@@ -867,24 +868,24 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task ImportProviderData_Clears_Caches()
     {
-        var cache = Substitute.For<IMemoryCache>();
+        var cacheService = Substitute.For<ICacheService>();
 
         await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
 
         var service = new ProviderDataServiceBuilder()
-            .Build(cache: cache);
+            .Build(cacheService: cacheService);
 
         await service.ImportProviderData(stream, true);
 
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.QualificationsKey);
 
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.ProviderDataDownloadInfoKey);
 
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.RoutesKey);
     }

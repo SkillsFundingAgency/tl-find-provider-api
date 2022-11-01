@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
@@ -18,7 +18,7 @@ public class ProviderDataServiceBuilder
         IRouteRepository routeRepository = null,
         IIndustryRepository industryRepository = null,
         ITownDataService townDataService = null,
-        IMemoryCache cache = null,
+        ICacheService cacheService = null,
         SearchSettings searchSettings = null,
         ILogger<ProviderDataService> logger = null)
     {
@@ -29,7 +29,7 @@ public class ProviderDataServiceBuilder
         routeRepository ??= Substitute.For<IRouteRepository>();
         industryRepository ??= Substitute.For<IIndustryRepository>();
         townDataService ??= Substitute.For<ITownDataService>();
-        cache ??= Substitute.For<IMemoryCache>();
+        cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<ProviderDataService>>();
 
         searchSettings ??= new SettingsBuilder().BuildSearchSettings();
@@ -44,7 +44,7 @@ public class ProviderDataServiceBuilder
             routeRepository,
             industryRepository,
             townDataService,
-            cache,
+            cacheService,
             searchOptions,
             logger);
     }

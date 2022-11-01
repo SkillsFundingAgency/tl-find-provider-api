@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Controllers;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
+using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Controllers;
 public class AccountControllerTests
@@ -28,10 +29,8 @@ public class AccountControllerTests
         var controller = new AccountControllerBuilder()
             .Build(userIsAuthenticated: false);
 
-        //controller.ControllerContext.HttpContext.User.Should().BeNull();
         await controller.SignIn();
 
-        //controller.ControllerContext.HttpContext.User.Should().NotBeNull();
         var authService = controller.ControllerContext.HttpContext.RequestServices
             .GetRequiredService<IAuthenticationService>();
         authService.Should().NotBeNull();
@@ -41,7 +40,8 @@ public class AccountControllerTests
             .ChallengeAsync(controller.ControllerContext.HttpContext,
                 null,
                 Arg.Is<AuthenticationProperties>(
-                    p => p.RedirectUri == AuthenticationExtensions.AuthenticatedUserStartPage));
+                    p => p.RedirectUri == 
+                         "/post-signin"));
 
         controller.ControllerContext.HttpContext
             .Response
@@ -54,7 +54,7 @@ public class AccountControllerTests
     public async Task AccountController_SignIn_Redirects_When_DfeSignIn_Skipped()
     {
         var configuration = Substitute.For<IConfiguration>();
-        configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
+        configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
             .Build(configuration: configuration);
@@ -99,7 +99,10 @@ public class AccountControllerTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be(AuthenticationExtensions.AuthenticatedUserStartPage);
+        redirectResult!
+            .PageName
+            .Should()
+            .Be(AuthenticationExtensions.AuthenticatedUserStartPageExact);
     }
 
     [Fact]
@@ -119,7 +122,7 @@ public class AccountControllerTests
     public async Task AccountController_SignOut_Returns_PageResult_When_DfeSignIn_Skipped()
     {
         var configuration = Substitute.For<IConfiguration>();
-        configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
+        configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
             .Build(configuration: configuration);
@@ -132,10 +135,28 @@ public class AccountControllerTests
     }
 
     [Fact]
+    public async Task AccountController_SignOut_Clears_User_Session_Cache()
+    {
+        var cacheService = Substitute.For<ICacheService>();
+
+        var controller = new AccountControllerBuilder()
+            .Build(cacheService);
+
+        await controller.SignOut();
+
+        cacheService
+            .Received(1)
+        .Remove(Arg.Any<string>());
+        cacheService
+            .Received(1)
+            .Remove(Arg.Is<string>(k => k.StartsWith("USERID")));
+    }
+
+    [Fact]
     public void AccountController_SignOutComplete_Returns_RedirectToPageResult()
     {
         var configuration = Substitute.For<IConfiguration>();
-        configuration[Constants.SkipProviderAuthenticationConfigKey].Returns("true");
+        configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey].Returns("true");
 
         var controller = new AccountControllerBuilder()
             .Build(configuration: configuration);

@@ -2,10 +2,11 @@
 using Notify.Client;
 using Notify.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using System.Net.Http.Headers;
 using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 
 // ReSharper disable UnusedMethodReturnValue.Global
 
