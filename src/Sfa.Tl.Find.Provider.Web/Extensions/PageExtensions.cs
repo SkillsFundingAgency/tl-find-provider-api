@@ -13,18 +13,15 @@ public static class PageExtensions
         string? title,
         bool isValid = true)
     {
-        var ignoreTitle = title == ServiceName;
-        const string titleSuffix = $"{ServiceName} - {GovUk}";
-
         var formattedTitle = new StringBuilder();
         if (!isValid) formattedTitle.Append("Error: ");
         if (string.IsNullOrEmpty(title))
         {
-            return formattedTitle.Append(titleSuffix).ToString();
+            return formattedTitle.Append($"{ServiceName}").ToString();
         }
 
-        if (!ignoreTitle) formattedTitle.Append($"{title} - ");
-        formattedTitle.Append(titleSuffix);
+        if (title != ServiceName) formattedTitle.Append($"{title} | ");
+        formattedTitle.Append($"{ServiceName}");
 
         return formattedTitle.ToString();
     }

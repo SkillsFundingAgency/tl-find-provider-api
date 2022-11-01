@@ -13,14 +13,14 @@ public class PageExtensionsTests
     }
 
     [Theory(DisplayName = "PageExtensions Data Tests")]
-    [InlineData(true, null, DefaultServiceName + " - GOV.UK")]
-    [InlineData(true, "", DefaultServiceName + " - GOV.UK")]
-    [InlineData(true, DefaultServiceName + "", DefaultServiceName + " - GOV.UK")]
-    [InlineData(true, "Page Title", "Page Title - " + DefaultServiceName + " - GOV.UK")]
-    [InlineData(false, null, "Error: " + DefaultServiceName + " - GOV.UK")]
-    [InlineData(false, "", "Error: " + DefaultServiceName + " - GOV.UK")]
-    [InlineData(false, DefaultServiceName + "", "Error: " + DefaultServiceName + " - GOV.UK")]
-    [InlineData(false, "Page Title", "Error: Page Title - " + DefaultServiceName + " - GOV.UK")]
+    [InlineData(true, null, DefaultServiceName)]
+    [InlineData(true, "", DefaultServiceName)]
+    [InlineData(true, DefaultServiceName + "", DefaultServiceName)]
+    [InlineData(true, "Page Title", "Page Title | " + DefaultServiceName)]
+    [InlineData(false, null, "Error: " + DefaultServiceName)]
+    [InlineData(false, "", "Error: " + DefaultServiceName)]
+    [InlineData(false, DefaultServiceName + "", "Error: " + DefaultServiceName)]
+    [InlineData(false, "Page Title", "Error: Page Title | " + DefaultServiceName)]
     public void DataTests(bool isValid, string title, string expectedResult)
     {
         var generatedTitle = PageExtensions.GenerateTitle(title, isValid);
@@ -28,10 +28,10 @@ public class PageExtensionsTests
     }
 
     [Theory(DisplayName = "PageExtensions Data Tests")]
-    [InlineData(null, DefaultServiceName + " - GOV.UK")]
-    [InlineData("", DefaultServiceName + " - GOV.UK")]
-    [InlineData(DefaultServiceName + "", DefaultServiceName + " - GOV.UK")]
-    [InlineData("Page Title", "Page Title - " + DefaultServiceName + " - GOV.UK")]
+    [InlineData(null, DefaultServiceName)]
+    [InlineData("", DefaultServiceName)]
+    [InlineData(DefaultServiceName + "", DefaultServiceName)]
+    [InlineData("Page Title", "Page Title | " + DefaultServiceName)]
     public void DataTestsWithDefaultValue(string title, string expectedResult)
     {
         var generatedTitle = PageExtensions.GenerateTitle(title);
