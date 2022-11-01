@@ -9,7 +9,6 @@
 <a asp-page="/EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
 }
 
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">@Model.EmployerInterest?.OrganisationName</h1>
@@ -57,7 +56,7 @@
                 {
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Additional details</th>
-                        <td class="govuk-table__cell">@Model.EmployerInterest?.AdditionalInformation</td>
+                        <td class="govuk-table__cell"><span class="tl-wordwrap">@Model.EmployerInterest?.AdditionalInformation</span></td>
                     </tr>
                 }
             </tbody>
@@ -92,9 +91,5 @@
                 </tr>
             </tbody>
         </table>
-
-        <a asp-page="/EmployerList" class="govuk-button" id="tl-back">Return to employer list</a>
-
     </div>
 </div>
-
