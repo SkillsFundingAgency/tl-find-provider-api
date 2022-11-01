@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+﻿using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages.Error;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 

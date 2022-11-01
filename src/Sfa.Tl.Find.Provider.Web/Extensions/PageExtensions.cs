@@ -5,7 +5,6 @@ namespace Sfa.Tl.Find.Provider.Web.Extensions;
 public static class PageExtensions
 {
     private const string ServiceName = "Connect with employers interested in T Levels";
-    private const string GovUk = "GOV.UK";
 
     public static string GetServiceName() => ServiceName;
 
