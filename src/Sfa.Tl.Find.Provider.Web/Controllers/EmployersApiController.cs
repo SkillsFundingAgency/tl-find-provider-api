@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -75,7 +74,7 @@ public class EmployersApiController : ControllerBase
     [AllowAnonymous]
     // ReSharper disable once StringLiteralTypo
     [Route("deletecacheduser")]
-    public async Task<IActionResult> DeleteCachedUser()
+    public IActionResult DeleteCachedUser()
     {
         _logger.LogInformation($"{nameof(EmployersApiController)} {nameof(DeleteCachedUser)} called.");
 

@@ -41,15 +41,10 @@ public class AccountController : Controller
         }
         else
         {
-            await HttpContext.ChallengeAsync(
-                new AuthenticationProperties
-                {
-                    //RedirectUri = "/Account/PostSignIn"
-                    RedirectUri = "/post-signin"
-                    // "/"
-                    // //AuthenticationExtensions.AuthenticatedUserStartPageExact
-                    //.Replace("-", "")
-                });
+            await HttpContext.ChallengeAsync(new AuthenticationProperties
+            {
+                RedirectUri = "/post-signin"
+            });
         }
     }
 

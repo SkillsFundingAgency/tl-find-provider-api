@@ -1,9 +1,9 @@
-﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages;
-using Sfa.Tl.Find.Provider.Web.Pages.EmployerInterest;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
@@ -37,5 +37,25 @@ public class EmployerDetailsPageTests
         detailsModel.EmployerInterest
             .Should()
             .BeEquivalentTo(employerInterestDetail);
+    }
+
+    [Fact]
+    public async Task EmployerDetailsModel_OnGet_Redirects_To_404_If_Employer_Not_Found()
+    {
+        const int id = 999;
+
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .GetEmployerInterestDetail(id)
+            .Returns(null as EmployerInterestDetail);
+
+        var detailsModel = new EmployerDetailsModelBuilder()
+            .Build(employerInterestService);
+
+        var result = await detailsModel.OnGet(id);
+
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Error/404");
     }
 }
