@@ -1,4 +1,4 @@
-﻿@page "{id}"
+﻿@page
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Sfa.Tl.Find.Provider.Application.Extensions
 @model Sfa.Tl.Find.Provider.Web.Pages.EmployerListModel
@@ -38,142 +38,74 @@
         <div class="govuk-grid-column-full">
             <table class="govuk-table tl-employers--table">
                 <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header">Organisation</th>
-                        <th scope="col" class="govuk-table__header">Placement areas</th>
-                        <th scope="col" class="govuk-table__header">Distance</th>
-                        <th scope="col" class="govuk-table__header">Details expire</th>
-                        <th scope="col" class="govuk-table__header"></th>
-                    </tr>
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Organisation</th>
+                    <th scope="col" class="govuk-table__header">Placement areas</th>
+                    <th scope="col" class="govuk-table__header">Distance</th>
+                    <th scope="col" class="govuk-table__header">Details expire</th>
+                    <th scope="col" class="govuk-table__header"></th>
+                </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header tl-wordwrap">Lloyds Banking Group <strong class="govuk-tag govuk-tag--blue">New</strong></th>
-                        <td class="govuk-table__cell tl-table__cell__list">
-                            <div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div>
-                            <div class="tl-employers--table--inline-cell">
-                                <p>Digital and IT</p>
-                                <p>Legal, Finance and Accounting</p>
-                            </div>
-                        </td>
-                        <td class="govuk-table__cell">
-                            <div class="tl-employers--table--inline-header"><strong>Distance</strong></div>
-                            <div class="tl-employers--table--inline-cell">22 miles</div>
-                        </td>
-                        <td class="govuk-table__cell">
-                            <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
-                            <div class="tl-employers--table--inline-cell">2 Jan 2023</div>
-                        </td>
-                        <td class="govuk-table__cell"><a href="/employer-details" class="govuk-link govuk-link--no-visited-state">View</a></td>
-                    </tr>
-
-                    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header tl-wordwrap">Lloyds Banking Group <strong class="govuk-tag govuk-tag--red">Expiring</strong></th>
-                        <td class="govuk-table__cell tl-table__cell__list">
-                            <div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div>
-                            <div class="tl-employers--table--inline-cell">
-                                <p>Digital and IT</p>
-                                <p>Legal, Finance and Accounting</p>
-                            </div>
-                        </td>
-                        <td class="govuk-table__cell">
-                            <div class="tl-employers--table--inline-header"><strong>Distance</strong></div>
-                            <div class="tl-employers--table--inline-cell">22 miles</div>
-                        </td>
-                        <td class="govuk-table__cell">
-                            <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
-                            <div class="tl-employers--table--inline-cell">2 Jan 2023</div>
-                        </td>
-                        <td class="govuk-table__cell"><a href="/employer-details" class="govuk-link govuk-link--no-visited-state">View</a></td>
-                    </tr>
-
-                    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header tl-wordwrap">Lloyds Banking Group</th>
-                        <td class="govuk-table__cell tl-table__cell__list">
-                            <div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div>
-                            <div class="tl-employers--table--inline-cell">
-                                <p>Digital and IT</p>
-                                <p>Legal, Finance and Accounting</p>
-                            </div>
-                        </td>
-                        <td class="govuk-table__cell">
-                            <div class="tl-employers--table--inline-header"><strong>Distance</strong></div>
-                            <div class="tl-employers--table--inline-cell">22 miles</div>
-                        </td>
-                        <td class="govuk-table__cell">
-                            <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
-                            <div class="tl-employers--table--inline-cell">2 Jan 2023</div>
-                        </td>
-                        <td class="govuk-table__cell"><a href="/employer-details" class="govuk-link govuk-link--no-visited-state">View</a></td>
-                    </tr>
-
                 @{
                     var isExpiring = false;
                     var isNew = true;
                 }
                 @foreach (var employerInterest in Model.EmployerInterestList)
-                    {
-                        var availableUntil = employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
-
+                {
+                    var availableUntil = employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
                         @*
                             ‘New’ tag shows next to organisation name if the interest has been received in the last 7 days.
                             ‘Expiring’ tag shows next to organisation name if the interest expires in the next 7 days.
                         *@
-
-                        isExpiring = !isExpiring;
-                        isNew = !isNew;
+                    isExpiring = !isExpiring;
+                    isNew = !isNew;
                         
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header">@employerInterest.OrganisationName
-                                @if (isNew)
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@employerInterest.OrganisationName
+                            @if (isNew)
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">New</strong>
+                            }
+                            else if (isExpiring)
+                            {
+                                <strong class="govuk-tag govuk-tag--red">Expiring</strong>
+                            }
+                        </th>
+                        <td class="govuk-table__cell tl-table__cell__list">
+                            <div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div>
+                            <div class="tl-employers--table--inline-cell">
+                                @if (employerInterest.SkillAreas is not null && employerInterest.SkillAreas.Any())
                                 {
-                                    <strong class="govuk-tag govuk-tag--blue">New</strong>
-                                }
-                                else if (isExpiring)
-                                {
-                                    <strong class="govuk-tag govuk-tag--red">Expiring</strong>
-                                }
-                            </th>
-                            <td class="govuk-table__cell tl-table__cell__list">
-                                <div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div>
-                                <div class="tl-employers--table--inline-cell">
-                                    @if (employerInterest.SkillAreas is not null && employerInterest.SkillAreas.Any())
+                                    @foreach (var skillArea in employerInterest.SkillAreas)
                                     {
-                                        @foreach (var skillArea in employerInterest.SkillAreas)
-                                        {
-                                            <p>@skillArea</p>
-                                        }
+                                        <p>@skillArea</p>
                                     }
-                                </div>
-                            </td>
-                            <td class="govuk-table__cell">
-                                <div class="tl-employers--table--inline-header"><strong>Distance</strong></div>
-                                <div class="tl-employers--table--inline-cell">@employerInterest.Distance.FormatDistance()</div>
-                            </td>
-                            <td class="govuk-table__cell">
-                                <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
-                                <div class="tl-employers--table--inline-cell">@($"{availableUntil:d MMM yyyy}")</div>
-                            </td>
-                            <td class="govuk-table__cell"><a asp-page="/EmployerDetails" asp-route-id="@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a></td>
-                        </tr>
-                    }
+                                }
+                            </div>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <div class="tl-employers--table--inline-header"><strong>Distance</strong></div>
+                            <div class="tl-employers--table--inline-cell">@employerInterest.Distance.FormatDistance()</div>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
+                            <div class="tl-employers--table--inline-cell">@($"{availableUntil:d MMM yyyy}")</div>
+                        </td>
+                        <td class="govuk-table__cell"><a asp-page="/EmployerDetails" asp-route-id="@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a></td>
+                    </tr>
+                }
                 </tbody>
             </table>
-<div class="tl-card">
-    <p class="govuk-body govuk-!-margin-bottom-0"><strong>There are currently no employers within 20 miles who have expressed interest in T Levels.</strong><br>
-          Please search another postcode or check back soon to see employers in your area. </p>
-</div>
-
+        </div>
     </div>
 }
 else if (Model.ZeroResultsFound == true)
 {
-<div class="tl-card">
-    <p class="govuk-body govuk-!-margin-bottom-0"><strong>There are currently no employers within 20 miles who have expressed interest in T Levels.</strong><br>
-          Please search another postcode or check back soon to see employers in your area. </p>
-</div>
-    <div>
-        <p>Zero results message goes here - should use search radius @Model.SearchRadius</p>
+    <div class="tl-card">
+    <p class="govuk-body govuk-!-margin-bottom-0">
+        <strong>There are currently no employers within @Model.SearchRadius miles who have expressed interest in T Levels.</strong><br>
+        Please search another postcode or check back soon to see employers in your area. </p>
     </div>
 }
 
