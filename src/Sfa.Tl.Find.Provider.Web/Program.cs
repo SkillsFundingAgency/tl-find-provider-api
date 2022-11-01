@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -11,7 +10,6 @@ using Sfa.Tl.Find.Provider.Infrastructure.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Filters;
-using Sfa.Tl.Find.Provider.Web.ParameterTransformers;
 using Sfa.Tl.Find.Provider.Web.Security;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
@@ -57,7 +55,6 @@ builder.Services.Configure<RouteOptions>(option =>
 builder.Services.AddRazorPages(options =>
 {
     //options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
-    options.Conventions.AddPageRoute("/EmployerInterest/Index", "/test-employer-list");
     options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
     options.Conventions.AddPageRoute("/EmployerDetails", "/employer-details");
     options.Conventions.AddPageRoute("/Help/AccessibilityStatement", "/accessibility-statement");
