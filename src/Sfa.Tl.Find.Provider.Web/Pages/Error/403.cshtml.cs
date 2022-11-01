@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using System.Security.Claims;
@@ -28,11 +27,5 @@ public class Error403Model : PageModel
         {
             _logger.LogError(feature.Error, "Unexpected error occurred during request to {path}", feature.Path);
         }
-    }
-
-    public IActionResult OnGetContactSupportClick()
-    {
-        _logger.LogInformation("Error/404 contact support link clicked");
-        return RedirectToPage(PageContext.ActionDescriptor.ViewEnginePath);
     }
 }
