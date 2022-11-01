@@ -22,6 +22,7 @@
         <partial name="_Header_Nav" />
     </div>
     <div class="govuk-width-container">
+        @RenderSection("breadcrumbs", required: false)
         <main class="govuk-main-wrapper" id="main-content" role="main">
             @RenderBody()
         </main>
@@ -32,7 +33,6 @@
     <script src="~/js/tlevels.min.js" asp-append-version="true"></script>
     <script src="~/js/all.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
     <script>
         window.GOVUKFrontend.initAll()
     </script>
