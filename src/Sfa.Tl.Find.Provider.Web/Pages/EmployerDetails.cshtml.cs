@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 
@@ -22,8 +23,12 @@ public class EmployerDetailsModel : PageModel
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task OnGet(int id)
+    public async Task<IActionResult> OnGet(int id)
     {
         EmployerInterest = await _employerInterestService.GetEmployerInterestDetail(id);
+
+        return EmployerInterest != null ? 
+            Page() : 
+            RedirectToPage("/Error/404");
     }
 }

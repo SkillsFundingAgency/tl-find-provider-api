@@ -59,7 +59,7 @@ builder.Services.AddRazorPages(options =>
     //options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
     options.Conventions.AddPageRoute("/EmployerInterest/Index", "/test-employer-list");
     options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
-    options.Conventions.AddPageRoute("/EmployerDetails", "/employer-detail");
+    options.Conventions.AddPageRoute("/EmployerDetails", "/employer-details");
     options.Conventions.AddPageRoute("/AccessibilityStatement", "/accessibility-statement");
     options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
     options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
