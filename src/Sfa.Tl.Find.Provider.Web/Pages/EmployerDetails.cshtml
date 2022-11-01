@@ -4,8 +4,9 @@
 @model EmployerDetailsModel
 @{
 }
-
+@section breadcrumbs {
 <a asp-page="/EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
+}
 
 @if (Model.EmployerInterest is null)
 {
