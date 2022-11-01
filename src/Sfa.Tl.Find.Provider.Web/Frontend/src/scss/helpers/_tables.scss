@@ -103,15 +103,17 @@
             display: none;
         }
 
+        tbody {
+            tr:hover {
+                background-color: govuk-colour("light-grey");
+            }
+        }
+
         tr {
             display: table-row;
             border: none;
             float: none;
             margin: 0;
-
-            &:hover {
-                background-color: govuk-colour("light-grey");
-            }
 
             th, td {
                 display: table-cell;

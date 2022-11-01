@@ -1,0 +1,4 @@
+﻿.tl-card {
+    background-color: govuk-colour("light-grey");
+    @include govuk-responsive-padding(5);
+}
