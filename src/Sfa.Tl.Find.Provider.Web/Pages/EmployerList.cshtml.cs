@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -22,6 +23,8 @@ public class EmployerListModel : PageModel
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
 
     public IEnumerable<LocationPostcode>? ProviderLocations { get; private set; }
+    public int EmployerInterestRetentionDays =>
+        _employerInterestSettings.RetentionDays;
 
     public int EmployerInterestRetentionWeeks =>
         (int)Math.Ceiling(_employerInterestSettings.RetentionDays / 7d);
@@ -35,6 +38,11 @@ public class EmployerListModel : PageModel
             : DateOnly.MinValue;
 
     public long? UkPrn { get; private set; }
+
+    public bool? ZeroResultsFound { get; set; }
+
+    [BindProperty]
+    public InputModel? Input { get; set; }
 
     public EmployerListModel(
         IEmployerInterestService employerInterestService,
@@ -55,13 +63,32 @@ public class EmployerListModel : PageModel
         await LoadProviderPostcodes(UkPrn);
     }
 
+    public async Task OnPost()
+    {
+        UkPrn = GetUkPrn();
+        await LoadProviderPostcodes(UkPrn);
+        //ZeroResultsFound = false;
+
+        if (!ModelState.IsValid)
+        {
+            return;
+        }
+
+        var postcode = Input.CustomPostcode; //TODO: Get from dropdown or custom box
+        if (!string.IsNullOrEmpty(postcode))
+        {
+            //TODO: If zero results, need to set a flag that says zero results so "no results in @Model.SearchRadius miles" can be shown
+            (EmployerInterestList, _) = await _employerInterestService.FindEmployerInterest(postcode);
+            ZeroResultsFound = !EmployerInterestList.Any();
+        }
+    }
+
     private long? GetUkPrn()
     {
         var ukPrnClaim = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
         return ukPrnClaim is not null && long.TryParse(ukPrnClaim, out var ukPrn)
             ? ukPrn
             : default;
-
     }
 
     private async Task LoadProviderPostcodes(long? ukPrn)
@@ -70,5 +97,10 @@ public class EmployerListModel : PageModel
 
         ProviderLocations = await _providerDataService
             .GetLocationPostcodes(ukPrn.Value);
+    }
+
+    public class InputModel
+    {
+        public string CustomPostcode { get; set; }
     }
 }

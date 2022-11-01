@@ -1,4 +1,5 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages;
@@ -35,6 +36,7 @@ public class EmployerListPageTests
             .Be(long.Parse(PageContextBuilder.DefaultUkPrn));
 
         employerListModel.SearchRadius.Should().Be(settings.SearchRadius);
+        employerListModel.EmployerInterestRetentionDays.Should().Be(retentionDays);
         employerListModel.EmployerInterestRetentionWeeks.Should().Be(expectedRetentionWeeks);
 
         var expectedServiceStartDate = DateOnly.FromDateTime(settings.ServiceStartDate!.Value);
@@ -101,13 +103,45 @@ public class EmployerListPageTests
         var employerListModel = new EmployerListModelBuilder()
             .Build(employerInterestService);
 
-        //employerListModel.Postcode = TestPostcode;
+        employerListModel.Input = new EmployerListModel.InputModel
+        {
+            CustomPostcode = TestPostcode
+        };
 
-        //await employerListModel.OnPost();
+        await employerListModel.OnPost();
 
-        //employerListModel.EmployerInterestList
-        //    .Should()
-        //    .BeEquivalentTo(employerInterestSummary);
+        employerListModel.EmployerInterestList
+            .Should()
+            .BeEquivalentTo(employerInterestSummary);
         //employerListModel.TotalEmployerInterestItems.Should().Be(employerInterestSummary.Count);
+
+        employerListModel.ZeroResultsFound.Should().NotBeNull();
+        employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task EmployerListModel_OnPost_Sets_Expected_HasResults_To_False_For_Zero_Results()
+    {
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .FindEmployerInterest(TestPostcode)
+            .Returns((new List<EmployerInterestSummary>(), 0));
+
+        var employerListModel = new EmployerListModelBuilder()
+            .Build(employerInterestService);
+
+        employerListModel.Input = new EmployerListModel.InputModel
+        {
+            CustomPostcode = TestPostcode
+        };
+
+        await employerListModel.OnPost();
+
+        employerListModel.EmployerInterestList
+            .Should()
+            .BeEmpty();
+
+        employerListModel.ZeroResultsFound.Should().NotBeNull();
+        employerListModel.ZeroResultsFound!.Value.Should().BeTrue();
     }
 }
