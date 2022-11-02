@@ -52,7 +52,7 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
-        
+
         var (_, uniqueId) = await _employerInterestRepository
             .Create(
                 employerInterest,
@@ -102,15 +102,12 @@ public class EmployerInterestService : IEmployerInterestService
 
     public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(string postcode)
     {
-        var postcodeLocation = postcode.Length <= 4
-            ? await _postcodeLookupService.GetOutcode(postcode)
-            : await _postcodeLookupService.GetPostcode(postcode);
+        var geoLocation = await GetPostcode(postcode);
 
-        if (postcodeLocation is not null)
+        if (geoLocation is not null)
         {
-            var searchRadius = _employerInterestSettings.SearchRadius;
             return await _employerInterestRepository
-                    .Search(postcodeLocation.Latitude, postcodeLocation.Longitude, searchRadius);
+                    .Search(geoLocation.Latitude, geoLocation.Longitude, _employerInterestSettings.SearchRadius);
         }
 
         var summaryList = (await _employerInterestRepository
@@ -122,9 +119,8 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(double latitude,
         double longitude)
     {
-        var searchRadius = _employerInterestSettings.SearchRadius;
         return (await _employerInterestRepository
-                .Search(latitude, longitude, searchRadius)
+                .Search(latitude, longitude, _employerInterestSettings.SearchRadius)
             ).SearchResults;
     }
 

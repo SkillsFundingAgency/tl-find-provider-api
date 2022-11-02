@@ -12,20 +12,32 @@
             Employers have agreed for their details to be shared for @Model.EmployerInterestRetentionWeeks weeks.<br />
             After @Model.EmployerInterestRetentionWeeks weeks, <strong>their details will expire</strong> unless they agree to extend their interest.
         </p>
-        <form method="post">
-            <div class="govuk-form-group tl-inline-form-group">
-                <label class="govuk-label govuk-!-margin-bottom-4" for="postcode-select">
+        
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a sfa-validation-for="Input!.CustomPostcode"></a></li>
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <form method="post" id="postcode-form">
+            <div class="govuk-form-group tl-inline-form-group" sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-form-group--error">
+                <label class="govuk-label govuk-!-margin-bottom-4" asp-for="Input!.SelectedPostcode">
                     Select or enter a postcode to see contact details for employers within @Model.SearchRadius miles:
                 </label>
-                <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" id="postcode-select" name="postcode">
-                    <option value="Select postcode" selected>Select postcode</option>
-                    <option value="SW1A 2AA">SW1A 2AA</option>
-                    <option value="CV11 1AB">CV11 1AB</option>
-                    <option value="Enter postcode">Enter postcode</option>
+                <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" asp-for="Input!.SelectedPostcode" asp-items="Model.Postcodes">
+                    <option value="">Select postcode</option>
                 </select>
-                <div class="tl-employers--search tl-hidden">
-                    <label class="govuk-label govuk-visually-hidden" for="Input.Postcode">Enter postcode</label>
-                    <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" asp-for="Input.CustomPostcode" type="text">
+                <div class="tl-employers--search tl-hidden @(Model.Input?.SelectedPostcode == "Enter postcode" ? "active" : string.Empty)">
+                    <label class="govuk-label govuk-visually-hidden" for="Input!.CustomPostcode">Enter postcode</label>
+                    <span class="govuk-error-message" asp-validation-for="Input!.CustomPostcode"></span>
+                    <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" asp-for="Input!.CustomPostcode" type="text"
+                           sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-input--error">
                     <button type="submit" class="govuk-button govuk-!-margin-bottom-2">Search</button>
                 </div>
             </div>
@@ -111,9 +123,13 @@ else if (Model.ZeroResultsFound == true)
 
 @section scripts {
     <script>
-        $("#postcode-select").change(function () {
-            let inputval = $(this).val()
+        $("#Input_SelectedPostcode").change(function () {
+            let inputval = $(this).val();  
+            if(inputval && inputval != "Enter postcode")
+            {
+                $("#postcode-form").submit();
+            }
             $(".tl-employers--search").toggleClass('active', inputval === "Enter postcode");
-        })
+        });
     </script>
 }
