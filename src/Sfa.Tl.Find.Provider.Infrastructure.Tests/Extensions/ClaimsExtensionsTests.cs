@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Extensions;
@@ -13,7 +14,6 @@ public class ClaimsExtensionsTests
     public void AddIfNotNullOrEmpty_Returns_Expected_Value()
     {
         var claims = new List<Claim>();
-
         claims
             .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, TestUkPrn)
             .AddIfNotNullOrEmpty(CustomClaimTypes.Urn, TestUrn);
@@ -31,7 +31,6 @@ public class ClaimsExtensionsTests
     public void AddIfNotNullOrEmpty_Should_Not_Add_Null_Value()
     {
         var claims = new List<Claim>();
-
         claims
             .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, null)
             .AddIfNotNullOrEmpty(CustomClaimTypes.Urn, "");
@@ -62,13 +61,31 @@ public class ClaimsExtensionsTests
     [Fact]
     public void GetClaim_Returns_Expected_Value()
     {
-        var claims = new List<Claim>
-        {
-            new(CustomClaimTypes.UkPrn, TestUkPrn)
-        };
-        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+        var claimsPrincipal = new ClaimsPrincipal(
+            new ClaimsIdentity(
+                new List<Claim>
+                {
+                    new(CustomClaimTypes.UkPrn, TestUkPrn)
+                }));
 
         var result = claimsPrincipal.GetClaim(CustomClaimTypes.UkPrn);
         result.Should().Be(TestUkPrn);
+    }
+
+    [Fact]
+    public void GetUserSessionCacheKey_Returns_Expected_Value()
+    {
+        const string userId = "0879e78c-1858-47c8-a373-96b9bb4516d5";
+        var expectedKey = CacheKeys.UserCacheKey(userId, CacheKeys.UserSessionActivityKey);
+        
+        var claimsPrincipal = new ClaimsPrincipal(
+            new ClaimsIdentity(
+                new List<Claim>
+                {
+                    new(CustomClaimTypes.UserId, userId)
+                }));
+        
+        var result = claimsPrincipal.GetUserSessionCacheKey();
+        result.Should().Be(expectedKey);
     }
 }
