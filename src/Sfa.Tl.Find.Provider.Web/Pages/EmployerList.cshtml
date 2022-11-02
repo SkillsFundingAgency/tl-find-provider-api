@@ -19,7 +19,7 @@
                 <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
-                        <li><a sfa-validation-for="Input!.CustomPostcode"></a></li>
+                        <li><a sfa-validation-for="Input!.CustomPostcode" href="Input_CustomPostcode"></a></li>
                     </ul>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                     isNew = !isNew;
                         
                     <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">@employerInterest.OrganisationName
+                        <th scope="row" class="govuk-table__header tl-wordwrap">
                             @if (isNew)
                             {
                                 <strong class="govuk-tag govuk-tag--blue">New</strong>
@@ -83,6 +83,7 @@
                             {
                                 <strong class="govuk-tag govuk-tag--red">Expiring</strong>
                             }
+                            @employerInterest.OrganisationName
                         </th>
                         <td class="govuk-table__cell tl-table__cell__list">
                             <div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div>

@@ -1,7 +1,14 @@
 .tl-employers--search {
     display: none;
+    position: relative;
 
     &.active {
         display: inline;
+    }
+
+    .govuk-error-message {
+        display: inline;
+        position: absolute;
+        top: -40px;
     }
 }

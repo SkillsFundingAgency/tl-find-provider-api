@@ -90,6 +90,7 @@
 
     .govuk-tag {
         float: right;
+        @include govuk-responsive-margin(1, "left");
     }
 }
 
@@ -97,6 +98,11 @@
     .tl-employers--table {
         thead {
             display: table-header-group;
+
+            tr th {
+                min-width: unset;
+                max-width: unset;
+            }
         }
 
         &--inline-header {
@@ -150,6 +156,8 @@
                 @include govuk-font($size: 19, $weight: 900);
                 @include govuk-responsive-margin(0);
                 @include govuk-responsive-margin(0);
+                min-width: 270px;
+                max-width: 400px;
             }
         }
 
