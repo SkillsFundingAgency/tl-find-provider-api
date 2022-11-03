@@ -18,7 +18,7 @@ jobs:
       SharedSQLServerName: $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.sharedSQLServerName'] ]
       ConfigurationStorageConnectionString: $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.configStorageConnectionString'] ]
       SharedResourceGroup: $[stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.SharedVariables.SharedResourceGroup']]
-      
+
     steps:
       - checkout: self
       - pwsh: |
@@ -46,11 +46,13 @@ jobs:
             -sqlDatabaseSkuName "$(SQLDatabaseSkuName)"
             -sqlDatabaseTier "$(SQLDatabaseTier)"
             -configurationStorageConnectionString "$(ConfigurationStorageConnectionString)"
-            -uiCustomHostName "$(UICustomHostName)"
-            -certificateName "$(CertificateName)"'
+            -webCustomHostName "$(UICustomHostName)"
+            -webCertificateName "$(UiCertificateName)"'
+            # -uiCustomHostName "$(UiCustomHostName)"
+            # -uiCertificateName "$(UiCertificateName)"'
             # -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
             # -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
             # -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
             # -providerReferenceTrigger "$(ProviderReferenceTrigger)"'
-          tags: $(Tags)          
+          tags: $(Tags)
           processOutputs: true

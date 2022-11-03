@@ -104,7 +104,6 @@
     <Build Include="Stored Procedures\GetAllProviders.sql" />
     <Build Include="Tables\EmailTemplate.sql" />
     <Build Include="Stored Procedures\GetAllProviderDetails.sql" />
-    <Build Include="Tables\EmployerInterest.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

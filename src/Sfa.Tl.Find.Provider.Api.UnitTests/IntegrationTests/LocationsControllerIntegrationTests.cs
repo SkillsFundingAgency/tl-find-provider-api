@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using FluentAssertions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 

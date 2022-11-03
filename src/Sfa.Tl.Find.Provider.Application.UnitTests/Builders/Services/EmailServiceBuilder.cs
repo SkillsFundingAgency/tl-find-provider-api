@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
-using NSubstitute;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
 

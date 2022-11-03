@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Sfa.Tl.Find.Provider.Api.Extensions;
+﻿using Sfa.Tl.Find.Provider.Api.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 
