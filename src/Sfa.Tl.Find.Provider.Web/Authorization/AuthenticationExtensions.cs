@@ -14,7 +14,7 @@ namespace Sfa.Tl.Find.Provider.Web.Authorization;
 
 public static class AuthenticationExtensions
 {
-    public const string AuthenticationCookieName = "tl-provider-auth-cookie";
+    public const string AuthenticationCookieName = ".tl-provider.auth-cookie";
     public const string AuthenticationTypeName = "DfE-SignIn";
     public const string AuthenticatedUserStartPage = "/employer-list";
     public const string AuthenticatedUserStartPageExact = "/EmployerList";

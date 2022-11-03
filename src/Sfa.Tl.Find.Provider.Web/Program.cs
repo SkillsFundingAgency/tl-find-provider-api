@@ -11,6 +11,7 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Filters;
 using Sfa.Tl.Find.Provider.Web.Security;
+using System;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
@@ -22,6 +23,8 @@ builder.Services
     .AddApplicationInsightsTelemetry();
 
 builder.Services.AddConfigurationOptions(siteConfiguration);
+
+builder.Services.AddMemoryCache();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -71,9 +74,24 @@ builder.Services.AddRazorPages(options =>
     .AddMvcOptions(options =>
     {
         options.Filters.Add<UserSessionActivityPageFilter>();
-    });
+    })
+    .AddSessionStateTempDataProvider();
 
 builder.Services.AddControllers();
+
+builder.Services
+    .AddTransient<IHttpContextAccessor, HttpContextAccessor>()
+    .AddSession(options =>
+    {
+        options.Cookie.Name = ".tl-provider.session";
+        options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+        options.IdleTimeout = TimeSpan.FromMinutes(siteConfiguration.DfeSignInSettings.Timeout);
+        options.Cookie.IsEssential = true;
+    })
+    .AddTransient<ISessionService>(x =>
+        new SessionService(
+            x.GetService<IHttpContextAccessor>()!, 
+            builder.Environment.EnvironmentName));
 
 if (!builder.Environment.IsDevelopment())
 {
@@ -106,6 +124,7 @@ builder.Services
     .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
+    .AddTransient<ISessionService, SessionService>()
     .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
@@ -169,6 +188,8 @@ app.UseWhen(ctx =>
         appBuilder.UseXXssProtection(opts => opts.EnabledWithBlockMode()));
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

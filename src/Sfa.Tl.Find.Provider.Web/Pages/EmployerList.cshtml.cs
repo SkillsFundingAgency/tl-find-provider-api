@@ -9,6 +9,7 @@ using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
@@ -19,14 +20,18 @@ public class EmployerListModel : PageModel
 {
     private readonly IEmployerInterestService _employerInterestService;
     private readonly IProviderDataService _providerDataService;
+    private readonly ISessionService _sessionService;
     private readonly EmployerInterestSettings _employerInterestSettings;
     private readonly ILogger<EmployerListModel> _logger;
+
+    public const string SessionKeySelectedPostcode = "_SelectedPostcode";
+    public const string SessionKeyCustomPostcode = "_CustomPostcode";
 
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
 
     public IEnumerable<LocationPostcode>? ProviderLocations { get; private set; }
 
-    public SelectListItem[] Postcodes { get; private set; }
+    public SelectListItem[]? Postcodes { get; private set; }
 
     public int EmployerInterestRetentionDays =>
         _employerInterestSettings.RetentionDays;
@@ -46,17 +51,19 @@ public class EmployerListModel : PageModel
 
     public bool? ZeroResultsFound { get; set; }
 
-    [BindProperty]
-    public InputModel? Input { get; set; }
+    [BindProperty] public InputModel? Input { get; set; }
 
     public EmployerListModel(
         IEmployerInterestService employerInterestService,
         IProviderDataService providerDataService,
+        ISessionService sessionService,
         IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<EmployerListModel> logger)
     {
-        _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
+        _employerInterestService =
+            employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _employerInterestSettings = employerInterestOptions?.Value
                                     ?? throw new ArgumentNullException(nameof(employerInterestOptions));
@@ -66,6 +73,16 @@ public class EmployerListModel : PageModel
     {
         UkPrn = GetUkPrn();
         await LoadProviderPostcodes(UkPrn);
+
+        var selectedPostcode = _sessionService.Get<string>(SessionKeySelectedPostcode);
+        var customPostcode = _sessionService.Get<string>(SessionKeyCustomPostcode);
+
+        if (!string.IsNullOrEmpty(selectedPostcode) || !string.IsNullOrEmpty(selectedPostcode))
+        {
+            Input ??= new InputModel();
+            Input.SelectedPostcode = selectedPostcode;
+            Input.CustomPostcode = customPostcode;
+        }
     }
 
     public async Task OnPost()
@@ -80,6 +97,10 @@ public class EmployerListModel : PageModel
             ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}", "Enter a postcode");
         }
 
+        //TODO: Call _postcodeLookupService.GetPostcode, if ok stash the whole geolocation in session storage
+        _sessionService.Set(SessionKeySelectedPostcode, Input?.SelectedPostcode ?? string.Empty);
+        _sessionService.Set(SessionKeyCustomPostcode, Input?.CustomPostcode ?? string.Empty);
+
         if (!ModelState.IsValid)
         {
             return;
@@ -87,19 +108,7 @@ public class EmployerListModel : PageModel
 
         try
         {
-            var lookup = !string.IsNullOrEmpty(Input?.SelectedPostcode)
-                ? ProviderLocations?.FirstOrDefault(p => p.Postcode == Input.SelectedPostcode)
-                : null;
-            if (lookup != null)
-            {
-                EmployerInterestList = await _employerInterestService.FindEmployerInterest(lookup.Latitude, lookup.Longitude);
-                ZeroResultsFound = !EmployerInterestList.Any();
-            }
-            else if (!string.IsNullOrEmpty(Input?.CustomPostcode))
-            {
-                (EmployerInterestList, _) = await _employerInterestService.FindEmployerInterest(Input?.CustomPostcode);
-                ZeroResultsFound = !EmployerInterestList.Any();
-            }
+            await PerformSearch();
         }
         catch (PostcodeNotFoundException)
         {
@@ -123,15 +132,34 @@ public class EmployerListModel : PageModel
             .GetLocationPostcodes(ukPrn.Value);
 
         Postcodes = ProviderLocations.Select(p
-            => new SelectListItem(
-                p.Postcode,
-                p.Postcode,
-                p.Postcode == Input?.SelectedPostcode) //Selected = false //TODO: set based on previous selection
+                    => new SelectListItem(
+                        p.Postcode,
+                        p.Postcode,
+                        p.Postcode ==
+                        Input?.SelectedPostcode) //Selected = false //TODO: set based on previous selection
             )
             //Select postcode
             //.Prepend(new SelectListItem("Select postcode", "", true))
             .Append(new SelectListItem("Enter postcode", "Enter postcode", Input?.SelectedPostcode == "Enter postcode"))
             .ToArray();
+    }
+
+    private async Task PerformSearch()
+    {
+        var locationLookup = !string.IsNullOrEmpty(Input?.SelectedPostcode)
+                ? ProviderLocations?.FirstOrDefault(p => p.Postcode == Input.SelectedPostcode)
+                : null;
+
+        if (locationLookup != null)
+        {
+            EmployerInterestList = await _employerInterestService.FindEmployerInterest(locationLookup.Latitude, locationLookup.Longitude);
+            ZeroResultsFound = !EmployerInterestList.Any();
+        }
+        else if (!string.IsNullOrEmpty(Input?.CustomPostcode))
+        {
+            (EmployerInterestList, _) = await _employerInterestService.FindEmployerInterest(Input?.CustomPostcode);
+            ZeroResultsFound = !EmployerInterestList.Any();
+        }
     }
 
     public class InputModel

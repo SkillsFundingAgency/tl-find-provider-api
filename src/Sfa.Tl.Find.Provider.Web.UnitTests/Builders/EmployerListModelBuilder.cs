@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Web.Pages;
 
@@ -12,6 +13,7 @@ public class EmployerListModelBuilder
     public EmployerListModel Build(
         IEmployerInterestService? employerInterestService = null,
         IProviderDataService? providerDataService = null,
+        ISessionService? sessionService = null,
         EmployerInterestSettings? employerInterestSettings = null,
         ILogger<EmployerListModel>? logger = null,
         PageContext? pageContext = null,
@@ -22,6 +24,7 @@ public class EmployerListModelBuilder
 
         employerInterestService ??= Substitute.For<IEmployerInterestService>();
         providerDataService ??= Substitute.For<IProviderDataService>();
+        sessionService ??= Substitute.For<ISessionService>();
         logger ??= Substitute.For<ILogger<EmployerListModel>>();
 
         var employerInterestOptions = Options.Create(
@@ -32,6 +35,7 @@ public class EmployerListModelBuilder
         var pageModel = new EmployerListModel(
             employerInterestService,
             providerDataService,
+            sessionService,
             employerInterestOptions,
             logger)
         {
