@@ -12,6 +12,7 @@ public class EmployerListModelBuilder
 {
     public EmployerListModel Build(
         IEmployerInterestService? employerInterestService = null,
+        IPostcodeLookupService? postcodeLookupService = null,
         IProviderDataService? providerDataService = null,
         ISessionService? sessionService = null,
         EmployerInterestSettings? employerInterestSettings = null,
@@ -23,6 +24,7 @@ public class EmployerListModelBuilder
             .Build(userIsAuthenticated);
 
         employerInterestService ??= Substitute.For<IEmployerInterestService>();
+        postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         providerDataService ??= Substitute.For<IProviderDataService>();
         sessionService ??= Substitute.For<ISessionService>();
         logger ??= Substitute.For<ILogger<EmployerListModel>>();
@@ -34,6 +36,7 @@ public class EmployerListModelBuilder
 
         var pageModel = new EmployerListModel(
             employerInterestService,
+            postcodeLookupService,
             providerDataService,
             sessionService,
             employerInterestOptions,

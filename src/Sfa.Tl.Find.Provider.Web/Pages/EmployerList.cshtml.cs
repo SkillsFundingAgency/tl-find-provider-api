@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
@@ -19,13 +18,14 @@ namespace Sfa.Tl.Find.Provider.Web.Pages;
 public class EmployerListModel : PageModel
 {
     private readonly IEmployerInterestService _employerInterestService;
+    private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IProviderDataService _providerDataService;
     private readonly ISessionService _sessionService;
     private readonly EmployerInterestSettings _employerInterestSettings;
     private readonly ILogger<EmployerListModel> _logger;
 
-    public const string SessionKeySelectedPostcode = "_SelectedPostcode";
-    public const string SessionKeyCustomPostcode = "_CustomPostcode";
+    public const string SessionKeyPostcodeLocation = "_EmployerList_PostcodeLocation";
+    public const string EnterPostcodeValue = "Enter postcode";
 
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
 
@@ -55,6 +55,7 @@ public class EmployerListModel : PageModel
 
     public EmployerListModel(
         IEmployerInterestService employerInterestService,
+        IPostcodeLookupService postcodeLookupService,
         IProviderDataService providerDataService,
         ISessionService sessionService,
         IOptions<EmployerInterestSettings> employerInterestOptions,
@@ -62,6 +63,7 @@ public class EmployerListModel : PageModel
     {
         _employerInterestService =
             employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
+        _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -74,46 +76,80 @@ public class EmployerListModel : PageModel
         UkPrn = GetUkPrn();
         await LoadProviderPostcodes(UkPrn);
 
-        var selectedPostcode = _sessionService.Get<string>(SessionKeySelectedPostcode);
-        var customPostcode = _sessionService.Get<string>(SessionKeyCustomPostcode);
+        var postcodeLocation = _sessionService.Get<LocationPostcode>(SessionKeyPostcodeLocation);
 
-        if (!string.IsNullOrEmpty(selectedPostcode) || !string.IsNullOrEmpty(selectedPostcode))
+        if (postcodeLocation is not null)
         {
             Input ??= new InputModel();
-            Input.SelectedPostcode = selectedPostcode;
-            Input.CustomPostcode = customPostcode;
+            if (ProviderLocations != null && ProviderLocations.Any(p => p.Postcode == postcodeLocation.Postcode))
+            {
+                Input.SelectedPostcode = postcodeLocation.Postcode;
+            }
+            else
+            {
+                Input.SelectedPostcode = EnterPostcodeValue;
+                Input.CustomPostcode = postcodeLocation.Postcode;
+            }
+
+            await PerformSearch(postcodeLocation);
         }
     }
 
-    public async Task OnPost()
+    public async Task<IActionResult> OnPost()
     {
         UkPrn = GetUkPrn();
         await LoadProviderPostcodes(UkPrn);
         ZeroResultsFound = false;
 
         //Validation - must have either a valid selected postcode, or a non-empty custom postcode
-        if (Input?.SelectedPostcode == "Enter postcode" && string.IsNullOrEmpty(Input.CustomPostcode))
+        if (Input?.SelectedPostcode == EnterPostcodeValue && string.IsNullOrEmpty(Input.CustomPostcode))
         {
             ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}", "Enter a postcode");
         }
-
-        //TODO: Call _postcodeLookupService.GetPostcode, if ok stash the whole geolocation in session storage
-        _sessionService.Set(SessionKeySelectedPostcode, Input?.SelectedPostcode ?? string.Empty);
-        _sessionService.Set(SessionKeyCustomPostcode, Input?.CustomPostcode ?? string.Empty);
-
-        if (!ModelState.IsValid)
+        
+        LocationPostcode postcodeLocation = null;
+        //TODO: Extract to method and add tests
+        if (Input?.SelectedPostcode != EnterPostcodeValue && !string.IsNullOrEmpty(Input?.SelectedPostcode))
         {
-            return;
+            //TODO: Use a dictionary here?
+            postcodeLocation = ProviderLocations?.FirstOrDefault(p => p.Postcode == Input.SelectedPostcode);
+        }
+        else
+        {
+            var geoLocation = Input.CustomPostcode.Length <= 4
+                ? await _postcodeLookupService.GetOutcode(Input.CustomPostcode)
+                : await _postcodeLookupService.GetPostcode(Input.CustomPostcode);
+
+            if (geoLocation is not null)
+            {
+                postcodeLocation = new LocationPostcode
+                {
+                    Postcode = geoLocation.Location,
+                    Latitude = geoLocation.Latitude,
+                    Longitude = geoLocation.Longitude
+                };
+            }
         }
 
-        try
-        {
-            await PerformSearch();
-        }
-        catch (PostcodeNotFoundException)
+        if (postcodeLocation is null)
         {
             ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}", "Enter a real postcode");
         }
+        
+        if (!ModelState.IsValid)
+        {
+            if (_sessionService.Exists(SessionKeyPostcodeLocation))
+            {
+                _sessionService.Remove(SessionKeyPostcodeLocation);
+            }
+            return Page();
+        }
+
+        _sessionService.Set(SessionKeyPostcodeLocation, postcodeLocation);
+
+        return RedirectToPage("/EmployerList");
+
+        //await PerformSearch(postcodeLocation);
     }
 
     private long? GetUkPrn()
@@ -140,7 +176,7 @@ public class EmployerListModel : PageModel
             )
             //Select postcode
             //.Prepend(new SelectListItem("Select postcode", "", true))
-            .Append(new SelectListItem("Enter postcode", "Enter postcode", Input?.SelectedPostcode == "Enter postcode"))
+            .Append(new SelectListItem(EnterPostcodeValue, EnterPostcodeValue, Input?.SelectedPostcode == EnterPostcodeValue))
             .ToArray();
     }
 
@@ -160,6 +196,12 @@ public class EmployerListModel : PageModel
             (EmployerInterestList, _) = await _employerInterestService.FindEmployerInterest(Input?.CustomPostcode);
             ZeroResultsFound = !EmployerInterestList.Any();
         }
+    }
+
+    private async Task PerformSearch(LocationPostcode postcodeLocation)
+    {
+        EmployerInterestList = await _employerInterestService.FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude);
+        ZeroResultsFound = !EmployerInterestList.Any();
     }
 
     public class InputModel
