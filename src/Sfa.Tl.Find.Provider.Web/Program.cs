@@ -124,7 +124,6 @@ builder.Services
     .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
-    .AddTransient<ISessionService, SessionService>()
     .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
