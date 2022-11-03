@@ -83,14 +83,14 @@ builder.Services
     .AddTransient<IHttpContextAccessor, HttpContextAccessor>()
     .AddSession(options =>
     {
-        options.Cookie.Name = ".tl-provider.session";
-        options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+        options.Cookie.Name = ".cookies.session";
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.IdleTimeout = TimeSpan.FromMinutes(siteConfiguration.DfeSignInSettings.Timeout);
         options.Cookie.IsEssential = true;
     })
     .AddTransient<ISessionService>(x =>
         new SessionService(
-            x.GetService<IHttpContextAccessor>()!, 
+            x.GetService<IHttpContextAccessor>()!,
             builder.Environment.EnvironmentName));
 
 if (!builder.Environment.IsDevelopment())
