@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Routing;
 
-namespace Sfa.Tl.Find.Provider.Web.ParameterTransformers;
+namespace Sfa.Tl.Find.Provider.Infrastructure.ParameterTransformers;
 
 public class SlugifyParameterTransformer : IOutboundParameterTransformer
 {
