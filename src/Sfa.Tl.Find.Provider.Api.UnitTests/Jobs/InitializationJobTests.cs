@@ -1,5 +1,4 @@
-﻿using NSubstitute;
-using Quartz;
+﻿using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Jobs;
 using Sfa.Tl.Find.Provider.Application.Interfaces;

@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Text.Json;
-using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;

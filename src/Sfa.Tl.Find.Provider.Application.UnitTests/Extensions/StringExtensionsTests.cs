@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Sfa.Tl.Find.Provider.Application.Extensions;
+﻿using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Polly.Registry;
+﻿using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
 

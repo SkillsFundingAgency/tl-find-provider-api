@@ -8,6 +8,7 @@ using Notify.Client;
 using Notify.Interfaces;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Configuration;

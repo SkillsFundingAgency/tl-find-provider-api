@@ -1,0 +1,20 @@
+﻿@page
+@model Error404Model
+@{
+    ViewData["Title"] = "Page not found";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Page not found</h1>
+        <p class="govuk-body">
+            If you typed the web address, check it is correct.
+        </p>
+        <p class="govuk-body">
+            If you pasted the web address, check you copied the entire address.
+        </p>
+        <p class="govuk-body">
+            If the web address is correct or you selected a link or button, <a class="govuk-link" asp-page-handler="ContactSupportClick">contact T Levels Support</a> if you need to speak to someone.
+        </p>
+    </div>
+</div>

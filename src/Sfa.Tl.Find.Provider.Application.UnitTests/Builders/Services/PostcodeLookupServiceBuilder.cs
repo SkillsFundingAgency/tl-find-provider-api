@@ -1,5 +1,4 @@
-﻿using NSubstitute;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 

@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json;
-using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;

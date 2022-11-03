@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using NSubstitute;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;

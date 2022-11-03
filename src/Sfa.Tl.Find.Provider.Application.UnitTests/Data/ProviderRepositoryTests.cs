@@ -1,7 +1,5 @@
 ﻿using System.Data;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Models;

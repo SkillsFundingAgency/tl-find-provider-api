@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using FluentAssertions;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
