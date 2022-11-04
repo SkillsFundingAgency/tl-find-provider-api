@@ -1,26 +1,19 @@
 ﻿@page
 @model ErrorModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "Sorry, there is a problem with the service";
 }
 
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">Error</h1>
+        <h1 class="govuk-heading-l">Sorry, there is a problem with the service</h1>
         <p class="govuk-body">
-            An error occurred while processing your request.
+            Please try again later.
         </p>
         <p class="govuk-body">
-            If the web address is correct or you selected a link or button, <a href="mailto:support.deliveringtlevels@education.gov.uk" class="govuk-link">contact T Levels Support</a> if you need to speak to someone.
+            You can <a href="mailto:support.deliveringtlevels@education.gov.uk" class="govuk-link">email us</a> if you have an urgent query about T Levels.
             
         </p>
     </div>
 </div>
-
-@if (Model.ShowRequestId)
-{
-    <p class="govuk-body">
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
