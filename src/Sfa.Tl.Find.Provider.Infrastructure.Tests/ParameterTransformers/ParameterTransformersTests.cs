@@ -1,6 +1,6 @@
-﻿using Sfa.Tl.Find.Provider.Web.ParameterTransformers;
+﻿using Sfa.Tl.Find.Provider.Infrastructure.ParameterTransformers;
 
-namespace Sfa.Tl.Find.Provider.Web.UnitTests.ParameterTransformers;
+namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.ParameterTransformers;
 public class ParameterTransformersTests
 {
     [Theory(DisplayName = "SlugifyParameterTransformer Data Tests")]

@@ -10,7 +10,6 @@ public class Error404ModelBuilder
             PageContext? pageContext = null)
     {
         pageContext ??= new PageContextBuilder()
-            .WithViewEnginePath("/Error/404")
             .Build();
 
         logger ??= Substitute.For<ILogger<Error404Model>>();

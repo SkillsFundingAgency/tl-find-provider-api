@@ -10,7 +10,6 @@ public class Error403ModelBuilder
             PageContext? pageContext = null)
     {
         pageContext ??= new PageContextBuilder()
-            .WithViewEnginePath("/Error/403")
             .Build();
 
         logger ??= Substitute.For<ILogger<Error403Model>>();

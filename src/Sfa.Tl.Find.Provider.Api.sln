@@ -29,11 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web.UnitTests", "Sfa.Tl.Find.Provider.Web.UnitTests\Sfa.Tl.Find.Provider.Web.UnitTests.csproj", "{3EDFE0B8-5E1B-4CF6-A6AF-4D5C25A366C4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Web.Samples", "Sfa.Tl.Find.Provider.Web.Samples\Sfa.Tl.Find.Provider.Web.Samples.csproj", "{E66CEAC7-8D58-431E-A9B6-25B0A42EAFD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Infrastructure.Tests", "Sfa.Tl.Find.Provider.Infrastructure.Tests\Sfa.Tl.Find.Provider.Infrastructure.Tests.csproj", "{C8F7ACF2-C922-4D05-9364-35A5BFDD1E72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Infrastructure.Tests", "Sfa.Tl.Find.Provider.Infrastructure.Tests\Sfa.Tl.Find.Provider.Infrastructure.Tests.csproj", "{C8F7ACF2-C922-4D05-9364-35A5BFDD1E72}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sfa.Tl.Find.Provider.Infrastructure", "Sfa.Tl.Find.Provider.Infrastructure\Sfa.Tl.Find.Provider.Infrastructure.csproj", "{6F18BEF7-64D7-4F3C-AE44-1BFDE87A3E96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sfa.Tl.Find.Provider.Infrastructure", "Sfa.Tl.Find.Provider.Infrastructure\Sfa.Tl.Find.Provider.Infrastructure.csproj", "{6F18BEF7-64D7-4F3C-AE44-1BFDE87A3E96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,10 +72,6 @@ Global
 		{3EDFE0B8-5E1B-4CF6-A6AF-4D5C25A366C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EDFE0B8-5E1B-4CF6-A6AF-4D5C25A366C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EDFE0B8-5E1B-4CF6-A6AF-4D5C25A366C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E66CEAC7-8D58-431E-A9B6-25B0A42EAFD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E66CEAC7-8D58-431E-A9B6-25B0A42EAFD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E66CEAC7-8D58-431E-A9B6-25B0A42EAFD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E66CEAC7-8D58-431E-A9B6-25B0A42EAFD0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8F7ACF2-C922-4D05-9364-35A5BFDD1E72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8F7ACF2-C922-4D05-9364-35A5BFDD1E72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8F7ACF2-C922-4D05-9364-35A5BFDD1E72}.Release|Any CPU.ActiveCfg = Release|Any CPU

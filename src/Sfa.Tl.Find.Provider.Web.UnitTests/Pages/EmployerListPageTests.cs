@@ -1,7 +1,9 @@
-﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Pages;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
@@ -100,23 +102,32 @@ public class EmployerListPageTests
             .FindEmployerInterest(TestPostcode)
             .Returns((employerInterestSummary, employerInterestSummary.Count));
 
+        var geoLocation = GeoLocationBuilder.BuildGeoLocation(TestPostcode);
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(TestPostcode)
+            .Returns(geoLocation);
+
         var employerListModel = new EmployerListModelBuilder()
-            .Build(employerInterestService);
+            .Build(employerInterestService, postcodeLookupService);
 
         employerListModel.Input = new EmployerListModel.InputModel
         {
             CustomPostcode = TestPostcode
         };
 
-        await employerListModel.OnPost();
+        var result = await employerListModel.OnPost();
 
-        employerListModel.EmployerInterestList
-            .Should()
-            .BeEquivalentTo(employerInterestSummary);
-        //employerListModel.TotalEmployerInterestItems.Should().Be(employerInterestSummary.Count);
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/EmployerList");
+        
+        //employerListModel.EmployerInterestList
+        //    .Should()
+        //    .BeEquivalentTo(employerInterestSummary);
+        ////employerListModel.TotalEmployerInterestItems.Should().Be(employerInterestSummary.Count);
 
-        employerListModel.ZeroResultsFound.Should().NotBeNull();
-        employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
+        //employerListModel.ZeroResultsFound.Should().NotBeNull();
+        //employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
     }
 
     [Fact]
@@ -127,21 +138,30 @@ public class EmployerListPageTests
             .FindEmployerInterest(TestPostcode)
             .Returns((new List<EmployerInterestSummary>(), 0));
 
+        var geoLocation = GeoLocationBuilder.BuildGeoLocation(TestPostcode);
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(TestPostcode)
+            .Returns(geoLocation);
+
         var employerListModel = new EmployerListModelBuilder()
-            .Build(employerInterestService);
+            .Build(employerInterestService, postcodeLookupService);
 
         employerListModel.Input = new EmployerListModel.InputModel
         {
             CustomPostcode = TestPostcode
         };
 
-        await employerListModel.OnPost();
+        var result = await employerListModel.OnPost();
 
-        employerListModel.EmployerInterestList
-            .Should()
-            .BeEmpty();
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/EmployerList");
 
-        employerListModel.ZeroResultsFound.Should().NotBeNull();
-        employerListModel.ZeroResultsFound!.Value.Should().BeTrue();
+        //employerListModel.EmployerInterestList
+        //    .Should()
+        //    .BeEmpty();
+
+        //employerListModel.ZeroResultsFound.Should().NotBeNull();
+        //employerListModel.ZeroResultsFound!.Value.Should().BeTrue();
     }
 }

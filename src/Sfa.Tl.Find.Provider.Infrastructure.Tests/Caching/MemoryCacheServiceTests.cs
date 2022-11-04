@@ -3,7 +3,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests;
+namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Caching;
 public class MemoryCacheServiceTests
 {
     private const string TestKey = "key";

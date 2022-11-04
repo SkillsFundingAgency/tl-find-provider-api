@@ -116,7 +116,7 @@ public static class ServiceCollectionExtensions
     {
         if (!string.IsNullOrEmpty(govNotifyApiKey))
         {
-            services.AddTransient<IAsyncNotificationClient, NotificationClient>(
+            services.AddTransient<IAsyncNotificationClient>(
                 _ => new NotificationClient(govNotifyApiKey));
         }
 
