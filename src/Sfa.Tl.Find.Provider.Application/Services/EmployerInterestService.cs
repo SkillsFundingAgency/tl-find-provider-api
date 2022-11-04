@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
@@ -97,31 +98,50 @@ public class EmployerInterestService : IEmployerInterestService
 
     public async Task<IEnumerable<EmployerInterestSummary>> GetSummaryList()
     {
-        return await _employerInterestRepository.GetSummaryList();
+        return (await _employerInterestRepository
+            .GetSummaryList())
+            .Select(x =>
+            {
+                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
+                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
+                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
+                return x;
+            });
     }
 
     public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(string postcode)
     {
         var geoLocation = await GetPostcode(postcode);
 
-        if (geoLocation is not null)
-        {
-            return await _employerInterestRepository
+        var (s, c) = await _employerInterestRepository
                     .Search(geoLocation.Latitude, geoLocation.Longitude, _employerInterestSettings.SearchRadius);
-        }
 
-        var summaryList = (await _employerInterestRepository
-            .GetSummaryList())
-            .ToList();
-        return (summaryList, summaryList.Count);
+        var summaryList = s
+            .Select(x =>
+            {
+                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
+                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
+                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
+                return x;
+            });
+
+        return (summaryList, c);
     }
 
-    public async Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(double latitude,
+    public async Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(
+        double latitude,
         double longitude)
     {
         return (await _employerInterestRepository
                 .Search(latitude, longitude, _employerInterestSettings.SearchRadius)
-            ).SearchResults;
+            ).SearchResults
+            .Select(x =>
+            {
+                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
+                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
+                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
+                return x;
+            });
     }
 
     public Task<EmployerInterestDetail> GetEmployerInterestDetail(int id)

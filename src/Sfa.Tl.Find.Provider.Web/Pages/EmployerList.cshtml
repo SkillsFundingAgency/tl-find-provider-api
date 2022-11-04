@@ -59,27 +59,15 @@
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                @{
-                    var isExpiring = false;
-                    var isNew = true;
-                }
                 @foreach (var employerInterest in Model.EmployerInterestList)
                 {
-                    var availableUntil = employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
-                        @*
-                            ‘New’ tag shows next to organisation name if the interest has been received in the last 7 days.
-                            ‘Expiring’ tag shows next to organisation name if the interest expires in the next 7 days.
-                        *@
-                    isExpiring = !isExpiring;
-                    isNew = !isNew;
-                        
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header tl-wordwrap">
-                            @if (isNew)
+                            @if (employerInterest.IsNew)
                             {
                                 <strong class="govuk-tag govuk-tag--blue">New</strong>
                             }
-                            else if (isExpiring)
+                            @if(employerInterest.IsExpiring)
                             {
                                 <strong class="govuk-tag govuk-tag--red">Expiring</strong>
                             }
@@ -103,7 +91,7 @@
                         </td>
                         <td class="govuk-table__cell">
                             <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
-                            <div class="tl-employers--table--inline-cell">@($"{availableUntil:d MMM yyyy}")</div>
+                            <div class="tl-employers--table--inline-cell">@($"{employerInterest.ExpiryDate:d MMM yyyy}")</div>
                         </td>
                         <td class="govuk-table__cell"><a asp-page="/EmployerDetails" asp-route-id="@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a></td>
                     </tr>

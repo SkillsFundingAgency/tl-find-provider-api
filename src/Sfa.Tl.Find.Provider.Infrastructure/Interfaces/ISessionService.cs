@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-
-namespace Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+﻿namespace Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 public interface ISessionService
 {
     void Set(string key, object value);

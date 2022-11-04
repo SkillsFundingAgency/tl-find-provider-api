@@ -4,6 +4,9 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class EmployerInterestSummaryBuilder
 {
+    private DateTime _creationDate = DateTime.Parse("2022-10-01 12:00");
+    private DateTime? _modificationDate = null;
+
     public IEnumerable<EmployerInterestSummary> BuildList() =>
         new List<EmployerInterestSummary>
         {
@@ -17,8 +20,8 @@ public class EmployerInterestSummaryBuilder
                 {
                     "Digital and IT"
                 },
-                CreatedOn = DateTime.Parse("2022-10-01 12:00"),
-                ModifiedOn = null
+                CreatedOn = _creationDate,
+                ModifiedOn = _modificationDate
             },
             new()
             {
@@ -31,8 +34,8 @@ public class EmployerInterestSummaryBuilder
                     "Creative and design",
                     "Digital and IT"
                 },
-                CreatedOn = DateTime.Parse("2022-10-01 12:00"),
-                ModifiedOn = null
+                CreatedOn = _creationDate,
+                ModifiedOn = _modificationDate
             }
         };
 
@@ -41,4 +44,17 @@ public class EmployerInterestSummaryBuilder
 
     public EmployerInterestSummary Build() =>
         BuildList().First();
+
+    public EmployerInterestSummaryBuilder WithCreationDate(DateTime dateTime)
+    {
+        _creationDate = dateTime;
+        return this;
+    }
+
+    public EmployerInterestSummaryBuilder WithModificationDate(DateTime dateTime)
+    {
+        _modificationDate = dateTime;
+        return this;
+    }
+
 }

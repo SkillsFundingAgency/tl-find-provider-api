@@ -2,5 +2,5 @@
 
 public class SearchSettings
 {
-    public bool MergeAdditionalProviderData { get; set; }
+    public bool? MergeAdditionalProviderData { get; set; }
 }

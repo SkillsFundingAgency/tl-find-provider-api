@@ -66,7 +66,6 @@ public class ProviderRepository : IProviderRepository
                     if (deliveryYear == null)
                     {
                         deliveryYear = dy;
-
                         deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
 
                         location.DeliveryYears.Add(deliveryYear);

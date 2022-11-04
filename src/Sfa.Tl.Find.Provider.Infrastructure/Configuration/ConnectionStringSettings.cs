@@ -2,7 +2,7 @@
 
 public class ConnectionStringSettings
 {
-    public string RedisConnectionString { get; set; }
+    public string? RedisConnectionString { get; set; }
     
-    public string SqlConnectionString { get; set; }
+    public string? SqlConnectionString { get; set; }
 }

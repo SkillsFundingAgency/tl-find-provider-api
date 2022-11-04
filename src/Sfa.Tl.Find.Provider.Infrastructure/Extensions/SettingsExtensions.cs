@@ -26,8 +26,8 @@ public static class SettingsExtensions
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-        settings.BaseUri = configuration.CourseDirectoryApiSettings.BaseUri;
-        settings.ApiKey = configuration.CourseDirectoryApiSettings.ApiKey;
+        settings.BaseUri = configuration.CourseDirectoryApiSettings?.BaseUri;
+        settings.ApiKey = configuration.CourseDirectoryApiSettings?.ApiKey;
     }
 
     public static void ConfigureDfeSignInSettings(this DfeSignInSettings settings, SiteConfiguration configuration)
