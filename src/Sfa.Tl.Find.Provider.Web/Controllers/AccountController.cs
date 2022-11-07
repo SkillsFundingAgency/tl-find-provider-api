@@ -58,7 +58,7 @@ public class AccountController : Controller
         var redirectPage = User.Identity is { IsAuthenticated: true }
             ? AuthenticationExtensions.AuthenticatedUserStartPageExact
             : AuthenticationExtensions.UnauthenticatedUserStartPage;
-        _logger.LogInformation("In post-signin - authenticated={isAuthenticated}, redirecting to ", 
+        _logger.LogInformation("In post-signin - authenticated={isAuthenticated}, redirecting to {page}", 
             User.Identity is { IsAuthenticated: true }, 
             redirectPage);
 
