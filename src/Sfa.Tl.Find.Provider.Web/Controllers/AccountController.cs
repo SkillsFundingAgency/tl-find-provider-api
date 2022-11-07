@@ -11,6 +11,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
 [Authorize]
+[ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class AccountController : Controller
 {
     private readonly IConfiguration _configuration;
@@ -55,6 +56,7 @@ public class AccountController : Controller
     [Route("post-signin")]
     public IActionResult PostSignIn()
     {
+        _logger.LogInformation("In post-signin");
         var redirectPage = User.Identity is { IsAuthenticated: true }
             ? AuthenticationExtensions.AuthenticatedUserStartPageExact
             : AuthenticationExtensions.UnauthenticatedUserStartPage;
