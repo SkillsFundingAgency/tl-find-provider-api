@@ -10,15 +10,6 @@ public static class BusinessRuleExtensions
                || (deliveryYear == today.Year && today.Month >= 9);
     }
 
-    /*
-                    var availableUntil = employerInterest.CreatedOn.AddDays(Model.EmployerInterestRetentionDays);
-                        @*
-                            ‘New’ tag shows next to organisation name if the interest has been received in the last 7 days.
-                            ‘Expiring’ tag shows next to organisation name if the interest expires in the next 7 days.
-                        *@
-                        var isExpiring = availableUntil.AddDays(-7) < DateTime.Today;
-                        var isNew = employerInterest.CreatedOn.AddDays(-7) < DateTime.Today.AddDays(-7);
-     */
     public static bool IsInterestExpiring(this EmployerInterestSummary employerInterest,
         DateTime today, 
         int retentionDays, 
@@ -26,12 +17,15 @@ public static class BusinessRuleExtensions
     {
         return employerInterest.InterestExpiryDate(retentionDays).AddDays(-numberOfDays) < today;
     }
-
+    
     public static bool IsInterestNew(this EmployerInterestSummary employerInterest, 
         DateTime today, 
-        int numberOfDays = 7)
+        int numberOfDays = 7,
+        DateOnly? serviceStartDate = null)
     {
-        return employerInterest.CreatedOn.Date > today.AddDays(-numberOfDays);
+        return employerInterest.CreatedOn.Date > today.AddDays(-numberOfDays)
+               && (serviceStartDate is null 
+                   || employerInterest.CreatedOn.Date > serviceStartDate.Value.AddDays(numberOfDays - 1).ToDateTime(new TimeOnly(0, 0, 0)));
     }
 
     public static DateTime InterestExpiryDate(this EmployerInterestSummary employerInterest,

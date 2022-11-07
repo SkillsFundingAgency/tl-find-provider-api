@@ -390,7 +390,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             .DynamicParameters
             .Get<int>("@totalEmployerInterestsCount");
 
-        _logger.LogInformation("{class}.{method} search with radius {searchRadius} found {resultsCount} of {resultsCount} results.",
+        _logger.LogInformation("{class}.{method} with radius {searchRadius} found {resultsCount} of {resultsCount} results.",
             nameof(EmployerInterestRepository), nameof(Search),
             searchRadius, summaryList.Count, totalEmployerInterestsCount);
 

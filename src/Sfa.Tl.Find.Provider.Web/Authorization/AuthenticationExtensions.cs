@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -84,7 +85,8 @@ public static class AuthenticationExtensions
             options.Scope.Add("openid");
             options.Scope.Add("email");
             options.Scope.Add("profile");
-            options.Scope.Add("organisationid");
+            //options.Scope.Add("organisationid");
+            options.Scope.Add("organisation");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In
             options.MaxAge = overallSessionTimeout;
@@ -180,22 +182,11 @@ public static class AuthenticationExtensions
 
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
 
+                    ctx.Properties ??= new AuthenticationProperties();
                     // so that we don't issue a session cookie but one with a fixed expiration
                     ctx.Properties.IsPersistent = true;
                     ctx.Properties.ExpiresUtc = DateTime.UtcNow.Add(overallSessionTimeout);
                 }
-
-                //Additional events for testing
-                //,
-                //OnRemoteSignOut = async ctx =>
-                //{
-                //},
-
-                //OnRedirectToIdentityProvider = context =>
-                //{
-                //    context.ProtocolMessage.Prompt = "consent";
-                //    return Task.CompletedTask;
-                //},
             };
         });
 

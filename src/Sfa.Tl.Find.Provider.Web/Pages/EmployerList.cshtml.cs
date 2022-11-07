@@ -180,27 +180,11 @@ public class EmployerListModel : PageModel
             .ToArray();
     }
 
-    private async Task PerformSearch()
-    {
-        var locationLookup = !string.IsNullOrEmpty(Input?.SelectedPostcode)
-                ? ProviderLocations?.FirstOrDefault(p => p.Postcode == Input.SelectedPostcode)
-                : null;
-
-        if (locationLookup != null)
-        {
-            EmployerInterestList = await _employerInterestService.FindEmployerInterest(locationLookup.Latitude, locationLookup.Longitude);
-            ZeroResultsFound = !EmployerInterestList.Any();
-        }
-        else if (!string.IsNullOrEmpty(Input?.CustomPostcode))
-        {
-            (EmployerInterestList, _) = await _employerInterestService.FindEmployerInterest(Input?.CustomPostcode);
-            ZeroResultsFound = !EmployerInterestList.Any();
-        }
-    }
-
     private async Task PerformSearch(LocationPostcode postcodeLocation)
     {
-        EmployerInterestList = await _employerInterestService.FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude);
+        EmployerInterestList = (await _employerInterestService
+            .FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude))
+            .SearchResults;
         ZeroResultsFound = !EmployerInterestList.Any();
     }
 
