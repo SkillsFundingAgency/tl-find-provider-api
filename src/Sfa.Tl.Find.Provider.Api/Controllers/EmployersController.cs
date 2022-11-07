@@ -4,6 +4,7 @@ using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
+using System.Text;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -76,6 +77,14 @@ public class EmployersController : ControllerBase
         {
             _logger.LogInformation("received additional information '{additionalInformation}' ({idx})",
             employerInterest.AdditionalInformation, employerInterest.AdditionalInformation?.IndexOf("\n"));
+            
+            //Website is base-64 encoded to get through the firewall
+            var website = employerInterest.Website is not null && employerInterest.Website.Length > 0
+                ? Encoding.UTF8.GetString(
+                        Convert.FromBase64String(
+                            employerInterest.Website))
+                    .Truncate(500)
+                : null;
 
             //TODO: Validate the model - for now, just enforce max lengths
             var cleanEmployerInterest = new EmployerInterest
@@ -90,7 +99,7 @@ public class EmployersController : ControllerBase
                     ?.ReplaceBreaksWithNewlines(),
                 Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
                 Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
-                Website = employerInterest.Website?.ToTrimmedOrNullString().Truncate(500),
+                Website = website,
                 ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
                 SkillAreaIds = employerInterest.SkillAreaIds
             };
