@@ -20,16 +20,10 @@ public static class AuthorizationServicePolicyExtension
                     policy =>
                     {
                         policy.RequireAuthenticatedUser();
+                        //TODO: THis will require a role
                         policy.RequireClaim(CustomClaimTypes.OrganisationCategory);
                         policy.Requirements.Add(new EmployerInterestViewerRequirement());
                     });
-
-            options.AddPolicy(PolicyNames.EmployerInterestViewer,
-                policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new EmployerInterestViewerRequirement());
-                });
         });
     }
 }

@@ -41,6 +41,9 @@ public class AccountController : Controller
         }
         else
         {
+            _logger.LogInformation("signin - challenging ({auth})",
+                User?.Identity is {IsAuthenticated: true});
+
             await HttpContext.ChallengeAsync(new AuthenticationProperties
             {
                 RedirectUri = "/post-signin"
@@ -52,6 +55,13 @@ public class AccountController : Controller
     [Route("post-signin")]
     public IActionResult PostSignIn()
     {
+        var redirectPage = User.Identity is { IsAuthenticated: true }
+            ? AuthenticationExtensions.AuthenticatedUserStartPageExact
+            : AuthenticationExtensions.UnauthenticatedUserStartPage;
+        _logger.LogInformation("In post-signin - authenticated={isAuthenticated}, redirecting to ", 
+            User.Identity is { IsAuthenticated: true }, 
+            redirectPage);
+
         return RedirectToPage(
             User.Identity is { IsAuthenticated: true }
                 ? AuthenticationExtensions.AuthenticatedUserStartPageExact

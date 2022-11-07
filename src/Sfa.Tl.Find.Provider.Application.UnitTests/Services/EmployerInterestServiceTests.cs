@@ -418,6 +418,7 @@ public class EmployerInterestServiceTests
 
         var results =
             (await service.FindEmployerInterest(latitude, longitude))
+            .SearchResults
             .ToList();
 
         results.Should().BeEquivalentTo(employerInterestSummaryList);
@@ -463,6 +464,7 @@ public class EmployerInterestServiceTests
 
         var results =
             (await service.FindEmployerInterest(latitude, longitude))
+            .SearchResults
             .ToList();
 
         results.Should().NotBeNullOrEmpty();

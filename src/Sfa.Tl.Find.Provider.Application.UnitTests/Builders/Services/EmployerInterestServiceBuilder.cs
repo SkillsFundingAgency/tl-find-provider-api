@@ -16,7 +16,6 @@ public class EmployerInterestServiceBuilder
         IPostcodeLookupService postcodeLookupService = null,
         IProviderDataService providerDataService = null,
         IEmployerInterestRepository employerInterestRepository = null,
-        ICacheService cacheService = null,
         EmployerInterestSettings employerInterestSettings = null,
         ILogger<EmployerInterestService> logger = null)
     {
@@ -25,7 +24,6 @@ public class EmployerInterestServiceBuilder
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         employerInterestRepository ??= Substitute.For<IEmployerInterestRepository>();
         providerDataService ??= Substitute.For<IProviderDataService>();
-        cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<EmployerInterestService>>();
 
         var employerInterestOptions = Options.Create(
@@ -39,7 +37,6 @@ public class EmployerInterestServiceBuilder
             postcodeLookupService,
             providerDataService,
             employerInterestRepository,
-            cacheService,
             employerInterestOptions,
             logger);
     }

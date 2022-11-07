@@ -42,6 +42,9 @@ public class EmployersController : ControllerBase
             _logger.LogDebug($"{nameof(EmployersController)} {nameof(CreateInterest)} called.");
         }
 
+        _logger.LogInformation("received additional information '{addtionalInformation}' ({idx})",
+            employerInterest.AdditionalInformation, employerInterest.AdditionalInformation?.IndexOf("\n"));
+
         //TODO: Validate the model - for now, just enforce max lengths
         var cleanEmployerInterest = new EmployerInterest
         {

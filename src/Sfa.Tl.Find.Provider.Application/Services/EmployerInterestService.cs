@@ -17,7 +17,6 @@ public class EmployerInterestService : IEmployerInterestService
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmployerInterestRepository _employerInterestRepository;
     private readonly IProviderDataService _providerDataService;
-    private readonly ICacheService _cacheService;
     private readonly ILogger<EmployerInterestService> _logger;
     private readonly EmployerInterestSettings _employerInterestSettings;
 
@@ -27,7 +26,6 @@ public class EmployerInterestService : IEmployerInterestService
         IPostcodeLookupService postcodeLookupService,
         IProviderDataService providerDataService,
         IEmployerInterestRepository employerInterestRepository,
-        ICacheService cacheService,
         IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<EmployerInterestService> logger)
     {
@@ -36,7 +34,6 @@ public class EmployerInterestService : IEmployerInterestService
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _employerInterestRepository = employerInterestRepository ?? throw new ArgumentNullException(nameof(employerInterestRepository));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _employerInterestSettings = employerInterestOptions?.Value
@@ -45,10 +42,10 @@ public class EmployerInterestService : IEmployerInterestService
 
     public int RetentionDays => _employerInterestSettings.RetentionDays;
 
-    public DateOnly ServiceStartDate =>
+    public DateOnly? ServiceStartDate =>
         _employerInterestSettings?.ServiceStartDate is not null
             ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
-            : DateOnly.MinValue;
+            : null;
 
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
@@ -103,7 +100,7 @@ public class EmployerInterestService : IEmployerInterestService
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
+                x.IsNew = x.IsInterestNew(_dateTimeService.Today, serviceStartDate: ServiceStartDate);
                 x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
                 return x;
             });
@@ -113,35 +110,29 @@ public class EmployerInterestService : IEmployerInterestService
     {
         var geoLocation = await GetPostcode(postcode);
 
-        var (s, c) = await _employerInterestRepository
-                    .Search(geoLocation.Latitude, geoLocation.Longitude, _employerInterestSettings.SearchRadius);
-
-        var summaryList = s
-            .Select(x =>
-            {
-                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
-                return x;
-            });
-
-        return (summaryList, c);
+        return await FindEmployerInterest(
+            geoLocation.Latitude, 
+            geoLocation.Longitude);
     }
 
-    public async Task<IEnumerable<EmployerInterestSummary>> FindEmployerInterest(
+    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(
         double latitude,
         double longitude)
     {
-        return (await _employerInterestRepository
-                .Search(latitude, longitude, _employerInterestSettings.SearchRadius)
-            ).SearchResults
+        var results = await _employerInterestRepository
+                .Search(latitude, longitude, _employerInterestSettings.SearchRadius);
+
+        var summaryList = results
+            .SearchResults
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
+                x.IsNew = x.IsInterestNew(_dateTimeService.Today, serviceStartDate: ServiceStartDate);
                 x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
                 return x;
             });
+
+        return (summaryList, results.TotalResultsCount);
     }
 
     public Task<EmployerInterestDetail> GetEmployerInterestDetail(int id)
