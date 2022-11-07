@@ -128,6 +128,20 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
+    [Theory(DisplayName = nameof(StringExtensions.ReplaceBreaksWithNewlines) + " Data Tests")]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    [InlineData("<br />", "\n")]
+    [InlineData("hello<br />world", "hello\nworld")]
+    [InlineData("hello<br/>world", "hello\nworld")]
+    [InlineData("hello<br/>world", "hello\nworld")]
+    public void String_ReplaceBreaksWithNewlines_Data_Tests(string input, string expectedResult)
+    {
+        var result = input.ReplaceBreaksWithNewlines();
+        result.Should().Be(expectedResult);
+    }
+
+
     [Theory(DisplayName = nameof(StringExtensions.ToTrimmedOrNullString) + " Data Tests")]
     [InlineData(null, null)]
     [InlineData("", null)]
