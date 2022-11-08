@@ -77,14 +77,6 @@ public class EmployersController : ControllerBase
         {
             _logger.LogInformation("received additional information '{additionalInformation}' ({idx})",
             employerInterest.AdditionalInformation, employerInterest.AdditionalInformation?.IndexOf("\n"));
-            
-            //Website is base-64 encoded to get through the firewall
-            var website = employerInterest.Website is not null && employerInterest.Website.Length > 0
-                ? Encoding.UTF8.GetString(
-                        Convert.FromBase64String(
-                            employerInterest.Website))
-                    .Truncate(500)
-                : null;
 
             //TODO: Validate the model - for now, just enforce max lengths
             var cleanEmployerInterest = new EmployerInterest
@@ -96,10 +88,14 @@ public class EmployersController : ControllerBase
                 OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
                 AdditionalInformation = employerInterest.AdditionalInformation
                     ?.ToTrimmedOrNullString()
+                    ?.ReplaceRedactedHttpStrings()
                     ?.ReplaceBreaksWithNewlines(),
                 Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
                 Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
-                Website = website,
+                Website = employerInterest.Website
+                    ?.ToTrimmedOrNullString()
+                    ?.ReplaceRedactedHttpStrings()
+                    .Truncate(500),
                 ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
                 SkillAreaIds = employerInterest.SkillAreaIds
             };

@@ -148,8 +148,6 @@ public class EmployerListModel : PageModel
         _sessionService.Set(SessionKeyPostcodeLocation, postcodeLocation);
 
         return RedirectToPage("/EmployerList");
-
-        //await PerformSearch(postcodeLocation);
     }
 
     private long? GetUkPrn()
@@ -171,10 +169,8 @@ public class EmployerListModel : PageModel
                     => new SelectListItem(
                         p.Postcode,
                         p.Postcode,
-                        p.Postcode ==
-                        Input?.SelectedPostcode) //Selected = false //TODO: set based on previous selection
+                        p.Postcode == Input?.SelectedPostcode)
             )
-            //Select postcode
             //.Prepend(new SelectListItem("Select postcode", "", true))
             .Append(new SelectListItem(EnterPostcodeValue, EnterPostcodeValue, Input?.SelectedPostcode == EnterPostcodeValue))
             .ToArray();

@@ -45,11 +45,6 @@ public class DfeSignInApiService : IDfeSignInApiService
         var user = userInfoTask.Result;
         var organisation = organisationInfoTask.Result;
 
-        //if (organisation?.UkPrn == null)
-        //{
-        //    user.HasAccessToService = false;
-        //}
-
         return (organisation, user);
     }
 
@@ -72,7 +67,7 @@ public class DfeSignInApiService : IDfeSignInApiService
                     .Select(o => new DfeOrganisationInfo
                     {
                         Id = Guid.Parse(o.SafeGetString("id")),
-                        Name = o.SafeGetString("name").ParseTLevelDefinitionName(Constants.QualificationNameMaxLength),
+                        Name = o.SafeGetString("name"),
                         UkPrn = long.TryParse(o.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
                         Urn = long.TryParse(o.SafeGetString("urn"), out var urnLong) ? urnLong : null,
                         Category = int.TryParse(
@@ -113,10 +108,6 @@ public class DfeSignInApiService : IDfeSignInApiService
                         {
                             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                         });
-            }
-            else if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                //userClaims.HasAccessToService = false;
             }
         }
         catch (Exception ex)
