@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models.Authentication;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
@@ -149,16 +150,39 @@ public static class AuthenticationExtensions
 
                     var organisation = ctx.Principal
                         .FindFirst("Organisation");
-                    if (organisation != null)
+                    if (organisation is {Value: { }})
                     {
-                        var organisationId = JsonDocument
-                                .Parse(organisation.Value)
-                                .RootElement
-                                .SafeGetString("id");
+                        //var organisationId = JsonDocument
+                        //        .Parse(organisation.Value)
+                        //        .RootElement
+                        //        .SafeGetString("id");
                         var userId = ctx.Principal.FindFirst("sub").Value;
 
-                        var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
-                        var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
+                        //TODO: Put back call to get user/organisation info from API?
+                        //var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
+                        //var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
+                        //For now, create the info objects by hand
+                        var root = JsonDocument
+                            .Parse(organisation.Value)
+                            .RootElement;
+                        var organisationId = root.SafeGetString("id");
+                        var organisationInfo = new DfeOrganisationInfo
+                        {
+                            Id = Guid.Parse(root.SafeGetString("id")),
+                            Name = root.SafeGetString("name"),
+                            UkPrn = long.TryParse(root.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
+                            Urn = long.TryParse(root.SafeGetString("urn"), out var urnLong) ? urnLong : null,
+                            Category = int.TryParse(
+                                root.GetProperty("category")
+                                    .SafeGetString("id"), out var category)
+                                ? category
+                                : 0
+                        };
+                        var userInfo = new DfeUserInfo
+                        {
+                            UserId = Guid.Parse(userId),
+                            Roles = new List<Role>()
+                        };
 
                         claims.AddRange(new List<Claim>
                         {
