@@ -3,8 +3,10 @@ using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using System.Text;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Controllers;
 
@@ -29,7 +31,28 @@ public class EmployersControllerTests
     {
         var uniqueId = Guid.Parse("6f3606b9-8323-49d5-b405-14bacb3a82e5");
 
-        var employerInterest = new EmployerInterestBuilder().Build();
+        var employerInterest = new EmployerInterestBuilder()
+            .Build();
+        employerInterest = new EmployerInterest
+        {
+                Id = employerInterest.Id,
+                UniqueId = employerInterest.UniqueId,
+                OrganisationName = employerInterest.OrganisationName,
+                ContactName = employerInterest.ContactName,
+                Postcode = employerInterest.Postcode,
+                Latitude = employerInterest.Latitude,
+                Longitude = employerInterest.Longitude,
+                IndustryId = employerInterest.IndustryId,
+                OtherIndustry = employerInterest.OtherIndustry,
+                AdditionalInformation = employerInterest.AdditionalInformation,
+                Email = employerInterest.Email,
+                Telephone = employerInterest.Telephone,
+                Website = Convert.ToBase64String(
+                    Encoding.UTF8.GetBytes(
+                        employerInterest.Website)),
+                ContactPreferenceType = employerInterest.ContactPreferenceType,
+                SkillAreaIds = employerInterest.SkillAreaIds
+        };
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
         employerInterestService

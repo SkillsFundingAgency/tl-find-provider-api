@@ -4,6 +4,7 @@ using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
+using System.Text;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -24,7 +25,37 @@ public class EmployersController : ControllerBase
         _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
+
+
+    /******TODO*********Remove*****/
+    [HttpGet]
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // ReSharper disable once StringLiteralTypo
+    [Route("createinteresttest")]
+    public async Task<IActionResult> CreateInterestTest(EmployerInterest employerInterest)
+    {
+        _logger.LogInformation($"{nameof(EmployersController)} {nameof(CreateInterestTest)} called.");
+        return Ok();
+    }
+    [HttpGet]
+    [HttpPost]
+    [Route("nointeresttest")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult NoInterest(Qualification qualification)
+    {
+        _logger.LogInformation($"{nameof(EmployersController)} {nameof(NoInterest)} called.");
+        return Ok();
+    }
+    /******TODO*********Remove*****/
+
+
+
     /// <summary>
     /// Creates an Employer Interest record.
     /// </summary>
@@ -42,32 +73,51 @@ public class EmployersController : ControllerBase
             _logger.LogDebug($"{nameof(EmployersController)} {nameof(CreateInterest)} called.");
         }
 
-        _logger.LogInformation("received additional information '{addtionalInformation}' ({idx})",
+        try
+        {
+            _logger.LogInformation("received additional information '{additionalInformation}' ({idx})",
             employerInterest.AdditionalInformation, employerInterest.AdditionalInformation?.IndexOf("\n"));
+            
+            //Website is base-64 encoded to get through the firewall
+            var website = employerInterest.Website is not null && employerInterest.Website.Length > 0
+                ? Encoding.UTF8.GetString(
+                        Convert.FromBase64String(
+                            employerInterest.Website))
+                    .Truncate(500)
+                : null;
 
-        //TODO: Validate the model - for now, just enforce max lengths
-        var cleanEmployerInterest = new EmployerInterest
+            //TODO: Validate the model - for now, just enforce max lengths
+            var cleanEmployerInterest = new EmployerInterest
+            {
+                OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
+                ContactName = employerInterest.ContactName?.Trim().Truncate(400),
+                Postcode = employerInterest.Postcode,
+                IndustryId = employerInterest.IndustryId,
+                OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
+                AdditionalInformation = employerInterest.AdditionalInformation
+                    ?.ToTrimmedOrNullString()
+                    ?.ReplaceBreaksWithNewlines(),
+                Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
+                Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
+                Website = website,
+                ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
+                SkillAreaIds = employerInterest.SkillAreaIds
+            };
+
+            var uniqueId = await _employerInterestService
+                .CreateEmployerInterest(cleanEmployerInterest);
+
+            return Ok(new
+            {
+                id = uniqueId
+            });
+        }
+        catch (Exception ex)
         {
-            OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
-            ContactName = employerInterest.ContactName?.Trim().Truncate(400),
-            Postcode = employerInterest.Postcode,
-            IndustryId = employerInterest.IndustryId,
-            OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
-            AdditionalInformation = employerInterest.AdditionalInformation?.ToTrimmedOrNullString(),
-            Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
-            Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
-            Website = employerInterest.Website?.ToTrimmedOrNullString().Truncate(500),
-            ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
-            SkillAreaIds = employerInterest.SkillAreaIds
-        };
+            _logger.LogError(ex, "Error creating Employer Interest.");
 
-        var uniqueId = await _employerInterestService
-            .CreateEmployerInterest(cleanEmployerInterest);
-
-        return Ok(new
-        {
-            id = uniqueId
-        });
+            return BadRequest("Request could not be processed.");
+        }
     }
 
     /// <summary>

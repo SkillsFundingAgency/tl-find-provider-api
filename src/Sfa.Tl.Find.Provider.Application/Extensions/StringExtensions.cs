@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
@@ -102,6 +103,14 @@ public static class StringExtensions
         result = Regex.Replace(result, @"(['’])S(\s|$)", "$1s$2");
 
         return result.Trim();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ReplaceBreaksWithNewlines(this string input)
+    {
+        return input is null
+            ? null
+            : Regex.Replace(input, @"(<br ?/>)|(\[br ?/\])", "\n");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
