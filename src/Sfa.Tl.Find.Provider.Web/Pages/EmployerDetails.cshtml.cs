@@ -6,8 +6,6 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
-//TODO: add security
-//[AllowAnonymous]
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class EmployerDetailsModel : PageModel
 {

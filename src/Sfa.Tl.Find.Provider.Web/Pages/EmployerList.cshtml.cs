@@ -9,12 +9,11 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
-//TODO: add security
-[AllowAnonymous]
-//[Authorize(nameof(PolicyNames.EmployerInterestViewer))]
+[Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class EmployerListModel : PageModel
 {
     private readonly IEmployerInterestService _employerInterestService;
