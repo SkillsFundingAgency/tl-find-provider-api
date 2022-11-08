@@ -8,6 +8,7 @@ public static class Constants
 
     public const string AllowedCorsOriginsConfigKey = "AllowedCorsOrigins";
     public const string ApiSettingsConfigKey = "ApiSettings";
+    public const string BlobStorageConnectionStringConfigKey = "BlobStorageConnectionString";
     public const string CourseDirectoryApiSettingsConfigKey = "CourseDirectoryApiSettings";
     public const string CourseDirectoryImportScheduleConfigKey = "CourseDirectoryImportSchedule";
     public const string DfeSignInSettingsConfigKey = "DfeSignInSettings";

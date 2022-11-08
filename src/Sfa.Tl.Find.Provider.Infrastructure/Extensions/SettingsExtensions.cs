@@ -17,6 +17,7 @@ public static class SettingsExtensions
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
+        settings.BlobStorageConnectionString = configuration.BlobStorageConnectionString;
         settings.SqlConnectionString = configuration.SqlConnectionString;
         settings.RedisConnectionString = configuration.RedisConnectionString;
     }
@@ -35,6 +36,7 @@ public static class SettingsExtensions
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
+        settings.Administrators = configuration.DfeSignInSettings?.Administrators;
         settings.ApiUri = configuration.DfeSignInSettings?.ApiUri;
         settings.ApiSecret = configuration.DfeSignInSettings?.ApiSecret;
         settings.Audience = configuration.DfeSignInSettings?.Audience;

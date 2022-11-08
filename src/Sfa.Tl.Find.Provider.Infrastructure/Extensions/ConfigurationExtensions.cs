@@ -66,6 +66,7 @@ public static class ConfigurationExtensions
             PostcodeApiSettings = configuration.GetSection(Constants.PostcodeApiSettingsConfigKey).Get<PostcodeApiSettings>(),
             SearchSettings = configuration.GetSection(Constants.SearchSettingsConfigKey).Get<SearchSettings>(),
             SqlConnectionString = configuration[Constants.SqlConnectionStringConfigKey],
+            BlobStorageConnectionString = configuration[Constants.BlobStorageConnectionStringConfigKey],
             CourseDirectoryImportSchedule = configuration[Constants.CourseDirectoryImportScheduleConfigKey],
             TownDataImportSchedule = configuration[Constants.TownDataImportScheduleConfigKey]
         };
