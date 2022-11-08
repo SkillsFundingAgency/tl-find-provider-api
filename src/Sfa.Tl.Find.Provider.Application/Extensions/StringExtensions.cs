@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
