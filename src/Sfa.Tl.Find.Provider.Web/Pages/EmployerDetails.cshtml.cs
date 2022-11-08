@@ -2,12 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
-//TODO: add security
-[AllowAnonymous]
-//[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class EmployerDetailsModel : PageModel
 {
     public Application.Models.EmployerInterestDetail? EmployerInterest { get; private set; }

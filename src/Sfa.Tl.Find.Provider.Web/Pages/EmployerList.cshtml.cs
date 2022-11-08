@@ -9,12 +9,11 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
-//TODO: add security
-[AllowAnonymous]
-//[Authorize(nameof(PolicyNames.EmployerInterestViewer))]
+[Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class EmployerListModel : PageModel
 {
     private readonly IEmployerInterestService _employerInterestService;
@@ -148,8 +147,6 @@ public class EmployerListModel : PageModel
         _sessionService.Set(SessionKeyPostcodeLocation, postcodeLocation);
 
         return RedirectToPage("/EmployerList");
-
-        //await PerformSearch(postcodeLocation);
     }
 
     private long? GetUkPrn()
@@ -171,10 +168,8 @@ public class EmployerListModel : PageModel
                     => new SelectListItem(
                         p.Postcode,
                         p.Postcode,
-                        p.Postcode ==
-                        Input?.SelectedPostcode) //Selected = false //TODO: set based on previous selection
+                        p.Postcode == Input?.SelectedPostcode)
             )
-            //Select postcode
             //.Prepend(new SelectListItem("Select postcode", "", true))
             .Append(new SelectListItem(EnterPostcodeValue, EnterPostcodeValue, Input?.SelectedPostcode == EnterPostcodeValue))
             .ToArray();

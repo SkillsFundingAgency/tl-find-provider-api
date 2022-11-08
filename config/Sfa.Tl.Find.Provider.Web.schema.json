@@ -145,6 +145,11 @@
       "minLength": 1,
       "type": "string",
       "environmentVariable": "SqlConnectionString"
+    },
+    "BlobStorageConnectionString": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "BlobStorageConnectionString"
     }
   },
   "additionalProperties": false,

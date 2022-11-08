@@ -110,7 +110,15 @@ public static class StringExtensions
     {
         return input is null
             ? null
-            : Regex.Replace(input, @"(<br ?/>)|(\[br ?/\])", "\n");
+            : Regex.Replace(input, @"(<br ?>)|(<br ?/>)|(\[br ?/\])", "\n");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ReplaceRedactedHttpStrings(this string input)
+    {
+        return input is null
+            ? null
+            : Regex.Replace(input, @"(http[s]?)___", "$1://");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

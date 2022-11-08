@@ -9,7 +9,8 @@ public class SettingsBuilder
 {
     private const string AppId = "2b1c1371f07a4add85a54b1812b2b0de";
     private const string ApiKey = "be1a8d303ea04e10810eed67f5cf174a";
-    
+
+    private const string BlobStorageConnectionString = "UseDevelopmentStorage=true;";
     private const string SqlConnectionString = "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
     private const string RedisConnectionString = "test.redis.cache.windows.net:6380,password='Test1',ssl=True,abortConnect=False";
 
@@ -51,9 +52,11 @@ public class SettingsBuilder
         };
 
     public ConnectionStringSettings BuildConnectionStringSettings(
+        string blobStorageConnectionString = BlobStorageConnectionString,
         string sqlConnectionString = SqlConnectionString,
         string redisConnectionString = RedisConnectionString) => new()
         {
+            BlobStorageConnectionString = blobStorageConnectionString,
             SqlConnectionString = sqlConnectionString,
             RedisConnectionString = redisConnectionString
         };
@@ -141,6 +144,7 @@ public class SettingsBuilder
         GoogleMapsApiSettings googleMapsApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
         SearchSettings searchSettings = null,
+        string blobStorageConnectionString = BlobStorageConnectionString,
         string sqlConnectionString = SqlConnectionString,
         string redisConnectionString = RedisConnectionString,
         string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI",
@@ -154,6 +158,7 @@ public class SettingsBuilder
             GoogleMapsApiSettings = googleMapsApiSettings ?? BuildGoogleMapsApiSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
+            BlobStorageConnectionString = blobStorageConnectionString,
             SqlConnectionString = sqlConnectionString,
             RedisConnectionString = redisConnectionString,
             CourseDirectoryImportSchedule = courseDirectoryImportSchedule,

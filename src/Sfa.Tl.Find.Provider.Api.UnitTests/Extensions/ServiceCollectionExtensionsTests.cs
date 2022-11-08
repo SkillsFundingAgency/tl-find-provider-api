@@ -51,6 +51,7 @@ public class ServiceCollectionExtensionsTests
 
         var connectionStringOptions = serviceProvider.GetRequiredService<IOptions<ConnectionStringSettings>>();
         connectionStringOptions.Value.Should().NotBeNull();
+        connectionStringOptions.Value.BlobStorageConnectionString.Should().BeEquivalentTo(siteConfiguration.BlobStorageConnectionString);
         connectionStringOptions.Value.SqlConnectionString.Should().BeEquivalentTo(siteConfiguration.SqlConnectionString);
         connectionStringOptions.Value.RedisConnectionString.Should().BeEquivalentTo(siteConfiguration.RedisConnectionString);
     }

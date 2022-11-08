@@ -17,6 +17,7 @@ public static class SettingsExtensions
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
+        settings.BlobStorageConnectionString = configuration.BlobStorageConnectionString;
         settings.SqlConnectionString = configuration.SqlConnectionString;
         settings.RedisConnectionString = configuration.RedisConnectionString;
     }

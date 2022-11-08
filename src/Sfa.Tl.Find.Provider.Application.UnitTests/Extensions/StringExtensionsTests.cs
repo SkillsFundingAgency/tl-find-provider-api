@@ -134,14 +134,24 @@ public class StringExtensionsTests
     [InlineData("<br />", "\n")]
     [InlineData("hello<br />world", "hello\nworld")]
     [InlineData("hello<br/>world", "hello\nworld")]
-    [InlineData("hello<br/>world", "hello\nworld")]
+    [InlineData("hello<br>world", "hello\nworld")]
     public void String_ReplaceBreaksWithNewlines_Data_Tests(string input, string expectedResult)
     {
         var result = input.ReplaceBreaksWithNewlines();
         result.Should().Be(expectedResult);
     }
 
-
+    [Theory(DisplayName = nameof(StringExtensions.ReplaceRedactedHttpStrings) + " Data Tests")]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    [InlineData("http___www.test.com/", "http://www.test.com/")]
+    [InlineData("https___www.test.com/", "https://www.test.com/")]
+    public void String_ReplaceHttpsRedactor_Data_Tests(string input, string expectedResult)
+    {
+        var result = input.ReplaceRedactedHttpStrings();
+        result.Should().Be(expectedResult);
+    }
+    
     [Theory(DisplayName = nameof(StringExtensions.ToTrimmedOrNullString) + " Data Tests")]
     [InlineData(null, null)]
     [InlineData("", null)]
