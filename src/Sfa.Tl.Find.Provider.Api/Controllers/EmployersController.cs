@@ -4,7 +4,6 @@ using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
-using System.Text;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -25,36 +24,6 @@ public class EmployersController : ControllerBase
         _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-
-
-
-    /******TODO*********Remove*****/
-    [HttpGet]
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // ReSharper disable once StringLiteralTypo
-    [Route("createinteresttest")]
-    public async Task<IActionResult> CreateInterestTest(EmployerInterest employerInterest)
-    {
-        _logger.LogInformation($"{nameof(EmployersController)} {nameof(CreateInterestTest)} called.");
-        return Ok();
-    }
-    [HttpGet]
-    [HttpPost]
-    [Route("nointeresttest")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult NoInterest(Qualification qualification)
-    {
-        _logger.LogInformation($"{nameof(EmployersController)} {nameof(NoInterest)} called.");
-        return Ok();
-    }
-    /******TODO*********Remove*****/
-
-
 
     /// <summary>
     /// Creates an Employer Interest record.
