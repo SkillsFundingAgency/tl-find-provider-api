@@ -40,6 +40,7 @@ if (bool.TryParse(builder.Configuration[ConfigurationConstants.SkipProviderAuthe
 else
 {
     builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment);
+    builder.Services.AddWebDataProtection(siteConfiguration);
 }
 
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
