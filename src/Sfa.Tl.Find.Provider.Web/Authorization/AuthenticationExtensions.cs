@@ -147,15 +147,16 @@ public static class AuthenticationExtensions
                 {
                     var claims = new List<Claim>();
 
+                    var userId = ctx.Principal.FindFirst("sub")?.Value;
+
                     var organisation = ctx.Principal
                         .FindFirst("Organisation");
-                    if (organisation is {Value: { }})
+                    if (organisation?.Value != null)
                     {
                         //var organisationId = JsonDocument
                         //        .Parse(organisation.Value)
                         //        .RootElement
                         //        .SafeGetString("id");
-                        var userId = ctx.Principal.FindFirst("sub").Value;
 
                         //TODO: Put back call to get user/organisation info from API?
                         //var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
@@ -165,18 +166,21 @@ public static class AuthenticationExtensions
                             .Parse(organisation.Value)
                             .RootElement;
                         var organisationId = root.SafeGetString("id");
-                        var organisationInfo = new DfeOrganisationInfo
-                        {
-                            Id = Guid.Parse(root.SafeGetString("id")),
-                            Name = root.SafeGetString("name"),
-                            UkPrn = long.TryParse(root.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
-                            Urn = long.TryParse(root.SafeGetString("urn"), out var urnLong) ? urnLong : null,
-                            Category = int.TryParse(
-                                root.GetProperty("category")
-                                    .SafeGetString("id"), out var category)
-                                ? category
-                                : 0
-                        };
+                        var organisationInfo = organisationId is not null 
+                            ? new DfeOrganisationInfo
+                            {
+                                Id = Guid.Parse(root.SafeGetString("id")),
+                                Name = root.SafeGetString("name"),
+                                UkPrn = long.TryParse(root.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
+                                Urn = long.TryParse(root.SafeGetString("urn"), out var urnLong) ? urnLong : null,
+                                Category = int.TryParse(
+                                    root.GetProperty("category")
+                                        .SafeGetString("id"), out var category)
+                                    ? category
+                                    : 0
+                            }
+                        : null;
+
                         var userInfo = new DfeUserInfo
                         {
                             UserId = Guid.Parse(userId),
