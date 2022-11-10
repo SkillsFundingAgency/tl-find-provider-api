@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 public class DfeSignInApiServiceTests
 {
     private const string TestOrganisationId = "E100D38D-6385-4C15-809D-832C8F7F48E1";
-    private const int TestOrganisationCategory = 1;
+    //private const int TestOrganisationCategory = 1;
     private const string TestUserId = "D5942B2A-36BD-4D2C-9522-52C2DCC2FE04";
     private const int TestUkPrn = 01234567;
     private const int TestUrn = 123456;
@@ -58,8 +58,9 @@ public class DfeSignInApiServiceTests
 
         user.Should().NotBeNull();
         user.UserId.Should().Be(TestUserId);
-        user.Roles.Should().NotBeNullOrEmpty();
-        user.Roles.Count().Should().Be(1);
-        user.Roles.First().Name.Should().Be(TestRoleName);
+        user.Roles.Should().NotBeNull();
+        //user.Roles.Should().NotBeNullOrEmpty();
+        //user.Roles.Count().Should().Be(1);
+        //user.Roles.First().Name.Should().Be(TestRoleName);
     }
 }
