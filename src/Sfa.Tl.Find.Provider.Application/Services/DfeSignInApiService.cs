@@ -67,12 +67,7 @@ public class DfeSignInApiService : IDfeSignInApiService
                         Id = Guid.Parse(o.SafeGetString("id")),
                         Name = o.SafeGetString("name"),
                         UkPrn = long.TryParse(o.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
-                        Urn = long.TryParse(o.SafeGetString("urn"), out var urnLong) ? urnLong : null,
-                        Category = int.TryParse(
-                            o.GetProperty("category")
-                                .SafeGetString("id"), out var category)
-                            ? category
-                            : 0
+                        Urn = long.TryParse(o.SafeGetString("urn"), out var urnLong) ? urnLong : null
                     })
                     .FirstOrDefault();
 
@@ -81,7 +76,6 @@ public class DfeSignInApiService : IDfeSignInApiService
         }
         catch (Exception ex)
         {
-            
             _logger.LogError(ex, "Call to {uri} failed.", requestUri);
         }
 
@@ -91,6 +85,11 @@ public class DfeSignInApiService : IDfeSignInApiService
     private async Task<DfeUserInfo> GetUserInfo(string organisationId, string userId)
     {
         var userClaims = new DfeUserInfo();
+        //TODO: Remove next 3 lines when we get service policy and roles from DSI
+        userClaims.UserId = Guid.Parse(userId);
+        userClaims.Roles = new List<Role>();
+        return userClaims;
+
         var requestUri = $"/services/{_clientId}/organisations/{organisationId}/users/{userId}";
 
         try

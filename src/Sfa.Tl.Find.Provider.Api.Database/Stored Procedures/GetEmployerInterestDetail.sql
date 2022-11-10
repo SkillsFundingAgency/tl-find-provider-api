@@ -3,25 +3,27 @@
 AS
 	--SET NOCOUNT ON;
 
-	SELECT		 ei.[Id]
-				,ei.[UniqueId]
-				,ei.[OrganisationName]
-				,ei.[ContactName]
-				,COALESCE(eil.[Postcode], ei.[Postcode]) AS [Postcode]
-				,ei.[Email]
-				,ei.[Website]
-				,ei.[Telephone]
-				,ei.[ContactPreferenceType]
-				,ei.[AdditionalInformation]
-				,eil.[Latitude]
-				,eil.[Longitude]
-				,ei.[CreatedOn]
-				,ei.[ModifiedOn]
-				,i.[Id] AS [IndustryId]
-				,i.[Name] AS [Industry]
-				,ei.[OtherIndustry]
-				,r.[Id] AS [RouteId]
-				,r.[Name] AS [RouteName]
+	SELECT		ei.[Id],
+				ei.[UniqueId],
+				ei.[OrganisationName],
+				ei.[ContactName],
+				COALESCE(eil.[Postcode], ei.[Postcode]) AS [Postcode],
+				ei.[Email],
+				ei.[Website],
+				ei.[Telephone],
+				ei.[ContactPreferenceType],
+				ei.[AdditionalInformation],
+				eil.[Latitude],
+				eil.[Longitude],
+				ei.[CreatedOn],
+				ei.[ModifiedOn],
+				i.[Id] AS [IndustryId],
+				CASE
+					WHEN i.[Id] IS NOT NULL THEN i.[Name]
+					ELSE ei.[OtherIndustry]
+				END AS [Industry],
+				r.[Id] AS [RouteId],
+				r.[Name] AS [RouteName]
 	FROM		[dbo].[EmployerInterest] ei
 	LEFT JOIN	[dbo].[EmployerInterestLocation] eil 
 	ON			eil.[EmployerInterestId] = ei.[Id]

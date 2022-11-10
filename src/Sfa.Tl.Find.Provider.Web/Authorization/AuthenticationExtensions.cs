@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Sfa.Tl.Find.Provider.Application.Extensions;
-using Sfa.Tl.Find.Provider.Application.Models.Authentication;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
@@ -85,8 +85,7 @@ public static class AuthenticationExtensions
             options.Scope.Add("openid");
             options.Scope.Add("email");
             options.Scope.Add("profile");
-            //options.Scope.Add("organisationid");
-            options.Scope.Add("organisation");
+            options.Scope.Add("organisationid");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In
             options.MaxAge = overallSessionTimeout;
@@ -147,42 +146,18 @@ public static class AuthenticationExtensions
                 {
                     var claims = new List<Claim>();
 
-                    var organisation = ctx.Principal
-                        .FindFirst("Organisation");
-                    if (organisation is {Value: { }})
+                    var organisation = ctx.Principal.FindFirst("Organisation");
+                    if (organisation?.Value != null)
                     {
-                        //var organisationId = JsonDocument
-                        //        .Parse(organisation.Value)
-                        //        .RootElement
-                        //        .SafeGetString("id");
-                        var userId = ctx.Principal.FindFirst("sub").Value;
+                        var organisationId = JsonDocument
+                                .Parse(organisation.Value)
+                                .RootElement
+                                .SafeGetString("id");
+                        var userId = ctx.Principal.FindFirst("sub")?.Value;
 
-                        //TODO: Put back call to get user/organisation info from API?
-                        //var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
-                        //var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
-                        //For now, create the info objects by hand
-                        var root = JsonDocument
-                            .Parse(organisation.Value)
-                            .RootElement;
-                        var organisationId = root.SafeGetString("id");
-                        var organisationInfo = new DfeOrganisationInfo
-                        {
-                            Id = Guid.Parse(root.SafeGetString("id")),
-                            Name = root.SafeGetString("name"),
-                            UkPrn = long.TryParse(root.SafeGetString("ukprn"), out var ukPrnLong) ? ukPrnLong : null,
-                            Urn = long.TryParse(root.SafeGetString("urn"), out var urnLong) ? urnLong : null,
-                            Category = int.TryParse(
-                                root.GetProperty("category")
-                                    .SafeGetString("id"), out var category)
-                                ? category
-                                : 0
-                        };
-                        var userInfo = new DfeUserInfo
-                        {
-                            UserId = Guid.Parse(userId),
-                            Roles = new List<Role>()
-                        };
-
+                        var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
+                        var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
+                        
                         claims.AddRange(new List<Claim>
                         {
                             new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
@@ -193,7 +168,6 @@ public static class AuthenticationExtensions
                         claims.AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationId, organisationId)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationName, organisationInfo?.Name)
-                            .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationCategory, organisationInfo?.Category.ToString())
                             .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn?.ToString())
                             .AddIfNotNullOrEmpty(CustomClaimTypes.Urn, organisationInfo?.Urn?.ToString());
 
