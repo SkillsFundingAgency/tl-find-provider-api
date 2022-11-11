@@ -46,7 +46,6 @@ public static class AuthenticationExtensions
         })
         .AddCookie(options =>
         {
-            //TODO: List auth cookie on cookies page?
             options.Cookie.Name = AuthenticationCookieName;
             options.Cookie.SecurePolicy = cookieSecurePolicy;
             options.SlidingExpiration = true;
@@ -93,6 +92,7 @@ public static class AuthenticationExtensions
             options.SaveTokens = true;
             options.CallbackPath = new PathString("/auth/cb");
             options.SignedOutCallbackPath = "/signout/complete";
+            options.SignedOutRedirectUri = "/signout-complete";
             options.SecurityTokenValidator = new JwtSecurityTokenHandler
             {
                 InboundClaimTypeMap = new Dictionary<string, string>(),
@@ -158,18 +158,19 @@ public static class AuthenticationExtensions
                         var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
                         var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
                         
-                        claims.AddRange(new List<Claim>
-                        {
-                            new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
-                            new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name")?.Value ?? string.Empty),
-                            new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
-                        });
+                        //claims.AddRange(new List<Claim>
+                        //{
+                        //    new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
+                        //    new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name")?.Value ?? string.Empty),
+                        //    new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
+                        //});
 
                         claims.AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationId, organisationId)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationName, organisationInfo?.Name)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn?.ToString())
-                            .AddIfNotNullOrEmpty(CustomClaimTypes.Urn, organisationInfo?.Urn?.ToString());
+                            //.AddIfNotNullOrEmpty(CustomClaimTypes.Urn, organisationInfo?.Urn?.ToString())
+                            ;
 
                         if (userInfo.Roles != null && userInfo.Roles.Any())
                         {

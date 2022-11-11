@@ -6,19 +6,17 @@ public static class CustomClaimTypes
 
     public const string RefreshToken = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/refreshtoken";
 
-    public const string HasAccessToService = "http://schemas.microsoft.com/ws/2008/06/identity/claims/hasaccesstoservice";
+    public const string UkPrn = "ukprn";
 
-    public const string UkPrn = "http://schemas.microsoft.com/ws/2008/06/identity/claims/ukprn"; 
+    public const string Urn = "urn";
 
-    public const string Urn = "http://schemas.microsoft.com/ws/2008/06/identity/claims/urn"; 
+    public const string OrganisationId = "org_id";
 
-    public const string OrganisationId = "http://schemas.microsoft.com/ws/2008/06/identity/claims/organisationid";
-    
-    public const string OrganisationName = "http://schemas.microsoft.com/ws/2008/06/identity/claims/organisationname";
+    public const string OrganisationName = "org_name";
 
-    public const string OrganisationCategory = "http://schemas.microsoft.com/ws/2008/06/identity/claims/organisationcategory";
+    public const string OrganisationCategory = "org_category";
 
-    public const string UserId = "http://schemas.microsoft.com/ws/2008/06/identity/claims/userid";
+    public const string UserId = "user_id";
 
     public const string LoginUserType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/loginusertype";
 
