@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
@@ -100,41 +101,59 @@ public class EmployerListModel : PageModel
         await LoadProviderPostcodes(UkPrn);
         ZeroResultsFound = false;
 
-        //Validation - must have either a valid selected postcode, or a non-empty custom postcode
-        if (Input?.SelectedPostcode == EnterPostcodeValue && string.IsNullOrEmpty(Input.CustomPostcode))
-        {
-            ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}", "Enter a postcode");
-        }
+        LocationPostcode? postcodeLocation = null;
         
-        LocationPostcode postcodeLocation = null;
-        //TODO: Extract to method and add tests
-        if (Input?.SelectedPostcode != EnterPostcodeValue && !string.IsNullOrEmpty(Input?.SelectedPostcode))
+        //User has selected a postcode from the dropdown
+        if (Input?.SelectedPostcode != EnterPostcodeValue)
         {
-            //TODO: Use a dictionary here?
-            postcodeLocation = ProviderLocations?.FirstOrDefault(p => p.Postcode == Input.SelectedPostcode);
-        }
-        else
-        {
-            var geoLocation = Input.CustomPostcode.Length <= 4
-                ? await _postcodeLookupService.GetOutcode(Input.CustomPostcode)
-                : await _postcodeLookupService.GetPostcode(Input.CustomPostcode);
-
-            if (geoLocation is not null)
+            if (!string.IsNullOrEmpty(Input?.SelectedPostcode))
             {
-                postcodeLocation = new LocationPostcode
-                {
-                    Postcode = geoLocation.Location,
-                    Latitude = geoLocation.Latitude,
-                    Longitude = geoLocation.Longitude
-                };
+                //TODO: Use a dictionary here?
+                postcodeLocation = ProviderLocations?.FirstOrDefault(p => p.Postcode == Input?.SelectedPostcode);
+            }
+
+            if (postcodeLocation is null)
+            {
+                ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}", "Enter a real postcode");
             }
         }
 
-        if (postcodeLocation is null)
+        //User has selected to enter a custom postcode
+        if (Input?.SelectedPostcode == EnterPostcodeValue)
         {
-            ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}", "Enter a real postcode");
+            if (string.IsNullOrEmpty(Input.CustomPostcode))
+            {
+                ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}", "Enter a postcode");
+            }
+            else if (!Input.CustomPostcode.IsFullOrPartialPostcode())
+            {
+                ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}",
+                    "Enter a postcode with numbers and letters only");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var geoLocation = Input.CustomPostcode.Length <= 4
+                    ? await _postcodeLookupService.GetOutcode(Input.CustomPostcode)
+                    : await _postcodeLookupService.GetPostcode(Input.CustomPostcode);
+
+                if (geoLocation is not null)
+                {
+                    postcodeLocation = new LocationPostcode
+                    {
+                        Postcode = geoLocation.Location,
+                        Latitude = geoLocation.Latitude,
+                        Longitude = geoLocation.Longitude
+                    };
+                }
+                else
+                {
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.CustomPostcode)}",
+                        "Enter a real postcode");
+                }
+            }
         }
-        
+
         if (!ModelState.IsValid)
         {
             if (_sessionService.Exists(SessionKeyPostcodeLocation))

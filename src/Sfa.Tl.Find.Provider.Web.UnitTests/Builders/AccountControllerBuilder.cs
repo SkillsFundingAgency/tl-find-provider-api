@@ -19,11 +19,13 @@ public class AccountControllerBuilder
 
     public AccountController Build(
         ICacheService? cacheService = null,
+        ISessionService? sessionService = null,
         IConfiguration? configuration = null,
         ILogger<AccountController>? logger = null,
         bool userIsAuthenticated = true)
     {
         cacheService ??= Substitute.For<ICacheService>();
+        sessionService ??= Substitute.For<ISessionService>();
         configuration ??= Substitute.For<IConfiguration>();
 
         logger ??= Substitute.For<ILogger<AccountController>>();
@@ -67,6 +69,7 @@ public class AccountControllerBuilder
 
         var controller = new AccountController(
             cacheService,
+            sessionService,
             configuration,
             logger)
         {

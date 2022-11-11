@@ -33,6 +33,32 @@ public class SessionServiceTests
     }
 
     [Fact]
+    public void Clear_Successfully_Removes_Keys()
+    {
+        var session = Substitute.For<ISession>();
+        var keys = new List<string> { TestEnvironmentWithKey };
+
+        session
+            .When(x => x.Clear())
+            .Do(_ =>
+            {
+                    keys.Clear();
+            });
+
+        var contextAccessor = Substitute.For<IHttpContextAccessor>();
+        contextAccessor.HttpContext.Returns(new DefaultHttpContext
+        {
+            Session = session
+        });
+
+        var service = new SessionServiceBuilder().Build(contextAccessor);
+
+        service.Clear();
+
+        keys.Should().BeEmpty();
+    }
+
+    [Fact]
     public void Exists_Returns_True_If_Key_Is_Present()
     {
         var session = Substitute.For<ISession>();

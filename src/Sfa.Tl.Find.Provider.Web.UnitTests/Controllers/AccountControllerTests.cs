@@ -146,10 +146,22 @@ public class AccountControllerTests
 
         cacheService
             .Received(1)
-        .Remove(Arg.Any<string>());
-        cacheService
-            .Received(1)
             .Remove(Arg.Is<string>(k => k.StartsWith("USERID")));
+    }
+    
+    [Fact]
+    public async Task AccountController_SignOut_Clears_Session()
+    {
+        var sessionService = Substitute.For<ISessionService>();
+
+        var controller = new AccountControllerBuilder()
+            .Build(sessionService: sessionService);
+
+        await controller.SignOut();
+
+        sessionService 
+            .Received(1)
+            .Clear();
     }
 
     [Fact]

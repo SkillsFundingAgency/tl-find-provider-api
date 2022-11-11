@@ -17,13 +17,16 @@ public class AccountController : Controller
     private readonly IConfiguration _configuration;
     private readonly ILogger<AccountController> _logger;
     private readonly ICacheService _cacheService;
+    private readonly ISessionService _sessionService;
 
     public AccountController(
         ICacheService cacheService,
+        ISessionService sessionService,
         IConfiguration configuration,
         ILogger<AccountController> logger)
     {
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+        _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -43,7 +46,7 @@ public class AccountController : Controller
         else
         {
             _logger.LogInformation("signin - challenging ({auth})",
-                User?.Identity is {IsAuthenticated: true});
+                User?.Identity is { IsAuthenticated: true });
 
             await HttpContext.ChallengeAsync(new AuthenticationProperties
             {
@@ -60,8 +63,8 @@ public class AccountController : Controller
         var redirectPage = User.Identity is { IsAuthenticated: true }
             ? AuthenticationExtensions.AuthenticatedUserStartPageExact
             : AuthenticationExtensions.UnauthenticatedUserStartPage;
-        _logger.LogInformation("In post-signin - authenticated={isAuthenticated}, redirecting to {page}", 
-            User.Identity is { IsAuthenticated: true }, 
+        _logger.LogInformation("In post-signin - authenticated={isAuthenticated}, redirecting to {page}",
+            User.Identity is { IsAuthenticated: true },
             redirectPage);
 
         return RedirectToPage(
@@ -76,6 +79,7 @@ public class AccountController : Controller
     public new async Task<IActionResult> SignOut()
     {
         _cacheService.Remove(User.GetUserSessionCacheKey());
+        _sessionService.Clear();
 
         if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
         {

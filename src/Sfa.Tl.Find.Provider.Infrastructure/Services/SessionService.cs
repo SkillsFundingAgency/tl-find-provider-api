@@ -14,6 +14,11 @@ public class SessionService : ISessionService
         _environment = environment ?? throw new ArgumentNullException(nameof(environment));
     }
 
+    public void Clear()
+    {
+        _httpContextAccessor.HttpContext.Session.Clear();
+    }
+
     public void Set(string key, object value)
     {
         _httpContextAccessor.HttpContext.Session.SetString(FormatKey(key),
