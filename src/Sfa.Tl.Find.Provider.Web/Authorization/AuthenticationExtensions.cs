@@ -178,6 +178,19 @@ public static class AuthenticationExtensions
                         }
                     }
 
+                    //TODO: Remove this and Administrators setting when DSI gives us roles
+                    if (!string.IsNullOrEmpty(signInSettings.Administrators))
+                    {
+                        var admins = signInSettings.Administrators?
+                            .Split(new[] {';', ','}, 
+                                StringSplitOptions.RemoveEmptyEntries);
+                        var email = ctx.Principal.FindFirst("email")?.Value;
+                        if(admins is not null && admins.Any(a => a == email))
+                        {
+                            claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
+                        }
+                    }
+
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
 
                     ctx.Properties ??= new AuthenticationProperties();

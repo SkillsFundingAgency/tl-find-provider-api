@@ -44,8 +44,8 @@ else
 }
 
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, EmployerInterestViewerAuthorizationHandler>();
-builder.Services.AddAuthorizationServicePolicies();
+builder.Services.AddSingleton<IAuthorizationHandler, ProviderUkPrnOrAdministratorAuthorizationHandler>();
+builder.Services.AddAuthorizationPolicies();
 
 builder.Services.AddResponseCaching();
 

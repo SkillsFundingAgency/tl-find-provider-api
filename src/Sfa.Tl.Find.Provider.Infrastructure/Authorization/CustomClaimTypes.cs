@@ -13,9 +13,8 @@ public static class CustomClaimTypes
     public const string OrganisationId = "org_id";
 
     public const string OrganisationName = "org_name";
-
-    public const string OrganisationCategory = "org_category";
-
+    
+    public const string OrganisationCategory = "http://schemas.microsoft.com/ws/2008/06/identity/claims/organisationcategory";
     public const string UserId = "user_id";
 
     public const string LoginUserType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/loginusertype";

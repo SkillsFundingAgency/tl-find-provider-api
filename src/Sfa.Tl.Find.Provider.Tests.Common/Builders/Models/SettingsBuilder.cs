@@ -32,7 +32,8 @@ public class SettingsBuilder
     private const string SupportEmailAddress = "support@test-email.gov.uk";
     private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
     private const string UnsubscribeEmployerUri = "https://test.employerssupportgov.uk/unsubscribeinterest/";
-    
+
+    private const string SignInAdministrators = "tester@test.com";
     private const string SignInApiUri = "https://test.api.oidc.com";
     private const string SignInApiSecret = "apisecret";
     private const string SignInAudience = "signin.oidc.com";
@@ -71,6 +72,7 @@ public class SettingsBuilder
     
     public DfeSignInSettings BuildDfeSignInSettings(
         string metadataAddress = SignInMetadataAddress,
+        string administrators = SignInAdministrators,
         string audience = SignInAudience,
         string authority = SignInAuthority,
         string clientId = SignInClientId,
@@ -80,6 +82,7 @@ public class SettingsBuilder
         string issuer = SignInIssuer,
         int timeout = SignInTimeout) => new()
     {
+        Administrators = administrators,
         Audience = audience,
         Authority = authority,
         ClientId = clientId,
@@ -90,7 +93,7 @@ public class SettingsBuilder
         Issuer = issuer,
         Timeout = timeout
     };
-
+    
     public EmailSettings BuildEmailSettings(
         string govNotifyApiKey = GovNotifyApiKey,
         string deliveryStatusToken = GovNotifyDeliveryStatusToken,

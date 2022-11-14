@@ -2,10 +2,9 @@
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Authorization;
-
-public class ProviderAuthorizationHandler : AuthorizationHandler<ProviderUkPrnRequirement>
+public class ProviderUkPrnOrAdministratorAuthorizationHandler : AuthorizationHandler<ProviderUkPrnOrAdministratorRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProviderUkPrnRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProviderUkPrnOrAdministratorRequirement requirement)
     {
         if (!IsAuthorized(context))
         {
@@ -23,8 +22,8 @@ public class ProviderAuthorizationHandler : AuthorizationHandler<ProviderUkPrnRe
         var ukPrn = context
             .User
             .FindFirst(c => c.Type.Equals(
-                CustomClaimTypes.UkPrn))?.Value;
+            CustomClaimTypes.UkPrn))?.Value;
 
-        return ukPrn is not null;
+        return ukPrn is not null || context.User.IsInRole(CustomRoles.Administrator);
     }
 }

@@ -10,8 +10,6 @@ public class DfeOrganisationInfo
 
     public string Name { get; set; }
 
-    public int Category { get; set; }
-
     public long? UkPrn { get; set; }
 
     public long? Urn { get; set; }

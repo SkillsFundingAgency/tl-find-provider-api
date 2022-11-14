@@ -22,8 +22,7 @@ public class ProviderAuthorizationHandlerTests
             new ClaimsIdentity(
                 new List<Claim>
                 {
-                    new(CustomClaimTypes.UkPrn, 
-                        TestUkPrn)
+                    new(CustomClaimTypes.UkPrn, TestUkPrn)
                 },
                 AuthenticationExtensions.AuthenticationTypeName));
 

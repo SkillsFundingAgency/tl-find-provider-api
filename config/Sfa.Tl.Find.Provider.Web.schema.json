@@ -54,6 +54,11 @@
           "minLength": 1,
           "type": "integer",
           "environmentVariable": "DfeSignIn_Timeout"
+        },
+        "Administrators": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Administrators"
         }
       },
       "additionalProperties": false,
@@ -155,7 +160,8 @@
   "additionalProperties": false,
   "required": [
     "SqlConnectionString",
-    "PostcodeApiSettings"
+    "PostcodeApiSettings",
+    "DfeSignInSettings"
   ],
   "type": "object"
 }

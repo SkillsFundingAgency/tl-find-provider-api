@@ -14,7 +14,7 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
-[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[Authorize(nameof(PolicyNames.IsProviderOrAdministrator))]
 public class EmployerListModel : PageModel
 {
     private readonly IEmployerInterestService _employerInterestService;
