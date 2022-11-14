@@ -46,10 +46,10 @@ jobs:
             -sqlDatabaseSkuName "$(SQLDatabaseSkuName)"
             -sqlDatabaseTier "$(SQLDatabaseTier)"
             -configurationStorageConnectionString "$(ConfigurationStorageConnectionString)"
-            -webCustomHostName "$(UICustomHostName)"
-            -webCertificateName "$(UiCertificateName)"'
-            # -uiCustomHostName "$(UiCustomHostName)"
-            # -uiCertificateName "$(UiCertificateName)"'
+            -apiCustomHostName "$(ApiCustomHostName)"
+            -apiCertificateName "$(ApiCertificateName)"
+            -uiCustomHostName "$(ConnectCustomHostName)"
+            -uiCertificateName "$(ConnectCertificateName)"'
             # -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
             # -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
             # -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
