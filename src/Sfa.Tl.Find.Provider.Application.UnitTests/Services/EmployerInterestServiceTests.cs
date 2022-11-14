@@ -222,6 +222,71 @@ public class EmployerInterestServiceTests
     }
 
     [Fact]
+    public async Task CreateEmployerInterest_Calls_EmailService_With_Double_Line_Breaks_Replaced()
+    {
+        const string inputAdditionalInformation = "Hello\n\n\nWorld.\n\nHow are you?\n";
+        const string expectedAdditionalInformation = "Hello\nWorld.\nHow are you?\n";
+
+        var employerInterest = new EmployerInterestBuilder()
+            .WithAdditionalInformation(inputAdditionalInformation)
+            .Build();
+        var routes = new RouteBuilder().BuildList().ToList();
+        var industries = new IndustryBuilder().BuildList().ToList();
+
+        var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>())
+            .Returns(true);
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetIndustries()
+            .Returns(industries);
+        providerDataService.GetRoutes()
+            .Returns(routes);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Create(
+                Arg.Any<EmployerInterest>(),
+                Arg.Any<GeoLocation>())
+            .Returns((1, uniqueId));
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                emailService: emailService,
+                postcodeLookupService: postcodeLookupService,
+                providerDataService: providerDataService,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.CreateEmployerInterest(employerInterest);
+
+        result.Should().Be(uniqueId);
+
+        await emailService
+            .Received(1)
+            .SendEmail(
+                employerInterest.Email,
+                EmailTemplateNames.EmployerRegisterInterest,
+                Arg.Is<IDictionary<string, string>>(tokens =>
+                    tokens.ValidateTokens(
+                        new Dictionary<string, string>
+                        {
+                            { "additional_information", expectedAdditionalInformation }
+                        })));
+    }
+
+    [Fact]
     public async Task CreateEmployerInterest_Calls_EmailService_With_Null_Non_Mandatory_Properties()
     {
         var employerInterest = new EmployerInterestBuilder().BuildWithEmptyNonMandatoryProperties();
@@ -283,7 +348,7 @@ public class EmployerInterestServiceTests
                         {
                             { "organisation_name", string.Empty },
                             { "contact_name", string.Empty },
-                            { "email_address", string.Empty },
+                            { "email_address", employerInterest.Email },
                             { "telephone", string.Empty },
                             { "website", string.Empty },
                             { "contact_preference", expectedContactPreference },
@@ -455,7 +520,7 @@ public class EmployerInterestServiceTests
                 settings.SearchRadius
             )
             .Returns((employerInterestSummaryList, employerInterestsCount));
-        
+
         var service = new EmployerInterestServiceBuilder()
             .Build(
                 dateTimeService,
@@ -541,11 +606,11 @@ public class EmployerInterestServiceTests
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             retentionDays: daysToRetain);
-        
+
         var dateTimeService = Substitute.For<IDateTimeService>();
         dateTimeService.Today.Returns(today);
 
-    var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository
             .Search(
                 geoLocation.Latitude,

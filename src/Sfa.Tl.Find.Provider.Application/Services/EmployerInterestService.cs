@@ -167,7 +167,7 @@ public class EmployerInterestService : IEmployerInterestService
             .OrderBy(r => r.Name)
             .Select(r => r.Name)
         );
-
+        
         var tokens = new Dictionary<string, string>
         {
             { "contact_name", employerInterest.ContactName ?? "" },
@@ -180,7 +180,7 @@ public class EmployerInterestService : IEmployerInterestService
             { "placement_area", placementAreas },
             { "has_multiple_placement_areas", skillAreas.Count > 1 ? "yes" : "no" },
             { "postcode", employerInterest.Postcode ?? "" },
-            { "additional_information", employerInterest.AdditionalInformation ?? "" },
+            { "additional_information", employerInterest.AdditionalInformation?.ReplaceMultipleLineBreaks() ?? "" },
             { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
             { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
         };
