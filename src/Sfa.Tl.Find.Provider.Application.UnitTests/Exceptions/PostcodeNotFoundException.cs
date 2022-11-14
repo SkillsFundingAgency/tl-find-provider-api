@@ -8,7 +8,7 @@ public class PostcodeNotFoundExceptionTests
     public void PostcodeNotFoundException_Sets_Expected_Message()
     {
         const string postcode = "A1A B2B";
-        var expectedMessage = $"Postcode {postcode} was not found";
+        const string expectedMessage = $"Postcode {postcode} was not found";
 
         var exception = new PostcodeNotFoundException(postcode);
 
@@ -21,7 +21,7 @@ public class PostcodeNotFoundExceptionTests
     public void PostcodeNotFoundException_Sets_Expected_Message_And_Inner_Exception()
     {
         const string postcode = "A1A B2B";
-        var expectedMessage = $"Postcode {postcode} was not found";
+        const string expectedMessage = $"Postcode {postcode} was not found";
         var innerException = new Exception("Test inner exception");
 
         var exception = new PostcodeNotFoundException(postcode, innerException);

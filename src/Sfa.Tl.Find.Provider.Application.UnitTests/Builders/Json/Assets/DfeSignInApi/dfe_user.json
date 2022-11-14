@@ -1,0 +1,16 @@
+{
+  "userId": "D5942B2A-36BD-4D2C-9522-52C2DCC2FE04",
+  "userLegacyNumericId": "66676",
+  "userLegacyTextId": "x2xzk44",
+  "serviceId": "45B26958-331F-4035-B463-1530C23D2239",
+  "organisationId": "E100D38D-6385-4C15-809D-832C8F7F48E1",
+  "organisationLegacyId": "3300925",
+  "roles": [
+    {
+      "id": "B42EF92B-040B-482B-A766-5B68960073B7",
+      "name": "Standard",
+      "code": "xxx"
+    }
+  ],
+  "identifiers": []
+}

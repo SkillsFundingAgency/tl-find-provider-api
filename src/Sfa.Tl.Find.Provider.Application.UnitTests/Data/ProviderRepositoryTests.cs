@@ -14,6 +14,13 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Data;
 public class ProviderRepositoryTests
 {
     [Fact]
+    public void Constructor_Guards_Against_Null_Parameters()
+    {
+        typeof(ProviderRepository)
+            .ShouldNotAcceptNullConstructorArguments();
+    }
+
+    [Fact]
     public async Task GetAll_Returns_Expected_List_For_Single_Result_Row()
     {
         var expectedResult = new ProviderDetailBuilder()
@@ -52,10 +59,37 @@ public class ProviderRepositoryTests
     }
 
     [Fact]
-    public void Constructor_Guards_Against_Null_Parameters()
+    public async Task GetLocationPostcodes_Returns_Expected_List_For_Single_Result_Row()
     {
-        typeof(ProviderRepository)
-            .ShouldNotAcceptNullConstructorArguments();
+        const long ukPrn = 12345678;
+        const bool includeAdditionalData = true;
+
+        var locationPostcodes = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<LocationPostcode>(dbConnection,
+                "GetProviderLocations",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
+            .Returns(locationPostcodes);
+
+        var repository = new ProviderRepositoryBuilder()
+            .Build(dbContextWrapper);
+
+        var results = (await repository
+                .GetLocationPostcodes(ukPrn, includeAdditionalData))
+            ?.ToList();
+
+        results.Should().NotBeNull();
+        results!.Count.Should().Be(locationPostcodes.Count);
+
+        results.Should().BeEquivalentTo(locationPostcodes);
+        results.First().Validate(locationPostcodes.First());
     }
 
     [Fact]
@@ -142,7 +176,6 @@ public class ProviderRepositoryTests
             .Build();
         var locationQualificationsChangeResult = new DataBaseChangeResultBuilder()
             .WithInserts(100)
-            //.WithUpdates(0)
             .WithDeletes(20)
             .Build();
 
@@ -191,8 +224,8 @@ public class ProviderRepositoryTests
                 receivedSqlArgs.Add(arg);
             });
 
-        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
-        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        var (_, pollyPolicyRegistry) = PollyPolicyBuilder
+            .BuildDapperPolicyAndRegistry();
 
         var logger = Substitute.For<ILogger<ProviderRepository>>();
 
@@ -209,7 +242,6 @@ public class ProviderRepositoryTests
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                //Arg.Is<object>(o => o != null),
                 Arg.Any<object>(),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
@@ -231,8 +263,8 @@ public class ProviderRepositoryTests
     [Fact]
     public async Task Save_Calls_Retry_Policy()
     {
-        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
-        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        var (pollyPolicy, pollyPolicyRegistry) = PollyPolicyBuilder
+            .BuildDapperPolicyAndRegistry();
 
         var logger = Substitute.For<ILogger<ProviderRepository>>();
 
@@ -255,12 +287,13 @@ public class ProviderRepositoryTests
     public async Task Search_Returns_Expected_List_For_Single_Result_Row()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        const int totalLocationsCount = 1234;
 
         var expectedResult = new ProviderSearchResultBuilder()
             .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
         var repository = await new ProviderRepositoryBuilder()
-            .BuildRepositoryWithDataToSearchProviders();
+            .BuildRepositoryWithDataToSearchProviders(totalLocationsCount);
 
         var searchResults = await repository.Search(fromGeoLocation, null, null, 0, 5, false);
 
@@ -268,6 +301,7 @@ public class ProviderRepositoryTests
         var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
+        searchResults.TotalResultsCount.Should().Be(totalLocationsCount);
 
         searchResultsList.First().Validate(expectedResult);
     }
@@ -276,26 +310,28 @@ public class ProviderRepositoryTests
     public async Task Search_Merges_Additional_Data()
     {
         var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        const int totalLocationsCount = 1234;
 
         var expectedResult = new ProviderSearchResultBuilder()
              .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
 
         var repository = await new ProviderRepositoryBuilder()
-            .BuildRepositoryWithDataToSearchProviders();
+            .BuildRepositoryWithDataToSearchProviders(totalLocationsCount);
 
         var searchResults = await repository
             .Search(
                 fromGeoLocation,
                 null,
-                null, 
-                0, 
-                5, 
+                null,
+                0,
+                5,
                 true);
 
         searchResults.Should().NotBeNull();
         var searchResultsList = searchResults.SearchResults?.ToList();
         searchResultsList.Should().NotBeNull();
         searchResultsList!.Count.Should().Be(1);
+        searchResults.TotalResultsCount.Should().Be(totalLocationsCount);
 
         searchResultsList.First().Validate(expectedResult);
     }

@@ -34,11 +34,7 @@ public class RouteTests
         
         //Take a route
         var route = routes.Last();
-        var expectedCount = 0;
-        foreach (var q in route.Qualifications)
-        {
-            expectedCount += q.NumberOfQualificationsOffered;
-        }
+        var expectedCount = route.Qualifications.Sum(q => q.NumberOfQualificationsOffered);
         route.NumberOfQualificationsOffered.Should().Be(expectedCount);
     }
 }

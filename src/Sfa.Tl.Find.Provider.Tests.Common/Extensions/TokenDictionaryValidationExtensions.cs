@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+﻿namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 public static class TokenDictionaryValidationExtensions
 {
@@ -9,7 +7,7 @@ public static class TokenDictionaryValidationExtensions
         foreach (var (key, value) in expectedTokens)
         {
             tokens.Should().ContainKey(key);
-            tokens[key].Should().Be(value, 
+            tokens[key].Should().Be(value,
                 $"this is the expected value for key '{key}'");
         }
 

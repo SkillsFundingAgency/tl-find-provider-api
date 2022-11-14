@@ -70,7 +70,7 @@ public class TownRepository : ITownRepository
     {
         try
         {
-            var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
             await retryPolicy
                 .ExecuteAsync(async _ =>

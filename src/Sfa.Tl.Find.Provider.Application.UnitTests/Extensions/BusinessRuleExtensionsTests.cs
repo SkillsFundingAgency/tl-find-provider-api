@@ -22,47 +22,85 @@ public class BusinessRuleExtensionsTests
         var result = deliveryYear.IsAvailableAtDate(today);
         result.Should().Be(expectedResult);
     }
-        
-    public static IEnumerable<object[]> JourneyLinksForPostcodeLocations =>
-        new List<object[]>
+
+    [Theory(DisplayName = nameof(BusinessRuleExtensions.InterestExpiryDate) + " Data Tests")]
+    [InlineData("2022-12-01 11:30", null, 30, "2022-12-31")]
+    [InlineData("2022-12-01 11:30", null, 84, "2023-02-23")]
+    public void EmployerInterestSummary_InterestExpiryDate_Data_Tests(string createdDate, string modifiedDate, int retentionDays, string expectedResult)
+    {
+        var expectedResultDate = DateTime.Parse(expectedResult);
+
+        var target = new EmployerInterestSummary
         {
-            new object[] { null, null, null },
-            new object[] { new GeoLocation { Location = "" }, new GeoLocation { Location = "" }, null },
-            new object[] { new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 }, null, null },
-            new object[] { null, new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 }, null },
-            new object[]
-            {
-                new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },
-                new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
-                "https://www.google.com/maps/dir/?api=1&origin=CV1+2WT&destination=SW1A+2HE&travelmode=transit"
-            },
-            new object[]
-            {
-                new GeoLocation { Location = "SW1A 2HE", Latitude = 51.506041, Longitude = -0.123846 },
-                new GeoLocation { Location = "CV1 2WT", Latitude = 52.400997, Longitude = -1.508122 },
-                "https://www.google.com/maps/dir/?api=1&origin=SW1A+2HE&destination=CV1+2WT&travelmode=transit"
-            }
+            CreatedOn = DateTime.Parse(createdDate),
+            ModifiedOn = modifiedDate is not null ? DateTime.Parse(modifiedDate) : null
         };
 
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.CreateJourneyLink) + " Data Tests")]
-    [MemberData(nameof(JourneyLinksForPostcodeLocations))]
-    public void GeoLocation_CreateJourneyLink_Data_Tests(
-        GeoLocation fromGeoLocation, 
-        GeoLocation toGeoLocation, 
-        string expectedResult)
+        var result = target.InterestExpiryDate(retentionDays);
+        result.Should().Be(expectedResultDate);
+    }
+
+    [Theory(DisplayName = nameof(BusinessRuleExtensions.IsInterestExpiring) + " Data Tests")]
+    [InlineData("2022-12-01 11:30", null, "2022-12-01", 30, false)]
+    [InlineData("2022-12-01 11:30", null, "2022-12-24", 30, false)]
+    [InlineData("2022-12-01 11:30", null, "2022-12-25", 30, true)]
+    public void EmployerInterestSummary_IsInterestExpiring_Data_Tests(string createdDate, string modifiedDate, string currentDate, int daysToRetain, bool expectedResult)
     {
-        var result = fromGeoLocation.CreateJourneyLink(toGeoLocation);
+        var today = DateTime.Parse(currentDate);
+
+        var target = new EmployerInterestSummary
+        {
+            CreatedOn = DateTime.Parse(createdDate),
+            ModifiedOn = modifiedDate is not null ? DateTime.Parse(modifiedDate) : null
+        };
+
+        var result = target.IsInterestExpiring(today, daysToRetain);
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.CreateJourneyLink) + " Data Tests")]
-    [MemberData(nameof(JourneyLinksForPostcodeLocations))]
-    public void GeoLocation_CreateJourneyLink_To_Postcode_String_Data_Tests(
-        GeoLocation fromGeoLocation,
-        GeoLocation toGeoLocation,
-        string expectedResult)
+    [Theory(DisplayName = nameof(BusinessRuleExtensions.IsInterestNew) + " Data Tests")]
+    [InlineData("2022-12-01 11:30", null, "2022-12-01", true)]
+    [InlineData("2022-12-01 11:30", null, "2022-12-07", true)]
+    [InlineData("2022-12-01 11:30", null, "2022-12-08", false)]
+    [InlineData("2022-12-01 11:30", null, "2022-12-09", false)]
+    public void EmployerInterestSummary_IsInterestNew_Data_Tests(string createdDate, string modifiedDate, string currentDate, bool expectedResult)
     {
-        var result = fromGeoLocation.CreateJourneyLink(toGeoLocation?.Location);
+        var today = DateTime.Parse(currentDate);
+
+        var target = new EmployerInterestSummary
+        {
+            CreatedOn = DateTime.Parse(createdDate),
+            ModifiedOn = modifiedDate is not null ? DateTime.Parse(modifiedDate) : null
+        };
+
+        var result = target.IsInterestNew(today);
+        result.Should().Be(expectedResult);
+    }
+    
+    [Theory(DisplayName = nameof(BusinessRuleExtensions.IsInterestNew) + " Service Start Date Data Tests")]
+    [InlineData(null, "2022-12-01 11:30",  "2022-12-05", true)]
+    [InlineData(null, "2022-12-01 11:30", "2022-12-07", true)]
+    [InlineData(null, "2022-12-01 11:30",  "2022-12-08", false)]
+    [InlineData("2022-12-01", "2022-12-01 11:30", "2022-12-05", false)]
+    [InlineData("2022-12-01", "2022-12-07 11:30", "2022-12-07", false)]
+    [InlineData("2022-12-01", "2022-12-02 11:30", "2022-12-08", false)]
+    [InlineData("2022-12-01", "2022-12-08 11:30", "2022-12-08", true)]
+    [InlineData("2022-12-01", "2022-12-09 11:30", "2022-12-09", true)]
+    public void EmployerInterestSummary_IsInterestNew_With_Service_Start_Date_Data_Tests(
+        string serviceStartDateString, string createdDate, string currentDate, bool expectedResult)
+    {
+        var today = DateTime.Parse(currentDate);
+
+        var serviceStartDate = serviceStartDateString is not null 
+            ? DateOnly.Parse(serviceStartDateString)
+            : null as DateOnly?;
+
+        var target = new EmployerInterestSummary
+        {
+            CreatedOn = DateTime.Parse(createdDate),
+        };
+
+        var result = target.IsInterestNew(today, serviceStartDate: serviceStartDate);
         result.Should().Be(expectedResult);
     }
 }

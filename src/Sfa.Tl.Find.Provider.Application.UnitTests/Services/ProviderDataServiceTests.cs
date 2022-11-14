@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.VisualBasic.FileIO;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Microsoft.VisualBasic.FileIO;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -32,6 +33,60 @@ public class ProviderDataServiceTests
     {
         typeof(ProviderDataService)
             .ShouldNotAcceptNullOrBadConstructorArguments();
+    }
+
+    [Fact]
+    public async Task GetIndustries_Returns_Expected_List()
+    {
+        var industries = new IndustryBuilder()
+            .BuildList()
+            .ToList();
+
+        var industryRepository = Substitute.For<IIndustryRepository>();
+        industryRepository.GetAll()
+            .Returns(industries);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(industryRepository: industryRepository);
+
+        var results = (await service.GetIndustries()).ToList();
+        results.Should().BeEquivalentTo(industries);
+
+        await industryRepository
+            .Received(1)
+            .GetAll();
+    }
+
+    [Fact]
+    public async Task GetIndustries_Returns_Expected_List_From_Cache()
+    {
+        var industries = new IndustryBuilder().BuildList();
+
+        var industryRepository = Substitute.For<IIndustryRepository>();
+
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Industry>>())
+            .Returns(x =>
+            {
+                if ((string)x[0] == CacheKeys.IndustriesKey)
+                {
+                    x[1] = industries;
+                    return true;
+                }
+
+                return false;
+            });
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(industryRepository: industryRepository,
+                cacheService: cacheService);
+
+        var results = await service.GetIndustries();
+        results.Should().BeEquivalentTo(industries);
+
+        await industryRepository
+            .DidNotReceive()
+            .GetAll();
     }
 
     [Fact]
@@ -63,8 +118,8 @@ public class ProviderDataServiceTests
 
         var qualificationRepository = Substitute.For<IQualificationRepository>();
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
             .Returns(x =>
             {
                 if ((string)x[0] == CacheKeys.QualificationsKey)
@@ -78,7 +133,7 @@ public class ProviderDataServiceTests
 
         var service = new ProviderDataServiceBuilder()
             .Build(qualificationRepository: qualificationRepository,
-                cache: cache);
+                cacheService: cacheService);
 
         var results = await service.GetQualifications();
         results.Should().BeEquivalentTo(qualifications);
@@ -117,8 +172,8 @@ public class ProviderDataServiceTests
 
         var routeRepository = Substitute.For<IRouteRepository>();
 
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Route>>())
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Route>>())
             .Returns(x =>
             {
                 if ((string)x[0] == CacheKeys.RoutesKey)
@@ -132,7 +187,7 @@ public class ProviderDataServiceTests
 
         var service = new ProviderDataServiceBuilder()
             .Build(routeRepository: routeRepository,
-                cache: cache);
+                cacheService: cacheService);
 
         var results = await service.GetRoutes();
         results.Should().BeEquivalentTo(routes);
@@ -326,8 +381,8 @@ public class ProviderDataServiceTests
                     // ReSharper disable CompareOfFloatsByEqualityOperator
                     p.Latitude == fromGeoLocation.Latitude &&
                     p.Longitude == fromGeoLocation.Longitude),
-                    // ReSharper restore CompareOfFloatsByEqualityOperator
-                    Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
+                // ReSharper restore CompareOfFloatsByEqualityOperator
+                Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
                 Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
                 Arg.Is<int>(p => p == TestPage),
                 Arg.Is<int>(s => s == TestPageSize),
@@ -372,57 +427,9 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task FindProviders_Returns_Expected_List_For_Valid_Postcode_From_Cache()
-    {
-        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
-        var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
-        const int totalSearchResults = 10;
-
-        var providerRepository = Substitute.For<IProviderRepository>();
-        providerRepository.Search(
-                Arg.Is<GeoLocation>(p => p.Location == fromGeoLocation.Location),
-                Arg.Any<List<int>>(),
-                Arg.Any<List<int>>(),
-                Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
-            .Returns((searchResults, totalSearchResults));
-
-        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
-
-        var cache = Substitute.For<IMemoryCache>();
-        cache.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
-            .Returns(x =>
-            {
-                if (((string)x[0]).Contains(fromGeoLocation.Location.Replace(" ", "")))
-                {
-                    x[1] = GeoLocationBuilder.BuildGeoLocation(fromGeoLocation.Location);
-                    return true;
-                }
-
-                return false;
-            });
-
-        var service = new ProviderDataServiceBuilder().Build(
-            postcodeLookupService: postcodeLookupService,
-            providerRepository: providerRepository,
-            cache: cache);
-
-        var results = await service.FindProviders(fromGeoLocation.Location);
-        results.Should().NotBeNull();
-        results.Error.Should().BeNull();
-        results.SearchTerm.Should().Be(fromGeoLocation.Location);
-        results.SearchResults.Should().BeEquivalentTo(searchResults);
-
-        await postcodeLookupService
-            .DidNotReceive()
-            .GetPostcode(Arg.Any<string>());
-    }
-
-    [Fact]
     public async Task FindProviders_Returns_Expected_List_For_Valid_Outcode()
     {
-        var fromGeoLocation = GeoLocationBuilder.BuildValidOutwardPostcodeLocation();
+        var fromGeoLocation = GeoLocationBuilder.BuildValidOutcodeLocation();
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
         const int totalSearchResults = 10;
 
@@ -550,7 +557,8 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task FindProviders_Returns_Expected_Error_Details_For_Valid_Town_With_Dot_And_Partial_Search_Term_Lower_Case()
+    public async Task
+        FindProviders_Returns_Expected_Error_Details_For_Valid_Town_With_Dot_And_Partial_Search_Term_Lower_Case()
     {
         const string searchTerms = "st. agnes";
         var searchResults = new ProviderSearchResultBuilder().BuildList().ToList();
@@ -684,6 +692,30 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task GetLocationPostcodes_Returns_Expected_List()
+    {
+        const long ukPrn = 12345678;
+
+        var locationPostcodes = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerRepository = Substitute.For<IProviderRepository>();
+        providerRepository.GetLocationPostcodes(ukPrn, Arg.Any<bool>())
+            .Returns(locationPostcodes);
+
+        var service = new ProviderDataServiceBuilder().Build(
+            providerRepository: providerRepository);
+
+        var response = (await service
+            .GetLocationPostcodes(ukPrn))
+            ?.ToList();
+
+        response.Should().NotBeNull();
+        response.Should().BeEquivalentTo(locationPostcodes);
+    }
+
+    [Fact]
     public async Task HasQualifications_Calls_Repository()
     {
         var qualificationRepository = Substitute.For<IQualificationRepository>();
@@ -720,7 +752,7 @@ public class ProviderDataServiceTests
             .Received(1)
             .HasAny();
     }
-    
+
     [Fact]
     public async Task ImportProviderData_Calls_Repository_To_Save_Data()
     {
@@ -836,24 +868,24 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task ImportProviderData_Clears_Caches()
     {
-        var cache = Substitute.For<IMemoryCache>();
+        var cacheService = Substitute.For<ICacheService>();
 
         await using var stream = ProviderDataJsonBuilder.BuildProviderDataStream();
 
         var service = new ProviderDataServiceBuilder()
-            .Build(cache: cache);
+            .Build(cacheService: cacheService);
 
         await service.ImportProviderData(stream, true);
-        
-        cache
+
+        cacheService
             .Received(1)
             .Remove(CacheKeys.QualificationsKey);
 
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.ProviderDataDownloadInfoKey);
 
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.RoutesKey);
     }

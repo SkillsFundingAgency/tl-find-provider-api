@@ -56,6 +56,15 @@ Add a new row to the table with:
             "SupportEmailAddress": "<email>",
             "DeliveryStatusToken" :  "<token>" 
         },
+        "EmployerInterestSettings": {
+            "CleanupJobSchedule": "0 0 3 * * ?",
+            "EmployerSupportSiteUri": "https://test.employers.tlevels.gov.uk/",
+            "RetentionDays": 84
+        },
+        "GoogleMapsApiSettings": {
+            "ApiKey": "<API key>",
+            "BaseUri": "https://maps.googleapis.com/maps/api/"
+        },
         "TownDataImportSchedule": "<CRON string>",
         "PostcodeApiSettings": {
             "BaseUri": "https://api.postcodes.io/"
@@ -201,6 +210,39 @@ Postcode details are retrieved using the postcodes.io API. Where possible,
 results are cached to avoid duplicate calls.
 
 Provider and course details are read from the NCS Course directory API. This is called from a scheduled Quartz job.
+
+
+## Website Local Configuration
+
+For local development on the we site, there are some optional settings. These should be added to a file `appsettings.Development.json` (add this file to the Web project if it doesn't exist - it is already listed in `.gitignore` so it won't be checked in.)
+Sample settings are below.
+
+To skip DfE Sign In for local devlopment, set `StubProviderAuth` to `true`.
+
+If you want to run without starting Azurite, then the other settings can be set.
+
+```
+{
+  "StubProviderAuth": true,
+  "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;MultipleActiveResultSets=True;",
+  "DfeSignInSettings": {
+  },
+  "EmailSettings": {
+    "GovNotifyApiKey": "<key from GOV.UK Notify>",
+    "SupportEmailAddress": "<email>"
+  },
+  "PostcodeApiSettings": {
+    "BaseUri": "https://postcodes.io/"
+  },
+  "DetailedErrors": true,
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
+```
 
 
 ## Notes

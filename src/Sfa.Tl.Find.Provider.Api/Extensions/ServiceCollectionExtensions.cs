@@ -10,9 +10,10 @@ using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
 // ReSharper disable UnusedMethodReturnValue.Global
 
@@ -26,7 +27,7 @@ public static class ServiceCollectionExtensions
         services.AddApiVersioning(config =>
         {
             config.DefaultApiVersion = new ApiVersion(
-                Constants.DefaultApiMajorVersion, 
+                Constants.DefaultApiMajorVersion,
                 Constants.DefaultApiMinorVersion);
             config.AssumeDefaultVersionWhenUnspecified = true;
             config.ReportApiVersions = true;
@@ -47,41 +48,35 @@ public static class ServiceCollectionExtensions
         services
             .Configure<ApiSettings>(x =>
             {
-                x.AppId = siteConfiguration.ApiSettings.AppId;
-                x.ApiKey = siteConfiguration.ApiSettings.ApiKey;
+                x.ConfigureApiSettings(siteConfiguration);
             })
             .Configure<CourseDirectoryApiSettings>(x =>
             {
-                x.BaseUri = siteConfiguration.CourseDirectoryApiSettings.BaseUri;
-                x.ApiKey = siteConfiguration.CourseDirectoryApiSettings.ApiKey;
+                x.ConfigureCourseDirectoryApiSettings(siteConfiguration);
             })
             .Configure<EmailSettings>(x =>
             {
-                x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
-                x.DeliveryStatusToken = siteConfiguration.EmailSettings.DeliveryStatusToken;
-                x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
+                x.ConfigureEmailSettings(siteConfiguration);
             })
             .Configure<EmployerInterestSettings>(x =>
             {
-                x.RetentionDays = siteConfiguration.EmployerInterestSettings.RetentionDays;
-                x.CleanupJobSchedule = siteConfiguration.EmployerInterestSettings.CleanupJobSchedule;
+                x.ConfigureEmployerInterestSettings(siteConfiguration);
             })
             .Configure<GoogleMapsApiSettings>(x =>
             {
-                x.ApiKey = siteConfiguration.GoogleMapsApiSettings.ApiKey;
-                x.BaseUri = siteConfiguration.GoogleMapsApiSettings.BaseUri;
+                x.ConfigureGoogleMapsApiSettings(siteConfiguration);
             })
             .Configure<PostcodeApiSettings>(x =>
             {
-                x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+                x.ConfigurePostcodeApiSettings(siteConfiguration);
             })
             .Configure<SearchSettings>(x =>
             {
-                x.MergeAdditionalProviderData = siteConfiguration.SearchSettings?.MergeAdditionalProviderData ?? false;
+                x.ConfigureSearchSettings(siteConfiguration);
             })
             .Configure<ConnectionStringSettings>(x =>
             {
-                x.SqlConnectionString = siteConfiguration.SqlConnectionString;
+                x.ConfigureConnectionStringSettings(siteConfiguration);
             });
 
         return services;
@@ -99,11 +94,16 @@ public static class ServiceCollectionExtensions
                 .Select(s => s.TrimEnd('/'))
                 .ToArray();
 
-            services.AddCors(options => options.AddPolicy(policyName, builder =>
-                builder
-                    .WithMethods(HttpMethod.Get.Method)
-                    .AllowAnyHeader()
-                    .WithOrigins(corsOrigins)));
+            services.AddCors(options => 
+                options
+                    .AddPolicy(policyName, builder =>
+                        builder
+                            .WithMethods(
+                                HttpMethod.Get.Method, 
+                                HttpMethod.Post.Method, 
+                                HttpMethod.Delete.Method)
+                            .AllowAnyHeader()
+                            .WithOrigins(corsOrigins)));
         }
 
         return services;
@@ -119,11 +119,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<PostcodeApiSettings>>()
                         .Value;
 
-                    client.BaseAddress =
-                        postcodeApiSettings.BaseUri.EndsWith("/")
-                            ? new Uri(postcodeApiSettings.BaseUri)
-                            : new Uri(postcodeApiSettings.BaseUri + "/");
-
+                    client.BaseAddress = new Uri(postcodeApiSettings.BaseUri);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                 }
@@ -138,11 +134,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<CourseDirectoryApiSettings>>()
                         .Value;
 
-                    client.BaseAddress =
-                        courseDirectoryApiSettings.BaseUri.EndsWith("/")
-                            ? new Uri(courseDirectoryApiSettings.BaseUri)
-                            : new Uri(courseDirectoryApiSettings.BaseUri + "/");
-
+                    client.BaseAddress = new Uri(courseDirectoryApiSettings.BaseUri);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", courseDirectoryApiSettings.ApiKey);
@@ -196,7 +188,7 @@ public static class ServiceCollectionExtensions
     {
         if (!string.IsNullOrEmpty(govNotifyApiKey))
         {
-            services.AddTransient<IAsyncNotificationClient, NotificationClient>(
+            services.AddTransient<IAsyncNotificationClient>(
                 _ => new NotificationClient(govNotifyApiKey));
         }
 
@@ -216,7 +208,7 @@ public static class ServiceCollectionExtensions
             q.UseMicrosoftDependencyInjectionJobFactory();
 
             var startupJobKey = new JobKey(Constants.StartupTasksJobKeyName);
-            q.AddJob<InitializationJob>(opts => 
+            q.AddJob<InitializationJob>(opts =>
                     opts.WithIdentity(startupJobKey))
                 .AddTrigger(opts => opts
                     .ForJob(startupJobKey)
@@ -224,23 +216,23 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
-                var courseImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
-                q.AddJob<CourseDataImportJob>(opts => 
-                        opts.WithIdentity(courseImportJobKey))
+                var courseDataImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
+                q.AddJob<CourseDataImportJob>(opts =>
+                        opts.WithIdentity(courseDataImportJobKey))
                     .AddTrigger(opts => opts
-                        .ForJob(courseImportJobKey)
+                        .ForJob(courseDataImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
                                 .CronSchedule(courseDirectoryImportCronSchedule)));
             }
-            
+
             if (!string.IsNullOrEmpty(townDataImportCronSchedule))
             {
-                var townImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
-                q.AddJob<TownDataImportJob>(opts => 
-                        opts.WithIdentity(townImportJobKey))
+                var townDataImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
+                q.AddJob<TownDataImportJob>(opts =>
+                        opts.WithIdentity(townDataImportJobKey))
                     .AddTrigger(opts => opts
-                        .ForJob(townImportJobKey)
+                        .ForJob(townDataImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
                                 .CronSchedule(townDataImportCronSchedule)));
@@ -249,7 +241,7 @@ public static class ServiceCollectionExtensions
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
             {
                 var employerInterestCleanupJobKey = new JobKey(Constants.EmployerInterestCleanupJobKeyName);
-                q.AddJob<EmployerInterestCleanupJob>(opts => 
+                q.AddJob<EmployerInterestCleanupJob>(opts =>
                         opts.WithIdentity(employerInterestCleanupJobKey))
                     .AddTrigger(opts => opts
                         .ForJob(employerInterestCleanupJobKey)
@@ -263,7 +255,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddRateLimitPolicy(
         this IServiceCollection services)
     {
@@ -290,7 +282,7 @@ public static class ServiceCollectionExtensions
                     Version = version
                 });
 
-            c.ResolveConflictingActions(apiDescriptions 
+            c.ResolveConflictingActions(apiDescriptions
                 => apiDescriptions.First());
 
             //c.EnableAnnotations(); //Needed with Swashbuckle.AspNetCore.Annotations

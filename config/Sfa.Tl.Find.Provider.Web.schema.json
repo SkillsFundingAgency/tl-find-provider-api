@@ -3,15 +3,115 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
+    "AllowedCorsOrigins": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "AllowedCorsOrigins"
+    },
+    "DfeSignInSettings": {
+      "properties": {
+        "MetadataAddress": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_MetadataAddress"
+        },
+        "Audience": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Audience"
+        },
+        "Authority": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Authority"
+        },
+        "Issuer": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Issuer"
+        },
+        "ClientId": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ClientId"
+        },
+        "ClientSecret": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ClientSecret"
+        },
+        "ApiUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ApiUri"
+        },
+        "ApiSecret": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_ApiSecret"
+        },
+        "Timeout": {
+          "minLength": 1,
+          "type": "integer",
+          "environmentVariable": "DfeSignIn_Timeout"
+        },
+        "Administrators": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "DfeSignIn_Administrators"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Audience",
+        "Issuer",
+        "MetadataAddress",
+        "ClientId",
+        "ClientSecret",
+        "ApiUri",
+        "ApiSecret"
+      ],
+      "type": "object"
+    },
     "EmailSettings": {
       "properties": {
         "GovNotifyApiKey": {
           "type": "string",
           "environmentVariable": "EmailSettings_GovNotifyApiKey"
         },
+        "DeliveryStatusToken": {
+          "type": "string",
+          "environmentVariable": "EmailSettings_DeliveryStatusToken"
+        },
         "SupportEmailAddress": {
           "type": "string",
           "environmentVariable": "EmailSettings_SupportEmailAddress"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "EmployerInterestSettings": {
+      "properties": {
+        "EmployerSupportSiteUri": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_EmployerSupportSiteUri"
+        },
+        "UnsubscribeEmployerUri": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_UnsubscribeEmployerUri"
+        },
+        "RetentionDays": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_RetentionDays"
+        },
+        "ServiceStartDate": {
+          "type": "string",
+          "environmentVariable": "EmployerInterestSettings_ServiceStartDate"
+        },
+        "SearchRadius": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_SearchRadius"
         }
       },
       "additionalProperties": false,
@@ -31,16 +131,37 @@
       ],
       "type": "object"
     },
+    "SearchSettings": {
+      "properties": {
+        "MergeAdditionalProviderData": {
+          "minLength": 1,
+          "type": "boolean",
+          "environmentVariable": "SearchSettings_MergeAdditionalProviderData",
+          "default": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "MergeAdditionalProviderData"
+      ],
+      "type": "object"
+    },
     "SqlConnectionString": {
       "minLength": 1,
       "type": "string",
       "environmentVariable": "SqlConnectionString"
+    },
+    "BlobStorageConnectionString": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "BlobStorageConnectionString"
     }
   },
   "additionalProperties": false,
   "required": [
     "SqlConnectionString",
-    "PostcodeApiSettings"
+    "PostcodeApiSettings",
+    "DfeSignInSettings"
   ],
   "type": "object"
 }

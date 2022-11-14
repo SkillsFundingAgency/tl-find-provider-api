@@ -1,0 +1,27 @@
+Thank you for registering an interest in hosting industry placements. 
+
+Here are the details you shared:
+
+* Name:  ((contact_name))
+* Email address: ((email_address))
+* Telephone: ((telephone))
+* How would you prefer to be contacted: ((contact_preference))
+* Organisation name: ((organisation_name))
+* Website: ((website))
+* Organisation’s primary industry: ((primary_industry))
+* Industry placement area((has_multiple_placement_areas??s)): ((placement_area))
+* Postcode:  ((postcode))
+* Additional information: ((additional_information))
+
+What happens next
+
+Your details will be shared with T Level schools or colleges near you for 12 weeks. 
+
+If they would like to speak to you about hosting an industry placement, they’ll get in touch using the contact details you have provided.
+
+You can [withdraw your interest in hosting industry placements](((employer_unsubscribe_uri))) at any time.
+
+We’ll email you again in 12 weeks to see if you’d like us to continue sharing your details with T Level schools and colleges. 
+
+T Levels support
+[((employer_support_site))](((employer_support_site)))

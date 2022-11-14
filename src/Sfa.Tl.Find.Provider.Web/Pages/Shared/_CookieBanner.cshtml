@@ -1,4 +1,11 @@
-﻿<div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on [name of service]">
+﻿@{
+    bool isCookies = this.ViewContext.RouteData.Values.Any(p => p.Value!.ToString()!.Contains("Cookies"));
+}
+
+@{
+    if(!isCookies)
+    {
+        <div class="govuk-cookie-banner tl-hidden" data-nosnippet role="region" aria-label="Cookies on @PageExtensions.GetServiceName()">
     <div class="govuk-cookie-banner__message govuk-width-container" id="govuk-cookie-banner__message">
 
       <div class="govuk-grid-row">
@@ -29,7 +36,7 @@
         <div class="govuk-grid-column-two-thirds">
 
           <div class="govuk-cookie-banner__content">
-            <p class="govuk-body">You’ve accepted additional cookies. You can <a class="govuk-link" href="/help/cookies">change your cookie settings</a> at any time.</p>
+            <p class="govuk-body">You’ve accepted additional cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
           </div>
         </div>
       </div>
@@ -47,7 +54,7 @@
         <div class="govuk-grid-column-two-thirds">
 
           <div class="govuk-cookie-banner__content">
-            <p class="govuk-body">You’ve rejected additional cookies. You can <a class="govuk-link" href="/help/cookies">change your cookie settings</a> at any time.</p>
+            <p class="govuk-body">You’ve rejected additional cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
           </div>
         </div>
       </div>
@@ -59,3 +66,6 @@
       </div>
     </div>
   </div>
+
+    }
+}

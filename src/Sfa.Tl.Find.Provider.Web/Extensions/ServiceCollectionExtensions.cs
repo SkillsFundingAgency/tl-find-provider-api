@@ -2,10 +2,11 @@
 using Notify.Client;
 using Notify.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using System.Net.Http.Headers;
 using Sfa.Tl.Find.Provider.Application.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 
 // ReSharper disable UnusedMethodReturnValue.Global
 
@@ -13,22 +14,60 @@ namespace Sfa.Tl.Find.Provider.Web.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, IConfiguration configuration, SiteConfiguration siteConfiguration)
+    public static IServiceCollection AddConfigurationOptions(this IServiceCollection services, SiteConfiguration siteConfiguration)
     {
         services
+            .Configure<DfeSignInSettings>(x =>
+            {
+                x.ConfigureDfeSignInSettings(siteConfiguration);
+            })
             .Configure<EmailSettings>(x =>
             {
-                x.GovNotifyApiKey = siteConfiguration.EmailSettings.GovNotifyApiKey;
-                x.SupportEmailAddress = siteConfiguration.EmailSettings.SupportEmailAddress;
+                x.ConfigureEmailSettings(siteConfiguration);
+            })
+            .Configure<EmployerInterestSettings>(x =>
+            {
+                x.ConfigureEmployerInterestSettings(siteConfiguration);
             })
             .Configure<PostcodeApiSettings>(x =>
             {
-                x.BaseUri = siteConfiguration.PostcodeApiSettings.BaseUri;
+                x.ConfigurePostcodeApiSettings(siteConfiguration);
+            })
+            .Configure<SearchSettings>(x =>
+            {
+                x.ConfigureSearchSettings(siteConfiguration);
             })
             .Configure<ConnectionStringSettings>(x =>
             {
-                x.SqlConnectionString = siteConfiguration.SqlConnectionString;
+                x.ConfigureConnectionStringSettings(siteConfiguration);
             });
+
+        return services;
+    }
+
+    public static IServiceCollection AddCorsPolicy(
+        this IServiceCollection services,
+        string policyName,
+        string allowedOrigins,
+        params string[]? allowedMethods)
+    {
+        if (!string.IsNullOrWhiteSpace(allowedOrigins) && 
+            allowedMethods != null && 
+            allowedMethods.Any())
+        {
+            var corsOrigins = allowedOrigins
+                .Split(';', ',')
+                .Select(s => s.TrimEnd('/'))
+                .ToArray();
+
+            services.AddCors(options =>
+                options
+                    .AddPolicy(policyName, builder =>
+                        builder
+                            .WithMethods(allowedMethods)
+                            .AllowAnyHeader()
+                            .WithOrigins(corsOrigins)));
+        }
 
         return services;
     }
@@ -43,11 +82,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<PostcodeApiSettings>>()
                         .Value;
 
-                    client.BaseAddress =
-                        postcodeApiSettings.BaseUri.EndsWith("/")
-                            ? new Uri(postcodeApiSettings.BaseUri)
-                            : new Uri(postcodeApiSettings.BaseUri + "/");
-
+                    client.BaseAddress = new Uri(postcodeApiSettings.BaseUri);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                 }
@@ -64,16 +99,28 @@ public static class ServiceCollectionExtensions
             )
             .AddRetryPolicyHandler<TownDataService>();
 
+        services.AddHttpClient<IDfeSignInApiService, DfeSignInApiService>(
+                (serviceProvider, client) =>
+                {
+                    var dfeSignInSettings = serviceProvider
+                        .GetRequiredService<IOptions<DfeSignInSettings>>()
+                        .Value;
+
+                    client.BaseAddress = new Uri(dfeSignInSettings.ApiUri);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                })
+            .AddRetryPolicyHandler<DfeSignInApiService>();
+        
         return services;
     }
 
     public static IServiceCollection AddNotifyService(
         this IServiceCollection services,
-        string govNotifyApiKey)
+        string? govNotifyApiKey)
     {
         if (!string.IsNullOrEmpty(govNotifyApiKey))
         {
-            services.AddTransient<IAsyncNotificationClient, NotificationClient>(
+            services.AddTransient<IAsyncNotificationClient>(
                 _ => new NotificationClient(govNotifyApiKey));
         }
 

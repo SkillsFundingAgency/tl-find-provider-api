@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.DelegatingHandlers;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 
@@ -37,7 +37,15 @@ public class TestServerFactory<TEntryPoint>
         };
 
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+        
         return client;
+    }
+
+    public T GetService<T>()
+    {
+        var service = _server
+            .Services
+            .GetRequiredService<T>();
+        return service;
     }
 }

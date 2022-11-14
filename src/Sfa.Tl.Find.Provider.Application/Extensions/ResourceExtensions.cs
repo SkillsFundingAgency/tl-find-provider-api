@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+// ReSharper disable UnusedMember.Global
 
 namespace Sfa.Tl.Find.Provider.Application.Extensions;
 

@@ -13,6 +13,10 @@ using Sfa.Tl.Find.Provider.Application.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Services;
 
 try
 {
@@ -43,9 +47,13 @@ try
         $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
 
     builder.Services
-        .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins)
+        .AddCorsPolicy(Constants.CorsPolicyName, siteConfiguration.AllowedCorsOrigins);
+
+    builder.Services
+
         .AddPolicyRegistry()
-        .AddDapperRetryPolicy();
+        .AddDapperRetryPolicy()
+        .AddGovNotifyRetryPolicy();
 
     builder.Services.AddHttpClients();
 
@@ -69,6 +77,7 @@ try
     builder.Services
         .AddScoped<IDateTimeService, DateTimeService>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
+        .AddScoped<IGuidService, GuidService>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
         .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
@@ -77,10 +86,14 @@ try
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
         .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
+        .AddTransient<IIndustryRepository, IndustryRepository>()
         .AddTransient<IProviderRepository, ProviderRepository>()
         .AddTransient<IQualificationRepository, QualificationRepository>()
         .AddTransient<IRouteRepository, RouteRepository>()
         .AddTransient<ITownRepository, TownRepository>();
+
+    builder.Services
+        .AddTransient<ICacheService, MemoryCacheService>();
 
     builder.Services.AddNotifyService(
         siteConfiguration.EmailSettings.GovNotifyApiKey);
@@ -106,16 +119,7 @@ try
 
     builder.Services.AddHealthChecks()
         .AddSqlServer(siteConfiguration.SqlConnectionString, 
-            tags: new[] { "database" })
-        //.Services
-        //.AddHealthChecksUI(setup =>
-        //{
-        //    setup.SetEvaluationTimeInSeconds(30);
-        //    setup.MaximumHistoryEntriesPerEndpoint(60);
-        //    setup.AddHealthCheckEndpoint("Find Provider API Health Checks", "/health");
-        //})
-        //.AddInMemoryStorage()
-        ;
+            tags: new[] { "database" });
 
     var app = builder.Build();
 
@@ -139,9 +143,7 @@ try
     app.UseHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = HealthCheckResponseWriter.WriteJsonResponse
-        })
-        //.UseHealthChecksUI()
-        ;
+        });
 
     if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
     {

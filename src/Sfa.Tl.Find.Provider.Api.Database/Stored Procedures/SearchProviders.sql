@@ -41,6 +41,7 @@ AS
 				UNIQUE CLUSTERED (Id)
 			)
 	DECLARE @hasRouteOrQualificationIds BIT = 0
+	DECLARE @metersPerMile DECIMAL = 1609.3399999999999E0;
 		
 	IF(EXISTS(SELECT 1 from @routeIds) OR 
 	   EXISTS(SELECT 1 from @qualificationIds))
@@ -96,7 +97,7 @@ AS
 				COALESCE(NULLIF(l.[StudentContactEmail], ''), p.[StudentContactEmail]) AS [StudentContactEmail],
 				COALESCE(NULLIF(l.[StudentContactTelephone], ''), p.[StudentContactTelephone]) AS [StudentContactTelephone],
 				COALESCE(NULLIF(l.[StudentContactWebsite], ''), p.[StudentContactWebsite]) AS [StudentContactWebsite],
-				l.[Location].STDistance(@fromLocation) / 1609.3399999999999E0 AS [Distance] --(Miles)
+				l.[Location].STDistance(@fromLocation) / @metersPerMile AS [Distance] --(Miles)
 		FROM	[ProvidersCTE] p
 		INNER JOIN	[dbo].[Location] l
 		ON		p.[Id] = l.[ProviderId]

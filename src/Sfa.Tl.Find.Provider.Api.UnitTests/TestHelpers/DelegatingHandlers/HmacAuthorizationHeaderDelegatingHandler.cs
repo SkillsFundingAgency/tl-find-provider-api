@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.Extensions;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.TestHelpers.DelegatingHandlers;
 

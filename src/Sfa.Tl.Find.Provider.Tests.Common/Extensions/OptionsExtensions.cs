@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using NSubstitute;
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 

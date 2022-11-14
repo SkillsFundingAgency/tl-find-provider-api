@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
+﻿using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Services;
 
@@ -149,21 +150,21 @@ public class CourseDirectoryServiceTests
             { CourseDirectoryService.CourseDetailEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelsResponse() }
         };
 
-        var cache = Substitute.For<IMemoryCache>();
+        var cacheService = Substitute.For<ICacheService>();
 
         var service = new CourseDirectoryServiceBuilder()
             .Build(responses,
-                cache: cache);
+                cacheService: cacheService);
 
         await service.ImportProviders();
 
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.QualificationsKey);
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.RoutesKey);
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }
@@ -177,21 +178,21 @@ public class CourseDirectoryServiceTests
             { CourseDirectoryService.QualificationsEndpoint, CourseDirectoryJsonBuilder.BuildValidTLevelDefinitionsResponse() }
         };
 
-        var cache = Substitute.For<IMemoryCache>();
+        var cacheService = Substitute.For<ICacheService>();
 
         var service = new CourseDirectoryServiceBuilder()
             .Build(responses,
-                cache: cache);
+                cacheService: cacheService);
 
         await service.ImportQualifications();
 
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.QualificationsKey);
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.RoutesKey);
-        cache
+        cacheService
             .Received(1)
             .Remove(CacheKeys.ProviderDataDownloadInfoKey);
     }

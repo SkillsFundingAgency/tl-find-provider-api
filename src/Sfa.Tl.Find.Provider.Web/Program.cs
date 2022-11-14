@@ -1,17 +1,29 @@
+using Microsoft.AspNetCore.Authorization;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Services;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
+using Sfa.Tl.Find.Provider.Web.Filters;
 using Sfa.Tl.Find.Provider.Web.Security;
+using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
+using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
 
 builder.Services
     .AddApplicationInsightsTelemetry();
 
-var siteConfiguration = builder.Configuration.LoadConfigurationOptions();
-builder.Services.AddConfigurationOptions(builder.Configuration, siteConfiguration);
+builder.Services.AddConfigurationOptions(siteConfiguration);
+
+builder.Services.AddMemoryCache();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -21,9 +33,65 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
+if (bool.TryParse(builder.Configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
+{
+    builder.Services.AddProviderStubAuthentication();
+}
+else
+{
+    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment);
+    builder.Services.AddWebDataProtection(siteConfiguration);
+}
+
+builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, ProviderUkPrnOrAdministratorAuthorizationHandler>();
+builder.Services.AddAuthorizationPolicies();
+
 builder.Services.AddResponseCaching();
 
-builder.Services.AddRazorPages();
+builder.Services.Configure<RouteOptions>(option =>
+{
+    option.LowercaseUrls = true;
+    option.LowercaseQueryStrings = true;
+});
+
+builder.Services.AddRazorPages(options =>
+{
+    //options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
+    options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
+    options.Conventions.AddPageRoute("/EmployerDetails", "/employer-details");
+    options.Conventions.AddPageRoute("/Help/AccessibilityStatement", "/accessibility-statement");
+    options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
+    options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
+    options.Conventions.AddPageRoute("/Help/TermsAndConditions", "/terms-and-conditions");
+    options.Conventions.AllowAnonymousToPage("/Index");
+    options.Conventions.AllowAnonymousToPage("/Start");
+    options.Conventions.AllowAnonymousToPage("/AccessibilityStatement");
+    options.Conventions.AllowAnonymousToPage("/Help/Cookies");
+    options.Conventions.AllowAnonymousToPage("/Help/Privacy");
+    options.Conventions.AllowAnonymousToPage("/TermsAndConditions");
+})
+    .AddMvcOptions(options =>
+    {
+        options.Filters.Add<UserSessionActivityPageFilter>();
+    })
+    .AddSessionStateTempDataProvider();
+
+builder.Services.AddControllers();
+
+builder.Services
+    .AddTransient<IHttpContextAccessor, HttpContextAccessor>()
+    .AddSession(options =>
+    {
+        options.Cookie.Name = ".cookies.session";
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.IdleTimeout = TimeSpan.FromMinutes(siteConfiguration.DfeSignInSettings.Timeout);
+        options.Cookie.IsEssential = true;
+    })
+    .AddTransient<ISessionService>(x =>
+        new SessionService(
+            x.GetService<IHttpContextAccessor>()!,
+            builder.Environment.EnvironmentName));
 
 if (!builder.Environment.IsDevelopment())
 {
@@ -32,30 +100,44 @@ if (!builder.Environment.IsDevelopment())
         options.MaxAge = TimeSpan.FromDays(365);
     });
 }
+
+builder.Services
+    .AddCorsPolicy(Constants.CorsPolicyName,
+        siteConfiguration.AllowedCorsOrigins,
+        HttpMethod.Get.Method,
+        HttpMethod.Post.Method);
+
 builder.Services
     .AddPolicyRegistry()
-    .AddDapperRetryPolicy();
+    .AddDapperRetryPolicy()
+    .AddGovNotifyRetryPolicy();
 
 builder.Services.AddHttpClients();
 
 builder.Services
     .AddScoped<IDateTimeService, DateTimeService>()
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
+    .AddScoped<IGuidService, GuidService>()
+    .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
+    .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
+    .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
     .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
+    .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
+    .AddTransient<IIndustryRepository, IndustryRepository>()
     .AddTransient<IProviderRepository, ProviderRepository>()
     .AddTransient<IQualificationRepository, QualificationRepository>()
     .AddTransient<IRouteRepository, RouteRepository>()
     .AddTransient<ITownRepository, TownRepository>();
 
-builder.Services.AddNotifyService(
-    siteConfiguration.EmailSettings.GovNotifyApiKey);
+builder.Services
+    .AddTransient<ICacheService, MemoryCacheService>();
 
-var webRootPath = builder.Environment.WebRootPath;
-var contentRootPath = builder.Environment.ContentRootPath;
+builder.Services.AddNotifyService(
+    siteConfiguration.EmailSettings?.GovNotifyApiKey);
 
 var app = builder.Build();
 
@@ -65,21 +147,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseReferrerPolicy(opts => opts.NoReferrer())
-    //.UseXXssProtection(opts => opts.EnabledWithBlockMode());
-    ;
+app.UseXContentTypeOptions()
+    .UseReferrerPolicy(opts => opts.NoReferrer());
 
-app.UseWhen(
-    ctx => IsNotImgFile(ctx.Request.Path),
-    appBuilder =>
-        appBuilder.UseXContentTypeOptions());
-
-app.UseWhen(
-        ctx => IsNotCssOrImgOrFontFile(ctx.Request.Path),
+app.UseWhen(ctx =>
+        ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern, Constants.FontsPathPattern),
         appBuilder =>
             appBuilder
-                //.UseXContentTypeOptions()
-            .UseCsp(options => options
+                .UseCsp(options => options
                     .FrameAncestors(s => s.None())
                     .ObjectSources(s => s.None())
                     .ScriptSources(s => s
@@ -97,60 +172,36 @@ app.UseWhen(
                 })
     );
 
-
-//app.UseWhen(
-//    ctx => IsCssOrJsFile(ctx.Request.Path),
-//    appBuilder => appBuilder.UseXContentTypeOptions());
+if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
+{
+    app.UseCors(Constants.CorsPolicyName);
+}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCookiePolicy();
 
-app.UseWhen(
-    ctx => IsNotJsOrCssFile(ctx.Request.Path),
+app.UseWhen(ctx =>
+        ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern),
     appBuilder =>
         appBuilder.UseXXssProtection(opts => opts.EnabledWithBlockMode()));
 
 app.UseRouting();
 
+app.UseSession();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapFallback("{*path}",
     () => Results.Redirect("/Error/404"));
 
 app.MapRazorPages();
+app.MapControllers();
 
 app.UseResponseCaching();
 
 app.Run();
 
-//var _fp = new PhysicalFileProvider()//
-bool IsNotJsFile(string path)
-{
-    if (string.IsNullOrEmpty(path)) return false;
-    var starts = !string.IsNullOrEmpty(webRootPath) && path.StartsWith(webRootPath);
-    var starts2 = !string.IsNullOrEmpty(webRootPath) && path.StartsWith(contentRootPath);
-    return !path.EndsWith(".js");
-}
-
-bool IsNotImgFile(string path)
-{
-    if (string.IsNullOrEmpty(path)) return false;
-    return !path.Contains("/assets/images/");
-}
-
-bool IsNotJsOrCssFile(string path)
-{
-    if (string.IsNullOrEmpty(path)) return false;
-    return !path.EndsWith(".css") && !path.EndsWith(".js");
-}
-
-bool IsNotCssOrImgOrFontFile(string path)
-{
-    if (string.IsNullOrEmpty(path)) return false;
-    return !path.Contains(".css") &&
-           !path.Contains("/assets/fonts/") &&
-           !path.Contains("/assets/images/");
-}
-
-public partial class Program { } //Required so tests can see this class
+// ReSharper disable once UnusedMember.Global - Required so tests can see this class
+public partial class Program { }

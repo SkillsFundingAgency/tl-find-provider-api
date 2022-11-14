@@ -1,10 +1,11 @@
-﻿using FluentAssertions;
-using Sfa.Tl.Find.Provider.Application.Models;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 public static class ModelValidationExtensions
 {
+    public const double DoubleTolerance = 0.00001;
+
     public static void Validate(this Application.Models.Provider provider,
         long ukPrn,
         string name,
@@ -190,6 +191,14 @@ public static class ModelValidationExtensions
         }
     }
 
+    public static void Validate(this LocationPostcode locationPostcode, LocationPostcode expected)
+    {
+        locationPostcode.Postcode.Should().Be(expected.Postcode);
+        locationPostcode.Name.Should().Be(expected.Name);
+        locationPostcode.Latitude.Should().Be(expected.Latitude);
+        locationPostcode.Longitude.Should().Be(expected.Longitude);
+    }
+
     public static void Validate(this DeliveryYearSearchResult deliveryYear, DeliveryYearSearchResult expected)
     {
         deliveryYear.Year.Should().Be(expected.Year);
@@ -265,5 +274,46 @@ public static class ModelValidationExtensions
     {
         qualification.Id.Should().Be(expected.Id);
         qualification.Name.Should().Be(expected.Name);
+    }
+
+    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected, bool validateId = false, bool validateUniqueId = false, bool validatePostcode = true, bool validateLatLong = true)
+    {
+        if(validateId) employerInterest.Id.Should().Be(expected.Id);
+        if (validateUniqueId) employerInterest.UniqueId.Should().Be(expected.UniqueId);
+
+        employerInterest.OrganisationName.Should().Be(expected.OrganisationName);
+        employerInterest.ContactName.Should().Be(expected.ContactName);
+
+        employerInterest.ContactPreferenceType.Should().Be(expected.ContactPreferenceType);
+        employerInterest.Email.Should().Be(expected.Email);
+        employerInterest.Telephone.Should().Be(expected.Telephone);
+        employerInterest.Website.Should().Be(expected.Website);
+
+        if (validatePostcode)
+        {
+            employerInterest.Postcode.Should().Be(expected.Postcode);
+        }
+
+        if (validateLatLong)
+        {
+            employerInterest.Longitude.Should().BeApproximately(expected.Longitude, DoubleTolerance);
+            employerInterest.Latitude.Should().BeApproximately(expected.Latitude, DoubleTolerance);
+        }
+
+        employerInterest.IndustryId.Should().Be(expected.IndustryId);
+        employerInterest.OtherIndustry.Should().Be(expected.OtherIndustry);
+
+        employerInterest.AdditionalInformation.Should().Be(expected.AdditionalInformation);
+
+        return true;
+    }
+
+    public static bool Validate(this GeoLocation geoLocation, GeoLocation expected)
+    {
+        geoLocation.Location.Should().Be(expected.Location);
+        geoLocation.Longitude.Should().BeApproximately(expected.Longitude, DoubleTolerance);
+        geoLocation.Latitude.Should().BeApproximately(expected.Latitude, DoubleTolerance);
+
+        return true;
     }
 }

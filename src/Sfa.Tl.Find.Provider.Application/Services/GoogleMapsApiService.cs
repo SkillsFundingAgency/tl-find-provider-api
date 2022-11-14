@@ -1,6 +1,6 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;

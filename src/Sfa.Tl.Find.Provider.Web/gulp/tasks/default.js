@@ -20,7 +20,8 @@ gulp.task('assets', () => {
 
 gulp.task('js', () => {
     return src([
-        (paths.src.JS)
+        (paths.src.JS),
+        '!Frontend/src/js/session-timeout.js'
     ])
         .pipe(concat('tlevels.js'))
         .pipe(minify({
@@ -38,6 +39,20 @@ gulp.task('govjs', () => {
         'node_modules/govuk-frontend/govuk/all.js',
         'node_modules/html5shiv/dist/html5shiv.js',
     ])
+        .pipe(gulp.dest(paths.dist.JS));
+});
+
+gulp.task('session-timeout-js', function () {
+    return src([
+        'Frontend/src/js/session-timeout.js'
+    ])
+        .pipe(concat('session-timeout.js'))
+        //.pipe(minify({
+        //    noSource: true,
+        //    ext: {
+        //        min: '.min.js'
+        //    }
+        //}))
         .pipe(gulp.dest(paths.dist.JS));
 });
 

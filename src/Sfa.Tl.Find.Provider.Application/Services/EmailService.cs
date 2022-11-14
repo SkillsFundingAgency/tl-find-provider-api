@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
+using Polly.Registry;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
@@ -8,15 +10,18 @@ public class EmailService : IEmailService
 {
     private readonly IEmailTemplateRepository _emailTemplateRepository;
     private readonly IAsyncNotificationClient _notificationClient;
+    private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
     private readonly ILogger<EmailService> _logger;
 
     public EmailService(
         IEmailTemplateRepository emailTemplateRepository,
         IAsyncNotificationClient notificationClient,
+        IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<EmailService> logger)
     {
         _emailTemplateRepository = emailTemplateRepository ?? throw new ArgumentNullException(nameof(emailTemplateRepository));
         _notificationClient = notificationClient ?? throw new ArgumentNullException(nameof(notificationClient));
+        _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -57,11 +62,17 @@ public class EmailService : IEmailService
         {
             try
             {
-                var emailResponse = await _notificationClient
-                    .SendEmailAsync(
-                        recipient,
-                        emailTemplate.TemplateId,
-                        tokens);
+                var (retryPolicy, context) = _policyRegistry.GetNotifyRetryPolicy(_logger);
+
+                var emailResponse =
+                    await retryPolicy
+                        .ExecuteAsync(async _ => 
+                                await _notificationClient
+                                    .SendEmailAsync(
+                                        recipient,
+                                        emailTemplate.TemplateId,
+                                        tokens),
+                            context);
 
                 if (_logger.IsEnabled(LogLevel.Information))
                 {

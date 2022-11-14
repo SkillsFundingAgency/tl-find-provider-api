@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
@@ -8,26 +8,9 @@ public static class StringExtensions
 {
     // adapted from http://stackoverflow.com/a/164994/1882637
     private const string PostcodeRegex =
-            @"(GIR 0AA)|((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX‌​]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY]))))\s?[0-9][A-Z-[C‌​IKMOV]]{2})(\w)*$"
-        ;
+            @"(GIR 0AA)|((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX‌​]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY]))))\s?[0-9][A-Z-[C‌​IKMOV]]{2})(\w)*$";
 
-    private const string PartialPostcodeRegex =
-            @"((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))))$"
-        ;
-
-    public static string FormatPostcodeForUri(this string postcode)
-    {
-        return Uri.EscapeDataString(postcode.Trim().ToUpper());
-    }
-
-    public static string FormatTownName(this Town town)
-    {
-        if (!string.IsNullOrWhiteSpace(town.County))
-            return $"{town.Name}, {town.County}";
-        else if (!string.IsNullOrWhiteSpace(town.LocalAuthority))
-            return $"{town.Name}, {town.LocalAuthority}";
-        return $"{town.Name}";
-    }
+    private const string PartialPostcodeRegex = @"((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[QVX]][A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))))$";
 
     public static bool IsPostcode(this string postcode)
     {
@@ -52,6 +35,11 @@ public static class StringExtensions
         var formattedPostcode = postcode.Trim().ToUpperInvariant();
 
         return Regex.IsMatch(formattedPostcode, regex);
+    }
+
+    public static bool DoesNotMatch(this string input, params string[] patterns)
+    {
+        return !patterns.Any(p => Regex.IsMatch(input, p));
     }
 
     public static string ParseTLevelDefinitionName(this string fullName, int maxLength = -1)
@@ -112,7 +100,39 @@ public static class StringExtensions
 
         //Fix S after apostrophe, if it is before space or at end of string
         result = Regex.Replace(result, @"(['’])S(\s|$)", "$1s$2");
-        
+
         return result.Trim();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ReplaceBreaksWithNewlines(this string input)
+    {
+        return input is null
+            ? null
+            : Regex.Replace(input, @"(<br ?>)|(<br ?/>)|(\[br ?/\])", "\n");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ReplaceRedactedHttpStrings(this string input)
+    {
+        return input is null
+            ? null
+            : Regex.Replace(input, @"(http[s]?)___", "$1://");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ToTrimmedOrNullString(this string input)
+    {
+        return input is null || input.Length == 0 || string.IsNullOrWhiteSpace(input)
+            ? null
+            : input.Trim();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string Truncate(this string input, int maxLength)
+    {
+        return input is null || input.Length <= maxLength
+            ? input
+            : input[..maxLength];
     }
 }

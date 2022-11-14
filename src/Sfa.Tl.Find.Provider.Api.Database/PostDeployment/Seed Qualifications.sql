@@ -1,15 +1,6 @@
 ﻿/*
 Insert initial data for Qualifications
-
-This is an insert-only script - the nightly import will manage any changes
-
 */
-
---TODO: Remove this delete when we have the final framework codes below
---DELETE FROM [dbo].[RouteQualification]
---WHERE [QualificationId] > 1000
---DELETE FROM [dbo].[Qualification]
---WHERE [Id] > 1000
 
 MERGE INTO [dbo].[Qualification] AS Target 
 USING (VALUES 

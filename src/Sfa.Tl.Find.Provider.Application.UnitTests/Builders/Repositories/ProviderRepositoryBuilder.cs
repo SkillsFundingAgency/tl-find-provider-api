@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
@@ -34,7 +35,7 @@ public class ProviderRepositoryBuilder
             logger);
     }
 
-    public async Task<IProviderRepository> BuildRepositoryWithDataToSearchProviders()
+    public async Task<IProviderRepository> BuildRepositoryWithDataToSearchProviders(int totalLocationsCountToReturn)
     {
         var builder = new ProviderSearchResultBuilder();
         var providersPart = builder
@@ -70,7 +71,6 @@ public class ProviderRepositoryBuilder
                         var r = routesPart[callIndex];
                         var q = qualificationsPart[callIndex];
                         x.Invoke(p, d, r, q);
-
                         callIndex++;
                     }),
                 Arg.Any<object>(),
@@ -83,7 +83,7 @@ public class ProviderRepositoryBuilder
 
         var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
         var parameters = new DynamicParameters();
-        parameters.Add("totalLocationsCount", 123, DbType.Int32, ParameterDirection.Output);
+        parameters.Add("totalLocationsCount", totalLocationsCountToReturn, DbType.Int32, ParameterDirection.Output);
         dynamicParametersWrapper.DynamicParameters.Returns(parameters);
 
         return Build(
@@ -133,7 +133,6 @@ public class ProviderRepositoryBuilder
                         var r = routesPart[callIndex];
                         var q = qualificationsPart[callIndex];
                         x.Invoke(p, l, d, r, q);
-
                         callIndex++;
                     }),
                 Arg.Any<object>(),

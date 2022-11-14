@@ -8,6 +8,8 @@ public interface IProviderRepository
 
     Task<IEnumerable<ProviderDetailFlat>> GetAllFlattened();
 
+    Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(long ukPrn, bool includeAdditionalData);
+
     Task<bool> HasAny(bool isAdditionalData = false);
 
     Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);

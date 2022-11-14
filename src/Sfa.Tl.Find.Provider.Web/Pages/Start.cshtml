@@ -1,0 +1,32 @@
+﻿@page "/start"
+@model Sfa.Tl.Find.Provider.Web.Pages.StartModel
+@{
+    ViewData["Title"] = PageExtensions.GetServiceName();
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">@PageExtensions.GetServiceName()</h1>
+        <p class="govuk-body">If you’re a T Level provider, use this service to find employers who have expressed interest in T Levels and industry placements.</p>
+
+        <details class="govuk-details" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Make sure employers can find you
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+           Remember to check that your organisation’s details are up to date in the <a href="https://coursedirectory.nationalcareers.service.gov.uk" class="govuk-link govuk-link--no-visited-state" >National Careers Service Course Directory</a> so that potential employers and students can find you using our T Level provider search tools. 
+          </div>
+        </details>
+        <h2 class="govuk-heading-s">Before you start</h2>
+        <p class="govuk-body">You will need to sign in with your DfE Sign-in account. </p>
+        <div class="govuk-form-group">
+            <a asp-action="SignIn" asp-controller="Account" id="tl-login" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
+              Start now
+              <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+              </svg></a>
+        </div>
+    </div>
+</div>

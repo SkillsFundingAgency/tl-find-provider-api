@@ -5,6 +5,7 @@ using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Data;
 
@@ -65,7 +66,6 @@ public class ProviderRepository : IProviderRepository
                     if (deliveryYear == null)
                     {
                         deliveryYear = dy;
-
                         deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
 
                         location.DeliveryYears.Add(deliveryYear);
@@ -109,6 +109,26 @@ public class ProviderRepository : IProviderRepository
                 commandType: CommandType.StoredProcedure);
     }
 
+    public async Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(
+        long ukPrn,
+        bool includeAdditionalData)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            ukPrn,
+            includeAdditionalData
+        });
+
+        return await _dbContextWrapper
+            .QueryAsync<LocationPostcode>(
+                connection,
+                "GetProviderLocations",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+    }
+
     public async Task<bool> HasAny(bool isAdditionalData = false)
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -142,7 +162,7 @@ public class ProviderRepository : IProviderRepository
                 }
             }
 
-            var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
             await retryPolicy
                 .ExecuteAsync(async _ =>
@@ -240,7 +260,8 @@ public class ProviderRepository : IProviderRepository
             page,
             pageSize,
             includeAdditionalData
-        }).AddOutputParameter("totalLocationsCount", DbType.Int32);
+        })
+            .AddOutputParameter("totalLocationsCount", DbType.Int32);
 
         await _dbContextWrapper
             .QueryAsync<ProviderSearchResult, DeliveryYearSearchResult, RouteDto, QualificationDto, ProviderSearchResult>(
@@ -307,7 +328,6 @@ public class ProviderRepository : IProviderRepository
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
 
-        //@
         var resultCount = 0;
         foreach (var contact in contacts)
         {

@@ -70,9 +70,9 @@ public class EmailServiceTests
 
         var personalisationTokens = new Dictionary<string, dynamic>
         {
-            {"full_name", TestFullName},
-            {"organisation_phone_number", TestPhone},
-            {"organisation_email_address", TestEmail}
+            { "full_name", TestFullName },
+            { "organisation_phone_number", TestPhone },
+            { "organisation_email_address", TestEmail }
         };
 
         var emailService = new EmailServiceBuilder()
@@ -156,7 +156,7 @@ public class EmailServiceTests
         var emailTemplateRepository = new EmailTemplateRepositoryBuilder()
             .BuildSubstitute(TestEmailTemplateId, TestEmailTemplateName);
 
-        var emailAddressList = $"{MainSupportEmailInboxAddress};{SecondarySupportEmailInboxAddress}";
+        const string emailAddressList = $"{MainSupportEmailInboxAddress};{SecondarySupportEmailInboxAddress}";
 
         var emailService = new EmailServiceBuilder()
             .Build(emailTemplateRepository,

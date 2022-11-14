@@ -1,7 +1,7 @@
 ﻿using Humanizer;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Microsoft.Extensions.Logging;
 
@@ -38,23 +38,21 @@ public class EmailDeliveryStatusService : IEmailDeliveryStatusService
         var emailTemplate = await _emailTemplateRepository
             .GetEmailTemplate(deliveryReceipt.TemplateId.ToString());
         var emailTemplateName = emailTemplate != null 
-            ? emailTemplate.Name 
+            ? emailTemplate.Name.Humanize()
             : $"Unknown template {deliveryReceipt.TemplateId}";
 
-        var tokens = new Dictionary<string, string>()
+        var tokens = new Dictionary<string, string>
         {
-            { "email_type", emailTemplateName },//.Humanize().ToLower() },
-            { "reference", deliveryReceipt.Reference },
+            { "email_type", emailTemplateName },
+            { "reference", deliveryReceipt.Reference ?? "none" },
             { "reason", deliveryReceipt.EmailDeliveryStatus.Humanize() },
-            { "sender_username", deliveryReceipt.To },
+            { "sender_username", deliveryReceipt.To }
         };
         
         await _emailService.SendEmail(
             _emailSettings.SupportEmailAddress,
             EmailTemplateNames.EmailDeliveryStatus,
-            tokens
-            );
-    
+            tokens);
 
         return 1;
     }

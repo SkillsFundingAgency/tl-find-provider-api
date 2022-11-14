@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Sfa.Tl.Find.Provider.Application.Models;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
@@ -11,20 +10,27 @@ public static class BusinessRuleExtensions
                || (deliveryYear == today.Year && today.Month >= 9);
     }
 
-    public static string CreateJourneyLink(this GeoLocation from, string toPostcode)
+    public static bool IsInterestExpiring(this EmployerInterestSummary employerInterest,
+        DateTime today, 
+        int retentionDays, 
+        int numberOfDays = 7)
     {
-        return from.CreateJourneyLink(new GeoLocation { Location = toPostcode });
+        return employerInterest.InterestExpiryDate(retentionDays).AddDays(-numberOfDays) < today;
+    }
+    
+    public static bool IsInterestNew(this EmployerInterestSummary employerInterest, 
+        DateTime today, 
+        int numberOfDays = 7,
+        DateOnly? serviceStartDate = null)
+    {
+        return employerInterest.CreatedOn.Date > today.AddDays(-numberOfDays)
+               && (serviceStartDate is null 
+                   || employerInterest.CreatedOn.Date > serviceStartDate.Value.AddDays(numberOfDays - 1).ToDateTime(new TimeOnly(0, 0, 0)));
     }
 
-    public static string CreateJourneyLink(this GeoLocation from, GeoLocation to)
+    public static DateTime InterestExpiryDate(this EmployerInterestSummary employerInterest,
+        int retentionDays)
     {
-        if (string.IsNullOrEmpty(from?.Location) ||
-            string.IsNullOrEmpty(to?.Location))
-            return null;
-
-        return "https://www.google.com/maps/dir/?api=1&" +
-               $"origin={WebUtility.UrlEncode(from.Location.Trim())}" +
-               $"&destination={WebUtility.UrlEncode(to.Location.Trim())}" +
-               "&travelmode=transit";
+        return employerInterest.CreatedOn.AddDays(retentionDays).Date;
     }
 }
