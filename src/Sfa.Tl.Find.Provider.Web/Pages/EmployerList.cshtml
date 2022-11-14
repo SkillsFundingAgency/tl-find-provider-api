@@ -27,15 +27,17 @@
 
         <form method="post" id="postcode-form">
             <div class="govuk-form-group tl-inline-form-group" sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-form-group--error">
+
                 <label class="govuk-label govuk-!-margin-bottom-4" asp-for="Input!.SelectedPostcode">
                     Select or enter a postcode to see contact details for employers within @Model.SearchRadius miles:
                 </label>
+                                                    <span class="govuk-error-message" asp-validation-for="Input!.CustomPostcode"></span>
+
                 <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" asp-for="Input!.SelectedPostcode" asp-items="Model.Postcodes">
                     <option value="">Select postcode</option>
                 </select>
                 <div class="tl-employers--search tl-hidden @(Model.Input?.SelectedPostcode == "Enter postcode" ? "active" : string.Empty)">
                     <label class="govuk-label govuk-visually-hidden" for="Input!.CustomPostcode">Enter postcode</label>
-                    <span class="govuk-error-message" asp-validation-for="Input!.CustomPostcode"></span>
                     <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" asp-for="Input!.CustomPostcode" type="text"
                            sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-input--error">
                     <button type="submit" id="tl-employers--postcode--submit" class="govuk-button govuk-!-margin-bottom-2">Search</button>
