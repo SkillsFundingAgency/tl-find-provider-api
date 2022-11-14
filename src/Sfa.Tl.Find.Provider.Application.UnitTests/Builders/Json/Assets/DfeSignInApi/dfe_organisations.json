@@ -1,0 +1,67 @@
+[
+  {
+    "id": "E100D38D-6385-4C15-809D-832C8F7F48E1",
+    "name": "Local College",
+    "category": {
+      "id": "001",
+      "name": "Establishment"
+    },
+    "type": {
+      "id": "18",
+      "name": "Further Education"
+    },
+    "urn": "123456",
+    "uid": null,
+    "ukprn": "01234567",
+    "establishmentNumber": "9999",
+    "status": {
+      "id": 1,
+      "name": "Open"
+    },
+    "closedOn": null,
+    "address": "Big Road, Coventry, Coventry, CV1 2WT",
+    "telephone": "01234567890",
+    "region": {
+      "id": "J",
+      "name": "South East"
+    },
+    "localAuthority": {
+      "id": "86C12AD7-D8A0-4F1A-92BE-B3562E44CCA1",
+      "name": "Coventry",
+      "code": "111"
+    },
+    "phaseOfEducation": {
+      "id": 6,
+      "name": "16 plus"
+    },
+    "statutoryLowAge": 16,
+    "statutoryHighAge": 99,
+    "legacyId": "9900999",
+    "companyRegistrationNumber": null,
+    "DistrictAdministrative_code": null
+  },
+  {
+    "id": "4FB0F553-D61E-4E39-AFF9-FDB3EB65AAA3",
+    "name": "Department for Education",
+    "category": {
+      "id": "002",
+      "name": "Local Authority"
+    },
+    "urn": null,
+    "uid": null,
+    "ukprn": null,
+    "establishmentNumber": "001",
+    "status": {
+      "id": 1,
+      "name": "Open"
+    },
+    "closedOn": null,
+    "address": null,
+    "telephone": null,
+    "statutoryLowAge": null,
+    "statutoryHighAge": null,
+    "legacyId": "1031237",
+    "companyRegistrationNumber": null,
+    "DistrictAdministrative_code": null
+  }
+]

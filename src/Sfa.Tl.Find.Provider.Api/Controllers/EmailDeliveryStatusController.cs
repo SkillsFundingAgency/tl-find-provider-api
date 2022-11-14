@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -24,7 +24,6 @@ public class EmailDeliveryStatusController : ControllerBase
     {
         _emailDeliveryStatusService = emailDeliveryStatusService ?? throw new ArgumentNullException(nameof(emailDeliveryStatusService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
         _emailSettings = emailOptions?.Value
                          ?? throw new ArgumentNullException(nameof(emailOptions));
     }

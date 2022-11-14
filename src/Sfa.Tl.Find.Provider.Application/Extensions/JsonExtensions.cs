@@ -43,7 +43,8 @@ public static class JsonExtensions
     public static bool SafeGetBoolean(this JsonElement element, 
         string propertyName)
     {
-        return element.TryGetProperty(propertyName, out var property)
+        return element.ValueKind != JsonValueKind.Undefined
+               && element.TryGetProperty(propertyName, out var property)
                && property.ValueKind is JsonValueKind.True or JsonValueKind.False
                && property.GetBoolean();
     }
@@ -52,7 +53,8 @@ public static class JsonExtensions
         string propertyName, 
         int defaultValue = default)
     {
-        return element.TryGetProperty(propertyName, out var property)
+        return element.ValueKind != JsonValueKind.Undefined
+               && element.TryGetProperty(propertyName, out var property)
                && property.ValueKind == JsonValueKind.Number
                && property.TryGetInt32(out var val)
             ? val
@@ -63,7 +65,8 @@ public static class JsonExtensions
         string propertyName, 
         long defaultValue = default)
     {
-        return element.TryGetProperty(propertyName, out var property)
+        return element.ValueKind != JsonValueKind.Undefined
+               && element.TryGetProperty(propertyName, out var property)
                && property.ValueKind == JsonValueKind.Number
                && property.TryGetInt64(out var val)
             ? val
@@ -74,7 +77,8 @@ public static class JsonExtensions
         string propertyName,
         decimal defaultValue = default)
     {
-        return element.TryGetProperty(propertyName, out var property)
+        return element.ValueKind != JsonValueKind.Undefined
+               && element.TryGetProperty(propertyName, out var property)
                && property.ValueKind == JsonValueKind.Number
                && property.TryGetDecimal(out var val)
             ? val
@@ -85,7 +89,8 @@ public static class JsonExtensions
         string propertyName, 
         double defaultValue = default)
     {
-        return element.TryGetProperty(propertyName, out var property)
+        return element.ValueKind != JsonValueKind.Undefined
+               && element.TryGetProperty(propertyName, out var property)
                && property.ValueKind == JsonValueKind.Number
                && property.TryGetDouble(out var val)
             ? val
@@ -97,7 +102,8 @@ public static class JsonExtensions
         int maxLength = -1, 
         string defaultValue = default)
     {
-        var result = element.TryGetProperty(propertyName, out var property)
+        var result = element.ValueKind != JsonValueKind.Undefined
+                     && element.TryGetProperty(propertyName, out var property)
                      && property.ValueKind == JsonValueKind.String
             ? property.GetString()
             : defaultValue;

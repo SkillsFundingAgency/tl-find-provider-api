@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Error;
 
@@ -9,16 +8,10 @@ public class Error404Model : PageModel
 
     public Error404Model(ILogger<Error404Model> logger)
     {
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public void OnGet()
     {
-    }
-
-    public IActionResult OnGetContactSupportClick()
-    {
-        _logger.LogInformation("Error/404 contact support link clicked");
-        return RedirectToPage(PageContext.ActionDescriptor.ViewEnginePath);
     }
 }

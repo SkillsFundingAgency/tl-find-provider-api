@@ -20,27 +20,15 @@ public class RouteRepositoryTests
     [Fact]
     public async Task GetAll_Returns_Expected_List()
     {
-        var routes = new RouteBuilder()
+        var routeDtoList = new RouteDtoBuilder()
+            .BuildList()
+            .ToList();
+        var qualificationDtoList = new QualificationDtoBuilder()
             .BuildList()
             .ToList();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
-
-        var routeDtoList =
-            routes.Select(r => new RouteDto
-            {
-                RouteId = r.Id,
-                RouteName = r.Name
-            }).ToList();
-
-        var qualificationDtoList =
-            routes.Select(r => new QualificationDto
-            {
-                QualificationId = r.Id,
-                QualificationName = r.Name,
-                NumberOfQualificationsOffered = r.Qualifications.Count
-            }).ToList();
 
         var callIndex = 0;
 
@@ -67,7 +55,7 @@ public class RouteRepositoryTests
             .GetAll(true))
             .ToList();
 
-        results.Should().NotBeNullOrEmpty();
+        results.Count.Should().Be(1);
         results[0].Id.Should().Be(routeDtoList[0].RouteId);
         results[0].Name.Should().Be(routeDtoList[0].RouteName);
         results[0].NumberOfQualifications.Should().Be(1);
@@ -75,14 +63,5 @@ public class RouteRepositoryTests
         results[0].Qualifications.Should().NotBeNullOrEmpty();
         results[0].Qualifications[0].Id.Should().Be(qualificationDtoList[0].QualificationId);
         results[0].Qualifications[0].Name.Should().Be(qualificationDtoList[0].QualificationName);
-
-        await dbContextWrapper
-            .Received(1)
-            .QueryAsync(dbConnection,
-                "GetRoutes",
-                Arg.Any<Func<RouteDto, QualificationDto, Route>>(),
-                Arg.Any<object>(),
-                splitOn: Arg.Any<string>(),
-                commandType: CommandType.StoredProcedure);
     }
 }

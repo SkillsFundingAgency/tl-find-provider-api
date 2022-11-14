@@ -1,0 +1,25 @@
+﻿@using Microsoft.Extensions.Options
+@using Sfa.Tl.Find.Provider.Infrastructure.Configuration
+@inject IOptions<DfeSignInSettings> SignInOptions
+
+<div id="timeout-message-container" class="tl-timeout-message--container hidden" data-timeout="@SignInOptions.Value.Timeout">
+    <div class="govuk-grid-row">
+        <div class="tl-modal tl-modal--timeout" role="dialog" aria-modal="true" aria-labelledby="timeout-heading" aria-describedby="timeout-description timeout-description2">
+            <div class="tl-modal--content">
+                <h1 id="timeout-heading" class="govuk-heading-l govuk-!-padding-top-4">You will be signed out soon</h1>
+                <p id="timeout-description" class="govuk-body">
+                    For security reasons we will sign you out if you remain inactive.
+                </p>
+                <p id="timeout-description2" class="govuk-body">
+                    You will be signed out in <span id="minutes-counter"></span><span id="seconds-counter"></span>.
+                </p>
+                <a id="keep-me-signed-in" class="govuk-button govuk-!-margin-right-4" role="button" tabindex="0">
+                    Keep me signed in
+                </a>
+                <a class="govuk-link modal-signout--link" role="link" asp-controller="Account" asp-action="SignOut">
+                    Sign out
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -4,13 +4,6 @@ namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface IProviderDataService
 {
-    Task<IEnumerable<Qualification>> GetQualifications();
-
-    Task<IEnumerable<Route>> GetRoutes();
-
-    Task<bool> HasQualifications();
-    Task<bool> HasProviders();
-
     Task<ProviderSearchResponse> FindProviders(
         string searchTerms,
         IList<int> routeIds = null,
@@ -26,11 +19,26 @@ public interface IProviderDataService
         int page = 0,
         int pageSize = Constants.DefaultPageSize);
 
+    Task<byte[]> GetCsv();
+    
     Task<ProviderDetailResponse> GetAllProviders();
+
+    Task<IEnumerable<Industry>> GetIndustries();
+
+    Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(long ukPrn);
+
+    Task<IEnumerable<Qualification>> GetQualifications();
+
+    Task<IEnumerable<Route>> GetRoutes();
+
+    
+    Task<bool> HasQualifications();
+
+    Task<bool> HasProviders();
+    
+    Task ImportProviderContacts(Stream stream);
 
     Task ImportProviderData(Stream stream, bool isAdditionalData);
 
-    Task<byte[]> GetCsv();
 
-    Task ImportProviderContacts(Stream stream);
 }

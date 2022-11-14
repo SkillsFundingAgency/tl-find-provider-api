@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Application.Data;
 
@@ -22,9 +22,7 @@ public class DbContextWrapper : IDbContextWrapper
         ILogger<DbContextWrapper> logger)
     {
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
-
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
         _connectionString = connectionStringOptions?.Value?.SqlConnectionString
                             ?? throw new ArgumentNullException(nameof(connectionStringOptions));
     }
@@ -43,7 +41,7 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+        var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection
@@ -66,7 +64,7 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+        var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
         return await retryPolicy
             .ExecuteAsync(async _ =>
@@ -81,7 +79,7 @@ public class DbContextWrapper : IDbContextWrapper
                             commandType: commandType),
                 context);
     }
-    
+
     public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
         IDbConnection connection,
         string sql,
@@ -92,7 +90,7 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+        var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
         return await retryPolicy
             .ExecuteAsync(async _ =>
@@ -118,7 +116,7 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+        var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
         return await retryPolicy
             .ExecuteAsync(async _ =>
@@ -142,15 +140,18 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
-            return await retryPolicy
-                .ExecuteAsync(async _ =>
-                        await connection.ExecuteAsync(
-                            sql, param, transaction,
-                            commandTimeout, commandType),
-                    context);
+        var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
+        return await retryPolicy
+            .ExecuteAsync(async _ =>
+                    await connection.ExecuteAsync(
+                        sql,
+                        param,
+                        transaction,
+                        commandTimeout,
+                        commandType),
+                context);
     }
-    
+
     public async Task<T> ExecuteScalarAsync<T>(
         IDbConnection connection,
         string sql,
@@ -159,12 +160,15 @@ public class DbContextWrapper : IDbContextWrapper
         int? commandTimeout = null,
         CommandType? commandType = null)
     {
-        var (retryPolicy, context) = _policyRegistry.GetRetryPolicy(_logger);
+        var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
         return await retryPolicy
             .ExecuteAsync(async _ =>
                     await connection.ExecuteScalarAsync<T>(
-                        sql, param, transaction,
-                        commandTimeout, commandType),
+                        sql,
+                        param,
+                        transaction,
+                        commandTimeout,
+                        commandType),
                 context);
     }
 }

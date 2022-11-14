@@ -1,0 +1,31 @@
+.tl {
+    &-visible {
+        display: inline-block;
+    }
+
+    &-hidden {
+        display: none;
+    }
+}
+
+.tl-js {
+    &-visible {
+        display: none;
+    }
+
+    &-hidden {
+        display: inline-block;
+    }
+}
+
+.js-enabled {
+    .tl-js {
+        &-visible {
+            display: inline-block;
+        }
+
+        &-hidden {
+            display: none;
+        }
+    }
+}

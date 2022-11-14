@@ -12,12 +12,12 @@ public static class GeoLocationBuilder
             Longitude = -1.508122
         };
 
-    public static GeoLocation BuildValidOutwardPostcodeLocation() =>
+    public static GeoLocation BuildValidOutcodeLocation() =>
         new()
         {
             Location = "CV1",
             Latitude = 52.4093942342931,
-            Longitude = -1.50652551178011,
+            Longitude = -1.50652551178011
         };
 
     public static GeoLocation BuildNotFoundPostcodeLocation() =>
@@ -36,6 +36,15 @@ public static class GeoLocationBuilder
             Longitude = double.NaN
         };
 
+    public static GeoLocation BuildInvalidOutcodeLocation() =>
+        new()
+        {
+            Location = "L99",
+            Latitude = double.NaN,
+            Longitude = double.NaN
+        };
+
+
     public static GeoLocation BuildTerminatedPostcodeLocation() =>
         new()
         {
@@ -52,12 +61,12 @@ public static class GeoLocationBuilder
             Longitude = Constants.DefaultLongitude
         };
 
-    public static GeoLocation BuildOutwardPostcodeLocationWithDefaultLatLong() =>
+    public static GeoLocation BuildOutcodeLocationWithDefaultLatLong() =>
         new()
         {
             Location = "IM4",
             Latitude = Constants.DefaultLatitude,
-            Longitude = Constants.DefaultLongitude,
+            Longitude = Constants.DefaultLongitude
         };
 
     public static GeoLocation BuildTerminatedPostcodeLocationWithDefaultLatLong() =>
@@ -65,15 +74,17 @@ public static class GeoLocationBuilder
         {
             Location = "IM4 4AQ",
             Latitude = Constants.DefaultLatitude,
-            Longitude = Constants.DefaultLongitude,
+            Longitude = Constants.DefaultLongitude
         };
 
     public static GeoLocation BuildGeoLocation(
-        string location) =>
+        string location,
+        double latitude = Constants.DefaultLatitude,
+        double longitude = Constants.DefaultLongitude) =>
         new()
         {
             Location = location,
-            Latitude = 50.0,
-            Longitude = -1.0
+            Latitude = latitude,
+            Longitude = longitude
         };
 }

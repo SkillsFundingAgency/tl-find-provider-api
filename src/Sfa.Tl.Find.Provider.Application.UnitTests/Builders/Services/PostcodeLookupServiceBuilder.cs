@@ -1,5 +1,7 @@
-﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
@@ -10,15 +12,28 @@ public class PostcodeLookupServiceBuilder
     private static readonly Uri PostcodeRetrieverApiBaseUri = new(PostcodeRetrieverApiBaseAbsoluteUri);
 
     public IPostcodeLookupService Build(
-        HttpClient httpClient = null)
+        HttpClient httpClient = null,
+        IDateTimeService dateTimeService = null,
+        ICacheService cacheService = null,
+        ILogger<PostcodeLookupService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
+        cacheService ??= Substitute.For<ICacheService>();
+        dateTimeService ??= Substitute.For<IDateTimeService>();
+        logger ??= Substitute.For<ILogger<PostcodeLookupService>>();
 
-        return new PostcodeLookupService(httpClient);
+        return new PostcodeLookupService(
+            httpClient,
+            dateTimeService,
+            cacheService,
+            logger);
     }
 
     public IPostcodeLookupService Build(
-        IDictionary<string, HttpResponseMessage> responseMessages)
+        IDictionary<string, HttpResponseMessage> responseMessages,
+        IDateTimeService dateTimeService = null,
+        ICacheService cacheService = null,
+        ILogger<PostcodeLookupService> logger = null)
     {
         var responsesWithUri = responseMessages
             .ToDictionary(
@@ -28,11 +43,18 @@ public class PostcodeLookupServiceBuilder
         var httpClient = new TestHttpClientFactory()
             .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri);
 
-        return Build(httpClient);
+        return Build(
+            httpClient,
+            dateTimeService,
+            cacheService,
+            logger);
     }
 
     public IPostcodeLookupService Build(
-        IDictionary<string, string> responseMessages)
+        IDictionary<string, string> responseMessages,
+        IDateTimeService dateTimeService = null,
+        ICacheService cacheService = null,
+        ILogger<PostcodeLookupService> logger = null)
     {
         var responsesWithUri = responseMessages
             .ToDictionary(
@@ -42,6 +64,10 @@ public class PostcodeLookupServiceBuilder
         var httpClient = new TestHttpClientFactory()
             .CreateHttpClientWithBaseUri(PostcodeRetrieverApiBaseUri, responsesWithUri);
 
-        return Build(httpClient);
+        return Build(
+            httpClient,
+            dateTimeService,
+            cacheService,
+            logger);
     }
 }

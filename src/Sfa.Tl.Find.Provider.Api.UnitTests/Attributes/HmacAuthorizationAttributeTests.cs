@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Api.Filters;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -32,12 +32,12 @@ public class HmacAuthorizationAttributeTests
             new SettingsBuilder()
                 .BuildApiSettings());
 
-        var memoryCache = Substitute.For<IMemoryCache>();
+        var cacheService = Substitute.For<ICacheService>();
         var logger = Substitute.For<ILogger<HmacAuthorizationFilter>>();
 
         var serviceProvider = new ServiceCollection()
             .AddScoped(_ => apiSettingOptions)
-            .AddScoped(_ => memoryCache)
+            .AddScoped(_ => cacheService)
             .AddScoped(_ => logger)
             .BuildServiceProvider();
 

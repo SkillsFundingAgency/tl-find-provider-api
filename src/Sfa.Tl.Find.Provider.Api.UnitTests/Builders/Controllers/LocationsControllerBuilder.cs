@@ -10,13 +10,16 @@ public class LocationsControllerBuilder
 {
     public LocationsController Build(
         ITownDataService townDataService = null,
+        IPostcodeLookupService postcodeLookupService = null,
         ILogger<LocationsController> logger = null)
     {
         townDataService ??= Substitute.For<ITownDataService>();
+        postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         logger ??= Substitute.For<ILogger<LocationsController>>();
 
         var controller = new LocationsController(
             townDataService, 
+            postcodeLookupService,
             logger)
         {
             ControllerContext = new ControllerContext

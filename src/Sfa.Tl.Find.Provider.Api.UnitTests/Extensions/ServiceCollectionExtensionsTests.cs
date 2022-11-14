@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Api.Extensions;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
@@ -51,7 +51,9 @@ public class ServiceCollectionExtensionsTests
 
         var connectionStringOptions = serviceProvider.GetRequiredService<IOptions<ConnectionStringSettings>>();
         connectionStringOptions.Value.Should().NotBeNull();
+        connectionStringOptions.Value.BlobStorageConnectionString.Should().BeEquivalentTo(siteConfiguration.BlobStorageConnectionString);
         connectionStringOptions.Value.SqlConnectionString.Should().BeEquivalentTo(siteConfiguration.SqlConnectionString);
+        connectionStringOptions.Value.RedisConnectionString.Should().BeEquivalentTo(siteConfiguration.RedisConnectionString);
     }
 
     [Fact]

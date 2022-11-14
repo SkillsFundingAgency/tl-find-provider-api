@@ -1,6 +1,4 @@
-﻿using System.Net;
-using FluentAssertions;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
+﻿using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
@@ -60,12 +58,13 @@ public class GoogleMapsApiServiceTests
     [Fact]
     public async Task GetAddressDetail_Returns_Expected_Result_For_Valid_Postcode()
     {
+        var serviceBuilder = new GoogleMapsApiServiceBuilder();
         var settings = new SettingsBuilder().BuildGoogleMapsApiSettings();
 
         var responses = new Dictionary<string, string>
         {
             {
-                FormatUriFragment(TestPostcode, settings.ApiKey),
+                serviceBuilder.BuildUriFragment(TestPostcode, settings.ApiKey),
                 GoogleApiJsonBuilder.BuildValidResponse()
             }
         };
@@ -81,12 +80,13 @@ public class GoogleMapsApiServiceTests
     [Fact]
     public async Task GetAddressDetail_Returns_Expected_Result_For_Invalid_Postcode()
     {
+        var serviceBuilder = new GoogleMapsApiServiceBuilder();
         var settings = new SettingsBuilder().BuildGoogleMapsApiSettings();
 
         var responses = new Dictionary<string, string>
         {
             {
-                FormatUriFragment(UnknownPostcode, settings.ApiKey),
+                serviceBuilder.BuildUriFragment(UnknownPostcode, settings.ApiKey),
                 GoogleApiJsonBuilder.BuildZeroResultsResponse()
             }
         };
@@ -97,8 +97,4 @@ public class GoogleMapsApiServiceTests
 
         result.Should().BeEmpty();
     }
-
-    // ReSharper disable once StringLiteralTypo
-    private string FormatUriFragment(string postcode, string apiKey) =>
-        $"place/textsearch/json?region=uk&radius=1&key={apiKey}&query={WebUtility.UrlEncode(postcode)}";
 }

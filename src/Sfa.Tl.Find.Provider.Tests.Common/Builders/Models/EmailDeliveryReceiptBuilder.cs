@@ -3,6 +3,7 @@
 namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 public class EmailDeliveryReceiptBuilder
 {
+    private string _reference = "Test reference";
     private string _status = EmailDeliveryStatus.Delivered;
 
     public  EmailDeliveryReceipt Build() =>
@@ -15,14 +16,19 @@ public class EmailDeliveryReceiptBuilder
             To = "receiver@test.co.uk",
             NotificationType = "email",
             TemplateId = Guid.Parse("102e85fe-00e4-46cf-bb0c-8f43d28aead2"),
-            Reference = "Test reference",
+            Reference = _reference,
             Status = _status
         };
 
     public EmailDeliveryReceiptBuilder WithDeliveryStatus(string status)
     {
         _status = status;
+        return this;
+    }
 
+    public EmailDeliveryReceiptBuilder WithReference(string reference)
+    {
+        _reference = reference;
         return this;
     }
 }

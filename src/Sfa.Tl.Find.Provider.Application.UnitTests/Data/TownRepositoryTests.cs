@@ -89,8 +89,8 @@ public class TownRepositoryTests
                 receivedSqlArgs.Add(arg);
             });
 
-        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
-        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        var (_, pollyPolicyRegistry) = PollyPolicyBuilder
+            .BuildDapperPolicyAndRegistry();
 
         var logger = Substitute.For<ILogger<TownRepository>>();
 
@@ -127,8 +127,8 @@ public class TownRepositoryTests
     [Fact]
     public async Task Save_Calls_Retry_Policy()
     {
-        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
-        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        var (pollyPolicy, pollyPolicyRegistry) = PollyPolicyBuilder
+            .BuildPolicyAndRegistry();
 
         var logger = Substitute.For<ILogger<TownRepository>>();
 

@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using System.Net;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 
@@ -19,5 +21,10 @@ public class QualificationsControllerIntegrationTests : IClassFixture<TestServer
             .GetAsync("/api/v3/qualifications");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var routes = await response.Content.DeserializeFromHttpContent<IList<Qualification>>();
+        routes.Should().NotBeNull();
+        routes.Count.Should().BeGreaterThan(0);
+
     }
 }

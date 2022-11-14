@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Application.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.HealthChecks;
 
@@ -25,10 +24,7 @@ public class HealthCheckResponseWriterTests
             .WriteJsonResponse(httpContext, healthReport);
 
         task.Should().NotBeNull();
-        //await task;
         task.GetAwaiter().GetResult();
-
-        //task.GetAwaiter().GetResult();
 
         httpContext.Response.Should().NotBeNull();
 
@@ -39,6 +35,5 @@ public class HealthCheckResponseWriterTests
         var response = await reader.ReadToEndAsync();
 
         response.Should().Be(expectedJson);
-        
     }
 }

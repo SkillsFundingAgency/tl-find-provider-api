@@ -118,8 +118,8 @@ public class QualificationRepositoryTests
                 receivedSqlArgs.Add(arg);
             });
 
-        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
-        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        var (_, pollyPolicyRegistry) = PollyPolicyBuilder
+            .BuildDapperPolicyAndRegistry();
 
         var logger = Substitute.For<ILogger<QualificationRepository>>();
 
@@ -156,8 +156,8 @@ public class QualificationRepositoryTests
     [Fact]
     public async Task Save_Calls_Retry_Policy()
     {
-        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
-        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+        var (pollyPolicy, pollyPolicyRegistry) = PollyPolicyBuilder
+            .BuildDapperPolicyAndRegistry();
 
         var logger = Substitute.For<ILogger<QualificationRepository>>();
 

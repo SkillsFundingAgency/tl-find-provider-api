@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using NSubstitute;
+﻿using System.Net;
+using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Sfa.Tl.Find.Provider.Application.Models.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -68,4 +68,8 @@ public class GoogleMapsApiServiceBuilder
 
         return Build(httpClient, googleMapsApiSettings);
     }
+
+    // ReSharper disable once StringLiteralTypo
+    public string BuildUriFragment(string postcode, string apiKey) =>
+        $"place/textsearch/json?region=uk&radius=1&key={apiKey}&query={WebUtility.UrlEncode(postcode)}";
 }

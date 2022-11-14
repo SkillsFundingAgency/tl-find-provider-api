@@ -5,35 +5,6 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;
 
 public class StringExtensionsTests
 {
-    [Theory(DisplayName = nameof(StringExtensions.FormatPostcodeForUri) + " Data Tests")]
-    [InlineData("CV1 2WT", "CV1%202WT")]
-    [InlineData("cv1 2wt", "CV1%202WT")]
-    [InlineData(" CV1 2WT ", "CV1%202WT")]
-    public void String_FormatPostcodeForUri_Data_Tests(string input, string expectedResult)
-    {
-        var result = input.FormatPostcodeForUri();
-        result.Should().Be(expectedResult);
-    }
-
-    [Theory(DisplayName = nameof(StringExtensions.FormatTownName) + " Data Tests")]
-    [InlineData("Oxford", "Oxfordshire", "Oxfordshire", "Oxford, Oxfordshire")]
-    [InlineData("Bristol", null, "Gloucestershire", "Bristol, Gloucestershire")]
-    [InlineData("Coventry", "West Midlands", "West Midlands", "Coventry, West Midlands")]
-    [InlineData("Coventry", "", "", "Coventry")]
-    [InlineData("Some Town (Somewhere)", "Some County", null, "Some Town (Somewhere), Some County")]
-    public void String_FormatTownName_Data_Tests(string name, string county, string localAuthority, string expectedResult)
-    {
-        var town = new Town
-        {
-            Name = name,
-            County = county,
-            LocalAuthority = localAuthority
-        };
-
-        var result = town.FormatTownName();
-        result.Should().Be(expectedResult);
-    }
-
     [Theory(DisplayName = nameof(StringExtensions.IsPostcode) + " Data Tests")]
     [InlineData("CV1 2WT", true)]
     [InlineData("cv1 2wt", true)]
@@ -64,6 +35,22 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
+    [Theory(DisplayName = nameof(StringExtensions.DoesNotMatch) + " Data Tests")]
+    [InlineData("/", Constants.CssPathPattern, true)]
+    [InlineData("/Index", Constants.CssPathPattern, true)]
+    [InlineData("/Folder/Index", Constants.CssPathPattern, true)]
+    [InlineData("/Folder/Index", Constants.JsPathPattern, true)]
+    [InlineData("/Folder/Index", Constants.FontsPathPattern, true)]
+    [InlineData("/css/test.css", Constants.CssPathPattern, false)]
+    [InlineData("/js/test.js", Constants.JsPathPattern, false)]
+    [InlineData("/assets/fonts/bold-a123d-v2.woff", Constants.FontsPathPattern, false)]
+    [InlineData("/assets/fonts/bold-a123d-v2.woff2", Constants.FontsPathPattern, false)]
+    public void String_DoesNotMatch_Data_Tests(string input, string pattern, bool expectedResult)
+    {
+        var result = input.DoesNotMatch(pattern);
+        result.Should().Be(expectedResult);
+    }
+    
     [Theory(DisplayName = nameof(StringExtensions.IsFullOrPartialPostcode) + " Data Tests")]
     [InlineData("CV1 2WT", true)]
     [InlineData("cv1 2wt", true)]
@@ -138,6 +125,55 @@ public class StringExtensionsTests
     {
         var result = input.ToSearchableString();
 
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory(DisplayName = nameof(StringExtensions.ReplaceBreaksWithNewlines) + " Data Tests")]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    [InlineData("<br />", "\n")]
+    [InlineData("hello<br />world", "hello\nworld")]
+    [InlineData("hello<br/>world", "hello\nworld")]
+    [InlineData("hello<br>world", "hello\nworld")]
+    public void String_ReplaceBreaksWithNewlines_Data_Tests(string input, string expectedResult)
+    {
+        var result = input.ReplaceBreaksWithNewlines();
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory(DisplayName = nameof(StringExtensions.ReplaceRedactedHttpStrings) + " Data Tests")]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    [InlineData("http___www.test.com/", "http://www.test.com/")]
+    [InlineData("https___www.test.com/", "https://www.test.com/")]
+    public void String_ReplaceHttpsRedactor_Data_Tests(string input, string expectedResult)
+    {
+        var result = input.ReplaceRedactedHttpStrings();
+        result.Should().Be(expectedResult);
+    }
+    
+    [Theory(DisplayName = nameof(StringExtensions.ToTrimmedOrNullString) + " Data Tests")]
+    [InlineData(null, null)]
+    [InlineData("", null)]
+    [InlineData(" ", null)]
+    [InlineData("Test", "Test")]
+    [InlineData(" Test ", "Test")]
+    public void String_ToTrimmedOrNullString_Data_Tests(string input, string expectedResult)
+    {
+        var result = input.ToTrimmedOrNullString();
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory(DisplayName = nameof(StringExtensions.Truncate) + " Data Tests")]
+    [InlineData(null, 10, null)]
+    [InlineData("", 10, "")]
+    [InlineData(" ", 10, " ")]
+    [InlineData("Test", 3, "Tes")]
+    [InlineData("Test", 4, "Test")]
+    [InlineData("Test", 5, "Test")]
+    public void String_Truncate_Data_Tests(string input, int length, string expectedResult)
+    {
+        var result = input.Truncate(length);
         result.Should().Be(expectedResult);
     }
 }

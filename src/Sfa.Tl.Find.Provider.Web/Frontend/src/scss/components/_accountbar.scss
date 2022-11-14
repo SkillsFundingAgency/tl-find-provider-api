@@ -1,0 +1,33 @@
+.tl-accountbar {
+    background-color: govuk-colour("light-grey");
+    @include govuk-responsive-padding(2);
+    overflow: auto;
+
+
+    p {
+        @extend .govuk-body-s;
+        @include govuk-responsive-margin(0);
+        @include govuk-responsive-padding(0);
+        display: inline-block;
+
+        &:last-child {
+            text-align: right;
+        }
+    }
+
+    &--link {
+        @include govuk-responsive-margin(2, "right");
+        @include govuk-font($size: 16);
+    }
+
+    &--nav {
+        float: right;
+
+        @include govuk-media-query ($until: tablet) {
+            float: none;
+            @include govuk-responsive-padding(2, "top");
+            @include govuk-responsive-margin(2, "top");
+            border-top: 1px solid $govuk-border-colour;
+        }
+    }
+}
