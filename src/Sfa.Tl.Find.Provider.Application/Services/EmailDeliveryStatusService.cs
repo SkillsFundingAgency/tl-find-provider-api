@@ -34,7 +34,11 @@ public class EmailDeliveryStatusService : IEmailDeliveryStatusService
         {
             return 0;
         }
-
+        _logger.LogInformation("Email delivery failure detected - {deliveryStatus} - {status} - {type}",
+            deliveryReceipt.EmailDeliveryStatus, 
+            deliveryReceipt.Status,
+            deliveryReceipt.NotificationType);
+        
         var emailTemplate = await _emailTemplateRepository
             .GetEmailTemplate(deliveryReceipt.TemplateId.ToString());
         var emailTemplateName = emailTemplate != null 

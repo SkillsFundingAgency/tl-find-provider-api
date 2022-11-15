@@ -188,7 +188,8 @@ public class EmployerInterestService : IEmployerInterestService
         return await _emailService.SendEmail(
             employerInterest.Email,
             EmailTemplateNames.EmployerRegisterInterest,
-            tokens);
+            tokens, 
+            employerInterest.UniqueId.ToString());
     }
 
     private async Task<GeoLocation> GetPostcode(string postcode)

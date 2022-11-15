@@ -111,7 +111,8 @@ public class EmployerInterestServiceTests
         emailService.SendEmail(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>())
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>())
             .Returns(true);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
@@ -135,8 +136,8 @@ public class EmployerInterestServiceTests
             .SendEmail(
                 employerInterest.Email,
                 EmailTemplateNames.EmployerRegisterInterest,
-                Arg.Any<IDictionary<string, string>>()
-            );
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>());
     }
 
     [Fact]
@@ -218,7 +219,8 @@ public class EmployerInterestServiceTests
                             { "additional_information", employerInterest.AdditionalInformation },
                             { "employer_support_site", settings.EmployerSupportSiteUri },
                             { "employer_unsubscribe_uri", expectedUnsubscribeUri }
-                        })));
+                        })),
+                Arg.Any<string>());
     }
 
     [Fact]
@@ -239,7 +241,8 @@ public class EmployerInterestServiceTests
         emailService.SendEmail(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>())
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>())
             .Returns(true);
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -283,7 +286,8 @@ public class EmployerInterestServiceTests
                         new Dictionary<string, string>
                         {
                             { "additional_information", expectedAdditionalInformation }
-                        })));
+                        })),
+                Arg.Any<string>());
     }
 
     [Fact]
@@ -359,7 +363,8 @@ public class EmployerInterestServiceTests
                             { "additional_information", string.Empty },
                             { "employer_support_site", settings.EmployerSupportSiteUri },
                             { "employer_unsubscribe_uri", expectedUnsubscribeUri }
-                        })));
+                        })),
+                uniqueId.ToString());
     }
 
     [Fact]
