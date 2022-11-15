@@ -45,11 +45,11 @@ public class CacheUtilitiesTests
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
-            .Contain(args => args[0] is LogLevel && (LogLevel)args[0] == LogLevel.Information);
+            .Contain(args => args[0] is LogLevel && (LogLevel)args[0]! == LogLevel.Information);
             
         logger.ReceivedCalls()
             .Select(call => call.GetArguments())
             .Should()
-            .Contain(args => args[2] != null && args[2].ToString() == $"Entry {key} was evicted from the cache. Reason: {reason}.");
+            .Contain(args => args[2] != null && args[2]!.ToString() == $"Entry {key} was evicted from the cache. Reason: {reason}.");
     }
 }
