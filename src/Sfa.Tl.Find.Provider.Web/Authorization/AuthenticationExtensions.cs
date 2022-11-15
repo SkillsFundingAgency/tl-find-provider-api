@@ -83,7 +83,7 @@ public static class AuthenticationExtensions
             options.Scope.Clear();
             options.Scope.Add("openid");
             options.Scope.Add("email");
-            options.Scope.Add("profile");
+            //options.Scope.Add("profile");
             options.Scope.Add("organisationid");
 
             // When we expire the session, ensure user is prompted to sign in again at DfE Sign In
@@ -138,7 +138,7 @@ public static class AuthenticationExtensions
                     ctx.HandleResponse();
                     return Task.FromException(ctx.Failure);
                 },
-                
+
                 // that event is called after the OIDC middleware received the authorisation code,
                 // redeemed it for an access token and a refresh token,
                 // and validated the identity token
@@ -157,7 +157,7 @@ public static class AuthenticationExtensions
 
                         var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
                         var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
-                        
+
                         //claims.AddRange(new List<Claim>
                         //{
                         //    new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
@@ -165,8 +165,9 @@ public static class AuthenticationExtensions
                         //    new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
                         //});
 
-                        claims.AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
-                            .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationId, organisationId)
+                        claims
+                            //.AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
+                            //.AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationId, organisationId)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationName, organisationInfo?.Name)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn?.ToString())
                             //.AddIfNotNullOrEmpty(CustomClaimTypes.Urn, organisationInfo?.Urn?.ToString())
@@ -182,10 +183,10 @@ public static class AuthenticationExtensions
                     if (!string.IsNullOrEmpty(signInSettings.Administrators))
                     {
                         var admins = signInSettings.Administrators?
-                            .Split(new[] {';', ','}, 
+                            .Split(new[] { ';', ',' },
                                 StringSplitOptions.RemoveEmptyEntries);
                         var email = ctx.Principal.FindFirst("email")?.Value;
-                        if(admins is not null && admins.Any(a => a == email))
+                        if (admins is not null && admins.Any(a => a == email))
                         {
                             claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
                         }
