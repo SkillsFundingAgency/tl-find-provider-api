@@ -18,7 +18,7 @@ jobs:
       value: $[stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName']]
     - name: appName
       ${{ if eq( parameters['appName'], 'api' )}}:
-        value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.webAppName']]
+        value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.apiAppName']]
       ${{ elseif eq( parameters['appName'], 'ui' )}}:
         value: $[dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.uiAppName']]
 

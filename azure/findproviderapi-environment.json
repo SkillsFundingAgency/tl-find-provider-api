@@ -29,30 +29,30 @@
         "configurationStorageConnectionString": {
             "type": "securestring"
         },
-        "webCustomHostName": {
+        "apiCustomHostName": {
             "type": "string"
         },
-        "webCertificateName": {
+        "apiCertificateName": {
             "type": "string"
         },
-        "apiCustomHostname": {
+        "uiCustomHostname": {
             "type": "string",
             "defaultValue": ""
         },
-        "apiCertificateName": {
+        "uiCertificateName": {
             "type": "string",
             "defaultValue": ""
         }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/operations-devops-deployment/master/ArmTemplates/",
-        "webAppName": "[concat(parameters('resourceNamePrefix'), '-web')]",
+        "apiAppName": "[concat(parameters('resourceNamePrefix'), '-web')]",
         "appInsightName": "[concat(parameters('resourceNamePrefix'), '-ai')]",
         "uiAppName": "[concat(parameters('resourceNamePrefix'), '-ui')]",
         // "workerFunctionAppName": "[concat(parameters('resourceNamePrefix'), '-func-worker')]",
         "sqlDatabaseName": "[concat(parameters('resourceNamePrefix'), '-sqldb')]",
         "storageAccountName": "[replace(concat(parameters('resourceNamePrefix'), 'str'), '-', '')]"
-        // "errorLink": "[concat('https://', variables('webAppName'), '.scm.azurewebsites.net/detectors?type=tools&name=eventviewer')]"
+        // "errorLink": "[concat('https://', variables('apiAppName'), '.scm.azurewebsites.net/detectors?type=tools&name=eventviewer')]"
     },
     "resources": [
         {
@@ -87,14 +87,14 @@
                         "value": "[variables('appInsightName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('webAppName')]"
+                        "value": "[variables('apiAppName')]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "[concat('web-app-service-certificate','-', parameters('environmentNameAbbreviation'))]",
+            "name": "[concat('api-app-service-certificate','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -104,7 +104,7 @@
                 },
                 "parameters": {
                     "keyVaultCertificateName": {
-                        "value": "[parameters('webCertificateName')]"
+                        "value": "[parameters('apiCertificateName')]"
                     },
                     "keyVaultName": {
                         "value": "[parameters('sharedKeyVaultName')]"
@@ -117,7 +117,7 @@
         },
         {
             "apiVersion": "2021-04-01",
-            "name": "[concat('web-app-service','-', parameters('environmentNameAbbreviation'))]",
+            "name": "[concat('api-app-service','-', parameters('environmentNameAbbreviation'))]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -127,7 +127,7 @@
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[variables('webAppName')]"
+                        "value": "[variables('apiAppName')]"
                     },
                     "appServicePlanName": {
                         "value": "[parameters('sharedASPName')]"
@@ -164,19 +164,19 @@
                       ]
                     },
                     "customHostName": {
-                        "value": "[parameters('webCustomHostName')]"
+                        "value": "[parameters('apiCustomHostName')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[reference(concat('web-app-service-certificate','-',parameters('environmentNameAbbreviation'))).outputs.certificateThumbprint.value]"
+                        "value": "[reference(concat('api-app-service-certificate','-',parameters('environmentNameAbbreviation'))).outputs.certificateThumbprint.value]"
                     }
                 }
             },
             "dependsOn": [
-                "[concat('web-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
+                "[concat('api-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
             ]
         },
         {
-            "condition": "[greater(length(parameters('apiCustomHostname')), 0)]",
+            "condition": "[greater(length(parameters('uiCustomHostname')), 0)]",
             "apiVersion": "2017-05-10",
             "name": "[concat('ui-app-service-certificate','-',parameters('environmentNameAbbreviation'))]",
             "resourceGroup": "[resourceGroup().name]",
@@ -189,7 +189,7 @@
                 },
                 "parameters": {
                     "keyVaultCertificateName": {
-                        "value": "[parameters('apiCertificateName')]"
+                        "value": "[parameters('uiCertificateName')]"
                     },
                     "keyVaultName": {
                         "value": "[parameters('sharedKeyVaultName')]"
@@ -249,10 +249,10 @@
                         ]
                     },
                     "customHostName": {
-                        "value": "[parameters('apiCustomHostname')]"
+                        "value": "[parameters('uiCustomHostname')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[if(greater(length(parameters('apiCustomHostname')), 0), reference(concat('ui-app-service-certificate','-',parameters('environmentNameAbbreviation')), '2018-11-01').outputs.certificateThumbprint.value, '')]"
+                        "value": "[if(greater(length(parameters('uiCustomHostname')), 0), reference(concat('ui-app-service-certificate','-',parameters('environmentNameAbbreviation')), '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     }
                 }
             },
@@ -370,7 +370,7 @@
                         "value": "AZURE_IP-"
                     },
                     "ipAddresses": {
-                        "value": "[reference(concat('web-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value]"
+                        "value": "[reference(concat('api-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value]"
                     },
                     "serverName": {
                         "value": "[parameters('sharedSQLServerName')]"
@@ -384,9 +384,9 @@
             "type": "string",
             "value": "[variables('sqlDatabaseName')]"
         },
-        "webAppName": {
+        "apiAppName": {
             "type": "string",
-            "value": "[variables('webAppName')]"
+            "value": "[variables('apiAppName')]"
         },
         // "workerFunctionAppName": {
         //     "type": "string",
