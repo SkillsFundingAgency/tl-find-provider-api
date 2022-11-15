@@ -47,12 +47,12 @@ gulp.task('session-timeout-js', function () {
         'Frontend/src/js/session-timeout.js'
     ])
         .pipe(concat('session-timeout.js'))
-        //.pipe(minify({
-        //    noSource: true,
-        //    ext: {
-        //        min: '.min.js'
-        //    }
-        //}))
+        .pipe(minify({
+            noSource: true,
+            ext: {
+                min: '.min.js'
+            }
+        }))
         .pipe(gulp.dest(paths.dist.JS));
 });
 
