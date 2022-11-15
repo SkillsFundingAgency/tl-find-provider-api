@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
@@ -111,6 +112,16 @@ public static class StringExtensions
             ? null
             : Regex.Replace(input, @"(<br ?>)|(<br ?/>)|(\[br ?/\])", "\n");
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ReplaceMultipleLineBreaks(this string input, string replacement = "\n")
+    {
+        return input is null
+            ? null
+            : Regex.Replace(input,
+                "(\n|\r|\r\n){2,}", replacement);
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ReplaceRedactedHttpStrings(this string input)
