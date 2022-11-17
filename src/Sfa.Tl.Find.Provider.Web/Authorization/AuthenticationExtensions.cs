@@ -186,7 +186,7 @@ public static class AuthenticationExtensions
                             .Split(new[] { ';', ',' },
                                 StringSplitOptions.RemoveEmptyEntries);
                         var email = ctx.Principal.FindFirst("email")?.Value;
-                        if (admins is not null && admins.Any(a => a == email))
+                        if (admins is not null && admins.Any(a =>  string.Compare(a, email, StringComparison.OrdinalIgnoreCase) == 0))
                         {
                             claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
                         }
