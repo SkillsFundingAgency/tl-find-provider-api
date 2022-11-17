@@ -7,6 +7,8 @@ public class EmployerInterestBuilder
 {
     private IList<Guid> _uniqueIds = new List<Guid>();
 
+    private string _additionalInformation;
+
     public IEnumerable<EmployerInterest> BuildList() =>
         new List<EmployerInterest>
         {
@@ -21,7 +23,7 @@ public class EmployerInterestBuilder
                 Longitude = -1.508122,
                 IndustryId = 9,
                 OtherIndustry = null,
-                AdditionalInformation = "These are my requirements: none",
+                AdditionalInformation = _additionalInformation ?? "These are my requirements: none",
                 Email = "test.contact1@employer.co.uk",
                 Telephone = "020 555 6666 ext 1",
                 Website = "https://employer-one.co.uk",
@@ -39,7 +41,7 @@ public class EmployerInterestBuilder
                 Longitude = -1.508122,
                 IndustryId = null,
                 OtherIndustry = "Test Industry",
-                AdditionalInformation = "These are my requirements: a few good people",
+                AdditionalInformation = _additionalInformation ?? "These are my requirements: a few good people",
                 Email = "test.contact2@employer.co.uk",
                 Telephone = "020 555 6666 ext 2",
                 Website = "https://employer-two.co.uk",
@@ -56,7 +58,6 @@ public class EmployerInterestBuilder
 
     public EmployerInterest BuildWithEmptyNonMandatoryProperties()
     {
-        var employerInterest = Build();
         return new EmployerInterest
         {
             Id = default,
@@ -66,7 +67,7 @@ public class EmployerInterestBuilder
             Postcode = "CV1 2WT",
             IndustryId = null,
             OtherIndustry = null,
-            Email = null,
+            Email = "test.contact1@employer.co.uk",
             Telephone = null,
             Website = null,
             ContactPreferenceType = default,
@@ -95,6 +96,14 @@ public class EmployerInterestBuilder
             ContactPreferenceType = employerInterest.ContactPreferenceType,
             AdditionalInformation = employerInterest.AdditionalInformation
         };
+    }
+
+
+    public EmployerInterestBuilder WithAdditionalInformation(string additionalInformation)
+    {
+        _additionalInformation = additionalInformation;
+
+        return this;
     }
 
     public EmployerInterestBuilder WithUniqueId(Guid uniqueId)

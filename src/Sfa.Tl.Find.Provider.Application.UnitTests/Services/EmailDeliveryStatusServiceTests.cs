@@ -52,7 +52,8 @@ public class EmailDeliveryStatusServiceTests
             .DidNotReceive()
             .SendEmail(Arg.Any<string>(),
                 Arg.Any<string>(),
-                Arg.Any<Dictionary<string, dynamic>>());
+                Arg.Any<Dictionary<string, dynamic>>(),
+                Arg.Any<string>());
     }
 
     [Fact]

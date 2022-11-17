@@ -28,19 +28,21 @@ public class EmailService : IEmailService
     public async Task<bool> SendEmail(
         string recipient,
         string templateName,
-        IDictionary<string, string> tokens = null)
+        IDictionary<string, string> tokens = null,
+        string reference = null)
     {
         var dynamicTokens =
             tokens?.Select(x => new { key = x.Key, val = (dynamic)x.Value })
                 .ToDictionary(item => item.key, item => item.val);
 
-        return await SendEmail(recipient, templateName, dynamicTokens);
+        return await SendEmail(recipient, templateName, dynamicTokens, reference);
     }
 
     public async Task<bool> SendEmail(
         string recipients,
         string templateName,
-        Dictionary<string, dynamic> tokens)
+        Dictionary<string, dynamic> tokens,
+        string reference)
     {
         var recipientList = recipients?.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
@@ -66,12 +68,13 @@ public class EmailService : IEmailService
 
                 var emailResponse =
                     await retryPolicy
-                        .ExecuteAsync(async _ => 
+                        .ExecuteAsync(async _ =>
                                 await _notificationClient
                                     .SendEmailAsync(
                                         recipient,
                                         emailTemplate.TemplateId,
-                                        tokens),
+                                        tokens,
+                                        clientReference: reference),
                             context);
 
                 if (_logger.IsEnabled(LogLevel.Information))

@@ -11,4 +11,5 @@ public class DfeSignInSettings
     public string? Issuer { get; set; }
     public string? MetadataAddress { get; set; }
     public int Timeout { get; set; }
+    public int CookiePadding { get; set; }
 }
