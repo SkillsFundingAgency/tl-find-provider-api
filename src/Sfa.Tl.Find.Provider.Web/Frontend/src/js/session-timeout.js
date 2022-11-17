@@ -25,7 +25,6 @@ $(document).ready(function () {
     };
 
     GOVUK.setInitialSessionTimeoutModalTimer = function (timeInMs) {
-        console.log('setInitialSessionTimeoutModalTimer ' + timeInMs);
         initialSessionTimeoutModalTimerHandle = setTimeout(function () {
             GOVUK.checkSessionActiveDuration(0, 0, true)
         }, (timeInMs - delayTimeInMs));
@@ -61,24 +60,20 @@ $(document).ready(function () {
 
     GOVUK.setSessionTimeoutCountDownTimer = function (minutes, seconds) {
         function startSessionTimeoutCountDownTimer() {
-            console.log('startSessionTimeoutCountDownTimer');
             var minutesCounterElement = $("#minutes-counter"), secondsCounterElement = $("#seconds-counter");
             minutesCounterElement.text(minutes > 0 ? minutes.toString() + (minutes === 1 ? " minute" : " minutes") : "");
             secondsCounterElement.text(seconds > 0 ? " " + seconds.toString() + (seconds === 1 ? " second" : " seconds") : "");
 
             if (minutes === 0 && seconds === 2) {
-                console.log('startSessionTimeoutCountDownTimer 0 2');
                 GOVUK.checkSessionActiveDuration(0, 2, false);
             }
 
             if (minutes <= 0 && seconds <= 0) {
-                console.log('startSessionTimeoutCountDownTimer 0 0');
                 GOVUK.hideTimeoutModal();
                 GOVUK.clearAllTimeoutTimers();
                 window.location.href = "/signout";
             }
             else {
-                console.log('startSessionTimeoutCountDownTimer --' + minutes + ":" + seconds);
                 seconds--;
                 if (seconds >= 0) {
                     sessionTimeoutCountDownTimerHandle = setTimeout(startSessionTimeoutCountDownTimer, 1000);
@@ -123,10 +118,8 @@ $(document).ready(function () {
     }
 
     GOVUK.checkSessionActiveDuration = function (timerMinutesValue, timerSecondsValue, isPreCheck) {
-        console.log('checkSessionActiveDuration');
         if (currentGetSessionActivityDurationXhr != null)
             currentGetSessionActivityDurationXhr.abort();
-        console.log('checkSessionActiveDuration 2');
 
         currentGetSessionActivityDurationXhr = $.ajax({
             type: "get",
@@ -196,7 +189,6 @@ $(document).ready(function () {
     GOVUK.renewUserSessionActivity = function () {
         if (currentRenewSessionXhr != null)
             currentRenewSessionXhr.abort();
-        console.log('renewUserSessionActivity');
 
         currentRenewSessionXhr = $.ajax({
             type: "get",
@@ -221,7 +213,6 @@ $(document).ready(function () {
         });
     }
     $("#keep-me-signed-in").click(function () {
-        console.log('GOVUK.renewUserSessionActivity()');
         GOVUK.renewUserSessionActivity();
     });
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Web.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -45,9 +46,6 @@ public class AccountController : Controller
         }
         else
         {
-            _logger.LogInformation("signin - challenging ({auth})",
-                User?.Identity is { IsAuthenticated: true });
-
             await HttpContext.ChallengeAsync(new AuthenticationProperties
             {
                 RedirectUri = "/post-signin"
@@ -59,7 +57,11 @@ public class AccountController : Controller
     [Route("post-signin")]
     public IActionResult PostSignIn()
     {
-        _logger.LogInformation("In post-signin");
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogCookies(HttpContext, "post-signin");
+        }
+
         var redirectPage = User.Identity is { IsAuthenticated: true }
             ? AuthenticationExtensions.AuthenticatedUserStartPageExact
             : AuthenticationExtensions.UnauthenticatedUserStartPage;

@@ -82,7 +82,8 @@ public class EmailServiceTests
         var result = await emailService.SendEmail(
             TestEmailAddress,
             TestEmailTemplateName,
-            personalisationTokens);
+            personalisationTokens,
+            null);
 
         result.Should().Be(true);
 

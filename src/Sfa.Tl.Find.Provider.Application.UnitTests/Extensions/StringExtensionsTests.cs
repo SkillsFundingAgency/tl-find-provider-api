@@ -141,6 +141,19 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
+    [Theory(DisplayName = nameof(StringExtensions.ReplaceMultipleLineBreaks) + " Data Tests")]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    [InlineData("hello world", "hello world")]
+    [InlineData("hello\nworld", "hello\nworld")]
+    [InlineData("hello\n\nworld", "hello\nworld")]
+    [InlineData("hello\n\n\nworld", "hello\nworld")]
+    public void ReplaceMultipleLineBreaks(string input, string expectedResult)
+    {
+        var result = input.ReplaceMultipleLineBreaks();
+        result.Should().Be(expectedResult);
+    }
+
     [Theory(DisplayName = nameof(StringExtensions.ReplaceRedactedHttpStrings) + " Data Tests")]
     [InlineData(null, null)]
     [InlineData("", "")]

@@ -59,6 +59,11 @@
           "minLength": 1,
           "type": "string",
           "environmentVariable": "DfeSignIn_Administrators"
+        },
+        "CookiePadding": {
+          "minLength": 1,
+          "type": "integer",
+          "environmentVariable": "DfeSignIn_CookiePadding"
         }
       },
       "additionalProperties": false,
