@@ -22,9 +22,17 @@
             @if (!string.IsNullOrEmpty(Model.EmployerInterest?.Website))
             {
                 <tr class="govuk-table__row">
+                    @{
+                        var website = Model.EmployerInterest?.Website;
+                        if (!website.StartsWith("http://") && 
+                            !website.StartsWith("https://"))
+                        {
+                            website = $"https://{website}";
+                        }
+                    }
                     <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Website</th>
                     <td class="govuk-table__cell">
-                        <a href="@Model.EmployerInterest.Website" class="govuk-link" id="tl-employer--info--website">@Model.EmployerInterest.Website</a>
+                        <a href="@website" class="govuk-link" id="tl-employer--info--website">@website</a>
                     </td>
                 </tr>
             }
