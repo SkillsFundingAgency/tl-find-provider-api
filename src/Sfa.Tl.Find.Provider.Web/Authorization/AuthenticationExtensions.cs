@@ -191,6 +191,13 @@ public static class AuthenticationExtensions
                             claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
                         }
                     }
+                    //TODO: Remove CookiePadding after WAF excludes our auth cookie
+                    if (signInSettings.CookiePadding > 0)
+                    {
+                        var _random = new Random((int)DateTime.Now.Ticks); //should be static, but we only call it once
+                        var f = (int len) => new string(Enumerable.Range(0, len).Select(_ => (char)_random.Next('a', 'z')).ToArray());
+                        claims.Add(new Claim("cookie_padding", f(signInSettings.CookiePadding)));
+                    }
 
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
 
