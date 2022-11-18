@@ -43,7 +43,7 @@ public class EmployerListModel : PageModel
         _employerInterestSettings.SearchRadius;
 
     public DateOnly? ServiceStartDate =>
-        _employerInterestSettings?.ServiceStartDate is not null
+        _employerInterestSettings.ServiceStartDate is not null
             ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
             : DateOnly.MinValue;
 
