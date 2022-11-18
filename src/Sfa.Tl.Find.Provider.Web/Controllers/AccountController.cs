@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Sfa.Tl.Find.Provider.Web.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
@@ -41,7 +40,6 @@ public class AccountController : Controller
         if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
             isStubProviderAuth)
         {
-            _logger.LogInformation("DfE Sign-in was not used. Redirecting to the dashboard.");
             Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPage);
         }
         else
@@ -57,18 +55,6 @@ public class AccountController : Controller
     [Route("post-signin")]
     public IActionResult PostSignIn()
     {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogCookies(HttpContext, "post-signin");
-        }
-
-        var redirectPage = User.Identity is { IsAuthenticated: true }
-            ? AuthenticationExtensions.AuthenticatedUserStartPageExact
-            : AuthenticationExtensions.UnauthenticatedUserStartPage;
-        _logger.LogInformation("In post-signin - authenticated={isAuthenticated}, redirecting to {page}",
-            User.Identity is { IsAuthenticated: true },
-            redirectPage);
-
         return RedirectToPage(
             User.Identity is { IsAuthenticated: true }
                 ? AuthenticationExtensions.AuthenticatedUserStartPageExact
@@ -85,8 +71,6 @@ public class AccountController : Controller
 
         if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)
         {
-            _logger.LogInformation("DfE Sign-in was not used. Signing out of fake authentication.");
-
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignOutAsync(AuthenticationExtensions.AuthenticationCookieName);
             return RedirectToPage("/SignedOut");

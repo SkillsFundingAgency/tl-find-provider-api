@@ -37,7 +37,6 @@ public static class SettingsExtensions
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
         settings.Administrators= configuration.DfeSignInSettings?.Administrators;
-        settings.CookiePadding = configuration.DfeSignInSettings?.CookiePadding ?? 0;
         settings.ApiUri = configuration.DfeSignInSettings?.ApiUri;
         settings.ApiSecret = configuration.DfeSignInSettings?.ApiSecret;
         settings.Audience = configuration.DfeSignInSettings?.Audience;
