@@ -65,7 +65,7 @@ public class EmployersController : ControllerBase
                     ?.ToTrimmedOrNullString()
                     ?.ReplaceRedactedHttpStrings()
                     .Truncate(500),
-                ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
+                ContactPreferenceType = employerInterest.ContactPreferenceType,
                 SkillAreaIds = employerInterest.SkillAreaIds
             };
 

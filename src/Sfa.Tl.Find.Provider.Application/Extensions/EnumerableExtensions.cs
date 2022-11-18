@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Reflection;
 using Dapper.Contrib.Extensions;
 
@@ -30,6 +31,17 @@ public static class EnumerableExtensions
             var columnNames = (orderedColumnNames ?? readableProperties.Select(s => s.Name)).ToArray();
             foreach (var name in columnNames)
             {
+                if (name == "ContactPreferenceType")
+                {
+                    var propertyInfo = readableProperties.Single(s => s.Name.Equals(name));
+                    var column = new DataColumn
+                    {
+                        ColumnName = name,
+                        DataType = propertyInfo.PropertyType.Name.Contains("Nullable") ? typeof(string) : propertyInfo.PropertyType
+                    };
+                    dataTable.Columns.Add(column);
+                }
+                else
                 dataTable.Columns.Add(name, readableProperties.Single(s => s.Name.Equals(name)).PropertyType);
             }
 

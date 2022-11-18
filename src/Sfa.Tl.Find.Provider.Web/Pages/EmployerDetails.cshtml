@@ -6,7 +6,7 @@
     ViewData["Title"] = @Model.EmployerInterest?.OrganisationName + " | Employer details";
 }
 @section breadcrumbs {
-<a asp-page="/EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
+    <a asp-page="/EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
 }
 
 <div class="govuk-grid-row">
@@ -19,47 +19,47 @@
         <table class="govuk-table">
             <caption class="govuk-table__caption govuk-table__caption--m">Organisation details</caption>
             <tbody class="govuk-table__body">
-            @if (!string.IsNullOrEmpty(Model.EmployerInterest?.Website))
-            {
-                <tr class="govuk-table__row">
-                    @{
-                        var website = Model.EmployerInterest?.Website;
-                        if (!website.StartsWith("http://") && 
+                @if (!string.IsNullOrEmpty(Model.EmployerInterest?.Website))
+                {
+                    <tr class="govuk-table__row">
+                        @{
+                            var website = Model.EmployerInterest?.Website;
+                            if (!website.StartsWith("http://") &&
                             !website.StartsWith("https://"))
-                        {
-                            website = $"https://{website}";
+                            {
+                                website = $"https://{website}";
+                            }
                         }
-                    }
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Website</th>
+                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Website</th>
+                        <td class="govuk-table__cell">
+                            <a href="@website" class="govuk-link" id="tl-employer--info--website">@website</a>
+                        </td>
+                    </tr>
+                }
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Primary industry</th>
+                    <td class="govuk-table__cell">@Model.EmployerInterest?.Industry</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">
+                        Industry placement skill area@(Model.EmployerInterest?.SkillAreas is { Count: > 1 } ? "s" : "")
+                    </th>
                     <td class="govuk-table__cell">
-                        <a href="@website" class="govuk-link" id="tl-employer--info--website">@website</a>
+                        @if (Model.EmployerInterest?.SkillAreas is { Count: > 0 })
+                        {
+                            <ul class="govuk-list">
+                                @foreach (var skillArea in Model.EmployerInterest.SkillAreas)
+                                {
+                                    <li>@skillArea</li>
+                                }
+                            </ul>
+                        }
                     </td>
                 </tr>
-            }
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Primary industry</th>
-                <td class="govuk-table__cell">@Model.EmployerInterest?.Industry</td>
-            </tr>
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">
-                    Industry placement skill area@(Model.EmployerInterest?.SkillAreas is { Count: > 1 } ? "s" : "")
-                </th>
-                <td class="govuk-table__cell">
-                    @if (Model.EmployerInterest?.SkillAreas is { Count: > 0 })
-                    {
-                        <ul class="govuk-list">
-                            @foreach (var skillArea in Model.EmployerInterest.SkillAreas)
-                            {
-                                <li>@skillArea</li>
-                            }
-                        </ul>
-                    }
-                </td>
-            </tr>
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Location</th>
-                <td class="govuk-table__cell">@Model.EmployerInterest?.Postcode</td>
-            </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Location</th>
+                    <td class="govuk-table__cell">@Model.EmployerInterest?.Postcode</td>
+                </tr>
                 @if (!string.IsNullOrEmpty(Model.EmployerInterest?.AdditionalInformation))
                 {
                     <tr class="govuk-table__row">
@@ -88,15 +88,18 @@
                         <td class="govuk-table__cell">@Model.EmployerInterest?.Telephone</td>
                     </tr>
                 }
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Contact preference</th>
-                    <td class="govuk-table__cell">
-                        @{
-                            var contactPreference = (Model.EmployerInterest?.ContactPreferenceType).GetContactPreferenceDisplayName();
-                        }
-                        @contactPreference
-                    </td>
-                </tr>
+                @if (Model.EmployerInterest?.ContactPreferenceType != null)
+                {
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Contact preference</th>
+                        <td class="govuk-table__cell">
+                            @{
+                                var contactPreference = (Model.EmployerInterest?.ContactPreferenceType).GetContactPreferenceDisplayName();
+                            }
+                            @contactPreference
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

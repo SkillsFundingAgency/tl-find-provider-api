@@ -16,6 +16,6 @@ public class EmployerInterestDto
     public string Email { get; init; }
     public string Telephone { get; init; }
     public string Website { get; init; }
-    public int ContactPreferenceType { get; init; }
+    public int? ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
 }
