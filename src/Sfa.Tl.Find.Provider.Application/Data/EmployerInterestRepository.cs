@@ -332,8 +332,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
         return summaryList
             .Values
-            .OrderByDescending(e => e.CreatedOn)
-            .ThenBy(e => e.OrganisationName)
+            .OrderBy(e => e.OrganisationName)
+            .ThenByDescending(e => e.CreatedOn)
             .ToList();
     }
 

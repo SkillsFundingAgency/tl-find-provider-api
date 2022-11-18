@@ -39,7 +39,7 @@ AS
 	ON eir.[EmployerInterestId] = ei.[Id]
 	LEFT JOIN [Route] r
 	ON r.[Id] = eir.[RouteId]
-	ORDER BY	ei.[CreatedOn] DESC,
-				ei.[OrganisationName], 
+	ORDER BY	ei.[OrganisationName], 
+				ei.[CreatedOn] DESC,
 				ei.[Id], 
 				r.[Name]
