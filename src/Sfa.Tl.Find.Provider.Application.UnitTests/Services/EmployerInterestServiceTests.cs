@@ -337,7 +337,7 @@ public class EmployerInterestServiceTests
 
         result.Should().Be(uniqueId);
 
-        const string expectedContactPreference = "No preference";
+        const string expectedContactPreference = "None";
         var expectedUnsubscribeUri =
              $"{settings.UnsubscribeEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
 

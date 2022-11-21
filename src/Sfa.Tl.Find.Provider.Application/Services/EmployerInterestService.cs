@@ -146,7 +146,8 @@ public class EmployerInterestService : IEmployerInterestService
         {
             ContactPreference.Email => "Email",
             ContactPreference.Telephone => "Telephone",
-            _ => "No preference"
+            ContactPreference.NoPreference => "No preference",
+            _ => "None"
         };
 
         var industries = await _providerDataService.GetIndustries();
