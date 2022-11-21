@@ -7,6 +7,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages;
+using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
@@ -290,7 +291,7 @@ public class EmployerListPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/EmployerList");
+        redirectResult!.PageName.Should().Be("/Employer/EmployerList");
     }
 
     [Fact]
@@ -314,7 +315,7 @@ public class EmployerListPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/EmployerList");
+        redirectResult!.PageName.Should().Be("/Employer/EmployerList");
     }
 
     [Fact]

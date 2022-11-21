@@ -21,7 +21,7 @@
         <div class="govuk-header__content">
             @if (Context.User.Identity!.IsAuthenticated)
             {
-                <a asp-page="/EmployerList" class="govuk-header__link govuk-header__link--service-name">
+                <a asp-page="/Employer/EmployerList" class="govuk-header__link govuk-header__link--service-name">
                     @PageExtensions.GetServiceName()
                 </a>
             }

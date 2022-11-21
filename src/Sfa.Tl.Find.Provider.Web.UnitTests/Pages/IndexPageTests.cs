@@ -37,7 +37,7 @@ public class IndexPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().BeEquivalentTo(AuthenticationExtensions.AuthenticatedUserStartPage
+        redirectResult!.PageName.Should().BeEquivalentTo(AuthenticationExtensions.AuthenticatedUserStartPageRoute
             .Replace("-", ""));
         indexModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeTrue();
     }

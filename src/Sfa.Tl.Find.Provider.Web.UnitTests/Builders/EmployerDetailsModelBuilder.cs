@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Pages;
+using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class EmployerDetailsModelBuilder

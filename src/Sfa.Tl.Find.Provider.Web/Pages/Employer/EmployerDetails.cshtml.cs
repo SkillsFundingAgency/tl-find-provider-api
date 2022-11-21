@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
-namespace Sfa.Tl.Find.Provider.Web.Pages;
+namespace Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 [Authorize(nameof(PolicyNames.IsProviderOrAdministrator))]
 public class EmployerDetailsModel : PageModel

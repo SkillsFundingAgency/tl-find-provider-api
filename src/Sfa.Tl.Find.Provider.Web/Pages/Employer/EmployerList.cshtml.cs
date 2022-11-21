@@ -12,7 +12,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
-namespace Sfa.Tl.Find.Provider.Web.Pages;
+namespace Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 [Authorize(nameof(PolicyNames.IsProviderOrAdministrator))]
 public class EmployerListModel : PageModel
@@ -179,7 +179,7 @@ public class EmployerListModel : PageModel
 
         _sessionService.Set(SessionKeyPostcodeLocation, postcodeLocation);
 
-        return RedirectToPage("/EmployerList");
+        return RedirectToPage("/Employer/EmployerList");
     }
 
     private long? GetUkPrn()

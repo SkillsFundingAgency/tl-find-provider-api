@@ -1,5 +1,5 @@
 ﻿@using Sfa.Tl.Find.Provider.Application.Extensions
-@model Sfa.Tl.Find.Provider.Web.Pages.EmployerListModel
+@model EmployerListModel
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -91,7 +91,7 @@
                                 <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
                                 <div class="tl-employers--table--inline-cell">@($"{employerInterest.ExpiryDate:d MMM yyyy}")</div>
                             </td>
-                            <td class="govuk-table__cell"><a asp-page="/EmployerDetails" asp-route-id="@employerInterest.Id" id="tl-employer--table--link--@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a></td>
+                            <td class="govuk-table__cell"><a asp-page="./EmployerDetails" asp-route-id="@employerInterest.Id" id="tl-employer--table--link--@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a></td>
                         </tr>
                     }
                 </tbody>

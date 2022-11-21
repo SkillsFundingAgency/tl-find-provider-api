@@ -17,8 +17,8 @@ public static class AuthenticationExtensions
 {
     public const string AuthenticationCookieName = ".cookies.auth";
     public const string AuthenticationTypeName = "DfE-SignIn";
-    public const string AuthenticatedUserStartPage = "/employer-list";
-    public const string AuthenticatedUserStartPageExact = "/EmployerList";
+    public const string AuthenticatedUserStartPage = "/Employer/EmployerList";
+    public const string AuthenticatedUserStartPageRoute = "/employer-list";
     public const string UnauthenticatedUserStartPage = "/start";
 
     public static IServiceCollection AddProviderAuthentication(

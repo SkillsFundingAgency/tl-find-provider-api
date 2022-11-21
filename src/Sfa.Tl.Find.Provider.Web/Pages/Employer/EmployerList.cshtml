@@ -1,18 +1,18 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Sfa.Tl.Find.Provider.Infrastructure.Authorization
-@model Sfa.Tl.Find.Provider.Web.Pages.EmployerListModel
+@model EmployerListModel
 @{
     ViewData["Title"] = "Employer list";
 }
 
 @if (Model?.UkPrn is not null)
 {
-    <partial name="partials/_providerEmployerList" />
+    <partial name="_providerEmployerList" />
 }
 else if (User.IsInRole(CustomRoles.Administrator))
 {
-    <partial name="partials/_administratorEmployerList" />
+    <partial name="_administratorEmployerList" />
 }
 
 @section scripts {

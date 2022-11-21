@@ -40,7 +40,7 @@ public class AccountController : Controller
         if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) &&
             isStubProviderAuth)
         {
-            Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPage);
+            Response.Redirect(AuthenticationExtensions.AuthenticatedUserStartPageRoute);
         }
         else
         {
@@ -57,7 +57,7 @@ public class AccountController : Controller
     {
         return RedirectToPage(
             User.Identity is { IsAuthenticated: true }
-                ? AuthenticationExtensions.AuthenticatedUserStartPageExact
+                ? AuthenticationExtensions.AuthenticatedUserStartPage
                 : AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 

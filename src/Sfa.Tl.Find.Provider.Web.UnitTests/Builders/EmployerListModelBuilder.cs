@@ -8,6 +8,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Web.Pages;
 using System.Security.Claims;
+using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class EmployerListModelBuilder
