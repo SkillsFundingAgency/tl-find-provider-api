@@ -67,7 +67,6 @@ public static class SettingsExtensions
         settings.CleanupJobSchedule = configuration.EmployerInterestSettings?.CleanupJobSchedule;
         settings.RetentionDays = configuration.EmployerInterestSettings?.RetentionDays ?? 0;
         settings.UnsubscribeEmployerUri = configuration.EmployerInterestSettings?.UnsubscribeEmployerUri;
-        settings.ServiceStartDate = configuration.EmployerInterestSettings?.ServiceStartDate;
         settings.SearchRadius = configuration.EmployerInterestSettings?.SearchRadius ?? 0;
     }
 

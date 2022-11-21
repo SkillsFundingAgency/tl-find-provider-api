@@ -45,9 +45,6 @@ public class EmployerListPageTests
         employerListModel.SearchRadius.Should().Be(settings.SearchRadius);
         employerListModel.EmployerInterestRetentionDays.Should().Be(retentionDays);
         employerListModel.EmployerInterestRetentionWeeks.Should().Be(expectedRetentionWeeks);
-
-        var expectedServiceStartDate = DateOnly.FromDateTime(settings.ServiceStartDate!.Value);
-        employerListModel.ServiceStartDate.Should().Be(expectedServiceStartDate);
     }
 
     [Fact]

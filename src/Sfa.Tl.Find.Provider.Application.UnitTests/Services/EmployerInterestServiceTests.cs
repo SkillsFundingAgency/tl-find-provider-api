@@ -738,19 +738,4 @@ public class EmployerInterestServiceTests
 
         service.RetentionDays.Should().Be(retentionDays);
     }
-
-    [Fact]
-    public void ServiceStartDate_Returns_Expected_Value()
-    {
-        var serviceStartDate = DateTime.Parse("2022-11-11");
-        var expectedServiceStartDate = DateOnly.FromDateTime(serviceStartDate);
-
-        var service = new EmployerInterestServiceBuilder()
-            .Build(employerInterestSettings:
-                new SettingsBuilder()
-                    .BuildEmployerInterestSettings(
-                        serviceStartDate: serviceStartDate));
-
-        service.ServiceStartDate.Should().Be(expectedServiceStartDate);
-    }
 }

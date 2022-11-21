@@ -5,8 +5,6 @@ public interface IEmployerInterestService
 {
     int RetentionDays { get; }
 
-    DateOnly? ServiceStartDate { get; }
-
     Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest);
 
     Task<int> DeleteEmployerInterest(Guid uniqueId);

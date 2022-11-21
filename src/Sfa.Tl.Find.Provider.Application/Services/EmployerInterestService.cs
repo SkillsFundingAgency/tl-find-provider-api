@@ -42,11 +42,6 @@ public class EmployerInterestService : IEmployerInterestService
 
     public int RetentionDays => _employerInterestSettings.RetentionDays;
 
-    public DateOnly? ServiceStartDate =>
-        _employerInterestSettings?.ServiceStartDate is not null
-            ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
-            : null;
-
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
@@ -100,7 +95,7 @@ public class EmployerInterestService : IEmployerInterestService
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today, serviceStartDate: ServiceStartDate);
+                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
                 x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
                 return x;
             });
@@ -127,7 +122,7 @@ public class EmployerInterestService : IEmployerInterestService
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today, serviceStartDate: ServiceStartDate);
+                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
                 x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
                 return x;
             });

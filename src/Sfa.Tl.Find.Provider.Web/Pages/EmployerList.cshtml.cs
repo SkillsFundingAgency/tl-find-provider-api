@@ -42,11 +42,6 @@ public class EmployerListModel : PageModel
     public int SearchRadius =>
         _employerInterestSettings.SearchRadius;
 
-    public DateOnly? ServiceStartDate =>
-        _employerInterestSettings.ServiceStartDate is not null
-            ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
-            : DateOnly.MinValue;
-
     public long? UkPrn { get; private set; }
 
     public bool? ZeroResultsFound { get; set; }
