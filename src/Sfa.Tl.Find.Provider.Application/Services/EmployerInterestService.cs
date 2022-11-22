@@ -60,6 +60,16 @@ public class EmployerInterestService : IEmployerInterestService
         return uniqueId;
     }
 
+    public async Task<int> DeleteEmployerInterest(int id)
+    {
+        var count = await _employerInterestRepository.Delete(id);
+
+        _logger.LogInformation("Removed {count} employer interest records with id {id}",
+            count, id);
+
+        return count;
+    }
+
     public async Task<int> DeleteEmployerInterest(Guid uniqueId)
     {
         var count = await _employerInterestRepository.Delete(uniqueId);

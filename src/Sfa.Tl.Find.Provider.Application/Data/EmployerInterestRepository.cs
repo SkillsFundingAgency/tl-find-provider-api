@@ -103,6 +103,50 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
     }
 
+    public async Task<int> Delete(int id)
+    {
+        try
+        {
+            var result = 0;
+
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
+
+            return await retryPolicy
+                .ExecuteAsync(async _ =>
+                {
+                    using var connection = _dbContextWrapper.CreateConnection();
+                    connection.Open();
+
+                    using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+                    _dynamicParametersWrapper.CreateParameters(new
+                    {
+                        employerInterestIds =
+                            new List<int> { id }
+                                .AsTableValuedParameter("dbo.IdListTableType")
+                    });
+
+                    await _dbContextWrapper.ExecuteAsync(
+                        connection,
+                        "DeleteEmployerInterest",
+                        _dynamicParametersWrapper.DynamicParameters,
+                        transaction,
+                        commandType: CommandType.StoredProcedure);
+
+                    result = 1;
+
+                    transaction.Commit();
+                    return result;
+                },
+                    context);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when deleting employer interest with id '{id}'", id);
+            throw;
+        }
+    }
+
     public async Task<int> Delete(Guid uniqueId)
     {
         try

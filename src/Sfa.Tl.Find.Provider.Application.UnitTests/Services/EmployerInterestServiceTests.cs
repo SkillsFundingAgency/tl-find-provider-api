@@ -392,6 +392,50 @@ public class EmployerInterestServiceTests
     }
 
     [Fact]
+    public async Task DeleteEmployerInterest_By_Id_Calls_Repository()
+    {
+        var id = 101;
+        const int count = 1;
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Delete(id)
+            .Returns(count);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository);
+
+        var result = await service.DeleteEmployerInterest(id);
+
+        result.Should().Be(count);
+
+        await employerInterestRepository
+            .Received(1)
+            .Delete(id);
+    }
+
+    [Fact]
+    public async Task DeleteEmployerInterest_By_UniqueId_Calls_Repository()
+    {
+        var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        const int count = 1;
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Delete(uniqueId)
+            .Returns(count);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository);
+
+        var result = await service.DeleteEmployerInterest(uniqueId);
+
+        result.Should().Be(count);
+
+        await employerInterestRepository
+            .Received(1)
+            .Delete(uniqueId);
+    }
+
+    [Fact]
     public async Task RemoveExpiredEmployerInterest_Does_Not_Call_Repository_For_Zero_RetentionDays()
     {
         var settings = new EmployerInterestSettings

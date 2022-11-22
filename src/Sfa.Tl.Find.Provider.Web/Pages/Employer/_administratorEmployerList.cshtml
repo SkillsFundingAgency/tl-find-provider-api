@@ -8,6 +8,7 @@
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">Organisation</th>
+                        <th scope="col" class="govuk-table__header">Primary industry</th>
                         <th scope="col" class="govuk-table__header">Placement areas</th>
                         <th scope="col" class="govuk-table__header">Details expire</th>
                         <th scope="col" class="govuk-table__header"></th>
@@ -40,11 +41,18 @@
                                     }
                                 </div>
                             </td>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>Primary Industry</strong></div>
+                                <div class="tl-employers--table--inline-cell">@employerInterest.Industry</div>
+                            </td>
                             <td class="govuk-table__cell">
                                 <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
                                 <div class="tl-employers--table--inline-cell">@($"{employerInterest.ExpiryDate:d MMM yyyy}")</div>
                             </td>
-                            <td class="govuk-table__cell"><a asp-page="./EmployerDetails" asp-route-id="@employerInterest.Id" id="tl-employer--table--link--@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a></td>
+                            <td class="govuk-table__cell">
+                                <a asp-page="./EmployerDetails" asp-route-id="@employerInterest.Id" id="tl-employer--table--link--@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a>
+                                <a asp-page="./EmployerDelete" asp-route-id="@employerInterest.Id" id="tl-employer--table--link--@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">Delete</a>
+                            </td>
                         </tr>
                     }
                 </tbody>

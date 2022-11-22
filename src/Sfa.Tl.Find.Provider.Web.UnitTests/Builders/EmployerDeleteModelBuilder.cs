@@ -1,24 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
-public class EmployerDetailsModelBuilder
+public class EmployerDeleteModelBuilder
 {
-    public EmployerDetailsModel Build(
+    public EmployerDeleteModel Build(
         IEmployerInterestService? employerInterestService = null,
         ILogger<EmployerDetailsModel>? logger = null,
         PageContext? pageContext = null,
-        bool userIsAuthenticated = true)
+        bool userIsAuthenticated = true,
+        bool isAdministrator = true)
     {
+        var claims = userIsAuthenticated && isAdministrator
+            ? new List<Claim>
+            {
+                new Claim(ClaimTypes.Role, CustomRoles.Administrator)
+            }
+            : null;
+
         pageContext ??= new PageContextBuilder()
-            .Build(userIsAuthenticated);
+            .Build(userIsAuthenticated, claims);
 
         employerInterestService ??= Substitute.For<IEmployerInterestService>();
         logger ??= Substitute.For<ILogger<EmployerDetailsModel>>();
 
-        var pageModel = new EmployerDetailsModel(
+        var pageModel = new EmployerDeleteModel(
             employerInterestService,
             logger)
         {

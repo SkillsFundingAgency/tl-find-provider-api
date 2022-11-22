@@ -1,0 +1,25 @@
+﻿@page "{id}"
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Sfa.Tl.Find.Provider.Web.Pages.Employer.EmployerDeleteModel
+@{
+    ViewData["Title"] = @Model.EmployerInterest?.OrganisationName + " | Delete";
+}
+
+@section breadcrumbs {
+    <a asp-page="./EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">@Model.EmployerInterest?.OrganisationName</h1>
+
+        <form method="post">
+            @*<input asp-for="Id" type="hidden" />*@
+            <p>@Model.EmployerInterest?.Id</p>
+            <p class="govuk-body">
+                Do you want to delete @Model.EmployerInterest?.OrganisationName
+            </p>
+            <button type="submit" asp-route-id="@Model.EmployerInterest?.Id" id="tl-employers--delete--submit" class="govuk-button govuk-!-margin-bottom-2">Delete</button>
+        </form>
+    </div>
+</div>
