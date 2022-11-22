@@ -6,17 +6,13 @@ jobs:
   workspace:
     clean: all
   steps:
-    - task: UseDotNet@2
-      displayName: "Use .NET Core SDK 2.1.x"
+    - task: gitversion/setup@0
+      displayName: GitVersion setup
       inputs:
-        packageType: 'sdk'
-        version: '2.1.x'
+        versionSpec: '5.x'
 
-    - task: GitVersion@5
-      displayName: GitVersion
-      inputs:
-        runtime: 'core'
-        updateAssemblyInfo: true
+    - task: gitversion/execute@0
+      displayName: GitVersion execute
 
     - task: NodeTool@0
       displayName: 'Node install'
