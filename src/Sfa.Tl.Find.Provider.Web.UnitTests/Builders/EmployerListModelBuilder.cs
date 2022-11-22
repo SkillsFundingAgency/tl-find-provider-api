@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
-using Sfa.Tl.Find.Provider.Web.Pages;
 using System.Security.Claims;
 using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
@@ -24,7 +23,7 @@ public class EmployerListModelBuilder
         bool userIsAuthenticated = true,
         bool isAdministrator = false)
     {
-        var claims = isAdministrator
+        var claims = userIsAuthenticated && isAdministrator
             ? new List<Claim>
             {
                 new Claim(ClaimTypes.Role, CustomRoles.Administrator)
