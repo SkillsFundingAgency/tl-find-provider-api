@@ -11,8 +11,8 @@ public class EmployerDetailsModel : PageModel
 {
     public Application.Models.EmployerInterestDetail? EmployerInterest { get; private set; }
 
-    private readonly ILogger<EmployerDetailsModel> _logger;
     private readonly IEmployerInterestService _employerInterestService;
+    private readonly ILogger<EmployerDetailsModel> _logger;
 
     public EmployerDetailsModel(
         IEmployerInterestService employerInterestService,

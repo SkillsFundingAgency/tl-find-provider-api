@@ -24,8 +24,8 @@
                     <tr class="govuk-table__row">
                         @{
                             var website = Model.EmployerInterest?.Website;
-                            if (!website.StartsWith("http://") &&
-                            !website.StartsWith("https://"))
+                            if (!website!.StartsWith("http://") &&
+                                !website.StartsWith("https://"))
                             {
                                 website = $"https://{website}";
                             }

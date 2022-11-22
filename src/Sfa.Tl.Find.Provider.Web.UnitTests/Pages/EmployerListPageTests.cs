@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Sfa.Tl.Find.Provider.Web.Pages;
 using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
