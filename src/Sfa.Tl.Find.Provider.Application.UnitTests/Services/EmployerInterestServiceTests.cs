@@ -61,8 +61,7 @@ public class EmployerInterestServiceTests
         await employerInterestRepository
             .Received(1)
             .Create(Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>()
-            );
+                Arg.Any<GeoLocation>());
 
         await employerInterestRepository
             .Received(1)
@@ -72,15 +71,13 @@ public class EmployerInterestServiceTests
                         false,
                         false,
                         false)),
-                Arg.Any<GeoLocation>()
-            );
+                Arg.Any<GeoLocation>());
 
         await employerInterestRepository
             .Received(1)
             .Create(Arg.Any<EmployerInterest>(),
                 Arg.Is<GeoLocation>(g =>
-                    g.Validate(geoLocation))
-            );
+                    g.Validate(geoLocation)));
 
         await employerInterestRepository
             .Received(1)
@@ -91,8 +88,7 @@ public class EmployerInterestServiceTests
                     false,
                     false)),
                 Arg.Is<GeoLocation>(g =>
-                    g.Validate(geoLocation))
-                );
+                    g.Validate(geoLocation)));
     }
 
     [Fact]
@@ -192,10 +188,23 @@ public class EmployerInterestServiceTests
             $"{industries.Single(i => i.Id == 9).Name}";
 
         var expectedSkillAreas =
-            $"{routes.Single(r => r.Id == 1).Name}, {routes.Single(r => r.Id == 2).Name}";
+            $"{routes.Single(r => r.Id == 1).Name}" +
+            $", {routes.Single(r => r.Id == 2).Name}";
 
         var expectedUnsubscribeUri =
             $"{settings.UnsubscribeEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+
+        var expectedDetails =
+            $"* Name: {employerInterest.ContactName}\r\n" +
+            $"* Email address: {employerInterest.Email}\r\n" +
+            $"* Telephone: {employerInterest.Telephone}\r\n" +
+            $"* How would you prefer to be contacted: {expectedContactPreference}\r\n" +
+            $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
+            $"* Website: {employerInterest.Website}\r\n" +
+            $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
+            $"* Industry placement areas: {expectedSkillAreas}\r\n" +
+            $"* Postcode: {employerInterest.Postcode}\r\n" +
+            $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
 
         await emailService
             .Received(1)
@@ -206,19 +215,9 @@ public class EmployerInterestServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "organisation_name", employerInterest.OrganisationName },
-                            { "contact_name", employerInterest.ContactName },
-                            { "email_address", employerInterest.Email },
-                            { "telephone", employerInterest.Telephone },
-                            { "website", employerInterest.Website  },
-                            { "contact_preference", expectedContactPreference },
-                            { "primary_industry", expectedIndustry },
-                            { "placement_area", expectedSkillAreas },
-                            { "has_multiple_placement_areas", "yes" },
-                            { "postcode", employerInterest.Postcode },
-                            { "additional_information", employerInterest.AdditionalInformation },
                             { "employer_support_site", settings.EmployerSupportSiteUri },
-                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri },
+                            { "details_list", expectedDetails }
                         })),
                 Arg.Any<string>());
     }
@@ -282,11 +281,9 @@ public class EmployerInterestServiceTests
                 employerInterest.Email,
                 EmailTemplateNames.EmployerRegisterInterest,
                 Arg.Is<IDictionary<string, string>>(tokens =>
-                    tokens.ValidateTokens(
-                        new Dictionary<string, string>
-                        {
-                            { "additional_information", expectedAdditionalInformation }
-                        })),
+                    tokens.ValidateTokenContains(
+                        "details_list",
+                        $"Additional information: {expectedAdditionalInformation}")),
                 Arg.Any<string>());
     }
 
@@ -337,9 +334,21 @@ public class EmployerInterestServiceTests
 
         result.Should().Be(uniqueId);
 
-        const string expectedContactPreference = "None";
+        var expectedIndustry =
+            $"{industries.Single(i => i.Id == 9).Name}";
+
+        var expectedSkillAreas =
+            $"{routes.Single(r => r.Id == 1).Name}";
+
         var expectedUnsubscribeUri =
              $"{settings.UnsubscribeEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+        var expectedDetails =
+            $"* Name: {employerInterest.ContactName}\r\n" +
+            $"* Email address: {employerInterest.Email}\r\n" +
+            $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
+            $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
+            $"* Industry placement area: {expectedSkillAreas}\r\n" +
+            $"* Postcode: {employerInterest.Postcode}\r\n";
 
         await emailService
             .Received(1)
@@ -350,19 +359,9 @@ public class EmployerInterestServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "organisation_name", string.Empty },
-                            { "contact_name", string.Empty },
-                            { "email_address", employerInterest.Email },
-                            { "telephone", string.Empty },
-                            { "website", string.Empty },
-                            { "contact_preference", expectedContactPreference },
-                            { "primary_industry", string.Empty },
-                            { "placement_area", string.Empty },
-                            { "has_multiple_placement_areas", "no" },
-                            { "postcode", employerInterest.Postcode },
-                            { "additional_information", string.Empty },
                             { "employer_support_site", settings.EmployerSupportSiteUri },
-                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri },
+                            { "details_list", expectedDetails }
                         })),
                 uniqueId.ToString());
     }

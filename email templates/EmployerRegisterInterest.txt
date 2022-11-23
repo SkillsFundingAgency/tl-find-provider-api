@@ -2,16 +2,7 @@ Thank you for registering an interest in hosting industry placements.
 
 Here are the details you shared:
 
-* Name:  ((contact_name))
-* Email address: ((email_address))
-* Telephone: ((telephone))
-* How would you prefer to be contacted: ((contact_preference))
-* Organisation name: ((organisation_name))
-* Website: ((website))
-* Organisation’s primary industry: ((primary_industry))
-* Industry placement area((has_multiple_placement_areas??s)): ((placement_area))
-* Postcode:  ((postcode))
-* Additional information: ((additional_information))
+((details_list))
 
 What happens next
 
