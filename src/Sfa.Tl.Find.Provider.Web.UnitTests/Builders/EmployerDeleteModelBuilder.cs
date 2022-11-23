@@ -18,7 +18,7 @@ public class EmployerDeleteModelBuilder
         var claims = userIsAuthenticated && isAdministrator
             ? new List<Claim>
             {
-                new Claim(ClaimTypes.Role, CustomRoles.Administrator)
+                new(ClaimTypes.Role, CustomRoles.Administrator)
             }
             : null;
 

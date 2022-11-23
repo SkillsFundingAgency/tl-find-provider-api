@@ -193,8 +193,8 @@ public class EmployerInterestRepositoryTests
         const int id = 101;
         const int employerInterestsCount = 1;
 
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
 
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
             .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
