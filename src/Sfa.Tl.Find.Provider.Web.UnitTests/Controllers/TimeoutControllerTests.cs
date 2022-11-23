@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Application.Models.Session;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Controllers;
@@ -15,47 +18,107 @@ public class TimeoutControllerTests
     }
 
     [Fact]
-    public void TimeoutController_ActivityTimeout_Returns_RedirectToPageResult()
+    public async Task TimeoutController_ActivityTimeout_Clears_Cache()
     {
+        var cacheService = Substitute.For<ICacheService>();
+
         var controller = new TimeoutControllerBuilder()
-            .Build();
+            .Build(cacheService);
 
-        var result = controller.ActivityTimeout();
+        await controller.ActivityTimeout();
 
-        //Signs out
-        //Clears cache
+        cacheService
+            .Received(1)
+            .Remove(Arg.Is<string>(k => k.StartsWith("USERID")));
     }
-    
-    [Fact]
-    public void TimeoutController_GetActiveDurationAsync_Returns_RedirectToPageResult()
-    {
-        var controller = new TimeoutControllerBuilder()
-            .Build();
 
-        var result = controller.GetActiveDuration();
+    [Fact]
+    public async Task TimeoutController_GetActiveDurationAsync_Returns_RedirectToPageResult()
+    {
+        var timeNowUtc = DateTime.SpecifyKind(DateTime.Parse("2022-11-01 10:21:42Z"), DateTimeKind.Utc);
+        var previousTimeUtc = DateTime.SpecifyKind(DateTime.Parse("2022-11-01 10:11:12Z"), DateTimeKind.Utc);
+
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.Get<DateTime?>(Arg.Is<string>(k => k.StartsWith("USER")))
+            .Returns(previousTimeUtc);
+
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService
+            .UtcNow
+            .Returns(timeNowUtc);
+
+        var signInSettings = new SettingsBuilder().BuildDfeSignInSettings(
+            timeout: 20);
+
+        var controller = new TimeoutControllerBuilder()
+            .Build(cacheService, dateTimeService, signInSettings);
+
+        var result = await controller.GetActiveDuration();
+
+        var jsonResult = result as JsonResult;
+        jsonResult.Should().NotBeNull();
+        var data = jsonResult!.Value as SessionActivityData;
+        data.Should().NotBeNull();
+        data!.Minutes.Should().Be(9);
+        data.Seconds.Should().Be(30);
+    }
+
+    [Fact]
+    public async Task TimeoutController_RenewSessionActivity_Returns_RedirectToPageResult()
+    {
+        var timeNowUtc = DateTime.SpecifyKind(DateTime.Parse("2022-11-01 10:21:42Z"), DateTimeKind.Utc);
+
+        var cacheService = Substitute.For<ICacheService>();
+
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService
+            .UtcNow
+            .Returns(timeNowUtc);
+
+        var signInSettings = new SettingsBuilder().BuildDfeSignInSettings(
+            timeout: 20);
+
+        var controller = new TimeoutControllerBuilder()
+            .Build(cacheService, dateTimeService, signInSettings);
+
+        var result = await controller.RenewSessionActivity();
 
         result.Should().NotBeNull();
-        //var redirectResult = result as JsonResult;
-        //redirectResult.Should().NotBeNull();
-        //Returns 
+
+        var jsonResult = result as JsonResult;
+        jsonResult.Should().NotBeNull();
+        var data = jsonResult!.Value as SessionActivityData;
+        data.Should().NotBeNull();
+        data!.Minutes.Should().Be(20);
+        data.Seconds.Should().Be(0);
     }
 
     [Fact]
-    public void TimeoutController_RenewSessionActivity_Returns_RedirectToPageResult()
+    public async Task TimeoutController_RenewSessionActivity_Sets_Session_Cache()
     {
-        var controller = new TimeoutControllerBuilder()
-            .Build();
+        var timeNowUtc = DateTime.SpecifyKind(DateTime.Parse("2022-11-01 10:21:42Z"), DateTimeKind.Utc);
 
-        var result = controller.RenewSessionActivity();
+        var cacheService = Substitute.For<ICacheService>();
 
-        result.Should().NotBeNull();
-    }
-    [Fact]
-    public void TimeoutController_e_Returns_RedirectToPageResult()
-    {
+        var dateTimeService = Substitute.For<IDateTimeService>();
+        dateTimeService
+            .UtcNow
+            .Returns(timeNowUtc);
+
+        var signInSettings = new SettingsBuilder().BuildDfeSignInSettings(
+            timeout: 20);
+
         var controller = new TimeoutControllerBuilder()
-            .Build();
+            .Build(cacheService, dateTimeService, signInSettings);
+
+        await controller.RenewSessionActivity();
+
+        cacheService
+            .Received(1)
+            .Set(Arg.Is<string>(k => k.StartsWith("USER")),
+                timeNowUtc);
     }
+
     [Fact]
     public void TimeoutController_SignOutComplete_Returns_RedirectToPageResult()
     {
@@ -69,7 +132,6 @@ public class TimeoutControllerTests
         redirectResult!.PageName.Should().Be(AuthenticationExtensions.UnauthenticatedUserStartPage);
     }
 
-    //TimeoutConfirmation
     [Fact]
     public void TimeoutController_TimeoutConfirmation_Returns_RedirectToPageResult()
     {

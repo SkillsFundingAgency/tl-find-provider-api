@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Models.Session;
-using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
@@ -19,6 +18,7 @@ public class TimeoutController : Controller
     private readonly DfeSignInSettings _signInSettings;
     private readonly ICacheService _cacheService;
     private readonly IDateTimeService _dateTimeService;
+    // ReSharper disable once NotAccessedField.Local
     private readonly ILogger<TimeoutController> _logger;
 
     public TimeoutController(
@@ -39,9 +39,11 @@ public class TimeoutController : Controller
     public async Task<IActionResult> GetActiveDuration()
     {
         var registeredSessionTime = _cacheService.Get<DateTime?>(User.GetUserSessionCacheKey());
-        var remainingActiveDuration = 
-            registeredSessionTime != null && registeredSessionTime != DateTime.MinValue 
-                ? (registeredSessionTime.Value.AddMinutes(_signInSettings.Timeout) - _dateTimeService.UtcNow) : new TimeSpan(0, 0, 0);
+        var remainingActiveDuration =
+            registeredSessionTime != null && registeredSessionTime != DateTime.MinValue
+                ? registeredSessionTime.Value.AddMinutes(_signInSettings.Timeout) - _dateTimeService.UtcNow 
+                : new TimeSpan(0, 0, 0);
+        
         return Json(new SessionActivityData { Minutes = remainingActiveDuration.Minutes < 0 ? 0 : remainingActiveDuration.Minutes, Seconds = remainingActiveDuration.Seconds < 0 ? 0 : remainingActiveDuration.Seconds });
     }
 
@@ -57,10 +59,8 @@ public class TimeoutController : Controller
     [Route("activity-timeout", Name = "ActivityTimeout")]
     public async Task ActivityTimeout()
     {
-        var userId = User.GetClaim(CustomClaimTypes.UserId);
-        //TempData.Set(Constants.UserSessionActivityId, userId);
         _cacheService.Remove(User.GetUserSessionCacheKey());
-        //TODO: Any redirect here?
+
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
