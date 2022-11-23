@@ -1,0 +1,7 @@
+@for $i from 1 through 10 {
+
+    .tl-min-#{$i} {
+            min-width: $i * 20px !important;
+        }
+}
+
