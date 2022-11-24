@@ -14,8 +14,7 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Do you want to remove @Model.EmployerInterest?.OrganisationName?</h1>
          <p class="govuk-body">
-        If you remove this employer they will no longer appear in this service. Please check the details below to confirm your selection before continuing.           
-        </p>
+            If you remove this employer, it will no longer be visible to providers using this service.        </p>
         <div class="govuk-details__text govuk-!-margin-bottom-8">
         <table class="govuk-table">
             <caption class="govuk-table__caption govuk-table__caption--m">Organisation details</caption>
@@ -110,7 +109,7 @@
                         <p class="govuk-body">
 
             <button type="submit" asp-route-id="@Model.EmployerInterest?.Id" id="tl-employers--delete--submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-2">Remove employer</button>
-                <a asp-page="./EmployerList" class="govuk-link govuk-link--no-visited-state tl-lineheight--40 govuk-!-margin-left-4">Cancel and return to employers</a>            
+                <a asp-page="./EmployerList" class="govuk-link govuk-link--no-visited-state tl-lineheight--40 govuk-!-margin-left-4">Cancel and return to employer list</a>            
             </p>
 
         </form>
