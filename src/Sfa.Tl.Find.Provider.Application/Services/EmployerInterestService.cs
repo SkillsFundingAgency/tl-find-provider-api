@@ -222,9 +222,7 @@ public class EmployerInterestService : IEmployerInterestService
         {
             detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks() }");
         }
-
-
-
+        
         return detailsList.ToString();
     }
 
