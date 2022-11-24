@@ -1,9 +1,9 @@
 ﻿@page "{id}"
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Sfa.Tl.Find.Provider.Application.Extensions
-@model Sfa.Tl.Find.Provider.Web.Pages.Employer.EmployerDeleteModel
+@model Sfa.Tl.Find.Provider.Web.Pages.Employer.RemoveEmployerModel
 @{
-    ViewData["Title"] = "Remove employer";
+    ViewData["Title"] = Model.EmployerInterest?.OrganisationName + " | Remove employer";
 }
 
 @section breadcrumbs {

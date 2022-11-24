@@ -8,11 +8,11 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
-public class EmployerDeleteModelBuilder
+public class RemoveEmployerModelBuilder
 {
-    public EmployerDeleteModel Build(
+    public RemoveEmployerModel Build(
         IEmployerInterestService? employerInterestService = null,
-        ILogger<EmployerDetailsModel>? logger = null,
+        ILogger<RemoveEmployerModel>? logger = null,
         PageContext? pageContext = null,
         bool userIsAuthenticated = true,
         bool isAdministrator = true)
@@ -28,14 +28,14 @@ public class EmployerDeleteModelBuilder
             .Build(userIsAuthenticated, claims);
 
         employerInterestService ??= Substitute.For<IEmployerInterestService>();
-        logger ??= Substitute.For<ILogger<EmployerDetailsModel>>();
+        logger ??= Substitute.For<ILogger<RemoveEmployerModel>>();
 
         var tempDataProvider = Substitute.For<ITempDataProvider>();
         var tempData = new TempDataDictionary(
             pageContext.HttpContext, 
             tempDataProvider);
 
-        var pageModel = new EmployerDeleteModel(
+        var pageModel = new RemoveEmployerModel(
             employerInterestService,
             logger)
         {

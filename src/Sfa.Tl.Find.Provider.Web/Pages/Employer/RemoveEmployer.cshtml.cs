@@ -8,16 +8,16 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 namespace Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 [Authorize(Roles = CustomRoles.Administrator)]
-public class EmployerDeleteModel : PageModel
+public class RemoveEmployerModel : PageModel
 {
     public EmployerInterestDetail? EmployerInterest { get; private set; }
 
     private readonly IEmployerInterestService _employerInterestService;
-    private readonly ILogger<EmployerDetailsModel> _logger;
+    private readonly ILogger<RemoveEmployerModel> _logger;
 
-    public EmployerDeleteModel(
+    public RemoveEmployerModel(
         IEmployerInterestService employerInterestService,
-        ILogger<EmployerDetailsModel> logger)
+        ILogger<RemoveEmployerModel> logger)
     {
         _employerInterestService = employerInterestService ?? throw new ArgumentNullException(nameof(employerInterestService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

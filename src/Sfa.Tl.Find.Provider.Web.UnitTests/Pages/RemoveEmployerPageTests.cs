@@ -9,17 +9,17 @@ using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
-public class EmployerDeletePageTests
+public class RemoveEmployerPageTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
     {
-        typeof(EmployerDeleteModel)
+        typeof(RemoveEmployerModel)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public async Task EmployerDeleteModel_OnGet_Sets_Expected_Results()
+    public async Task RemoveEmployerModel_OnGet_Sets_Expected_Results()
     {
         var employerInterestDetail = new EmployerInterestDetailBuilder()
             .Build();
@@ -31,7 +31,7 @@ public class EmployerDeletePageTests
         .GetEmployerInterestDetail(id)
             .Returns(employerInterestDetail);
 
-        var detailsModel = new EmployerDeleteModelBuilder()
+        var detailsModel = new RemoveEmployerModelBuilder()
             .Build(employerInterestService);
 
         await detailsModel.OnGet(id);
@@ -42,7 +42,7 @@ public class EmployerDeletePageTests
     }
 
     [Fact]
-    public async Task EmployerDeleteModel_OnGet_Redirects_To_404_If_Employer_Not_Found()
+    public async Task RemoveEmployerModel_OnGet_Redirects_To_404_If_Employer_Not_Found()
     {
         const int id = 999;
 
@@ -51,7 +51,7 @@ public class EmployerDeletePageTests
             .GetEmployerInterestDetail(id)
             .Returns(null as EmployerInterestDetail);
 
-        var detailsModel = new EmployerDeleteModelBuilder()
+        var detailsModel = new RemoveEmployerModelBuilder()
             .Build(employerInterestService);
 
         var result = await detailsModel.OnGet(id);
@@ -62,7 +62,7 @@ public class EmployerDeletePageTests
     }
 
     [Fact]
-    public async Task EmployerDeleteModel_OnPost_Deletes_From_Repository_And_Redirects()
+    public async Task RemoveEmployerModel_OnPost_Deletes_From_Repository_And_Redirects()
     {
         const int id = 999;
 
@@ -74,7 +74,7 @@ public class EmployerDeletePageTests
             .GetEmployerInterestDetail(id)
             .Returns(employerInterestDetail);
 
-        var detailsModel = new EmployerDeleteModelBuilder()
+        var detailsModel = new RemoveEmployerModelBuilder()
             .Build(employerInterestService);
 
         var result = await detailsModel.OnPost(id);
@@ -89,7 +89,7 @@ public class EmployerDeletePageTests
     }
 
     [Fact]
-    public async Task EmployerDeleteModel_OnPost_Sets_TempData()
+    public async Task RemoveEmployerModel_OnPost_Sets_TempData()
     {
         const int id = 999;
 
@@ -101,7 +101,7 @@ public class EmployerDeletePageTests
             .GetEmployerInterestDetail(id)
             .Returns(employerInterestDetail);
 
-        var detailsModel = new EmployerDeleteModelBuilder()
+        var detailsModel = new RemoveEmployerModelBuilder()
             .Build(employerInterestService);
 
         await detailsModel.OnPost(id);
