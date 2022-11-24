@@ -41,7 +41,7 @@ public class EmployerDeleteModel : PageModel
 
         EmployerInterest = await _employerInterestService.GetEmployerInterestDetail(id.Value);
 
-        TempData["DeletedOrganisationName"] = EmployerInterest.OrganisationName;
+        TempData["DeletedOrganisationName"] = EmployerInterest?.OrganisationName;
 
         await _employerInterestService.DeleteEmployerInterest(id.Value);
 
