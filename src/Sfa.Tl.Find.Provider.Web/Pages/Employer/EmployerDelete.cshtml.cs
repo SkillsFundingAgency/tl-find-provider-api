@@ -38,6 +38,11 @@ public class EmployerDeleteModel : PageModel
         {
             return NotFound();
         }
+
+        EmployerInterest = await _employerInterestService.GetEmployerInterestDetail(id.Value);
+
+        TempData["DeletedOrganisationName"] = EmployerInterest.OrganisationName;
+
         await _employerInterestService.DeleteEmployerInterest(id.Value);
 
         return RedirectToPage("/Employer/EmployerList");

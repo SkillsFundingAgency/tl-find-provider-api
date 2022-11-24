@@ -33,6 +33,9 @@ public class EmployerListModel : PageModel
 
     public SelectListItem[]? Postcodes { get; private set; }
 
+    [TempData]
+    public string? DeletedOrganisationName { get; set; }
+
     public int EmployerInterestRetentionDays =>
         _employerInterestSettings.RetentionDays;
 

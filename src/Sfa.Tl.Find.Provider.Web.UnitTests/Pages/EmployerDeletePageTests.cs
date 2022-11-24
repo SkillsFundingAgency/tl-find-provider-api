@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
@@ -63,10 +65,14 @@ public class EmployerDeletePageTests
     public async Task EmployerDeleteModel_OnPost_Deletes_From_Repository_And_Redirects()
     {
         const int id = 999;
+
+        var employerInterestDetail = new EmployerInterestDetailBuilder()
+            .Build();
+
         var employerInterestService = Substitute.For<IEmployerInterestService>();
         employerInterestService
-            .DeleteEmployerInterest(id)
-            .Returns(1);
+            .GetEmployerInterestDetail(id)
+            .Returns(employerInterestDetail);
 
         var detailsModel = new EmployerDeleteModelBuilder()
             .Build(employerInterestService);
@@ -76,9 +82,39 @@ public class EmployerDeletePageTests
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Employer/EmployerList");
-
+        
         await employerInterestService
             .Received(1)
             .DeleteEmployerInterest(id);
+    }
+
+    [Fact]
+    public async Task EmployerDeleteModel_OnPost_Sets_TempData()
+    {
+        const int id = 999;
+
+        var employerInterestDetail = new EmployerInterestDetailBuilder()
+            .Build();
+
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .GetEmployerInterestDetail(id)
+            .Returns(employerInterestDetail);
+
+        var detailsModel = new EmployerDeleteModelBuilder()
+            .Build(employerInterestService);
+
+        await detailsModel.OnPost(id);
+
+        detailsModel.TempData.Should().NotBeNull();
+        detailsModel.TempData
+            .Keys
+            .Should()
+            .Contain("DeletedOrganisationName");
+
+        detailsModel.TempData
+            .Peek("DeletedOrganisationName")
+            .Should()
+            .Be(employerInterestDetail.OrganisationName);
     }
 }

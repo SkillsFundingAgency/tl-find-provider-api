@@ -1,5 +1,12 @@
 ﻿@model EmployerListModel
 
+@if (Model.DeletedOrganisationName != null)
+{
+    <p>
+        @Model.DeletedOrganisationName was deleted
+    </p>
+}
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <div class="tl-notification tl-notification--green">
