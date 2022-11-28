@@ -103,12 +103,6 @@ if (!builder.Environment.IsDevelopment())
 }
 
 builder.Services
-    .AddCorsPolicy(Constants.CorsPolicyName,
-        siteConfiguration.AllowedCorsOrigins,
-        HttpMethod.Get.Method,
-        HttpMethod.Post.Method);
-
-builder.Services
     .AddPolicyRegistry()
     .AddDapperRetryPolicy()
     .AddGovNotifyRetryPolicy();
@@ -122,10 +116,8 @@ builder.Services
     .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
-    .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
-    .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
     .AddTransient<IIndustryRepository, IndustryRepository>()
@@ -172,11 +164,6 @@ app.UseWhen(ctx =>
                     await next.Invoke();
                 })
     );
-
-if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
-{
-    app.UseCors(Constants.CorsPolicyName);
-}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

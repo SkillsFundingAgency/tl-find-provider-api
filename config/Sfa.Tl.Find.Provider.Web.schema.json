@@ -3,11 +3,6 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
-    "AllowedCorsOrigins": {
-      "minLength": 1,
-      "type": "string",
-      "environmentVariable": "AllowedCorsOrigins"
-    },
     "DfeSignInSettings": {
       "properties": {
         "MetadataAddress": {
@@ -78,18 +73,13 @@
         "GovNotifyApiKey": {
           "type": "string",
           "environmentVariable": "EmailSettings_GovNotifyApiKey"
-        },
-        "DeliveryStatusToken": {
-          "type": "string",
-          "environmentVariable": "EmailSettings_DeliveryStatusToken"
-        },
-        "SupportEmailAddress": {
-          "type": "string",
-          "environmentVariable": "EmailSettings_SupportEmailAddress"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "required": [
+        "GovNotifyApiKey"
+      ],
+      "type":"object"
     },
     "EmployerInterestSettings": {
       "properties": {
