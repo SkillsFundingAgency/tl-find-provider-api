@@ -42,8 +42,8 @@ public class TimeoutControllerTests
         cacheService.Get<DateTime?>(Arg.Is<string>(k => k.StartsWith("USER")))
             .Returns(previousTimeUtc);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider
             .UtcNow
             .Returns(timeNowUtc);
 
@@ -51,7 +51,7 @@ public class TimeoutControllerTests
             timeout: 20);
 
         var controller = new TimeoutControllerBuilder()
-            .Build(cacheService, dateTimeService, signInSettings);
+            .Build(cacheService, dateTimeProvider, signInSettings);
 
         var result = await controller.GetActiveDuration();
 
@@ -70,8 +70,8 @@ public class TimeoutControllerTests
 
         var cacheService = Substitute.For<ICacheService>();
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider
             .UtcNow
             .Returns(timeNowUtc);
 
@@ -79,7 +79,7 @@ public class TimeoutControllerTests
             timeout: 20);
 
         var controller = new TimeoutControllerBuilder()
-            .Build(cacheService, dateTimeService, signInSettings);
+            .Build(cacheService, dateTimeProvider, signInSettings);
 
         var result = await controller.RenewSessionActivity();
 
@@ -100,8 +100,8 @@ public class TimeoutControllerTests
 
         var cacheService = Substitute.For<ICacheService>();
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider
             .UtcNow
             .Returns(timeNowUtc);
 
@@ -109,7 +109,7 @@ public class TimeoutControllerTests
             timeout: 20);
 
         var controller = new TimeoutControllerBuilder()
-            .Build(cacheService, dateTimeService, signInSettings);
+            .Build(cacheService, dateTimeProvider, signInSettings);
 
         await controller.RenewSessionActivity();
 

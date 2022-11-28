@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 using Sfa.Tl.Find.Provider.Infrastructure.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
@@ -110,9 +111,9 @@ builder.Services
 builder.Services.AddHttpClients();
 
 builder.Services
-    .AddScoped<IDateTimeService, DateTimeService>()
+    .AddScoped<IDateTimeProvider, DateTimeProvider>()
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
-    .AddScoped<IGuidService, GuidService>()
+    .AddScoped<IGuidProvider, GuidProvider>()
     .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()

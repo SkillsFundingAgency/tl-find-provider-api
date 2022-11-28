@@ -17,18 +17,18 @@ public class TimeoutController : Controller
 {
     private readonly DfeSignInSettings _signInSettings;
     private readonly ICacheService _cacheService;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     // ReSharper disable once NotAccessedField.Local
     private readonly ILogger<TimeoutController> _logger;
 
     public TimeoutController(
         ICacheService cacheService,
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         IOptions<DfeSignInSettings> signInOptions,
         ILogger<TimeoutController> logger)
     {
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _signInSettings = signInOptions?.Value
                           ?? throw new ArgumentNullException(nameof(signInOptions));
@@ -41,7 +41,7 @@ public class TimeoutController : Controller
         var registeredSessionTime = _cacheService.Get<DateTime?>(User.GetUserSessionCacheKey());
         var remainingActiveDuration =
             registeredSessionTime != null && registeredSessionTime != DateTime.MinValue
-                ? registeredSessionTime.Value.AddMinutes(_signInSettings.Timeout) - _dateTimeService.UtcNow 
+                ? registeredSessionTime.Value.AddMinutes(_signInSettings.Timeout) - _dateTimeProvider.UtcNow 
                 : new TimeSpan(0, 0, 0);
         
         return Json(new SessionActivityData { Minutes = remainingActiveDuration.Minutes < 0 ? 0 : remainingActiveDuration.Minutes, Seconds = remainingActiveDuration.Seconds < 0 ? 0 : remainingActiveDuration.Seconds });
@@ -51,7 +51,7 @@ public class TimeoutController : Controller
     [Route("renew-activity", Name = "RenewSessionActivity")]
     public async Task<IActionResult> RenewSessionActivity()
     {
-        _cacheService.Set(User.GetUserSessionCacheKey(), _dateTimeService.UtcNow);
+        _cacheService.Set(User.GetUserSessionCacheKey(), _dateTimeProvider.UtcNow);
         return Json(new SessionActivityData { Minutes = _signInSettings.Timeout, Seconds = 0 });
     }
 

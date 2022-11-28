@@ -11,7 +11,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 public class EmployerInterestServiceBuilder
 {
     public IEmployerInterestService Build(
-        IDateTimeService dateTimeService = null,
+        IDateTimeProvider dateTimeProvider = null,
         IEmailService emailService = null,
         IPostcodeLookupService postcodeLookupService = null,
         IProviderDataService providerDataService = null,
@@ -19,7 +19,7 @@ public class EmployerInterestServiceBuilder
         EmployerInterestSettings employerInterestSettings = null,
         ILogger<EmployerInterestService> logger = null)
     {
-        dateTimeService ??= Substitute.For<IDateTimeService>();
+        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
         emailService ??= Substitute.For<IEmailService>();
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         employerInterestRepository ??= Substitute.For<IEmployerInterestRepository>();
@@ -32,7 +32,7 @@ public class EmployerInterestServiceBuilder
                 .BuildEmployerInterestSettings());
 
         return new EmployerInterestService(
-            dateTimeService,
+            dateTimeProvider,
             emailService,
             postcodeLookupService,
             providerDataService,

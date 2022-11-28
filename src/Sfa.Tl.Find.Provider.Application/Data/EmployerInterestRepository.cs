@@ -12,7 +12,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
     private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
-    private readonly IGuidService _guidService;
+    private readonly IGuidProvider _guidProvider;
     private readonly ILogger<EmployerInterestRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
@@ -20,13 +20,13 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         IDbContextWrapper dbContextWrapper,
         IDynamicParametersWrapper dynamicParametersWrapper,
         IReadOnlyPolicyRegistry<string> policyRegistry,
-        IGuidService guidService,
+        IGuidProvider guidProvider,
         ILogger<EmployerInterestRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
         _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
-        _guidService = guidService ?? throw new ArgumentNullException(nameof(guidService));
+        _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -36,7 +36,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
-            var uniqueId = _guidService.NewGuid();
+            var uniqueId = _guidProvider.NewGuid();
             _dynamicParametersWrapper.CreateParameters(new
             {
                 data = new List<EmployerInterestDto>

@@ -21,13 +21,13 @@ public class TimeoutControllerBuilder
 
     public TimeoutController Build(
         ICacheService? cacheService = null,
-        IDateTimeService? dateTimeService = null,
+        IDateTimeProvider? dateTimeProvider = null,
         DfeSignInSettings? signInSettings = null,
         ILogger<TimeoutController>? logger = null,
         bool userIsAuthenticated = true)
     {
         cacheService ??= Substitute.For<ICacheService>();
-        dateTimeService ??= Substitute.For<IDateTimeService>();
+        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
 
         var signInOptions = Options.Create(
             signInSettings
@@ -75,7 +75,7 @@ public class TimeoutControllerBuilder
 
         var controller = new TimeoutController(
             cacheService,
-            dateTimeService,
+            dateTimeProvider,
             signInOptions,
             logger)
         {

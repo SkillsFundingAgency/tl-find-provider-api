@@ -13,7 +13,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class EmployerInterestService : IEmployerInterestService
 {
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IEmailService _emailService;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmployerInterestRepository _employerInterestRepository;
@@ -22,7 +22,7 @@ public class EmployerInterestService : IEmployerInterestService
     private readonly EmployerInterestSettings _employerInterestSettings;
 
     public EmployerInterestService(
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         IEmailService emailService,
         IPostcodeLookupService postcodeLookupService,
         IProviderDataService providerDataService,
@@ -30,7 +30,7 @@ public class EmployerInterestService : IEmployerInterestService
         IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<EmployerInterestService> logger)
     {
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _employerInterestRepository = employerInterestRepository ?? throw new ArgumentNullException(nameof(employerInterestRepository));
@@ -90,7 +90,7 @@ public class EmployerInterestService : IEmployerInterestService
             return 0;
         }
 
-        var date = _dateTimeService.Today.AddDays(-_employerInterestSettings.RetentionDays);
+        var date = _dateTimeProvider.Today.AddDays(-_employerInterestSettings.RetentionDays);
         var count = await _employerInterestRepository.DeleteBefore(date);
 
         _logger.LogInformation("Removed {count} employer interest records because they are over {days} days (older than {date:yyyy-MM-dd})",
@@ -106,8 +106,8 @@ public class EmployerInterestService : IEmployerInterestService
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
+                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
+                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
                 return x;
             });
     }
@@ -133,8 +133,8 @@ public class EmployerInterestService : IEmployerInterestService
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
+                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
+                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
                 return x;
             });
 

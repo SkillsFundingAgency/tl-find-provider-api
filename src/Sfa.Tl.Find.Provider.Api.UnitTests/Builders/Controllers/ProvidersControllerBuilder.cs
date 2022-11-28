@@ -11,18 +11,18 @@ public class ProvidersControllerBuilder
 {
     public ProvidersController Build(
         IProviderDataService providerDataService = null,
-        IDateTimeService dateTimeService = null,
+        IDateTimeProvider dateTimeProvider = null,
         ICacheService cacheService = null,
         ILogger<ProvidersController> logger = null)
     {
         providerDataService ??= Substitute.For<IProviderDataService>();
-        dateTimeService ??= Substitute.For<IDateTimeService>();
+        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
         cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<ProvidersController>>();
 
         var controller = new ProvidersController(
             providerDataService,
-            dateTimeService,
+            dateTimeProvider,
             cacheService,
             logger)
         {

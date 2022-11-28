@@ -13,20 +13,20 @@ public class ProviderRepository : IProviderRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
     private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<ProviderRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
     public ProviderRepository(
         IDbContextWrapper dbContextWrapper,
         IDynamicParametersWrapper dynamicParametersWrapper,
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<ProviderRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
         _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -66,7 +66,7 @@ public class ProviderRepository : IProviderRepository
                     if (deliveryYear == null)
                     {
                         deliveryYear = dy;
-                        deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
+                        deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeProvider.Today);
 
                         location.DeliveryYears.Add(deliveryYear);
                     }
@@ -284,7 +284,7 @@ public class ProviderRepository : IProviderRepository
                 {
                     deliveryYear = ly;
 
-                    deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeService.Today);
+                    deliveryYear.IsAvailableNow = deliveryYear.Year.IsAvailableAtDate(_dateTimeProvider.Today);
 
                     searchResult.DeliveryYears.Add(deliveryYear);
                 }
@@ -340,7 +340,7 @@ public class ProviderRepository : IProviderRepository
                 contact.StudentContactEmail,
                 contact.StudentContactTelephone,
                 contact.StudentContactWebsite,
-                currentTime = _dateTimeService.UtcNow
+                currentTime = _dateTimeProvider.UtcNow
             });
 
             resultCount += await _dbContextWrapper.ExecuteAsync(

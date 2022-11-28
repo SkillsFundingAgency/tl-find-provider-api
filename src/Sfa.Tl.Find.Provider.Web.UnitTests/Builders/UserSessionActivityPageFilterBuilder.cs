@@ -6,14 +6,14 @@ public class UserSessionActivityPageFilterBuilder
 {
     public UserSessionActivityPageFilter Build(
         ICacheService? cacheService = null,
-        IDateTimeService? dateTimeService = null)
+        IDateTimeProvider? dateTimeProvider = null)
     {
         cacheService ??= Substitute.For<ICacheService>();
-        dateTimeService ??= Substitute.For<IDateTimeService>();
+        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
 
         var controller = new UserSessionActivityPageFilter(
             cacheService,
-            dateTimeService);
+            dateTimeProvider);
 
         return controller;
     }

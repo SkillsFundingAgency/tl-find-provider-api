@@ -442,15 +442,15 @@ public class EmployerInterestServiceTests
             RetentionDays = 0
         };
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.DeleteBefore(Arg.Any<DateTime>())
             .Returns(0);
 
         var service = new EmployerInterestServiceBuilder()
-            .Build(dateTimeService,
+            .Build(dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -471,8 +471,8 @@ public class EmployerInterestServiceTests
             RetentionDays = 12
         };
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         //Expected date is Today - RetentionDays 
         var expectedDate = DateTime.Parse("2022-08-01");
@@ -485,7 +485,7 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -520,12 +520,12 @@ public class EmployerInterestServiceTests
             )
             .Returns((employerInterestSummaryList, employerInterestsCount));
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -557,8 +557,8 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             retentionDays: daysToRetain);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(today);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(today);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository
@@ -571,7 +571,7 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -613,12 +613,12 @@ public class EmployerInterestServiceTests
                 )
             .Returns((employerInterestSummaryList, employerInterestsCount));
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 postcodeLookupService: postcodeLookupService,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
@@ -655,8 +655,8 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             retentionDays: daysToRetain);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(today);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(today);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository
@@ -669,7 +669,7 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 postcodeLookupService: postcodeLookupService,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
@@ -713,12 +713,12 @@ public class EmployerInterestServiceTests
         employerInterestRepository.GetSummaryList()
             .Returns(employerInterestSummaryList);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository);
 
         var results =
@@ -747,12 +747,12 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             retentionDays: daysToRetain);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(today);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(today);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 

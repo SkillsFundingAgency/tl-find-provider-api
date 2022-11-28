@@ -8,7 +8,7 @@ namespace Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 public static class CacheUtilities
 {
     public static MemoryCacheEntryOptions DefaultMemoryCacheEntryOptions(
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         ILogger logger,
         int absoluteExpirationInMinutes = Constants.DefaultAbsoluteExpirationInMinutes,
         int slidingExpirationInMinutes = Constants.DefaultSlidingExpirationInMinutes,
@@ -16,7 +16,7 @@ public static class CacheUtilities
         new()
         {
             AbsoluteExpiration = absoluteExpirationInMinutes > 0 
-                ? new DateTimeOffset(dateTimeService.Now.AddMinutes(absoluteExpirationInMinutes)) 
+                ? new DateTimeOffset(dateTimeProvider.Now.AddMinutes(absoluteExpirationInMinutes)) 
                 : null,
             Priority = CacheItemPriority.Normal,
             SlidingExpiration = slidingExpirationInMinutes > 0 

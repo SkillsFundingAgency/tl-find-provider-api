@@ -16,12 +16,12 @@ public class ProviderRepositoryBuilder
     public IProviderRepository Build(
         IDbContextWrapper dbContextWrapper = null,
         IDynamicParametersWrapper dynamicParametersWrapper = null,
-        IDateTimeService dateTimeService = null,
+        IDateTimeProvider dateTimeProvider = null,
         IReadOnlyPolicyRegistry<string> policyRegistry = null,
         ILogger<ProviderRepository> logger = null)
     {
         dbContextWrapper ??= Substitute.For<IDbContextWrapper>();
-        dateTimeService ??= Substitute.For<IDateTimeService>();
+        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
         dynamicParametersWrapper ??= Substitute.For<IDynamicParametersWrapper>();
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
 
@@ -30,7 +30,7 @@ public class ProviderRepositoryBuilder
         return new ProviderRepository(
             dbContextWrapper,
             dynamicParametersWrapper,
-            dateTimeService,
+            dateTimeProvider,
             policyRegistry, 
             logger);
     }
@@ -78,8 +78,8 @@ public class ProviderRepositoryBuilder
                 commandType: CommandType.StoredProcedure
             );
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(DateTime.Parse("2021-09-01"));
 
         var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
         var parameters = new DynamicParameters();
@@ -89,7 +89,7 @@ public class ProviderRepositoryBuilder
         return Build(
             dbContextWrapper,
             dynamicParametersWrapper: dynamicParametersWrapper,
-            dateTimeService: dateTimeService);
+            dateTimeProvider: dateTimeProvider);
     }
 
     public async Task<IProviderRepository> BuildRepositoryWithDataToGetAllProviders()
@@ -140,12 +140,12 @@ public class ProviderRepositoryBuilder
                 commandType: CommandType.StoredProcedure
             );
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(DateTime.Parse("2021-09-01"));
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(DateTime.Parse("2021-09-01"));
 
         return Build(
             dbContextWrapper,
-            dateTimeService: dateTimeService);
+            dateTimeProvider: dateTimeProvider);
     }
 
     public IProviderRepository BuildRepositoryWithDataToGetAllFlattenedProviders()

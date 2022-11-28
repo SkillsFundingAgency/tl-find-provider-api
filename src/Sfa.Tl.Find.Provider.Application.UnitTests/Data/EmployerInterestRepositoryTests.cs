@@ -86,8 +86,8 @@ public class EmployerInterestRepositoryTests
     public async Task Create_Returns_Expected_Result()
     {
         var uniqueId = new Guid();
-        var guidService = Substitute.For<IGuidService>();
-        guidService
+        var guidProvider = Substitute.For<IGuidProvider>();
+        guidProvider
             .NewGuid()
             .Returns(uniqueId);
 
@@ -112,7 +112,7 @@ public class EmployerInterestRepositoryTests
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
                 policyRegistry: pollyPolicyRegistry,
-                guidService: guidService);
+                guidProvider: guidProvider);
 
         var result = await repository.Create(employerInterest, geoLocation);
 
