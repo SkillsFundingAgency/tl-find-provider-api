@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Sfa.Tl.Find.Provider.Web.Pages;
+using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
@@ -44,9 +45,36 @@ public class EmployerListPageTests
         employerListModel.SearchRadius.Should().Be(settings.SearchRadius);
         employerListModel.EmployerInterestRetentionDays.Should().Be(retentionDays);
         employerListModel.EmployerInterestRetentionWeeks.Should().Be(expectedRetentionWeeks);
+    }
 
-        var expectedServiceStartDate = DateOnly.FromDateTime(settings.ServiceStartDate!.Value);
-        employerListModel.ServiceStartDate.Should().Be(expectedServiceStartDate);
+    [Fact]
+    public async Task EmployerListModel_OnGet_Populates_EmployerInterest_List_For_Administrator()
+    {
+        var employerInterestSummary = new EmployerInterestSummaryBuilder()
+            .BuildList()
+            .ToList();
+
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .GetSummaryList()
+            .Returns(employerInterestSummary);
+
+        var employerListModel = new EmployerListModelBuilder()
+            .Build(employerInterestService,
+                isAdministrator: true);
+
+        await employerListModel.OnGet();
+
+        employerListModel.EmployerInterestList
+            .Should()
+            .NotBeNullOrEmpty();
+
+        employerListModel.EmployerInterestList
+            .Should()
+            .BeEquivalentTo(employerInterestSummary);
+
+        employerListModel.ZeroResultsFound.Should().NotBeNull();
+        employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
     }
 
     [Fact]
@@ -80,7 +108,7 @@ public class EmployerListPageTests
     }
 
     [Fact]
-    public async Task EmployerListModel_OnGet_Sets_Expected_EmployerInterest_List_When_Session_Has_Postcode()
+    public async Task EmployerListModel_OnGet_Populates_EmployerInterest_List_When_Session_Has_Postcode()
     {
         var locationPostcode = new LocationPostcodeBuilder()
             .Build();
@@ -161,9 +189,84 @@ public class EmployerListPageTests
 
         await employerListModel.OnGet();
 
+        employerListModel.ProviderLocations.Should().NotBeNull();
+        employerListModel.ProviderLocations!
+            .Count
+            .Should()
+            .Be(locationPostcodes.Count);
         employerListModel.ProviderLocations
+            .Select(p => p.Value)
             .Should()
             .BeEquivalentTo(locationPostcodes);
+    }
+
+    [Fact]
+    public async Task EmployerListModel_OnGet_Sets_Expected_Postcodes()
+    {
+        var locationPostcodes = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var ukPrn = long.Parse(PageContextBuilder.DefaultUkPrn);
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetLocationPostcodes(ukPrn)
+            .Returns(locationPostcodes);
+
+        var employerListModel = new EmployerListModelBuilder()
+            .Build(providerDataService: providerDataService);
+
+        await employerListModel.OnGet();
+
+        employerListModel.Postcodes.Should().NotBeNullOrEmpty();
+        employerListModel.Postcodes!.Length.Should().Be(locationPostcodes.Count + 1);
+        
+        employerListModel.Postcodes
+            .Last()
+            .Should()
+            .BeEquivalentTo(new SelectListItem(EmployerListModel.EnterPostcodeValue, EmployerListModel.EnterPostcodeValue));
+        
+        var orderedPostcodes = locationPostcodes.OrderBy(x => x.Postcode).ToArray();
+        for (var i = 0; i < orderedPostcodes.Length; i++)
+        {
+            employerListModel.Postcodes[i].Text.Should().Be(orderedPostcodes[i].Postcode);
+            employerListModel.Postcodes[i].Value.Should().Be(orderedPostcodes[i].Postcode);
+        }
+
+        employerListModel.Postcodes
+            .Last()
+            .Should()
+            .BeEquivalentTo(new SelectListItem(EmployerListModel.EnterPostcodeValue, EmployerListModel.EnterPostcodeValue));
+    }
+
+    [Fact]
+    public async Task EmployerListModel_OnGet_Sets_Expected_Postcodes_For_Provider_With_No_Locations()
+    {
+        var locationPostcodes = Enumerable.Empty<LocationPostcode>().ToList();
+
+        var ukPrn = long.Parse(PageContextBuilder.DefaultUkPrn);
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetLocationPostcodes(ukPrn)
+            .Returns(locationPostcodes);
+
+        var employerListModel = new EmployerListModelBuilder()
+            .Build(providerDataService: providerDataService);
+
+        await employerListModel.OnGet();
+
+        employerListModel.Postcodes.Should().NotBeNullOrEmpty();
+        employerListModel.Postcodes!.Length.Should().Be(1);
+
+        employerListModel.Postcodes
+            .Should()
+            .Contain(x => 
+                x.Text == EmployerListModel.EnterPostcodeValue);
+        employerListModel.Postcodes
+            .Should()
+            .Contain(x =>
+                x.Text == EmployerListModel.EnterPostcodeValue &&
+                x.Value == EmployerListModel.EnterPostcodeValue);
     }
 
     [Fact]
@@ -187,7 +290,7 @@ public class EmployerListPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/EmployerList");
+        redirectResult!.PageName.Should().Be("/Employer/EmployerList");
     }
 
     [Fact]
@@ -211,7 +314,7 @@ public class EmployerListPageTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/EmployerList");
+        redirectResult!.PageName.Should().Be("/Employer/EmployerList");
     }
 
     [Fact]

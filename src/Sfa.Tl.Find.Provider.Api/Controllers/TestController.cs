@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Attributes;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
@@ -13,38 +12,16 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class TestController : ControllerBase
 {
-    private readonly IGoogleMapsApiService _googleMapsApiService;
-    
+    // ReSharper disable once NotAccessedField.Local
     private readonly ILogger<TestController> _logger;
     private readonly ISchedulerFactory _schedulerFactory;
 
     public TestController(
-        IGoogleMapsApiService googleMapsApiService,
         ILogger<TestController> logger,
         ISchedulerFactory schedulerFactory)
     {
-        _googleMapsApiService = googleMapsApiService ?? throw new ArgumentNullException(nameof(googleMapsApiService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _schedulerFactory = schedulerFactory ?? throw new ArgumentNullException(nameof(schedulerFactory));
-    }
-
-    [HttpPost]
-    public IActionResult PostQualification(Qualification qualification)
-    {
-        _logger.LogInformation($"{nameof(TestController)} {nameof(PostQualification)} called " +
-                         " with {id} {name}", qualification.Id, qualification.Name);
-
-        return Ok();
-    }
-    
-    [HttpGet]
-    [Route("lookup")]
-    public async Task<IActionResult> GoogleLookupPostcode(
-        [FromQuery(Name = "postcode")] string postcode)
-    {
-        var result = await _googleMapsApiService.GetAddressDetails(postcode);
-
-        return Ok(result);
     }
 
     [HttpGet, HttpPost]

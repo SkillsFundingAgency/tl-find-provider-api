@@ -19,18 +19,18 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class ProvidersController : ControllerBase
 {
     private readonly IProviderDataService _providerDataService;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ICacheService _cacheService;
     private readonly ILogger<ProvidersController> _logger;
 
     public ProvidersController(
         IProviderDataService providerDataService,
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         ICacheService cacheService,
         ILogger<ProvidersController> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -136,7 +136,7 @@ public class ProvidersController : ControllerBase
         HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
         return new FileContentResult(bytes, "text/csv")
         {
-            FileDownloadName = $"All T Level providers {_dateTimeService.Today:MMMM yyyy}.csv"
+            FileDownloadName = $"All T Level providers {_dateTimeProvider.Today:MMMM yyyy}.csv"
         };
     }
 
@@ -153,13 +153,13 @@ public class ProvidersController : ControllerBase
 
             info = new ProviderDataDownloadInfoResponse
             {
-                FormattedFileDate = $"{_dateTimeService.Today:MMMM yyyy}",
+                FormattedFileDate = $"{_dateTimeProvider.Today:MMMM yyyy}",
                 FileSize = bytes.Length
             };
 
             _cacheService.Set(key, info,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(
-                    _dateTimeService,
+                    _dateTimeProvider,
                     _logger));
 
         }

@@ -2,7 +2,7 @@
 
 namespace Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
-public interface IDateTimeService
+public interface IDateTimeProvider
 {
     DateTime Now { get; }
     DateTime UtcNow { get; }

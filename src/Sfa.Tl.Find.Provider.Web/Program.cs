@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 using Sfa.Tl.Find.Provider.Infrastructure.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
@@ -58,8 +59,9 @@ builder.Services.Configure<RouteOptions>(option =>
 builder.Services.AddRazorPages(options =>
 {
     //options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
-    options.Conventions.AddPageRoute("/EmployerList", "/employer-list");
-    options.Conventions.AddPageRoute("/EmployerDetails", "/employer-details");
+    options.Conventions.AddPageRoute("/Employer/EmployerList", "/employer-list");
+    options.Conventions.AddPageRoute("/Employer/EmployerDetails", "/employer-details");
+    options.Conventions.AddPageRoute("/Employer/RemoveEmployer", "/remove-employer");
     options.Conventions.AddPageRoute("/Help/AccessibilityStatement", "/accessibility-statement");
     options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
     options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
@@ -102,12 +104,6 @@ if (!builder.Environment.IsDevelopment())
 }
 
 builder.Services
-    .AddCorsPolicy(Constants.CorsPolicyName,
-        siteConfiguration.AllowedCorsOrigins,
-        HttpMethod.Get.Method,
-        HttpMethod.Post.Method);
-
-builder.Services
     .AddPolicyRegistry()
     .AddDapperRetryPolicy()
     .AddGovNotifyRetryPolicy();
@@ -115,16 +111,14 @@ builder.Services
 builder.Services.AddHttpClients();
 
 builder.Services
-    .AddScoped<IDateTimeService, DateTimeService>()
+    .AddScoped<IDateTimeProvider, DateTimeProvider>()
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
-    .AddScoped<IGuidService, GuidService>()
+    .AddScoped<IGuidProvider, GuidProvider>()
     .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
-    .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
-    .AddTransient<ITownDataService, TownDataService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
     .AddTransient<IIndustryRepository, IndustryRepository>()
@@ -171,11 +165,6 @@ app.UseWhen(ctx =>
                     await next.Invoke();
                 })
     );
-
-if (!string.IsNullOrWhiteSpace(siteConfiguration.AllowedCorsOrigins))
-{
-    app.UseCors(Constants.CorsPolicyName);
-}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

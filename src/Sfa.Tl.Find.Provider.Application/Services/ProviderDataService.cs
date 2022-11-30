@@ -18,7 +18,7 @@ namespace Sfa.Tl.Find.Provider.Application.Services;
 
 public class ProviderDataService : IProviderDataService
 {
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ITownDataService _townDataService;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IProviderRepository _providerRepository;
@@ -30,7 +30,7 @@ public class ProviderDataService : IProviderDataService
     private readonly bool _mergeAdditionalProviderData;
 
     public ProviderDataService(
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         IPostcodeLookupService postcodeLookupService,
         IProviderRepository providerRepository,
         IQualificationRepository qualificationRepository,
@@ -41,7 +41,7 @@ public class ProviderDataService : IProviderDataService
         IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
     {
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
@@ -69,7 +69,7 @@ public class ProviderDataService : IProviderDataService
                     .GetAll())
                 .ToList();
             _cacheService.Set(key, industries,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeProvider, _logger));
         }
 
         return industries;
@@ -89,7 +89,7 @@ public class ProviderDataService : IProviderDataService
                 .GetAll())
                 .ToList();
             _cacheService.Set(key, qualifications,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeProvider, _logger));
         }
 
         return qualifications;
@@ -109,7 +109,7 @@ public class ProviderDataService : IProviderDataService
                 .GetAll(_mergeAdditionalProviderData))
                 .ToList();
             _cacheService.Set(key, routes,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeService, _logger));
+                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeProvider, _logger));
         }
 
         return routes;
@@ -388,7 +388,7 @@ public class ProviderDataService : IProviderDataService
 
             _cacheService.Set(key, geoLocation,
                 CacheUtilities.DefaultMemoryCacheEntryOptions(
-                    _dateTimeService,
+                    _dateTimeProvider,
                     _logger));
         }
 

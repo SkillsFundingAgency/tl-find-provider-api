@@ -29,6 +29,18 @@ public class DbContextWrapperBuilder
         return new DbContextWrapper(connectionStringOptions, policyRegistry, logger);
     }
 
+    public IDbContextWrapper BuildSubstitute()
+    {
+        var dbConnection = Substitute.For<IDbConnection>();
+
+        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+        dbContextWrapper
+            .CreateConnection()
+            .Returns(dbConnection);
+
+        return dbContextWrapper;
+    }
+
     public (IDbContextWrapper, IDbConnection) BuildSubstituteWrapperAndConnection()
     {
         var dbConnection = Substitute.For<IDbConnection>();

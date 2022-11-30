@@ -11,7 +11,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 public class ProviderDataServiceBuilder
 {
     public IProviderDataService Build(
-        IDateTimeService dateTimeService = null,
+        IDateTimeProvider dateTimeProvider = null,
         IPostcodeLookupService postcodeLookupService = null,
         IProviderRepository providerRepository = null,
         IQualificationRepository qualificationRepository = null,
@@ -22,7 +22,7 @@ public class ProviderDataServiceBuilder
         SearchSettings searchSettings = null,
         ILogger<ProviderDataService> logger = null)
     {
-        dateTimeService ??= Substitute.For<IDateTimeService>();
+        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         providerRepository ??= Substitute.For<IProviderRepository>();
         qualificationRepository ??= Substitute.For<IQualificationRepository>();
@@ -37,7 +37,7 @@ public class ProviderDataServiceBuilder
             .ToOptions();
 
         return new ProviderDataService(
-            dateTimeService,
+            dateTimeProvider,
             postcodeLookupService,
             providerRepository,
             qualificationRepository,

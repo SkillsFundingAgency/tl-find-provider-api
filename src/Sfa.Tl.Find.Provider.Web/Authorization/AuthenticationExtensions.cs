@@ -17,8 +17,8 @@ public static class AuthenticationExtensions
 {
     public const string AuthenticationCookieName = ".cookies.auth";
     public const string AuthenticationTypeName = "DfE-SignIn";
-    public const string AuthenticatedUserStartPage = "/employer-list";
-    public const string AuthenticatedUserStartPageExact = "/EmployerList";
+    public const string AuthenticatedUserStartPage = "/Employer/EmployerList";
+    public const string AuthenticatedUserStartPageRoute = "/employer-list";
     public const string UnauthenticatedUserStartPage = "/start";
 
     public static IServiceCollection AddProviderAuthentication(
@@ -190,13 +190,6 @@ public static class AuthenticationExtensions
                         {
                             claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
                         }
-                    }
-                    //TODO: Remove CookiePadding after WAF excludes our auth cookie
-                    if (signInSettings.CookiePadding > 0)
-                    {
-                        var _random = new Random((int)DateTime.Now.Ticks); //should be static, but we only call it once
-                        var f = (int len) => new string(Enumerable.Range(0, len).Select(_ => (char)_random.Next('a', 'z')).ToArray());
-                        claims.Add(new Claim("cookie_padding", f(signInSettings.CookiePadding)));
                     }
 
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));

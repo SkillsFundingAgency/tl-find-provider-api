@@ -1,0 +1,31 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Sfa.Tl.Find.Provider.Infrastructure.Authorization
+@model EmployerListModel
+@{
+    ViewData["Title"] = "Employer list";
+}
+
+@if (Model?.UkPrn is not null)
+{
+    <partial name="_providerEmployerList" />
+}
+else if (User.IsInRole(CustomRoles.Administrator))
+{
+    <partial name="_administratorEmployerList" />
+}
+
+@section scripts {
+    @if (Model?.UkPrn is not null)
+    {
+        <script>
+            $("#Input_SelectedPostcode").change(function () {
+                let inputval = $(this).val();
+                if (inputval && inputval != "Enter postcode") {
+                    $("#postcode-form").submit();
+                }
+                $(".tl-employers--search").toggleClass('active', inputval === "Enter postcode");
+            });
+        </script>
+    }
+}

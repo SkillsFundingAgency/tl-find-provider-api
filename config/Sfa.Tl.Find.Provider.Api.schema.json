@@ -64,6 +64,9 @@
         }
       },
       "additionalProperties": false,
+      "required": [
+        "GovNotifyApiKey"
+      ],
       "type": "object"
     },
     "EmployerInterestSettings": {

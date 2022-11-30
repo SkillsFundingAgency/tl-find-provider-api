@@ -5,3 +5,10 @@
 .tl-prewrap {
     white-space: pre-wrap;
 }
+
+@for $i from 1 through 10 {
+
+    .tl-lineheight--#{$i * 5} {
+        line-height: $i * 5px;
+    }
+}

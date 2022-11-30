@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
-namespace Sfa.Tl.Find.Provider.Web.Pages;
+namespace Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 [Authorize(nameof(PolicyNames.IsProviderOrAdministrator))]
 public class EmployerDetailsModel : PageModel
 {
     public Application.Models.EmployerInterestDetail? EmployerInterest { get; private set; }
 
-    private readonly ILogger<EmployerDetailsModel> _logger;
     private readonly IEmployerInterestService _employerInterestService;
+    private readonly ILogger<EmployerDetailsModel> _logger;
 
     public EmployerDetailsModel(
         IEmployerInterestService employerInterestService,

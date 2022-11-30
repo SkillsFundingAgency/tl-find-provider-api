@@ -1,0 +1,110 @@
+﻿@using Sfa.Tl.Find.Provider.Application.Extensions
+@model EmployerListModel
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">@PageExtensions.GetServiceName()</h1>
+        <p class="govuk-body">
+            Employers have agreed for their details to be shared for @Model.EmployerInterestRetentionWeeks weeks.<br />
+            After @Model.EmployerInterestRetentionWeeks weeks, <strong>their details will expire</strong> unless they agree to extend their interest.
+        </p>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a sfa-validation-for="Input!.CustomPostcode" href="#Input_CustomPostcode"></a></li>
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <form method="post" id="postcode-form">
+            <div class="govuk-form-group tl-inline-form-group" sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-form-group--error">
+
+                <label class="govuk-label govuk-!-margin-bottom-4" asp-for="Input!.SelectedPostcode">
+                    Select or enter a postcode to see contact details for employers within @Model.SearchRadius miles:
+                </label>
+                <span class="govuk-error-message" asp-validation-for="Input!.CustomPostcode"></span>
+
+                <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" asp-for="Input!.SelectedPostcode" asp-items="Model.Postcodes">
+                    <option value="">Select postcode</option>
+                </select>
+                <div class="tl-employers--search tl-hidden @(Model.Input?.SelectedPostcode == "Enter postcode" ? "active" : string.Empty)">
+                    <label class="govuk-label govuk-visually-hidden" for="Input!.CustomPostcode">Enter postcode</label>
+                    <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" asp-for="Input!.CustomPostcode" type="text"
+                           sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-input--error">
+                    <button type="submit" id="tl-employers--postcode--submit" class="govuk-button govuk-!-margin-bottom-2">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@if (Model.EmployerInterestList != null && Model.EmployerInterestList.Any())
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <table class="govuk-table tl-employers--table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Organisation</th>
+                        <th scope="col" class="govuk-table__header">Placement areas</th>
+                        <th scope="col" class="govuk-table__header">Distance</th>
+                        <th scope="col" class="govuk-table__header">Details expire</th>
+                        <th scope="col" class="govuk-table__header"></th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var employerInterest in Model.EmployerInterestList)
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header tl-wordwrap">
+                                @if (employerInterest.IsNew)
+                                {
+                                    <strong class="govuk-tag govuk-tag--blue">New</strong>
+                                }
+                                @if (employerInterest.IsExpiring)
+                                {
+                                    <strong class="govuk-tag govuk-tag--red">Expiring</strong>
+                                }
+                                @employerInterest.OrganisationName
+                            </th>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>Placement areas</strong></div>
+                                <div class="tl-employers--table--inline-cell">
+                                    @if (employerInterest.SkillAreas is not null && employerInterest.SkillAreas.Any())
+                                    {
+                                        @foreach (var skillArea in employerInterest.SkillAreas)
+                                        {
+                                            <p>@skillArea</p>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td class="govuk-table__cell">
+                                <div class="tl-employers--table--inline-header"><strong>Distance</strong></div>
+                                <div class="tl-employers--table--inline-cell">@employerInterest.Distance.FormatDistance()</div>
+                            </td>
+                            <td class="govuk-table__cell">
+                                <div class="tl-employers--table--inline-header"><strong>Details expire</strong></div>
+                                <div class="tl-employers--table--inline-cell">@($"{employerInterest.ExpiryDate:d MMM yyyy}")</div>
+                            </td>
+                            <td class="govuk-table__cell"><a asp-page="./EmployerDetails" asp-route-id="@employerInterest.Id" id="tl-employer--table--link--@employerInterest.Id" class="govuk-link govuk-link--no-visited-state">View</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (Model.ZeroResultsFound == true)
+{
+    <div class="tl-card" id="tl-employers--noresults">
+        <p class="govuk-body govuk-!-margin-bottom-0">
+            <strong>There are currently no employers within @Model.SearchRadius miles who have expressed interest in T Levels.</strong><br>
+            Please search another postcode or check back soon to see employers in your area.
+        </p>
+    </div>
+}

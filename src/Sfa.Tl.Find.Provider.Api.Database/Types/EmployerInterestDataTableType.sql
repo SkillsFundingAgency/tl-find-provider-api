@@ -10,6 +10,6 @@
 	[Email] NVARCHAR(320) NULL,
 	[Telephone] NVARCHAR(150) NULL,
 	[Website] NVARCHAR(500) NULL,
-	[ContactPreferenceType] INT NOT NULL,
+	[ContactPreferenceType] INT NULL,
 	[AdditionalInformation] NVARCHAR(MAX) NULL
 )

@@ -1,0 +1,14 @@
+.tl-notification {
+    display: inline-flex;
+    border-left: 7px solid #2e8ec4;
+    background-color: #eaf4fa;
+    padding: 17px 25px 18px 17px;
+    margin: 5px 0px 30px;
+    @include govuk-font($size: 19);
+
+
+    &--green {
+        border-left: 7px solid #00703c;
+        background-color: rgb(224, 245, 228);
+    }
+}

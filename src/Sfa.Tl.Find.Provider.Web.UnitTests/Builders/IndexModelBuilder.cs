@@ -6,9 +6,9 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class IndexModelBuilder
 {
     public IndexModel Build(
-            ILogger<IndexModel>? logger = null,
-            PageContext? pageContext = null,
-            bool userIsAuthenticated = true)
+        ILogger<IndexModel>? logger = null,
+        PageContext? pageContext = null,
+        bool userIsAuthenticated = true)
     {
         pageContext ??= new PageContextBuilder()
             .Build(userIsAuthenticated);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+﻿using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Extensions;
@@ -12,7 +13,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class EmployerInterestService : IEmployerInterestService
 {
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IEmailService _emailService;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmployerInterestRepository _employerInterestRepository;
@@ -21,7 +22,7 @@ public class EmployerInterestService : IEmployerInterestService
     private readonly EmployerInterestSettings _employerInterestSettings;
 
     public EmployerInterestService(
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         IEmailService emailService,
         IPostcodeLookupService postcodeLookupService,
         IProviderDataService providerDataService,
@@ -29,7 +30,7 @@ public class EmployerInterestService : IEmployerInterestService
         IOptions<EmployerInterestSettings> employerInterestOptions,
         ILogger<EmployerInterestService> logger)
     {
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _employerInterestRepository = employerInterestRepository ?? throw new ArgumentNullException(nameof(employerInterestRepository));
@@ -41,11 +42,6 @@ public class EmployerInterestService : IEmployerInterestService
     }
 
     public int RetentionDays => _employerInterestSettings.RetentionDays;
-
-    public DateOnly? ServiceStartDate =>
-        _employerInterestSettings?.ServiceStartDate is not null
-            ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
-            : null;
 
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
@@ -63,6 +59,16 @@ public class EmployerInterestService : IEmployerInterestService
         }
 
         return uniqueId;
+    }
+
+    public async Task<int> DeleteEmployerInterest(int id)
+    {
+        var count = await _employerInterestRepository.Delete(id);
+
+        _logger.LogInformation("Removed {count} employer interest records with id {id}",
+            count, id);
+
+        return count;
     }
 
     public async Task<int> DeleteEmployerInterest(Guid uniqueId)
@@ -84,7 +90,7 @@ public class EmployerInterestService : IEmployerInterestService
             return 0;
         }
 
-        var date = _dateTimeService.Today.AddDays(-_employerInterestSettings.RetentionDays);
+        var date = _dateTimeProvider.Today.AddDays(-_employerInterestSettings.RetentionDays);
         var count = await _employerInterestRepository.DeleteBefore(date);
 
         _logger.LogInformation("Removed {count} employer interest records because they are over {days} days (older than {date:yyyy-MM-dd})",
@@ -100,8 +106,8 @@ public class EmployerInterestService : IEmployerInterestService
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today, serviceStartDate: ServiceStartDate);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
+                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
+                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
                 return x;
             });
     }
@@ -127,8 +133,8 @@ public class EmployerInterestService : IEmployerInterestService
             .Select(x =>
             {
                 x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeService.Today, serviceStartDate: ServiceStartDate);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeService.Today, RetentionDays);
+                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
+                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
                 return x;
             });
 
@@ -146,13 +152,25 @@ public class EmployerInterestService : IEmployerInterestService
             _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
             "id",
             employerInterest.UniqueId.ToString("D").ToLower()));
+        
+        var detailsList = await BuildEmployerInterestDetailsList(employerInterest);
 
-        var contactPreference = employerInterest.ContactPreferenceType switch
+        var tokens = new Dictionary<string, string>
         {
-            ContactPreference.Email => "Email",
-            ContactPreference.Telephone => "Telephone",
-            _ => "No preference"
+            { "details_list", detailsList },
+            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
+            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
         };
+
+        return await _emailService.SendEmail(
+            employerInterest.Email,
+            EmailTemplateNames.EmployerRegisterInterest,
+            tokens, 
+            employerInterest.UniqueId.ToString());
+    }
+
+    private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest)
+    {
 
         var industries = await _providerDataService.GetIndustries();
         var routes = await _providerDataService.GetRoutes();
@@ -167,29 +185,45 @@ public class EmployerInterestService : IEmployerInterestService
             .OrderBy(r => r.Name)
             .Select(r => r.Name)
         );
-        
-        var tokens = new Dictionary<string, string>
-        {
-            { "contact_name", employerInterest.ContactName ?? "" },
-            { "email_address", employerInterest.Email ?? "" },
-            { "telephone", employerInterest.Telephone ?? "" },
-            { "contact_preference", contactPreference },
-            { "organisation_name", employerInterest.OrganisationName ?? "" },
-            { "website", employerInterest.Website ?? "" },
-            { "primary_industry", industry ?? "" },
-            { "placement_area", placementAreas },
-            { "has_multiple_placement_areas", skillAreas.Count > 1 ? "yes" : "no" },
-            { "postcode", employerInterest.Postcode ?? "" },
-            { "additional_information", employerInterest.AdditionalInformation?.ReplaceMultipleLineBreaks() ?? "" },
-            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
-            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
-        };
 
-        return await _emailService.SendEmail(
-            employerInterest.Email,
-            EmailTemplateNames.EmployerRegisterInterest,
-            tokens, 
-            employerInterest.UniqueId.ToString());
+        var detailsList = new StringBuilder();
+        detailsList.AppendLine($"* Name: {employerInterest.ContactName}");
+        if (!string.IsNullOrEmpty(employerInterest.Email))
+        {
+            detailsList.AppendLine($"* Email address: {employerInterest.Email}");
+        }
+        if (!string.IsNullOrEmpty(employerInterest.Telephone))
+        {
+            detailsList.AppendLine($"* Telephone: {employerInterest.Telephone}");
+        }
+
+        if (employerInterest.ContactPreferenceType is not null)
+        {
+            var contactPreference = employerInterest.ContactPreferenceType switch
+            {
+                ContactPreference.Email => "Email",
+                ContactPreference.Telephone => "Telephone",
+                ContactPreference.NoPreference => "No preference",
+                _ => "None"
+            };
+
+            detailsList.AppendLine($"* How would you prefer to be contacted: {contactPreference}");
+        }
+        detailsList.AppendLine($"* Organisation name: {employerInterest.OrganisationName}");
+        if (!string.IsNullOrEmpty(employerInterest.Website))
+        {
+            detailsList.AppendLine($"* Website: {employerInterest.Website}");
+        }
+        
+        detailsList.AppendLine($"* Organisation’s primary industry: {industry}");
+        detailsList.AppendLine($"* Industry placement area{(skillAreas.Count > 1 ? "s" : "")}: {placementAreas}");
+        detailsList.AppendLine($"* Postcode: {employerInterest.Postcode}");
+        if (!string.IsNullOrEmpty(employerInterest.AdditionalInformation))
+        {
+            detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks() }");
+        }
+        
+        return detailsList.ToString();
     }
 
     private async Task<GeoLocation> GetPostcode(string postcode)

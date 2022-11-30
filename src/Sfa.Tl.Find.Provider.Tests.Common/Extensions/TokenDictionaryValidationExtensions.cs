@@ -13,4 +13,15 @@ public static class TokenDictionaryValidationExtensions
 
         return true;
     }
+
+    public static bool ValidateTokenContains(this IDictionary<string, string> tokens,
+        string key,
+        string expectedValue)
+    {
+        tokens.Should().ContainKey(key);
+        var token = tokens[key];
+        token.Should().Contain(expectedValue);
+
+        return true;
+    }
 }

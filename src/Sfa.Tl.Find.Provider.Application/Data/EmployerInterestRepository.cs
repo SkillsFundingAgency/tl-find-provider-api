@@ -12,7 +12,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
     private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
-    private readonly IGuidService _guidService;
+    private readonly IGuidProvider _guidProvider;
     private readonly ILogger<EmployerInterestRepository> _logger;
     private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
@@ -20,13 +20,13 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         IDbContextWrapper dbContextWrapper,
         IDynamicParametersWrapper dynamicParametersWrapper,
         IReadOnlyPolicyRegistry<string> policyRegistry,
-        IGuidService guidService,
+        IGuidProvider guidProvider,
         ILogger<EmployerInterestRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
         _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
-        _guidService = guidService ?? throw new ArgumentNullException(nameof(guidService));
+        _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -36,7 +36,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
-            var uniqueId = _guidService.NewGuid();
+            var uniqueId = _guidProvider.NewGuid();
             _dynamicParametersWrapper.CreateParameters(new
             {
                 data = new List<EmployerInterestDto>
@@ -54,7 +54,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,
                             Website = employerInterest.Website,
-                            ContactPreferenceType = (int)employerInterest.ContactPreferenceType
+                            ContactPreferenceType = (int?)employerInterest.ContactPreferenceType
                         }
                     }
                     .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
@@ -77,24 +77,24 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
             return await retryPolicy
                 .ExecuteAsync(async _ =>
-                {
-                    using var connection = _dbContextWrapper.CreateConnection();
-                    connection.Open();
+                    {
+                        using var connection = _dbContextWrapper.CreateConnection();
+                        connection.Open();
 
-                    using var transaction = _dbContextWrapper.BeginTransaction(connection);
+                        using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
-                    var result = await _dbContextWrapper.ExecuteAsync(
-                        connection,
-                        "CreateEmployerInterest",
-                        _dynamicParametersWrapper.DynamicParameters,
-                        transaction,
-                        commandType: CommandType.StoredProcedure);
+                        var result = await _dbContextWrapper.ExecuteAsync(
+                            connection,
+                            "CreateEmployerInterest",
+                            _dynamicParametersWrapper.DynamicParameters,
+                            transaction,
+                            commandType: CommandType.StoredProcedure);
 
-                    transaction.Commit();
+                        transaction.Commit();
 
-                    return (result, uniqueId);
-                },
-            context);
+                        return (result, uniqueId);
+                    },
+                    context);
         }
         catch (Exception ex)
         {
@@ -103,11 +103,56 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
     }
 
+    public async Task<int> Delete(int id)
+    {
+        try
+        {
+            var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
+
+            return await retryPolicy
+                .ExecuteAsync(async _ =>
+                    {
+                        using var connection = _dbContextWrapper.CreateConnection();
+                        connection.Open();
+
+                        using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+                        _dynamicParametersWrapper.CreateParameters(new
+                        {
+                            employerInterestIds =
+                                new List<int> { id }
+                                    .AsTableValuedParameter("dbo.IdListTableType")
+                        })
+                            .AddOutputParameter("@employerInterestsDeleted", DbType.Int32);
+
+                        await _dbContextWrapper.ExecuteAsync(
+                            connection,
+                            "DeleteEmployerInterest",
+                            _dynamicParametersWrapper.DynamicParameters,
+                            transaction,
+                            commandType: CommandType.StoredProcedure);
+
+                        var employerInterestsDeleted = _dynamicParametersWrapper
+                            .DynamicParameters
+                            .Get<int>("@employerInterestsDeleted");
+
+                        transaction.Commit();
+                        return employerInterestsDeleted;
+                    },
+                    context);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when deleting employer interest with id '{id}'", id);
+            throw;
+        }
+    }
+
     public async Task<int> Delete(Guid uniqueId)
     {
         try
         {
-            var result = 0;
+            var employerInterestsDeleted = 0;
 
             var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
@@ -135,7 +180,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 employerInterestIds =
                                     new List<int> { id.Value }
                                         .AsTableValuedParameter("dbo.IdListTableType")
-                            });
+                            })
+                                .AddOutputParameter("@employerInterestsDeleted", DbType.Int32);
 
                             await _dbContextWrapper.ExecuteAsync(
                                 connection,
@@ -144,11 +190,13 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 transaction,
                                 commandType: CommandType.StoredProcedure);
 
-                            result = 1;
+                            employerInterestsDeleted = _dynamicParametersWrapper
+                                .DynamicParameters
+                                .Get<int>("@employerInterestsDeleted");
                         }
 
                         transaction.Commit();
-                        return result;
+                        return employerInterestsDeleted;
                     },
                     context);
         }
@@ -163,7 +211,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
-            var result = 0;
+            var employerInterestsDeleted = 0;
 
             using var connection = _dbContextWrapper.CreateConnection();
             connection.Open();
@@ -195,7 +243,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                 {
                     employerInterestIds = idsToDelete
                         .AsTableValuedParameter("dbo.IdListTableType")
-                });
+                })
+                    .AddOutputParameter("@employerInterestsDeleted", DbType.Int32);
 
                 await _dbContextWrapper.ExecuteAsync(
                     connection,
@@ -204,12 +253,14 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                     transaction,
                     commandType: CommandType.StoredProcedure);
 
-                result = idsToDelete.Count;
+                employerInterestsDeleted = _dynamicParametersWrapper
+                    .DynamicParameters
+                    .Get<int>("@employerInterestsDeleted");
             }
 
             transaction.Commit();
 
-            return result;
+            return employerInterestsDeleted;
         }
         catch (Exception ex)
         {
@@ -332,8 +383,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
         return summaryList
             .Values
-            .OrderByDescending(e => e.CreatedOn)
-            .ThenBy(e => e.OrganisationName)
+            .OrderBy(e => e.OrganisationName)
+            .ThenByDescending(e => e.CreatedOn)
             .ToList();
     }
 
@@ -389,10 +440,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         var totalEmployerInterestsCount = _dynamicParametersWrapper
             .DynamicParameters
             .Get<int>("@totalEmployerInterestsCount");
-
-        _logger.LogInformation("{class}.{method} with radius {searchRadius} found {resultsCount} of {resultsCount} results.",
-            nameof(EmployerInterestRepository), nameof(Search),
-            searchRadius, summaryList.Count, totalEmployerInterestsCount);
 
         var searchResults = summaryList
             .Values

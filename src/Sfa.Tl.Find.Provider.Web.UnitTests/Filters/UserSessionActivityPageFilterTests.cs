@@ -22,8 +22,8 @@ public class UserSessionActivityPageFilterTests
         var timeNowUtc = new DateTime(2022, 11, 01, 10, 11, 12, 0, DateTimeKind.Utc);
 
         var cacheService = Substitute.For<ICacheService>();
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider
             .UtcNow
             .Returns(timeNowUtc);
 
@@ -52,7 +52,7 @@ public class UserSessionActivityPageFilterTests
         }
 
         var filter = new UserSessionActivityPageFilterBuilder()
-            .Build(cacheService, dateTimeService);
+            .Build(cacheService, dateTimeProvider);
 
         await filter.OnPageHandlerExecutionAsync(context, Next);
 
@@ -70,8 +70,8 @@ public class UserSessionActivityPageFilterTests
         var timeNowUtc = new DateTime(2022, 11, 01, 10, 11, 12, 0, DateTimeKind.Utc);
 
         var cacheService = Substitute.For<ICacheService>();
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider
             .UtcNow
             .Returns(timeNowUtc);
 
@@ -100,7 +100,7 @@ public class UserSessionActivityPageFilterTests
         }
 
         var filter = new UserSessionActivityPageFilterBuilder()
-            .Build(cacheService, dateTimeService);
+            .Build(cacheService, dateTimeProvider);
 
         await filter.OnPageHandlerExecutionAsync(context, Next);
 

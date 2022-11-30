@@ -1,9 +1,7 @@
 ﻿using System.Data;
-using Dapper;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
@@ -88,8 +86,8 @@ public class EmployerInterestRepositoryTests
     public async Task Create_Returns_Expected_Result()
     {
         var uniqueId = new Guid();
-        var guidService = Substitute.For<IGuidService>();
-        guidService
+        var guidProvider = Substitute.For<IGuidProvider>();
+        guidProvider
             .NewGuid()
             .Returns(uniqueId);
 
@@ -114,7 +112,7 @@ public class EmployerInterestRepositoryTests
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
                 policyRegistry: pollyPolicyRegistry,
-                guidService: guidService);
+                guidProvider: guidProvider);
 
         var result = await repository.Create(employerInterest, geoLocation);
 
@@ -123,7 +121,102 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task Delete_Calls_Retry_Policy()
+    public async Task Delete_By_Id_Calls_Retry_Policy()
+    {
+        const int id = 101;
+
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var logger = Substitute.For<ILogger<EmployerInterestRepository>>();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(
+                policyRegistry: pollyPolicyRegistry,
+                logger: logger);
+
+        await repository.Delete(id);
+
+        await pollyPolicy.Received(1).ExecuteAsync(
+            Arg.Any<Func<Context, Task<int>>>(),
+            Arg.Is<Context>(ctx =>
+                ctx.ContainsKey(PolicyContextItems.Logger) &&
+                ctx[PolicyContextItems.Logger] == logger
+            ));
+    }
+
+    [Fact]
+    public async Task Delete_By_Id_Calls_Database_As_Expected()
+    {
+        const int id = 101;
+        const int employerInterestsCount = 1;
+
+        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithTransaction();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
+
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<int>();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper,
+                policyRegistry: pollyPolicyRegistry);
+
+        var results = await repository.Delete(id);
+
+        results.Should().Be(employerInterestsCount);
+
+        dbContextWrapper
+            .Received(1)
+            .BeginTransaction(dbConnection);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("DeleteEmployerInterest")),
+                Arg.Any<object>(),
+                Arg.Is<IDbTransaction>(t => t != null),
+                commandType: CommandType.StoredProcedure);
+
+        transaction
+            .Received(1)
+            .Commit();
+    }
+
+    [Fact]
+    public async Task Delete_By_Id_Returns_Expected_Result()
+    {
+        const int id = 101;
+        const int employerInterestsCount = 1;
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
+        
+        var pollyPolicy = PollyPolicyBuilder.BuildPolicy<int>();
+        var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
+
+        var logger = Substitute.For<ILogger<EmployerInterestRepository>>();
+
+        var repository = new EmployerInterestRepositoryBuilder().Build(
+            dbContextWrapper,
+            dynamicParametersWrapper,
+            policyRegistry: pollyPolicyRegistry,
+            logger: logger);
+
+        var result = await repository.Delete(id);
+
+        result.Should().Be(employerInterestsCount);
+    }
+
+    [Fact]
+    public async Task Delete_By_UniqueId_Calls_Retry_Policy()
     {
         var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
 
@@ -148,13 +241,17 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task Delete_Calls_Database_As_Expected()
+    public async Task Delete_By_UniqueId_Calls_Database_As_Expected()
     {
         const int id = 101;
+        const int employerInterestsCount = 101;
         var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
 
         dbContextWrapper
             .ExecuteScalarAsync<int?>(dbConnection,
@@ -169,6 +266,7 @@ public class EmployerInterestRepositoryTests
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
+                dynamicParametersWrapper,
                 policyRegistry: pollyPolicyRegistry);
 
         await repository.Delete(uniqueId);
@@ -192,14 +290,17 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task Delete_Returns_Expected_Result()
+    public async Task Delete_By_UniqueId_Returns_Expected_Result()
     {
-        const int count = 1;
         const int id = 101;
+        const int employerInterestsCount = 1;
         var uniqueId = Guid.Parse("5FBDFA5D-3987-4A3D-B4A2-DBAF545455CB");
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
 
         dbContextWrapper
             .ExecuteScalarAsync<int?>(dbConnection,
@@ -209,15 +310,6 @@ public class EmployerInterestRepositoryTests
                 Arg.Is<IDbTransaction>(t => t != null))
             .Returns(id);
 
-        dbContextWrapper
-            .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s =>
-                    s.Contains("DeleteEmployerInterest")),
-                Arg.Any<object>(),
-                Arg.Is<IDbTransaction>(t => t != null),
-                commandType: CommandType.StoredProcedure)
-        .Returns(count);
-
         var pollyPolicy = PollyPolicyBuilder.BuildPolicy<int>();
         var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
 
@@ -225,23 +317,27 @@ public class EmployerInterestRepositoryTests
 
         var repository = new EmployerInterestRepositoryBuilder().Build(
             dbContextWrapper,
+            dynamicParametersWrapper,
             policyRegistry: pollyPolicyRegistry,
             logger: logger);
 
         var result = await repository.Delete(uniqueId);
 
-        result.Should().Be(count);
+        result.Should().Be(employerInterestsCount);
     }
 
     [Fact]
     public async Task DeleteBefore_Returns_Expected_Result()
     {
-        const int count = 10;
+        const int employerInterestsCount = 10;
         var date = DateTime.Parse("2022-09-13");
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
+        
         dbContextWrapper
             .QueryAsync<int>(dbConnection,
                 Arg.Is<string>(s =>
@@ -252,20 +348,13 @@ public class EmployerInterestRepositoryTests
                 Arg.Is<IDbTransaction>(t => t != null))
             .Returns(Enumerable.Range(1, 10));
 
-        dbContextWrapper
-            .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s =>
-                    s.Contains("DeleteEmployerInterest")),
-                Arg.Any<object>(),
-                Arg.Is<IDbTransaction>(t => t != null),
-                commandType: CommandType.StoredProcedure)
-            .Returns(count);
-
-        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper, 
+                dynamicParametersWrapper);
 
         var result = await repository.DeleteBefore(date);
 
-        result.Should().Be(count);
+        result.Should().Be(employerInterestsCount);
     }
 
     [Fact]
@@ -413,10 +502,8 @@ public class EmployerInterestRepositoryTests
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
-        var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
-        var parameters = new DynamicParameters();
-        parameters.Add("totalEmployerInterestsCount", employerInterestsCount, DbType.Int32, ParameterDirection.Output);
-        dynamicParametersWrapper.DynamicParameters.Returns(parameters);
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameter("totalEmployerInterestsCount", employerInterestsCount);
 
         var callIndex = 0;
 

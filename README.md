@@ -33,46 +33,50 @@ open Storage Explorer and navigate to the local storage account emulator.
 
 Add a table `Configuration` if it doesn't already exist.
 
+##### API settings
+
 Add a new row to the table with:
 > **PartitionKey** : `LOCAL`  
 > **RowKey** : `Sfa.Tl.Find.Provider.Api_1.0`  
 > Add a property **Data** and set the value as below.  
 > 
 ```
-    {
-        "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;",
-        "AllowedCorsOrigins": "*",
-        "ApiSettings": {
-            "AppId": "<Application ID>",
-            "ApiKey": "<API Key>"
-        },
-        "CourseDirectoryApiSettings": {
-            "BaseUri": "<Course Directory API>",
-            "ApiKey": "<API Key>"
-        },
-        "CourseDirectoryImportSchedule": "<CRON string>",
-        "EmailSettings": {
-            "GovNotifyApiKey": "<key from GOV.UK Notify>",
-            "SupportEmailAddress": "<email>",
-            "DeliveryStatusToken" :  "<token>" 
-        },
-        "EmployerInterestSettings": {
-            "CleanupJobSchedule": "0 0 3 * * ?",
-            "EmployerSupportSiteUri": "https://test.employers.tlevels.gov.uk/",
-            "RetentionDays": 84
-        },
-        "GoogleMapsApiSettings": {
-            "ApiKey": "<API key>",
-            "BaseUri": "https://maps.googleapis.com/maps/api/"
-        },
-        "TownDataImportSchedule": "<CRON string>",
-        "PostcodeApiSettings": {
-            "BaseUri": "https://api.postcodes.io/"
-        },
-        "SearchSettings": {
-            "MergeAdditionalProviderData": false
-        }
+{
+    "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;",
+    "AllowedCorsOrigins": "*",
+    "ApiSettings": {
+        "AppId": "<Application ID>",
+        "ApiKey": "<API Key>"
+    },
+    "CourseDirectoryApiSettings": {
+        "BaseUri": "<Course Directory API>",
+        "ApiKey": "<API Key>"
+    },
+    "CourseDirectoryImportSchedule": "<CRON string>",
+    "EmailSettings": {
+        "GovNotifyApiKey": "<key from GOV.UK Notify>",
+        "SupportEmailAddress": "<email>",
+        "DeliveryStatusToken" :  "<token>" 
+    },
+    "EmployerInterestSettings": {
+        "CleanupJobSchedule": "0 0 3 * * ?",
+        "EmployerSupportSiteUri": "https://test.employers.tlevels.gov.uk/",
+        "UnsubscribeEmployerUri": "https://localhost:7191/EmployerInterest/Unsubscribe",
+        "RetentionDays": 84,
+        "SearchRadius": 30
+    },
+    "GoogleMapsApiSettings": {
+        "ApiKey": "<API key>",
+        "BaseUri": "https://maps.googleapis.com/maps/api/"
+    },
+    "TownDataImportSchedule": "<CRON string>",
+    "PostcodeApiSettings": {
+        "BaseUri": "https://api.postcodes.io/"
+    },
+    "SearchSettings": {
+        "MergeAdditionalProviderData": false
     }
+}
 ```
 
 The API Settings are maintained by the T Levels DevOps team, and contain the Application ID and API Key used for HMAC. 
@@ -80,6 +84,44 @@ The API Settings are maintained by the T Levels DevOps team, and contain the App
 Course directory API values can be obtained from the NCS API portal. Ask the NCS Course Directory Team for details.
 
 CRON schedule needs to use a valid CRON string, such as `0 0 9 ? * MON-FRI`
+
+##### Connect web site settings
+
+Add a new row to the table with:
+> **PartitionKey** : `LOCAL`  
+> **RowKey** : `Sfa.Tl.Find.Provider.Web_1.0`  
+> Add a property **Data** and set the value as below.  
+> 
+```
+{
+    "BlobStorageConnectionString": "UseDevelopmentStorage=true;",
+    "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;",
+    "EmailSettings": {
+        "GovNotifyApiKey": "<key from GOV.UK Notify>"
+    },
+    "EmployerInterestSettings": {
+        "EmployerSupportSiteUri": "https://test.employers.tlevels.gov.uk/",
+        "SearchRadius": 20,
+        "RetentionDays": 84
+    },
+    "DfeSignInSettings": {
+        "MetadataAddress": "https://test-oidc.signin.education.gov.uk/.well-known/openid-configuration",
+        "ApiUri": "https://test-api.signin.education.gov.uk",
+        "Authority": "https://test-oidc.signin.education.gov.uk",
+        "Issuer": "TLevelsConnect",
+        "ClientId": "TLevelsConnect",
+        "ClientSecret": "<client secret>",
+        "ApiSecret": "<api secret>",
+        "Audience": "signin.education.gov.uk",
+        "Timeout": 30,
+        "Administrators": "<list of administrator email addresses>"
+    },
+    "PostcodeApiSettings": {
+        "BaseUri": "https://api.postcodes.io/"
+    }
+}
+```
+
 
 ### Troubleshooting
 

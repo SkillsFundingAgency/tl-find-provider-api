@@ -12,7 +12,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
-namespace Sfa.Tl.Find.Provider.Web.Pages;
+namespace Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 [Authorize(nameof(PolicyNames.IsProviderOrAdministrator))]
 public class EmployerListModel : PageModel
@@ -29,9 +29,12 @@ public class EmployerListModel : PageModel
 
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
 
-    public IEnumerable<LocationPostcode>? ProviderLocations { get; private set; }
+    public IDictionary<string, LocationPostcode>? ProviderLocations { get; private set; }
 
     public SelectListItem[]? Postcodes { get; private set; }
+
+    [TempData]
+    public string? DeletedOrganisationName { get; set; }
 
     public int EmployerInterestRetentionDays =>
         _employerInterestSettings.RetentionDays;
@@ -41,11 +44,6 @@ public class EmployerListModel : PageModel
 
     public int SearchRadius =>
         _employerInterestSettings.SearchRadius;
-
-    public DateOnly? ServiceStartDate =>
-        _employerInterestSettings?.ServiceStartDate is not null
-            ? DateOnly.FromDateTime(_employerInterestSettings.ServiceStartDate.Value)
-            : DateOnly.MinValue;
 
     public long? UkPrn { get; private set; }
 
@@ -74,14 +72,33 @@ public class EmployerListModel : PageModel
     public async Task OnGet()
     {
         UkPrn = GetUkPrn();
-        await LoadProviderPostcodes(UkPrn);
+        if (UkPrn is not null && UkPrn > 0)
+        {
+            await LoadProviderView(UkPrn.Value);
+        }
+        else if(User.IsInRole(CustomRoles.Administrator))
+        {
+            await LoadAdministratorView();
+        }
+    }
+
+    private async Task LoadAdministratorView()
+    {
+        EmployerInterestList = await _employerInterestService
+                .GetSummaryList();
+        ZeroResultsFound = !EmployerInterestList.Any();
+    }
+
+    private async Task LoadProviderView(long ukPrn)
+    {
+        await LoadProviderPostcodes(ukPrn);
 
         var postcodeLocation = _sessionService.Get<LocationPostcode>(SessionKeyPostcodeLocation);
 
         if (postcodeLocation is not null)
         {
             Input ??= new InputModel();
-            if (ProviderLocations != null && ProviderLocations.Any(p => p.Postcode == postcodeLocation.Postcode))
+            if (ProviderLocations != null && ProviderLocations.ContainsKey(postcodeLocation.Postcode))
             {
                 Input.SelectedPostcode = postcodeLocation.Postcode;
             }
@@ -108,8 +125,8 @@ public class EmployerListModel : PageModel
         {
             if (!string.IsNullOrEmpty(Input?.SelectedPostcode))
             {
-                //TODO: Use a dictionary here?
-                postcodeLocation = ProviderLocations?.FirstOrDefault(p => p.Postcode == Input?.SelectedPostcode);
+                postcodeLocation = ProviderLocations?.TryGetValue(Input?.SelectedPostcode!, out var loc) == true
+                    ? loc : null;
             }
 
             if (postcodeLocation is null)
@@ -165,7 +182,7 @@ public class EmployerListModel : PageModel
 
         _sessionService.Set(SessionKeyPostcodeLocation, postcodeLocation);
 
-        return RedirectToPage("/EmployerList");
+        return RedirectToPage("/Employer/EmployerList");
     }
 
     private long? GetUkPrn()
@@ -173,22 +190,26 @@ public class EmployerListModel : PageModel
         var ukPrnClaim = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
         return ukPrnClaim is not null && long.TryParse(ukPrnClaim, out var ukPrn)
             ? ukPrn
-            : default;
+            : null;
     }
 
     private async Task LoadProviderPostcodes(long? ukPrn)
     {
         if (ukPrn is null) return;
 
-        ProviderLocations = await _providerDataService
-            .GetLocationPostcodes(ukPrn.Value);
+        ProviderLocations = (await _providerDataService
+            .GetLocationPostcodes(ukPrn.Value))
+            ?.ToDictionary(
+                x => x.Postcode,
+                x => x);
 
-        Postcodes = ProviderLocations.Select(p
+        Postcodes = ProviderLocations?.Select(p
                     => new SelectListItem(
-                        p.Postcode,
-                        p.Postcode,
-                        p.Postcode == Input?.SelectedPostcode)
+                        p.Key,
+                        p.Key,
+                        p.Key == Input?.SelectedPostcode)
             )
+            .OrderBy(x => x.Text)
             //.Prepend(new SelectListItem("Select postcode", "", true))
             .Append(new SelectListItem(EnterPostcodeValue, EnterPostcodeValue, Input?.SelectedPostcode == EnterPostcodeValue))
             .ToArray();

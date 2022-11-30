@@ -9,7 +9,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Sfa.Tl.Find.Provider.Infrastructure.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using RouteBuilder = Sfa.Tl.Find.Provider.Tests.Common.Builders.Models.RouteBuilder;
@@ -81,7 +81,7 @@ public class FakeStartup
         services
             .AddSingleton(_ => _testConfigurationSettings)
             .AddScoped(_ => Substitute.For<IDbContextWrapper>())
-            .AddScoped<IDateTimeService, DateTimeService>()
+            .AddScoped<IDateTimeProvider, DateTimeProvider>()
             .AddTransient(_ =>
             {
                 var providerDataService = Substitute.For<IProviderDataService>();

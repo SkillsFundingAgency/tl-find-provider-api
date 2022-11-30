@@ -12,20 +12,20 @@ public class EmployerInterestRepositoryBuilder
         IDbContextWrapper dbContextWrapper = null,
         IDynamicParametersWrapper dynamicParametersWrapper = null,
         IReadOnlyPolicyRegistry<string> policyRegistry = null,
-        IGuidService guidService = null,
+        IGuidProvider guidProvider = null,
         ILogger<EmployerInterestRepository> logger = null)
     {
         dbContextWrapper ??= Substitute.For<IDbContextWrapper>();
         dynamicParametersWrapper ??= Substitute.For<IDynamicParametersWrapper>();
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
-        guidService ??= Substitute.For<IGuidService>();
+        guidProvider ??= Substitute.For<IGuidProvider>();
         logger ??= Substitute.For<ILogger<EmployerInterestRepository>>();
 
         return new EmployerInterestRepository(
             dbContextWrapper,
             dynamicParametersWrapper,
             policyRegistry,
-            guidService,
+            guidProvider,
             logger);
     }
 }

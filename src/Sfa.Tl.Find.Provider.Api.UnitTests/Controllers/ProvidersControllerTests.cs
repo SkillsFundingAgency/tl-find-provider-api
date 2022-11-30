@@ -526,8 +526,8 @@ public class ProvidersControllerTests
     {
         var bytes = new byte[] { 104, 101, 108 , 108, 111 };
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(DateTime.Parse("2022-08-19"));
         const string expectedFileName = "All T Level providers August 2022.csv";
 
         var providerDataService = Substitute.For<IProviderDataService>();
@@ -535,7 +535,7 @@ public class ProvidersControllerTests
             .Returns(bytes);
 
         var controller = new ProvidersControllerBuilder()
-            .Build(providerDataService, dateTimeService);
+            .Build(providerDataService, dateTimeProvider);
 
         var result = await controller.GetProviderDataAsCsv();
 
@@ -551,8 +551,8 @@ public class ProvidersControllerTests
     {
         var bytes = new byte[] { 104, 101, 108, 108, 111 };
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(DateTime.Parse("2022-08-19"));
         const string expectedFormattedFileDate = "August 2022";
 
         var providerDataService = Substitute.For<IProviderDataService>();
@@ -561,7 +561,7 @@ public class ProvidersControllerTests
 
         var controller = new ProvidersControllerBuilder()
             .Build(providerDataService,
-                dateTimeService);
+                dateTimeProvider);
 
         var result = await controller.GetProviderDataCsvFileInfo();
         
@@ -600,14 +600,14 @@ public class ProvidersControllerTests
                 return false;
             });
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(DateTime.Parse("2022-08-19"));
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(DateTime.Parse("2022-08-19"));
 
         var providerDataService = Substitute.For<IProviderDataService>();
  
         var controller = new ProvidersControllerBuilder()
             .Build(providerDataService,
-                dateTimeService,
+                dateTimeProvider,
                 cacheService);
 
         var result = await controller.GetProviderDataCsvFileInfo();
