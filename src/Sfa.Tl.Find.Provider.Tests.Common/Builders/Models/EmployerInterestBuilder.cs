@@ -62,17 +62,17 @@ public class EmployerInterestBuilder
         {
             Id = default,
             UniqueId = default,
-            OrganisationName = null,
-            ContactName = null,
+            OrganisationName = "Test Employer",
+            ContactName = "Test Contact",
             Postcode = "CV1 2WT",
-            IndustryId = null,
+            IndustryId = 9,
             OtherIndustry = null,
             Email = "test.contact1@employer.co.uk",
             Telephone = null,
             Website = null,
             ContactPreferenceType = default,
             AdditionalInformation = null,
-            SkillAreaIds = null
+            SkillAreaIds = new List<int> { 1 }
         };
     }
 

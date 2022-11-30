@@ -15,17 +15,17 @@ public class PostcodeLookupService : IPostcodeLookupService
 {
     private readonly HttpClient _httpClient;
     private readonly ICacheService _cacheService;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<PostcodeLookupService> _logger;
 
     public PostcodeLookupService(
         HttpClient httpClient,
-        IDateTimeService dateTimeService,
+        IDateTimeProvider dateTimeProvider,
         ICacheService cacheService,
         ILogger<PostcodeLookupService> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -137,7 +137,7 @@ public class PostcodeLookupService : IPostcodeLookupService
 
         _cacheService.Set(key, geoLocation,
             CacheUtilities.DefaultMemoryCacheEntryOptions(
-                _dateTimeService,
+                _dateTimeProvider,
                 _logger));
     }
 }

@@ -1,5 +1,5 @@
 ﻿namespace Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-public interface IGuidService
+public interface IGuidProvider
 {
     Guid NewGuid();
 }

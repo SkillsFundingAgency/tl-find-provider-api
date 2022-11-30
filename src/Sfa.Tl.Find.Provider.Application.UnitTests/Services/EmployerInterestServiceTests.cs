@@ -61,8 +61,7 @@ public class EmployerInterestServiceTests
         await employerInterestRepository
             .Received(1)
             .Create(Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>()
-            );
+                Arg.Any<GeoLocation>());
 
         await employerInterestRepository
             .Received(1)
@@ -72,15 +71,13 @@ public class EmployerInterestServiceTests
                         false,
                         false,
                         false)),
-                Arg.Any<GeoLocation>()
-            );
+                Arg.Any<GeoLocation>());
 
         await employerInterestRepository
             .Received(1)
             .Create(Arg.Any<EmployerInterest>(),
                 Arg.Is<GeoLocation>(g =>
-                    g.Validate(geoLocation))
-            );
+                    g.Validate(geoLocation)));
 
         await employerInterestRepository
             .Received(1)
@@ -91,8 +88,7 @@ public class EmployerInterestServiceTests
                     false,
                     false)),
                 Arg.Is<GeoLocation>(g =>
-                    g.Validate(geoLocation))
-                );
+                    g.Validate(geoLocation)));
     }
 
     [Fact]
@@ -192,10 +188,23 @@ public class EmployerInterestServiceTests
             $"{industries.Single(i => i.Id == 9).Name}";
 
         var expectedSkillAreas =
-            $"{routes.Single(r => r.Id == 1).Name}, {routes.Single(r => r.Id == 2).Name}";
+            $"{routes.Single(r => r.Id == 1).Name}" +
+            $", {routes.Single(r => r.Id == 2).Name}";
 
         var expectedUnsubscribeUri =
             $"{settings.UnsubscribeEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+
+        var expectedDetails =
+            $"* Name: {employerInterest.ContactName}\r\n" +
+            $"* Email address: {employerInterest.Email}\r\n" +
+            $"* Telephone: {employerInterest.Telephone}\r\n" +
+            $"* How would you prefer to be contacted: {expectedContactPreference}\r\n" +
+            $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
+            $"* Website: {employerInterest.Website}\r\n" +
+            $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
+            $"* Industry placement areas: {expectedSkillAreas}\r\n" +
+            $"* Postcode: {employerInterest.Postcode}\r\n" +
+            $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
 
         await emailService
             .Received(1)
@@ -206,19 +215,9 @@ public class EmployerInterestServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "organisation_name", employerInterest.OrganisationName },
-                            { "contact_name", employerInterest.ContactName },
-                            { "email_address", employerInterest.Email },
-                            { "telephone", employerInterest.Telephone },
-                            { "website", employerInterest.Website  },
-                            { "contact_preference", expectedContactPreference },
-                            { "primary_industry", expectedIndustry },
-                            { "placement_area", expectedSkillAreas },
-                            { "has_multiple_placement_areas", "yes" },
-                            { "postcode", employerInterest.Postcode },
-                            { "additional_information", employerInterest.AdditionalInformation },
                             { "employer_support_site", settings.EmployerSupportSiteUri },
-                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri },
+                            { "details_list", expectedDetails }
                         })),
                 Arg.Any<string>());
     }
@@ -282,11 +281,9 @@ public class EmployerInterestServiceTests
                 employerInterest.Email,
                 EmailTemplateNames.EmployerRegisterInterest,
                 Arg.Is<IDictionary<string, string>>(tokens =>
-                    tokens.ValidateTokens(
-                        new Dictionary<string, string>
-                        {
-                            { "additional_information", expectedAdditionalInformation }
-                        })),
+                    tokens.ValidateTokenContains(
+                        "details_list",
+                        $"Additional information: {expectedAdditionalInformation}")),
                 Arg.Any<string>());
     }
 
@@ -337,9 +334,21 @@ public class EmployerInterestServiceTests
 
         result.Should().Be(uniqueId);
 
-        const string expectedContactPreference = "No preference";
+        var expectedIndustry =
+            $"{industries.Single(i => i.Id == 9).Name}";
+
+        var expectedSkillAreas =
+            $"{routes.Single(r => r.Id == 1).Name}";
+
         var expectedUnsubscribeUri =
              $"{settings.UnsubscribeEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+        var expectedDetails =
+            $"* Name: {employerInterest.ContactName}\r\n" +
+            $"* Email address: {employerInterest.Email}\r\n" +
+            $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
+            $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
+            $"* Industry placement area: {expectedSkillAreas}\r\n" +
+            $"* Postcode: {employerInterest.Postcode}\r\n";
 
         await emailService
             .Received(1)
@@ -350,19 +359,9 @@ public class EmployerInterestServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
-                            { "organisation_name", string.Empty },
-                            { "contact_name", string.Empty },
-                            { "email_address", employerInterest.Email },
-                            { "telephone", string.Empty },
-                            { "website", string.Empty },
-                            { "contact_preference", expectedContactPreference },
-                            { "primary_industry", string.Empty },
-                            { "placement_area", string.Empty },
-                            { "has_multiple_placement_areas", "no" },
-                            { "postcode", employerInterest.Postcode },
-                            { "additional_information", string.Empty },
                             { "employer_support_site", settings.EmployerSupportSiteUri },
-                            { "employer_unsubscribe_uri", expectedUnsubscribeUri }
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri },
+                            { "details_list", expectedDetails }
                         })),
                 uniqueId.ToString());
     }
@@ -392,6 +391,50 @@ public class EmployerInterestServiceTests
     }
 
     [Fact]
+    public async Task DeleteEmployerInterest_By_Id_Calls_Repository()
+    {
+        var id = 101;
+        const int count = 1;
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Delete(id)
+            .Returns(count);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository);
+
+        var result = await service.DeleteEmployerInterest(id);
+
+        result.Should().Be(count);
+
+        await employerInterestRepository
+            .Received(1)
+            .Delete(id);
+    }
+
+    [Fact]
+    public async Task DeleteEmployerInterest_By_UniqueId_Calls_Repository()
+    {
+        var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        const int count = 1;
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Delete(uniqueId)
+            .Returns(count);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository);
+
+        var result = await service.DeleteEmployerInterest(uniqueId);
+
+        result.Should().Be(count);
+
+        await employerInterestRepository
+            .Received(1)
+            .Delete(uniqueId);
+    }
+
+    [Fact]
     public async Task RemoveExpiredEmployerInterest_Does_Not_Call_Repository_For_Zero_RetentionDays()
     {
         var settings = new EmployerInterestSettings
@@ -399,15 +442,15 @@ public class EmployerInterestServiceTests
             RetentionDays = 0
         };
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.DeleteBefore(Arg.Any<DateTime>())
             .Returns(0);
 
         var service = new EmployerInterestServiceBuilder()
-            .Build(dateTimeService,
+            .Build(dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -428,8 +471,8 @@ public class EmployerInterestServiceTests
             RetentionDays = 12
         };
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         //Expected date is Today - RetentionDays 
         var expectedDate = DateTime.Parse("2022-08-01");
@@ -442,7 +485,7 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -477,12 +520,12 @@ public class EmployerInterestServiceTests
             )
             .Returns((employerInterestSummaryList, employerInterestsCount));
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -514,8 +557,8 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             retentionDays: daysToRetain);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(today);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(today);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository
@@ -528,7 +571,7 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -570,12 +613,12 @@ public class EmployerInterestServiceTests
                 )
             .Returns((employerInterestSummaryList, employerInterestsCount));
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 postcodeLookupService: postcodeLookupService,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
@@ -612,8 +655,8 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             retentionDays: daysToRetain);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(today);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(today);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository
@@ -626,7 +669,7 @@ public class EmployerInterestServiceTests
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 postcodeLookupService: postcodeLookupService,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
@@ -670,12 +713,12 @@ public class EmployerInterestServiceTests
         employerInterestRepository.GetSummaryList()
             .Returns(employerInterestSummaryList);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(_defaultDateToday);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository);
 
         var results =
@@ -704,12 +747,12 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             retentionDays: daysToRetain);
 
-        var dateTimeService = Substitute.For<IDateTimeService>();
-        dateTimeService.Today.Returns(today);
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(today);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(
-                dateTimeService,
+                dateTimeProvider,
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
@@ -737,20 +780,5 @@ public class EmployerInterestServiceTests
                         retentionDays: retentionDays));
 
         service.RetentionDays.Should().Be(retentionDays);
-    }
-
-    [Fact]
-    public void ServiceStartDate_Returns_Expected_Value()
-    {
-        var serviceStartDate = DateTime.Parse("2022-11-11");
-        var expectedServiceStartDate = DateOnly.FromDateTime(serviceStartDate);
-
-        var service = new EmployerInterestServiceBuilder()
-            .Build(employerInterestSettings:
-                new SettingsBuilder()
-                    .BuildEmployerInterestSettings(
-                        serviceStartDate: serviceStartDate));
-
-        service.ServiceStartDate.Should().Be(expectedServiceStartDate);
     }
 }

@@ -45,33 +45,6 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddCorsPolicy(
-        this IServiceCollection services,
-        string policyName,
-        string allowedOrigins,
-        params string[]? allowedMethods)
-    {
-        if (!string.IsNullOrWhiteSpace(allowedOrigins) && 
-            allowedMethods != null && 
-            allowedMethods.Any())
-        {
-            var corsOrigins = allowedOrigins
-                .Split(';', ',')
-                .Select(s => s.TrimEnd('/'))
-                .ToArray();
-
-            services.AddCors(options =>
-                options
-                    .AddPolicy(policyName, builder =>
-                        builder
-                            .WithMethods(allowedMethods)
-                            .AllowAnyHeader()
-                            .WithOrigins(corsOrigins)));
-        }
-
-        return services;
-    }
-
     public static IServiceCollection AddHttpClients(this IServiceCollection services)
     {
         services
@@ -82,7 +55,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<PostcodeApiSettings>>()
                         .Value;
 
-                    client.BaseAddress = new Uri(postcodeApiSettings.BaseUri);
+                    client.BaseAddress = new Uri(postcodeApiSettings.BaseUri!);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                 }
@@ -106,7 +79,7 @@ public static class ServiceCollectionExtensions
                         .GetRequiredService<IOptions<DfeSignInSettings>>()
                         .Value;
 
-                    client.BaseAddress = new Uri(dfeSignInSettings.ApiUri);
+                    client.BaseAddress = new Uri(dfeSignInSettings.ApiUri!);
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 })
             .AddRetryPolicyHandler<DfeSignInApiService>();

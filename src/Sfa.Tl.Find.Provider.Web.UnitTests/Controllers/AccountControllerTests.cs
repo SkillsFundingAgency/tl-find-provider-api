@@ -87,7 +87,7 @@ public class AccountControllerTests
             .Response
             .Headers["Location"].ToString()
             .Should()
-            .Be(AuthenticationExtensions.AuthenticatedUserStartPage);
+            .Be(AuthenticationExtensions.AuthenticatedUserStartPageRoute);
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class AccountControllerTests
         redirectResult!
             .PageName
             .Should()
-            .Be(AuthenticationExtensions.AuthenticatedUserStartPageExact);
+            .Be(AuthenticationExtensions.AuthenticatedUserStartPage);
     }
 
     [Fact]

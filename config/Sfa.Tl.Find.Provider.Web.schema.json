@@ -3,11 +3,6 @@
   "definitions": {},
   "id": "http://example.com/example.json",
   "properties": {
-    "AllowedCorsOrigins": {
-      "minLength": 1,
-      "type": "string",
-      "environmentVariable": "AllowedCorsOrigins"
-    },
     "DfeSignInSettings": {
       "properties": {
         "MetadataAddress": {
@@ -59,11 +54,6 @@
           "minLength": 1,
           "type": "string",
           "environmentVariable": "DfeSignIn_Administrators"
-        },
-        "CookiePadding": {
-          "minLength": 1,
-          "type": "integer",
-          "environmentVariable": "DfeSignIn_CookiePadding"
         }
       },
       "additionalProperties": false,
@@ -83,18 +73,13 @@
         "GovNotifyApiKey": {
           "type": "string",
           "environmentVariable": "EmailSettings_GovNotifyApiKey"
-        },
-        "DeliveryStatusToken": {
-          "type": "string",
-          "environmentVariable": "EmailSettings_DeliveryStatusToken"
-        },
-        "SupportEmailAddress": {
-          "type": "string",
-          "environmentVariable": "EmailSettings_SupportEmailAddress"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "required": [
+        "GovNotifyApiKey"
+      ],
+      "type":"object"
     },
     "EmployerInterestSettings": {
       "properties": {
@@ -109,10 +94,6 @@
         "RetentionDays": {
           "type": "integer",
           "environmentVariable": "EmployerInterestSettings_RetentionDays"
-        },
-        "ServiceStartDate": {
-          "type": "string",
-          "environmentVariable": "EmployerInterestSettings_ServiceStartDate"
         },
         "SearchRadius": {
           "type": "integer",

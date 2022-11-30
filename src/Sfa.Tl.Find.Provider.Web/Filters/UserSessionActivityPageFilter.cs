@@ -7,14 +7,14 @@ namespace Sfa.Tl.Find.Provider.Web.Filters;
 public class UserSessionActivityPageFilter : IAsyncPageFilter
 {
     private readonly ICacheService _cacheService;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public UserSessionActivityPageFilter(
         ICacheService cacheService,
-        IDateTimeService dateTimeService)
+        IDateTimeProvider dateTimeProvider)
     {
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _dateTimeService = dateTimeService ?? throw new ArgumentNullException(nameof(dateTimeService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
     }
 
     public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
@@ -28,7 +28,7 @@ public class UserSessionActivityPageFilter : IAsyncPageFilter
         if (context.HttpContext.User.Identity is { IsAuthenticated: true })
         {
             var cacheKey = context.HttpContext.User.GetUserSessionCacheKey();
-            _cacheService.Set(cacheKey, _dateTimeService.UtcNow);
+            _cacheService.Set(cacheKey, _dateTimeProvider.UtcNow);
         }
 
         await next.Invoke();

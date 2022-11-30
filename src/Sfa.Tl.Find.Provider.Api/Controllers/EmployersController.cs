@@ -3,7 +3,6 @@ using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -65,7 +64,7 @@ public class EmployersController : ControllerBase
                     ?.ToTrimmedOrNullString()
                     ?.ReplaceRedactedHttpStrings()
                     .Truncate(500),
-                ContactPreferenceType = employerInterest.ContactPreferenceType ?? ContactPreference.NoPreference,
+                ContactPreferenceType = employerInterest.ContactPreferenceType,
                 SkillAreaIds = employerInterest.SkillAreaIds
             };
 

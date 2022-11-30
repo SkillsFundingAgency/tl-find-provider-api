@@ -27,7 +27,6 @@ public class SettingsBuilder
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
     private const int EmployerInterestRetentionDays = 10;
-    private static readonly DateTime EmployerInterestServiceStartDate = DateTime.Parse("2022-11-18");
     private const int EmployerInterestSearchRadius = 30;
     private const string SupportEmailAddress = "support@test-email.gov.uk";
     private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
@@ -108,12 +107,10 @@ public class SettingsBuilder
         string employerSupportSiteUri = EmployerSupportSiteUri,
         string unsubscribeEmployerUri = UnsubscribeEmployerUri,
         int retentionDays = EmployerInterestRetentionDays,
-        DateTime? serviceStartDate = null,
         int searchRadius = EmployerInterestSearchRadius) => new()
         {
             EmployerSupportSiteUri = employerSupportSiteUri,
             RetentionDays = retentionDays,
-            ServiceStartDate = serviceStartDate ?? EmployerInterestServiceStartDate,
             SearchRadius = searchRadius,
             UnsubscribeEmployerUri = unsubscribeEmployerUri
         };

@@ -37,7 +37,6 @@ public static class SettingsExtensions
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
         settings.Administrators= configuration.DfeSignInSettings?.Administrators;
-        settings.CookiePadding = configuration.DfeSignInSettings?.CookiePadding ?? 0;
         settings.ApiUri = configuration.DfeSignInSettings?.ApiUri;
         settings.ApiSecret = configuration.DfeSignInSettings?.ApiSecret;
         settings.Audience = configuration.DfeSignInSettings?.Audience;
@@ -68,7 +67,6 @@ public static class SettingsExtensions
         settings.CleanupJobSchedule = configuration.EmployerInterestSettings?.CleanupJobSchedule;
         settings.RetentionDays = configuration.EmployerInterestSettings?.RetentionDays ?? 0;
         settings.UnsubscribeEmployerUri = configuration.EmployerInterestSettings?.UnsubscribeEmployerUri;
-        settings.ServiceStartDate = configuration.EmployerInterestSettings?.ServiceStartDate;
         settings.SearchRadius = configuration.EmployerInterestSettings?.SearchRadius ?? 0;
     }
 

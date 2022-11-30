@@ -76,31 +76,4 @@ public class BusinessRuleExtensionsTests
         var result = target.IsInterestNew(today);
         result.Should().Be(expectedResult);
     }
-    
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.IsInterestNew) + " Service Start Date Data Tests")]
-    [InlineData(null, "2022-12-01 11:30",  "2022-12-05", true)]
-    [InlineData(null, "2022-12-01 11:30", "2022-12-07", true)]
-    [InlineData(null, "2022-12-01 11:30",  "2022-12-08", false)]
-    [InlineData("2022-12-01", "2022-12-01 11:30", "2022-12-05", false)]
-    [InlineData("2022-12-01", "2022-12-07 11:30", "2022-12-07", false)]
-    [InlineData("2022-12-01", "2022-12-02 11:30", "2022-12-08", false)]
-    [InlineData("2022-12-01", "2022-12-08 11:30", "2022-12-08", true)]
-    [InlineData("2022-12-01", "2022-12-09 11:30", "2022-12-09", true)]
-    public void EmployerInterestSummary_IsInterestNew_With_Service_Start_Date_Data_Tests(
-        string serviceStartDateString, string createdDate, string currentDate, bool expectedResult)
-    {
-        var today = DateTime.Parse(currentDate);
-
-        var serviceStartDate = serviceStartDateString is not null 
-            ? DateOnly.Parse(serviceStartDateString)
-            : null as DateOnly?;
-
-        var target = new EmployerInterestSummary
-        {
-            CreatedOn = DateTime.Parse(createdDate),
-        };
-
-        var result = target.IsInterestNew(today, serviceStartDate: serviceStartDate);
-        result.Should().Be(expectedResult);
-    }
 }

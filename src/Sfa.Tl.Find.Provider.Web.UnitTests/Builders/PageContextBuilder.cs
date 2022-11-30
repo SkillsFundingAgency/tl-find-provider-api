@@ -20,19 +20,22 @@ public class PageContextBuilder
     private CompiledPageActionDescriptor? _actionDescriptor;
 
     public PageContext Build(
-        bool userIsAuthenticated = true)
+        bool userIsAuthenticated = true,
+        List<Claim>? userClaims = null)
     {
         var httpContext = new DefaultHttpContext();
 
         if (userIsAuthenticated)
         {
-            var claims = new List<Claim>
-            {
-                new(CustomClaimTypes.UkPrn, DefaultUkPrn),
-                new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
-                new(CustomClaimTypes.DisplayName, DefaultDisplayName),
-                new(CustomClaimTypes.OrganisationName, DefaultOrganisationName)
-            };
+            var claims = userClaims != null && userClaims.Any() 
+                ? userClaims 
+                : new List<Claim>
+                {
+                    new(CustomClaimTypes.UkPrn, DefaultUkPrn),
+                    new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
+                    new(CustomClaimTypes.DisplayName, DefaultDisplayName),
+                    new(CustomClaimTypes.OrganisationName, DefaultOrganisationName)
+                };
 
             httpContext.User = new ClaimsPrincipal(
                 new ClaimsIdentity(claims,

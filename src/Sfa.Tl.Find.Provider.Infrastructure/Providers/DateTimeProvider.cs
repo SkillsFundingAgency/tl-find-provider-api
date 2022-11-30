@@ -1,8 +1,8 @@
 ﻿using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Services;
+namespace Sfa.Tl.Find.Provider.Infrastructure.Providers;
 
-public class DateTimeService : IDateTimeService
+public class DateTimeProvider : IDateTimeProvider
 {
     public DateTime Now => DateTime.Now;
     public DateTime UtcNow => DateTime.UtcNow;

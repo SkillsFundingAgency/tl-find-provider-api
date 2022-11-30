@@ -10,11 +10,11 @@ public class CacheUtilitiesTests
     [Fact]
     public void DefaultMemoryCacheEntryOptions_Returns_Expected_Value()
     {
-        var dateTimeService = Substitute.For<IDateTimeService>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var logger = Substitute.For<ILogger<object>>();
 
         var options = CacheUtilities.DefaultMemoryCacheEntryOptions(
-            dateTimeService,
+            dateTimeProvider,
             logger);
 
         options.Should().NotBeNull();

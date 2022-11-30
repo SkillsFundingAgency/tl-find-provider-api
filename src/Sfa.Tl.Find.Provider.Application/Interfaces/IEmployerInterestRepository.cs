@@ -9,6 +9,8 @@ public interface IEmployerInterestRepository
         EmployerInterest employerInterest,
         GeoLocation geoLocation);
 
+    Task<int> Delete(int id);
+
     Task<int> Delete(Guid uniqueId);
 
     Task<int> DeleteBefore(DateTime date);

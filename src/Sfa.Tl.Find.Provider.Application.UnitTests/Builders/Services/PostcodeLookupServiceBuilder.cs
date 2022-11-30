@@ -13,25 +13,25 @@ public class PostcodeLookupServiceBuilder
 
     public IPostcodeLookupService Build(
         HttpClient httpClient = null,
-        IDateTimeService dateTimeService = null,
+        IDateTimeProvider dateTimeProvider = null,
         ICacheService cacheService = null,
         ILogger<PostcodeLookupService> logger = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
         cacheService ??= Substitute.For<ICacheService>();
-        dateTimeService ??= Substitute.For<IDateTimeService>();
+        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
         logger ??= Substitute.For<ILogger<PostcodeLookupService>>();
 
         return new PostcodeLookupService(
             httpClient,
-            dateTimeService,
+            dateTimeProvider,
             cacheService,
             logger);
     }
 
     public IPostcodeLookupService Build(
         IDictionary<string, HttpResponseMessage> responseMessages,
-        IDateTimeService dateTimeService = null,
+        IDateTimeProvider dateTimeProvider = null,
         ICacheService cacheService = null,
         ILogger<PostcodeLookupService> logger = null)
     {
@@ -45,14 +45,14 @@ public class PostcodeLookupServiceBuilder
 
         return Build(
             httpClient,
-            dateTimeService,
+            dateTimeProvider,
             cacheService,
             logger);
     }
 
     public IPostcodeLookupService Build(
         IDictionary<string, string> responseMessages,
-        IDateTimeService dateTimeService = null,
+        IDateTimeProvider dateTimeProvider = null,
         ICacheService cacheService = null,
         ILogger<PostcodeLookupService> logger = null)
     {
@@ -66,7 +66,7 @@ public class PostcodeLookupServiceBuilder
 
         return Build(
             httpClient,
-            dateTimeService,
+            dateTimeProvider,
             cacheService,
             logger);
     }

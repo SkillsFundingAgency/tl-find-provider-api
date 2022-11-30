@@ -16,7 +16,7 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Sfa.Tl.Find.Provider.Infrastructure.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 
 try
 {
@@ -75,9 +75,9 @@ try
     });
 
     builder.Services
-        .AddScoped<IDateTimeService, DateTimeService>()
+        .AddScoped<IDateTimeProvider, DateTimeProvider>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
-        .AddScoped<IGuidService, GuidService>()
+        .AddScoped<IGuidProvider, GuidProvider>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
         .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
