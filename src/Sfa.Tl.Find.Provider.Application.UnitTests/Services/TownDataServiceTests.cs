@@ -105,55 +105,58 @@ public class TownDataServiceTests
         receivedTowns.Count.Should().Be(5);
 
         // ReSharper disable StringLiteralTypo
-        ValidateTown(receivedTowns
-                .SingleOrDefault(t => 
-                    t.Id == 302),
-            302,
-            "Abingdon",
-            "Oxfordshire",
-            "Oxfordshire",
-            51.674302M,
-            -1.282302M);
+        receivedTowns
+            .SingleOrDefault(t => 
+                t.Id == 302)
+            .Validate(302,
+                "Abingdon",
+                "Oxfordshire",
+                "Oxfordshire",
+                51.674302M,
+                -1.282302M);
 
-        ValidateTown(receivedTowns
-                .SingleOrDefault(t => 
-                    t.Id == 304),
-            304,
-            "Abingdon",
-            "Inner London",
-            "Greater London",
-            51.497681M,
-            -0.192782M);
+        receivedTowns
+            .SingleOrDefault(t => 
+                t.Id == 304)
+            .Validate(304,
+                "Abingdon",
+                "Inner London",
+                "Greater London",
+                51.497681M,
+                -0.192782M);
 
-        ValidateTown(receivedTowns
-                .SingleOrDefault(t =>
-                    t.Id == 72832),
-            72832,
-            "West Bromwich",
-            "West Midlands",
-            "West Midlands",
-            52.530629M,
-            -2.005941M);
+        receivedTowns
+            .SingleOrDefault(t =>
+                t.Id == 72832)
+            .Validate(
+                72832,
+                "West Bromwich",
+                "West Midlands",
+                "West Midlands",
+                52.530629M,
+                -2.005941M);
 
-        ValidateTown(receivedTowns
-                .SingleOrDefault(t =>
-                    t.Id == 72834),
-            72834,
-            "West Bromwich (East)",
-            "West Midlands",
-            "West Midlands",
-            52.540693M,
-            -1.942085M);
+        receivedTowns
+            .SingleOrDefault(t =>
+                t.Id == 72834)
+            .Validate(
+                72834,
+                "West Bromwich (East)",
+                "West Midlands",
+                "West Midlands",
+                52.540693M,
+                -1.942085M);
 
-        ValidateTown(receivedTowns
-                .SingleOrDefault(t =>
-                    t.Id == 72835),
-            72835,
-            "West Bromwich Central",
-            "West Midlands",
-            "West Midlands",
-            52.520416M,
-            -1.984158M);
+        receivedTowns
+            .SingleOrDefault(t =>
+                t.Id == 72835)
+            .Validate(
+                72835,
+                "West Bromwich Central",
+                "West Midlands",
+                "West Midlands",
+                52.520416M,
+                -1.984158M);
         // ReSharper restore StringLiteralTypo
     }
 
@@ -217,15 +220,16 @@ public class TownDataServiceTests
         abingdonInstances.Count().Should().Be(2);
         abingdonInOxfordshire.Count.Should().Be(1);
 
-        ValidateTown(abingdonInOxfordshire.Single(),
-            302,
-            "Abingdon",
-            "Oxfordshire",
-            "Oxfordshire",
-            //"Vale of White Horse",
-            //"NMD",
-            51.674302M,
-            -1.282302M);
+        abingdonInOxfordshire
+            .Single()
+            .Validate(302,
+                "Abingdon",
+                "Oxfordshire",
+                "Oxfordshire",
+                //"Vale of White Horse",
+                //"NMD",
+                51.674302M,
+                -1.282302M);
     }
 
     [Fact]
@@ -257,15 +261,16 @@ public class TownDataServiceTests
 
         westBromwich.Count.Should().Be(1);
 
-        ValidateTown(westBromwich.Single(),
-            72832,
-            "West Bromwich",
-            "West Midlands",
-            "West Midlands",
-            //"Sandwell",
-            //"MD",
-            52.530629M,
-            -2.005941M);
+        westBromwich
+            .Single()
+            .Validate(72832,
+                "West Bromwich",
+                "West Midlands",
+                "West Midlands",
+                //"Sandwell",
+                //"MD",
+                52.530629M,
+                -2.005941M);
     }
     
     [Fact]
@@ -345,22 +350,5 @@ public class TownDataServiceTests
         await townRepository
             .DidNotReceive()
             .Search(Arg.Any<string>(), Arg.Any<int>());
-    }
-
-    private static void ValidateTown(Town town, 
-        int id, 
-        string name, 
-        string county, 
-        string localAuthority,
-        decimal latitude, 
-        decimal longitude)
-    {
-        town.Should().NotBeNull();
-        town.Id.Should().Be(id);
-        town.Name.Should().Be(name);
-        town.County.Should().Be(county);
-        town.LocalAuthority.Should().Be(localAuthority);
-        town.Latitude.Should().Be(latitude);
-        town.Longitude.Should().Be(longitude);
     }
 }
