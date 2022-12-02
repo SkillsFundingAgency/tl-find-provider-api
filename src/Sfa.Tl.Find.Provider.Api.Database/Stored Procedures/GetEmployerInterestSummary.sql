@@ -11,12 +11,13 @@ AS
 	WITH EmployerInterest_CTE AS (
 		SELECT ei.[Id],
 			ei.[OrganisationName],
+			ei.[Postcode],
 			ei.[OtherIndustry],
 			ei.[CreatedOn],
 			ei.[ModifiedOn]
 		FROM [dbo].[EmployerInterest] ei),
 	EmployerInterestIndustry_CTE AS (
-		SELECT eii.[EmployerInterestId], 
+		SELECT eii.[EmployerInterestId],
 			i.[Name],
 			ROW_NUMBER() OVER(PARTITION BY eii.[EmployerInterestId] ORDER BY eii.[CreatedOn]) AS IndustryRowNum
 		FROM [dbo].[EmployerInterestIndustry] eii
@@ -25,6 +26,7 @@ AS
 	)
 	SELECT	ei.[Id],
 			ei.[OrganisationName],
+			ei.[Postcode],
 			NULL AS [Distance],
 			COALESCE (i.[Name], ei.[OtherIndustry]) AS Industry,
 			ei.[CreatedOn],
@@ -39,7 +41,7 @@ AS
 	ON eir.[EmployerInterestId] = ei.[Id]
 	LEFT JOIN [Route] r
 	ON r.[Id] = eir.[RouteId]
-	ORDER BY	ei.[OrganisationName], 
+	ORDER BY	ei.[OrganisationName],
 				ei.[CreatedOn] DESC,
-				ei.[Id], 
+				ei.[Id],
 				r.[Name]

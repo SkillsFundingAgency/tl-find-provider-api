@@ -24,6 +24,7 @@
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">Organisation</th>
+                        <th scope="col" class="govuk-table__header">Postcode</th>
                         <th scope="col" class="govuk-table__header">Industry</th>
                         <th scope="col" class="govuk-table__header">Placement areas</th>
                         <th scope="col" class="govuk-table__header tl-min-8">Details expire</th>
@@ -45,6 +46,10 @@
                                 }
                                 @employerInterest.OrganisationName
                             </th>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>Postcode</strong></div>
+                                <div class="tl-employers--table--inline-cell">@employerInterest.Postcode</div>
+                            </td>
                             <td class="govuk-table__cell tl-table__cell__list">
                                 <div class="tl-employers--table--inline-header"><strong>Primary Industry</strong></div>
                                 <div class="tl-employers--table--inline-cell">@employerInterest.Industry</div>

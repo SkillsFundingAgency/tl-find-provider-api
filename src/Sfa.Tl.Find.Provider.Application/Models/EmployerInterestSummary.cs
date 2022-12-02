@@ -9,6 +9,7 @@ public class EmployerInterestSummary
     public string OrganisationName { get; init; }
     public string Industry { get; init; }
     public IList<string> SkillAreas { get; init; }
+    public string Postcode { get; init; }
     public double? Distance { get; init; }
     public DateTime CreatedOn { get; init; }
     public DateTime? ModifiedOn { get; init; }

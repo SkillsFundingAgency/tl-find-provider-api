@@ -363,6 +363,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             {
                                 Id = e.Id,
                                 OrganisationName = e.OrganisationName,
+                                Postcode = e.Postcode,
                                 Distance = e.Distance,
                                 Industry = e.Industry,
                                 CreatedOn = e.CreatedOn,

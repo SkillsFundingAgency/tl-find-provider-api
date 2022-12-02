@@ -14,6 +14,7 @@ public class EmployerInterestSummaryBuilder
             {
                 Id = 1,
                 OrganisationName = "Test Employer",
+                Postcode = "CV1 2WT",
                 Distance = 1.0,
                 Industry = "",
                 SkillAreas = new List<string>
@@ -27,6 +28,7 @@ public class EmployerInterestSummaryBuilder
             {
                 Id = 2,
                 OrganisationName = "Test Employer 2",
+                Postcode = "CV2 2WT",
                 Distance = 1.0,
                 Industry = "",
                 SkillAreas = new List<string>
