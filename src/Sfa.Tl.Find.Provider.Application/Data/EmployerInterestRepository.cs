@@ -268,6 +268,29 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             throw;
         }
     }
+    public async Task<IEnumerable<EmployerInterest>> GetAll()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        return await _dbContextWrapper.QueryAsync<EmployerInterest>(
+            connection,
+            "SELECT Id, " +
+            "UniqueId, " +
+            "OrganisationName, " +
+            "ContactName, " +
+            "Postcode, " +
+            "HasMultipleLocations, " +
+            "LocationCount, " +
+            "IndustryId,  " +
+            "AdditionalInformation, " +
+            "Email, " +
+            "Telephone, " +
+            "ContactPreferenceType, " +
+            "CreatedOn, " +
+            "ModifiedOn " +
+            "FROM dbo.EmployerInterest " +
+            "ORDER BY OrganisationName");
+    }
 
     public async Task<EmployerInterestDetail> GetDetail(int id)
     {
@@ -320,28 +343,58 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         return detailItem;
     }
 
-    public async Task<IEnumerable<EmployerInterest>> GetAll()
+    public async Task<IEnumerable<EmployerInterest>> GetExpiringInterest(DateTime date)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
-        return await _dbContextWrapper.QueryAsync<EmployerInterest>(
-            connection,
-            "SELECT Id, " +
-            "UniqueId, " +
-            "OrganisationName, " +
-            "ContactName, " +
-            "Postcode, " +
-            "HasMultipleLocations, " +
-            "LocationCount, " +
-            "IndustryId,  " +
-            "AdditionalInformation, " +
-            "Email, " +
-            "Telephone, " +
-            "ContactPreferenceType, " +
-            "CreatedOn, " +
-            "ModifiedOn " +
-            "FROM dbo.EmployerInterest " +
-            "ORDER BY OrganisationName");
+        var employerInterestList = new List<EmployerInterest>();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            date
+        });
+
+        //EmployerInterest employerInterestItem = null;
+        var employerInterests = new Dictionary<Guid, EmployerInterest>();
+
+        await _dbContextWrapper
+            //.QueryAsync<EmployerInterest, RouteDto, EmployerInterest>(
+            .QueryAsync<EmployerInterest, int, EmployerInterest>(
+                connection,
+                "GetExpiringEmployerInterest",
+                (e, r) =>
+                {
+                    if (!employerInterests.TryGetValue(e.UniqueId, out var employerInterestItem))
+                    {
+                        employerInterests.Add(e.UniqueId,
+                            employerInterestItem = new EmployerInterest
+                            {
+                                Id = e.Id,
+                                UniqueId = e.UniqueId,
+                                OrganisationName = e.OrganisationName,
+                                ContactName = e.ContactName,
+                                Postcode = e.Postcode,
+                                Latitude = e.Latitude,
+                                Longitude = e.Longitude,
+                                IndustryId = e.IndustryId,
+                                AdditionalInformation = e.AdditionalInformation,
+                                Email = e.Email,
+                                Telephone = e.Telephone,
+                                Website = e.Website,
+                                ContactPreferenceType = e.ContactPreferenceType,
+                                SkillAreaIds = new List<int>()
+                            });
+                    }
+
+                    employerInterestItem.SkillAreaIds!.Add(r);
+
+                    return employerInterestItem;
+                },
+                _dynamicParametersWrapper.DynamicParameters,
+                splitOn: "Id, RouteId",
+                commandType: CommandType.StoredProcedure);
+
+        return employerInterests.Values;
     }
 
     public async Task<IEnumerable<EmployerInterestSummary>> GetSummaryList()

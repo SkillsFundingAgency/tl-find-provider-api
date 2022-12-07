@@ -11,6 +11,8 @@ public interface IEmployerInterestService
 
     Task<int> DeleteEmployerInterest(Guid uniqueId);
 
+    Task<int> NotifyExpiringEmployerInterest();
+    
     Task<int> RemoveExpiredEmployerInterest();
 
     Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(

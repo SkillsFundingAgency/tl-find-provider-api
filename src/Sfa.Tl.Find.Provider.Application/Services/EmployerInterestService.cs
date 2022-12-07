@@ -81,6 +81,34 @@ public class EmployerInterestService : IEmployerInterestService
         return count;
     }
 
+    public async Task<int> NotifyExpiringEmployerInterest()
+    {
+        if (_employerInterestSettings.RetentionDays <= 0)
+        {
+            _logger.LogInformation("{service} {method} processing skipped because retention dates was not greater than zero.",
+                nameof(EmployerInterestService), nameof(NotifyExpiringEmployerInterest));
+            return 0;
+        }
+
+        var date = _dateTimeProvider.Today.AddDays(
+            -(_employerInterestSettings.RetentionDays + 
+              _employerInterestSettings.ExpiryNotificationDays));
+
+        var expiringInterestList = (await _employerInterestRepository
+            .GetExpiringInterest(date))
+            .ToList();
+
+        foreach (var employerInterest in expiringInterestList)
+        {
+            await SendEmployerExtendInterestEmail(employerInterest);
+        }
+
+        _logger.LogInformation("Notified {count} employers that their interest is about to expire because they are over {days} days (older than {date:yyyy-MM-dd})",
+            expiringInterestList.Count, _employerInterestSettings.RetentionDays, date);
+
+        return expiringInterestList.Count;
+    }
+
     public async Task<int> RemoveExpiredEmployerInterest()
     {
         if (_employerInterestSettings.RetentionDays <= 0)
@@ -146,27 +174,57 @@ public class EmployerInterestService : IEmployerInterestService
         return _employerInterestRepository.GetDetail(id);
     }
 
+    private async Task<bool> SendEmployerExtendInterestEmail(EmployerInterest employerInterest)
+    {
+        return await _emailService.SendEmail(
+            employerInterest.Email,
+            EmailTemplateNames.EmployerExtendInterest,
+            new Dictionary<string, string>
+            {
+                { "details_list", await BuildEmployerInterestDetailsList(employerInterest) },
+                { "employer_extend_uri", BuildUriWithUniqueId(_employerInterestSettings.ExtendEmployerUri, employerInterest) },
+                { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
+                { "employer_unsubscribe_uri", BuildUriWithUniqueId(_employerInterestSettings.UnsubscribeEmployerUri, employerInterest) }
+            },
+            employerInterest.UniqueId.ToString());
+    }
+
+    private async Task<bool> SendEmployerInterestRemovedEmail(EmployerInterest employerInterest)
+    {
+        return await _emailService.SendEmail(
+            employerInterest.Email,
+            EmailTemplateNames.EmployerInterestRemoved,
+            new Dictionary<string, string>
+            {
+                { "register_interest_uri", _employerInterestSettings.RegisterInterestUri ?? "" },
+                { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" }
+            },
+            employerInterest.UniqueId.ToString());
+    }
+
     private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest)
     {
-        var unsubscribeUri = new Uri(QueryHelpers.AddQueryString(
-            _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
-            "id",
-            employerInterest.UniqueId.ToString("D").ToLower()));
-        
-        var detailsList = await BuildEmployerInterestDetailsList(employerInterest);
-
-        var tokens = new Dictionary<string, string>
-        {
-            { "details_list", detailsList },
-            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
-            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
-        };
-
         return await _emailService.SendEmail(
             employerInterest.Email,
             EmailTemplateNames.EmployerRegisterInterest,
-            tokens, 
+            new Dictionary<string, string>
+            {
+                { "details_list", await BuildEmployerInterestDetailsList(employerInterest) },
+                { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
+                { "employer_unsubscribe_uri", BuildUriWithUniqueId(_employerInterestSettings.UnsubscribeEmployerUri, employerInterest) }
+            }, 
             employerInterest.UniqueId.ToString());
+    }
+
+    private static string BuildUriWithUniqueId(string baseUri, EmployerInterest employerInterest)
+    {
+        return !string.IsNullOrEmpty(baseUri) 
+            ? new Uri(QueryHelpers.AddQueryString(
+                baseUri.TrimEnd('/'),
+                "id",
+                employerInterest.UniqueId.ToString("D").ToLower()))
+                .ToString()
+            : "";
     }
 
     private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest)
@@ -209,7 +267,9 @@ public class EmployerInterestService : IEmployerInterestService
 
             detailsList.AppendLine($"* How would you prefer to be contacted: {contactPreference}");
         }
+
         detailsList.AppendLine($"* Organisation name: {employerInterest.OrganisationName}");
+
         if (!string.IsNullOrEmpty(employerInterest.Website))
         {
             detailsList.AppendLine($"* Website: {employerInterest.Website}");

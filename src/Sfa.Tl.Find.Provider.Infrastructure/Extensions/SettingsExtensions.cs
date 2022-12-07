@@ -65,8 +65,11 @@ public static class SettingsExtensions
 
         settings.EmployerSupportSiteUri = configuration.EmployerInterestSettings?.EmployerSupportSiteUri;
         settings.CleanupJobSchedule = configuration.EmployerInterestSettings?.CleanupJobSchedule;
+        settings.ExtendEmployerUri = configuration.EmployerInterestSettings?.ExtendEmployerUri;
+        settings.ExpiryNotificationDays = configuration.EmployerInterestSettings?.ExpiryNotificationDays ?? 0;
         settings.RetentionDays = configuration.EmployerInterestSettings?.RetentionDays ?? 0;
         settings.UnsubscribeEmployerUri = configuration.EmployerInterestSettings?.UnsubscribeEmployerUri;
+        settings.RegisterInterestUri = configuration.EmployerInterestSettings?.RegisterInterestUri;
         settings.SearchRadius = configuration.EmployerInterestSettings?.SearchRadius ?? 0;
     }
 

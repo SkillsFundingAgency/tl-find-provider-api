@@ -358,6 +358,32 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
+    public async Task GetAll_Returns_Expected_List()
+    {
+        var employerInterests = new EmployerInterestBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<EmployerInterest>(dbConnection,
+                Arg.Any<string>())
+            .Returns(employerInterests);
+
+        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
+
+        var results = (await repository.GetAll()).ToList();
+        results.Should().BeEquivalentTo(employerInterests);
+
+        await dbContextWrapper
+            .Received(1)
+            .QueryAsync<EmployerInterest>(dbConnection,
+                Arg.Is<string>(sql => sql.Contains("FROM dbo.EmployerInterest")));
+    }
+
+    [Fact]
     public async Task GetDetail_Returns_Expected_Item()
     {
         var uniqueId = Guid.Parse("69e33e1f-2dc3-40bf-a1a7-52493025d3d1");
@@ -412,29 +438,60 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task GetAll_Returns_Expected_List()
+    public async Task GetExpiringInterest_Returns_Expected_Item()
     {
-        var employerInterests = new EmployerInterestBuilder()
+        var date = DateTime.Parse("2022-09-13");
+        var uniqueId = Guid.Parse("69e33e1f-2dc3-40bf-a1a7-52493025d3d1");
+
+        var routeIdList = new RouteDtoBuilder()
             .BuildList()
-            .ToList();
+            .Where(r => r.RouteName is "Digital and IT")
+            .Select(r => r.RouteId)
+            .ToList(); 
+        
+        var employerInterest = new EmployerInterestBuilder()
+            .WithUniqueId(uniqueId)
+            .WithSkillAreaIds(routeIdList)
+            .Build();
+        
+        var expectedEmployerInterest = new EmployerInterestBuilder()
+            .WithUniqueId(uniqueId)
+            .WithSkillAreaIds(routeIdList)
+            .Build();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
-        dbContextWrapper
-            .QueryAsync<EmployerInterest>(dbConnection,
-                Arg.Any<string>())
-            .Returns(employerInterests);
+        var callIndex = 0;
+
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
+                "GetExpiringEmployerInterest",
+                //Arg.Do<Func<EmployerInterest, RouteDto, EmployerInterest>>(
+                Arg.Do<Func<EmployerInterest, int, EmployerInterest>>(
+                    x =>
+                    {
+                        var e = employerInterest;
+                        var r = routeIdList[callIndex];
+                        x.Invoke(e, r);
+
+                        callIndex++;
+                    }),
+                Arg.Any<object>(),
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
 
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetAll()).ToList();
-        results.Should().BeEquivalentTo(employerInterests);
+        var result = (await repository
+            .GetExpiringInterest(date))
+            .ToList();
 
-        await dbContextWrapper
-            .Received(1)
-            .QueryAsync<EmployerInterest>(dbConnection,
-                Arg.Is<string>(sql => sql.Contains("FROM dbo.EmployerInterest")));
+        result.Should().NotBeNullOrEmpty();
+        result.First().Should().BeEquivalentTo(expectedEmployerInterest);
+
+        callIndex.Should().Be(1);
     }
 
     [Fact]
