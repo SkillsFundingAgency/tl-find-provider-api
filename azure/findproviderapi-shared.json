@@ -348,7 +348,7 @@
         },
         "RedisCacheConnectionString": {
             "type": "securestring",
-            "value": "[reference(concat('redis-cache','-',parameters('environmentNameAbbreviation'))).outputs.PrimaryConnectionString.value]"
+            "value": "[reference(concat('redis-cache','-',parameters('environmentNameAbbreviation'))).outputs.PrimaryConnectionString]"
         }
     }
 }
