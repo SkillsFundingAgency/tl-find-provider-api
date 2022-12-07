@@ -347,8 +347,8 @@
             "value": "[variables('configStorageAccountName')]"
         },
         "RedisCacheConnectionString": {
-            "type": "securestring",
-            "value": "[reference(concat('redis-cache','-',parameters('environmentNameAbbreviation'))).outputs.PrimaryConnectionString]"
+            "type": "string",
+            "value": "[reference(concat('redis-cache','-',parameters('environmentNameAbbreviation'))).outputs.PrimaryConnectionString.value]"
         }
     }
 }
