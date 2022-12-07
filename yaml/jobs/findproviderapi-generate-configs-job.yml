@@ -9,9 +9,10 @@ parameters:
 jobs:
 - job: GenerateConfigs
   variables:
-    ConfigStorageAccountName: $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName'] ]
-    SqlConnectionString: $[ dependencies.DeploySQLDatabase.outputs['SqlVariables.SqlConnectionString'] ]
+    ConfigStorageAccountName:     $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName'] ]
+    SqlConnectionString:          $[ dependencies.DeploySQLDatabase.outputs['SqlVariables.SqlConnectionString'] ]
     BlobStorageConnectionString : $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.BlobStorageConnectionString'] ]
+    RedisCacheConnectionString:   $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.redisCacheConnectionString'] ]
     
   pool:
     name: 'Azure Pipelines'
