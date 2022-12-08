@@ -12,7 +12,7 @@ jobs:
     ConfigStorageAccountName:     $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName'] ]
     SqlConnectionString:          $[ dependencies.DeploySQLDatabase.outputs['SqlVariables.SqlConnectionString'] ]
     BlobStorageConnectionString : $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.BlobStorageConnectionString'] ]
-    RedisCacheConnectionString:   $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.redisCacheConnectionString'] ]
+    RedisCacheName:               $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.RedisCacheName'] ]
     
   pool:
     name: 'Azure Pipelines'
@@ -25,7 +25,21 @@ jobs:
         'Write-Host "ConfigStorageAccountName variable: $(ConfigStorageAccountName)"'
         'Write-Host "SqlConnectionString variable: $(SqlConnectionString)"'
         'Write-Host "BlobStorageConnectionString variable: $(BlobStorageConnectionString)"'
+        'Write-Host "RedisCacheName variable: $(RedisCacheName)"'
       name: SetVariables
+
+    - task: AzurePowerShell@5
+      inputs: 
+        azureSubscription: ${{ parameters.serviceConnection }}
+        scriptType: 'InlineScript'
+        Inline: |
+          $variableName = "RedisCacheConnectionString"
+          Write-Host "Obtaining the connection string for $RedisCacheName and setting $variableName"
+          $redisCache = Get-AzRedisCache -Name $RedisCacheName
+          $primaryKey = Get-AzRedisCacheKey -Name $RedisCacheName
+          $connectionString = $redisCache.HostName + ":" + $redisCache.SslPort + ",password=" + $primaryKey + ",ssl=True,abortConnect=False"
+          Write-Output "##vso[task.setvariable variable=$variableName;issecret=true]$connectionString"
+          Write-Host "Variable $variableName set"
 
     - task: DownloadBuildArtifacts@0
       inputs:
