@@ -3,7 +3,9 @@
 @using Sfa.Tl.Find.Provider.Infrastructure.Authorization
 @model EmployerListModel
 @{
-    ViewData["Title"] = "Employer list";
+    ViewData["Title"] = Model?.UkPrn is null && User.IsInRole(CustomRoles.Administrator)
+        ? "Employer list - Administrator"
+        : "Employer list";
 }
 
 @if (Model?.UkPrn is not null)
