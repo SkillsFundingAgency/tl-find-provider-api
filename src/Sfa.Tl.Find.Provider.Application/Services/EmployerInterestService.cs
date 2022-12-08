@@ -46,7 +46,7 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
-
+        
         var (_, uniqueId) = await _employerInterestRepository
             .Create(
                 employerInterest,
@@ -55,7 +55,7 @@ public class EmployerInterestService : IEmployerInterestService
         if (uniqueId != Guid.Empty)
         {
             employerInterest.UniqueId = uniqueId;
-            await SendEmployerRegisterInterestEmail(employerInterest);
+            await SendEmployerRegisterInterestEmail(employerInterest, geoLocation);
         }
 
         return uniqueId;
@@ -146,14 +146,14 @@ public class EmployerInterestService : IEmployerInterestService
         return _employerInterestRepository.GetDetail(id);
     }
 
-    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest)
+    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geolocation)
     {
         var unsubscribeUri = new Uri(QueryHelpers.AddQueryString(
             _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
             "id",
             employerInterest.UniqueId.ToString("D").ToLower()));
         
-        var detailsList = await BuildEmployerInterestDetailsList(employerInterest);
+        var detailsList = await BuildEmployerInterestDetailsList(employerInterest, geolocation);
 
         var tokens = new Dictionary<string, string>
         {
@@ -169,9 +169,8 @@ public class EmployerInterestService : IEmployerInterestService
             employerInterest.UniqueId.ToString());
     }
 
-    private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest)
+    private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest, GeoLocation geolocation)
     {
-
         var industries = await _providerDataService.GetIndustries();
         var routes = await _providerDataService.GetRoutes();
 
@@ -217,7 +216,7 @@ public class EmployerInterestService : IEmployerInterestService
         
         detailsList.AppendLine($"* Organisation’s primary industry: {industry}");
         detailsList.AppendLine($"* Industry placement area{(skillAreas.Count > 1 ? "s" : "")}: {placementAreas}");
-        detailsList.AppendLine($"* Postcode: {employerInterest.Postcode}");
+        detailsList.AppendLine($"* Postcode: {geolocation.Location}");
         if (!string.IsNullOrEmpty(employerInterest.AdditionalInformation))
         {
             detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks() }");
