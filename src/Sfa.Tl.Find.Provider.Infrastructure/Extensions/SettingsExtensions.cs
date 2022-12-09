@@ -19,7 +19,7 @@ public static class SettingsExtensions
 
         settings.BlobStorageConnectionString = configuration.BlobStorageConnectionString;
         settings.SqlConnectionString = configuration.SqlConnectionString;
-        settings.RedisConnectionString = configuration.RedisConnectionString;
+        settings.RedisCacheConnectionString = configuration.RedisCacheConnectionString;
     }
 
     public static void ConfigureCourseDirectoryApiSettings(this CourseDirectoryApiSettings settings, SiteConfiguration configuration)
