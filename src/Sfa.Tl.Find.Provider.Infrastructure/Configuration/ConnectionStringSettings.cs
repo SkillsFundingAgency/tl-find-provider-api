@@ -4,7 +4,7 @@ public class ConnectionStringSettings
 {
     public string? BlobStorageConnectionString { get; set; }
  
-    public string? RedisConnectionString { get; set; }
+    public string? RedisCacheConnectionString { get; set; }
     
     public string? SqlConnectionString { get; set; }
 }

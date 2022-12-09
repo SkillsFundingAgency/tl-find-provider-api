@@ -15,6 +15,6 @@ public class SiteConfiguration
     public SearchSettings? SearchSettings { get; init; }
     public string? BlobStorageConnectionString { get; init; }
     public string? SqlConnectionString { get; init; }
-    public string? RedisConnectionString { get; init; }
+    public string? RedisCacheConnectionString { get; init; }
     public string? TownDataImportSchedule { get; init; }
 }
