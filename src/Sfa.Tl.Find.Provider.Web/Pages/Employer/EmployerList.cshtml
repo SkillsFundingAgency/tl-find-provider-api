@@ -3,9 +3,9 @@
 @using Sfa.Tl.Find.Provider.Infrastructure.Authorization
 @model EmployerListModel
 @{
-    ViewData["Title"] = Model?.UkPrn is null && User.IsInRole(CustomRoles.Administrator)
-        ? "Employer list - Administrator"
-        : "Employer list";
+    ViewData["Title"] = PageExtensions.FormatTitleWithAdministratorTag(
+        "Employer list", 
+        HttpContext.User);
 }
 
 @if (Model?.UkPrn is not null)
