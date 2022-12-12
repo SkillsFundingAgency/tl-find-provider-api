@@ -39,15 +39,22 @@ public class CacheUtilitiesTests
         const EvictionReason reason = EvictionReason.Removed;
         var value = new { x = "test " };
         var logger = Substitute.For<ILogger<object>>();
+        logger.IsEnabled(LogLevel.Debug).Returns(true);
 
         CacheUtilities.EvictionLoggingCallback(key, value, reason, logger);
-            
-        logger.ReceivedCalls()
+
+        logger.ReceivedCalls().Count().Should().Be(2);
+
+        logger
+            .ReceivedCalls()
+            .Skip(1)
             .Select(call => call.GetArguments())
             .Should()
-            .Contain(args => args[0] is LogLevel && (LogLevel)args[0]! == LogLevel.Information);
-            
-        logger.ReceivedCalls()
+            .Contain(args => args[0] is LogLevel && (LogLevel)args[0]! == LogLevel.Debug);
+
+        logger
+            .ReceivedCalls()
+            .Skip(1)
             .Select(call => call.GetArguments())
             .Should()
             .Contain(args => args[2] != null && args[2]!.ToString() == $"Entry {key} was evicted from the cache. Reason: {reason}.");

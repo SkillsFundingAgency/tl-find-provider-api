@@ -221,6 +221,102 @@ public class EmployerInterestServiceTests
                 Arg.Any<string>());
     }
 
+
+    [Fact]
+    public async Task CreateEmployerInterest_Calls_EmailService_With_Expected_Tokens_With_Formatted_Postcode()
+    {
+        const string unformattedPostcode = "cv12wt";
+        const string expectedPostcode = "CV1 2WT";
+
+        var employerInterest = new EmployerInterestBuilder()
+            .BuildWithGeoLocation(
+                new GeoLocation
+                {
+                    Location = unformattedPostcode
+                });
+
+        var routes = new RouteBuilder().BuildList().ToList();
+        var industries = new IndustryBuilder().BuildList().ToList();
+
+        var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>())
+            .Returns(true);
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(GeoLocationBuilder.BuildGeoLocation(expectedPostcode));
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetIndustries()
+            .Returns(industries);
+        providerDataService.GetRoutes()
+            .Returns(routes);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.Create(
+                Arg.Any<EmployerInterest>(),
+                Arg.Any<GeoLocation>())
+            .Returns((1, uniqueId));
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                emailService: emailService,
+                postcodeLookupService: postcodeLookupService,
+                providerDataService: providerDataService,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.CreateEmployerInterest(employerInterest);
+
+        result.Should().Be(uniqueId);
+
+        const string expectedContactPreference = "Email";
+        var expectedIndustry =
+            $"{industries.Single(i => i.Id == 9).Name}";
+
+        var expectedSkillAreas =
+            $"{routes.Single(r => r.Id == 1).Name}" +
+            $", {routes.Single(r => r.Id == 2).Name}";
+
+        var expectedUnsubscribeUri =
+            $"{settings.UnsubscribeEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+
+        var expectedDetails =
+            $"* Name: {employerInterest.ContactName}\r\n" +
+            $"* Email address: {employerInterest.Email}\r\n" +
+            $"* Telephone: {employerInterest.Telephone}\r\n" +
+            $"* How would you prefer to be contacted: {expectedContactPreference}\r\n" +
+            $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
+            $"* Website: {employerInterest.Website}\r\n" +
+            $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
+            $"* Industry placement areas: {expectedSkillAreas}\r\n" +
+            $"* Postcode: {expectedPostcode}\r\n" +
+            $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
+
+        await emailService
+            .Received(1)
+            .SendEmail(
+                employerInterest.Email,
+                EmailTemplateNames.EmployerRegisterInterest,
+                Arg.Is<IDictionary<string, string>>(tokens =>
+                    tokens.ValidateTokens(
+                        new Dictionary<string, string>
+                        {
+                            { "employer_support_site", settings.EmployerSupportSiteUri },
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri },
+                            { "details_list", expectedDetails }
+                        })),
+                Arg.Any<string>());
+    }
+
     [Fact]
     public async Task CreateEmployerInterest_Calls_EmailService_With_Double_Line_Breaks_Replaced()
     {

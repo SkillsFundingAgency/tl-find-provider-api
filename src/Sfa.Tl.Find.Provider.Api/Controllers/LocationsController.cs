@@ -51,7 +51,10 @@ public class LocationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> ValidatePostcode(string postcode)
     {
-        _logger.LogInformation($"{nameof(LocationsController)} {nameof(ValidatePostcode)} called.");
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(LocationsController)} {nameof(ValidatePostcode)} called.");
+        }
 
         var result = false;
 
@@ -65,8 +68,11 @@ public class LocationsController : ControllerBase
             _logger.LogError(ex, "Error in ValidatePostcode");
         }
 
-        _logger.LogInformation("ValidatePostcode result is {result}.",
-            result);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("ValidatePostcode result is {result}.",
+                result);
+        }
 
         return result
             ? Ok()

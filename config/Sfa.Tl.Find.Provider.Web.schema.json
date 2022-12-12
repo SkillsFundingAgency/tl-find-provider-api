@@ -137,6 +137,11 @@
       "minLength": 1,
       "type": "string",
       "environmentVariable": "BlobStorageConnectionString"
+    },
+    "RedisCacheConnectionString": {
+      "minLength": 1,
+      "type": "string",
+      "environmentVariable": "RedisCacheConnectionString"
     }
   },
   "additionalProperties": false,
