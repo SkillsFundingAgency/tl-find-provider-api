@@ -176,28 +176,19 @@ public class EmployerInterestService : IEmployerInterestService
 
     private async Task<bool> SendEmployerExtendInterestEmail(EmployerInterest employerInterest)
     {
+        var geoLocation = new GeoLocation
+        {
+            Location = employerInterest.Postcode,
+            Latitude = employerInterest.Latitude,
+            Longitude = employerInterest.Longitude
+        };
+
         return await _emailService.SendEmail(
             employerInterest.Email,
             EmailTemplateNames.EmployerExtendInterest,
-    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geolocation)
-    {
-        var unsubscribeUri = new Uri(QueryHelpers.AddQueryString(
-            _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
-            "id",
-            employerInterest.UniqueId.ToString("D").ToLower()));
-        
-        var detailsList = await BuildEmployerInterestDetailsList(employerInterest, geolocation);
-
-        var tokens = new Dictionary<string, string>
-        {
-            { "details_list", detailsList },
-            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
-            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
-        };
-
             new Dictionary<string, string>
             {
-                { "details_list", await BuildEmployerInterestDetailsList(employerInterest) },
+                { "details_list", await BuildEmployerInterestDetailsList(employerInterest, geoLocation) },
                 { "employer_extend_uri", BuildUriWithUniqueId(_employerInterestSettings.ExtendEmployerUri, employerInterest) },
                 { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
                 { "employer_unsubscribe_uri", BuildUriWithUniqueId(_employerInterestSettings.UnsubscribeEmployerUri, employerInterest) }
@@ -218,14 +209,14 @@ public class EmployerInterestService : IEmployerInterestService
             employerInterest.UniqueId.ToString());
     }
 
-    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest)
+    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geoLocation)
     {
         return await _emailService.SendEmail(
             employerInterest.Email,
             EmailTemplateNames.EmployerRegisterInterest,
             new Dictionary<string, string>
             {
-                { "details_list", await BuildEmployerInterestDetailsList(employerInterest) },
+                { "details_list", await BuildEmployerInterestDetailsList(employerInterest, geoLocation) },
                 { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
                 { "employer_unsubscribe_uri", BuildUriWithUniqueId(_employerInterestSettings.UnsubscribeEmployerUri, employerInterest) }
             }, 
@@ -243,7 +234,7 @@ public class EmployerInterestService : IEmployerInterestService
             : "";
     }
 
-    private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest, GeoLocation geolocation)
+    private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest, GeoLocation geoLocation)
     {
         var industries = await _providerDataService.GetIndustries();
         var routes = await _providerDataService.GetRoutes();
@@ -292,7 +283,7 @@ public class EmployerInterestService : IEmployerInterestService
         
         detailsList.AppendLine($"* Organisation’s primary industry: {industry}");
         detailsList.AppendLine($"* Industry placement area{(skillAreas.Count > 1 ? "s" : "")}: {placementAreas}");
-        detailsList.AppendLine($"* Postcode: {geolocation.Location}");
+        detailsList.AppendLine($"* Postcode: {geoLocation.Location}");
         if (!string.IsNullOrEmpty(employerInterest.AdditionalInformation))
         {
             detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks() }");
