@@ -1,9 +1,11 @@
 ﻿@page "{id}"
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Sfa.Tl.Find.Provider.Application.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model Sfa.Tl.Find.Provider.Web.Pages.Employer.RemoveEmployerModel
 @{
-    ViewData["Title"] = Model.EmployerInterest?.OrganisationName + " | Remove employer";
+    ViewData["Title"] = PageExtensions.FormatTitleWithAdministratorTag(
+        $"{Model.EmployerInterest?.OrganisationName} | Remove employer", 
+        HttpContext.User);
 }
 
 @section breadcrumbs {

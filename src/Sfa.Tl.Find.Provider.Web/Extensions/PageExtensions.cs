@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using System.Security.Claims;
+using System.Text;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+
 
 namespace Sfa.Tl.Find.Provider.Web.Extensions;
 
@@ -23,5 +27,18 @@ public static class PageExtensions
         formattedTitle.Append($"{ServiceName}");
 
         return formattedTitle.ToString();
+    }
+
+    public static string FormatTitleWithAdministratorTag(string title, ClaimsPrincipal user)
+    {
+        var ukPrnClaim = user?.GetClaim(CustomClaimTypes.UkPrn);
+        var userTypeTag = (ukPrnClaim is null
+                           || (long.TryParse(ukPrnClaim, out var ukPrn) && ukPrn == 0))
+                          && user is not null 
+                          && user.IsInRole(CustomRoles.Administrator)
+            ? " - Administrator"
+            : null;
+
+        return $"{title}{userTypeTag}";
     }
 }

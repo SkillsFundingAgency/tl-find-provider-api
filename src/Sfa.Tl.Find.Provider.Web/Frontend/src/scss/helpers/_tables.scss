@@ -51,10 +51,10 @@
         }
 
         td {
-            border-top: 2px solid $govuk-border-colour;
+            border-top: none;
             border-left: 2px solid $govuk-border-colour;
             border-right: 2px solid $govuk-border-colour;
-            border-bottom: none;
+            border-bottom: 2px solid $govuk-border-colour;
             @include govuk-responsive-padding(2);
             display: block;
             clear: left;
@@ -66,8 +66,8 @@
                 text-align: right;
             }
 
-            &:nth-child(4) {
-                border-bottom: 2px solid $govuk-border-colour;
+            &:nth-child(2) {
+                border-top: 2px solid $govuk-border-colour;
             }
         }
     }
@@ -141,6 +141,10 @@
 
                 &:last-child {
                     padding-right: 0;
+                }
+
+                &:nth-child(2) {
+                    border-top: none;
                 }
 
                 &:before {

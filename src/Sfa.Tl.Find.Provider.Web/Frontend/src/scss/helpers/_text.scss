@@ -6,6 +6,11 @@
     white-space: pre-wrap;
 }
 
+.tl-nobreak {
+    word-break:keep-all;
+    white-space:nowrap;
+}
+
 @for $i from 1 through 10 {
 
     .tl-lineheight--#{$i * 5} {

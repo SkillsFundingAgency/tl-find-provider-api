@@ -94,7 +94,8 @@ public class EmployerInterestBuilder
             Telephone = employerInterest.Telephone,
             Website = employerInterest.Website,
             ContactPreferenceType = employerInterest.ContactPreferenceType,
-            AdditionalInformation = employerInterest.AdditionalInformation
+            AdditionalInformation = employerInterest.AdditionalInformation,
+            SkillAreaIds = employerInterest.SkillAreaIds
         };
     }
 
