@@ -3,7 +3,9 @@
 @using Sfa.Tl.Find.Provider.Infrastructure.Authorization
 @model EmployerListModel
 @{
-    ViewData["Title"] = "Employer list";
+    ViewData["Title"] = PageExtensions.FormatTitleWithAdministratorTag(
+        "Employer list", 
+        HttpContext.User);
 }
 
 @if (Model?.UkPrn is not null)

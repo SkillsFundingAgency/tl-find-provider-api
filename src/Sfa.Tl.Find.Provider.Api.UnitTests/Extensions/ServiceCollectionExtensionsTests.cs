@@ -53,7 +53,7 @@ public class ServiceCollectionExtensionsTests
         connectionStringOptions.Value.Should().NotBeNull();
         connectionStringOptions.Value.BlobStorageConnectionString.Should().BeEquivalentTo(siteConfiguration.BlobStorageConnectionString);
         connectionStringOptions.Value.SqlConnectionString.Should().BeEquivalentTo(siteConfiguration.SqlConnectionString);
-        connectionStringOptions.Value.RedisConnectionString.Should().BeEquivalentTo(siteConfiguration.RedisConnectionString);
+        connectionStringOptions.Value.RedisCacheConnectionString.Should().BeEquivalentTo(siteConfiguration.RedisCacheConnectionString);
     }
 
     [Fact]

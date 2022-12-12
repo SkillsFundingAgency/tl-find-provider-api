@@ -1,4 +1,6 @@
-﻿using Sfa.Tl.Find.Provider.Web.Extensions;
+﻿using System.Security.Claims;
+using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
+using Sfa.Tl.Find.Provider.Web.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Extensions;
 
@@ -35,6 +37,83 @@ public class PageExtensionsTests
     public void DataTestsWithDefaultValue(string title, string expectedResult)
     {
         var generatedTitle = PageExtensions.GenerateTitle(title);
+
+        generatedTitle.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void FormatTitleWithAdministratorTag_Null()
+    {
+        const string title = "Test";
+        const string expectedResult = "Test";
+
+        var generatedTitle = PageExtensions.FormatTitleWithAdministratorTag(title, null);
+
+        generatedTitle.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void FormatTitleWithAdministratorTag_When_User_Has_No_Claims()
+    {
+        const string title = "Test";
+        const string expectedResult = "Test";
+
+       var generatedTitle = PageExtensions.FormatTitleWithAdministratorTag(
+            title,
+            new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>())));
+
+        generatedTitle.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void FormatTitleWithAdministratorTag_When_User_Has_UkPrn()
+    {
+        const string title = "Test";
+        const string expectedResult = "Test";
+
+        var generatedTitle = PageExtensions.FormatTitleWithAdministratorTag(
+            title,
+            new ClaimsPrincipal(
+                new ClaimsIdentity(new List<Claim>
+                {
+                    new(CustomClaimTypes.UkPrn, "10000001")
+                })));
+
+        generatedTitle.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void FormatTitleWithAdministratorTag_When_User_Is_Administrator_With_UkPrn()
+    {
+        const string title = "Test";
+        const string expectedResult = "Test";
+        
+        var generatedTitle = PageExtensions.FormatTitleWithAdministratorTag(
+            title,
+            new ClaimsPrincipal(
+                new ClaimsIdentity(
+                    new List<Claim>
+                    {
+                        new(CustomClaimTypes.UkPrn, "10000001"),
+                        new(ClaimTypes.Role, CustomRoles.Administrator)
+                    })));
+
+        generatedTitle.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void _FormatTitleWithAdministratorTag_When_User_Is_Administrator_Without_UkPrn()
+    {
+        const string title = "Test";
+        const string expectedResult = "Test - Administrator";
+        
+        var generatedTitle = PageExtensions.FormatTitleWithAdministratorTag(
+            title,
+            new ClaimsPrincipal(
+                new ClaimsIdentity(new List<Claim>
+                {
+                    new(ClaimTypes.Role, CustomRoles.Administrator)
+                })));
 
         generatedTitle.Should().Be(expectedResult);
     }

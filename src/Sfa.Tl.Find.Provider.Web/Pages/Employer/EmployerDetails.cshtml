@@ -3,8 +3,11 @@
 @using Sfa.Tl.Find.Provider.Application.Extensions
 @model EmployerDetailsModel
 @{
-    ViewData["Title"] = Model.EmployerInterest?.OrganisationName + " | Employer details";
+    ViewData["Title"] = PageExtensions.FormatTitleWithAdministratorTag(
+        $"{Model.EmployerInterest?.OrganisationName} | Employer details",
+        HttpContext.User);
 }
+
 @section breadcrumbs {
     <a asp-page="./EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
 }

@@ -316,4 +316,21 @@ public static class ModelValidationExtensions
 
         return true;
     }
+
+    public static void Validate(this Town town,
+        int id,
+        string name,
+        string county,
+        string localAuthority,
+        decimal latitude,
+        decimal longitude)
+    {
+        town.Should().NotBeNull();
+        town.Id.Should().Be(id);
+        town.Name.Should().Be(name);
+        town.County.Should().Be(county);
+        town.LocalAuthority.Should().Be(localAuthority);
+        town.Latitude.Should().Be(latitude);
+        town.Longitude.Should().Be(longitude);
+    }
 }

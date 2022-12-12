@@ -12,7 +12,7 @@ public class SettingsBuilder
 
     private const string BlobStorageConnectionString = "UseDevelopmentStorage=true;";
     private const string SqlConnectionString = "Data Source=Test;Initial Catalog=Test;Integrated Security=True;";
-    private const string RedisConnectionString = "test.redis.cache.windows.net:6380,password='Test1',ssl=True,abortConnect=False";
+    private const string RedisCacheConnectionString = "test.redis.cache.windows.net:6380,password='Test1',ssl=True,abortConnect=False";
 
     private const string FindCourseApiKey = "0f608e5d437f4baabc04a0bc2dabbc1b";
     private const string FindCourseApiBaseAbsoluteUri = "https://test.com/findacourse/api";
@@ -54,11 +54,11 @@ public class SettingsBuilder
     public ConnectionStringSettings BuildConnectionStringSettings(
         string blobStorageConnectionString = BlobStorageConnectionString,
         string sqlConnectionString = SqlConnectionString,
-        string redisConnectionString = RedisConnectionString) => new()
+        string redisCacheConnectionString = RedisCacheConnectionString) => new()
         {
             BlobStorageConnectionString = blobStorageConnectionString,
             SqlConnectionString = sqlConnectionString,
-            RedisConnectionString = redisConnectionString
+            RedisCacheConnectionString = redisCacheConnectionString
         };
 
     public CourseDirectoryApiSettings BuildCourseDirectoryApiSettings(
@@ -146,7 +146,7 @@ public class SettingsBuilder
         SearchSettings searchSettings = null,
         string blobStorageConnectionString = BlobStorageConnectionString,
         string sqlConnectionString = SqlConnectionString,
-        string redisConnectionString = RedisConnectionString,
+        string redisCacheConnectionString = RedisCacheConnectionString,
         string courseDirectoryImportSchedule = "0 0 9 * * MON-FRI",
         string townDataImportSchedule = "0 0 10 * * MON-FRI") => new()
         {
@@ -160,7 +160,7 @@ public class SettingsBuilder
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             BlobStorageConnectionString = blobStorageConnectionString,
             SqlConnectionString = sqlConnectionString,
-            RedisConnectionString = redisConnectionString,
+            RedisCacheConnectionString = redisCacheConnectionString,
             CourseDirectoryImportSchedule = courseDirectoryImportSchedule,
             TownDataImportSchedule = townDataImportSchedule
         };
