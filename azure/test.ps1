@@ -6,7 +6,10 @@ $location = "westeurope"
 $envPrefix = "s126d99"
 $environmentNameAbbreviation = "xxx"
 $sharedResourceGroupName = $envPrefix + "-fprapi-shared"
+$envResourceGroupName = $envPrefix + "-fprapi-xxx"
 
+# purge the keyvault if it's in InRemoveState due to resource group deletion
+# this is up front as it's such a common reason for the script to fail
 if (Get-AzKeyVault -Vaultname "$($envPrefix)fprapisharedkv" -Location $location -InRemovedState) { 
     Write-Host 'Purging vault'
     Remove-AzKeyVault -VaultName s126d99fprapisharedkv -InRemovedState -Location $location -Force
@@ -89,8 +92,6 @@ foreach ($key in $certsToUpload.Keys) {
     Clear-Variable -Name certPassword
 }
 
-$envResourceGroupName = $envPrefix + "-fprapi-xxx"
-
 Get-AzResourceGroup -Name $envResourceGroupName -ErrorVariable notPresent -ErrorAction SilentlyContinue
 if ($notPresent) {
     $tags = @{
@@ -131,3 +132,10 @@ $envDeployment = New-AzResourceGroupDeployment @deploymentParameters
 if ($envDeployment.ProvisioningState -eq "Succeeded") {
     Write-Output "Yippee!!"
 }
+
+
+<# A section to allow easy cleanup of the environments, the first line is because I've been looking at migration from app insights.
+Remove-AzOperationalInsightsWorkspace -ResourceGroupName $sharedResourceGroupName -Name "$($sharedResourceGroupName)-log" -ForceDelete -Force -ErrorAction SilentlyContinue
+Remove-AzResourceGroup -ResourceGroupName $envResourceGroupName -Force -ErrorAction SilentlyContinue
+Remove-AzResourceGroup -ResourceGroupName $sharedResourceGroupName -Force -ErrorAction SilentlyContinue
+#>
