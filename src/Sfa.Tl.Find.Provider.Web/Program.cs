@@ -12,6 +12,7 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Filters;
 using Sfa.Tl.Find.Provider.Web.Security;
+using StackExchange.Redis;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
@@ -24,6 +25,11 @@ builder.Services
 
 builder.Services.AddConfigurationOptions(siteConfiguration);
 
+if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
+{
+    builder.Services.AddSingleton<IConnectionMultiplexer>(x =>
+        ConnectionMultiplexer.Connect(siteConfiguration.RedisCacheConnectionString));
+}
 builder.Services.AddMemoryCache();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -87,13 +93,21 @@ builder.Services
     {
         options.Cookie.Name = ".cookies.session";
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.IdleTimeout = TimeSpan.FromMinutes(siteConfiguration.DfeSignInSettings.Timeout);
+        options.IdleTimeout = TimeSpan.FromMinutes(siteConfiguration.DfeSignInSettings?.Timeout ?? 20);
         options.Cookie.IsEssential = true;
     })
     .AddTransient<ISessionService>(x =>
         new SessionService(
             x.GetService<IHttpContextAccessor>()!,
             builder.Environment.EnvironmentName));
+
+if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(o =>
+    {
+        o.Configuration = siteConfiguration.RedisCacheConnectionString;
+    });
+}
 
 if (!builder.Environment.IsDevelopment())
 {
@@ -127,8 +141,16 @@ builder.Services
     .AddTransient<IRouteRepository, RouteRepository>()
     .AddTransient<ITownRepository, TownRepository>();
 
-builder.Services
-    .AddTransient<ICacheService, MemoryCacheService>();
+if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
+{
+    builder.Services
+        .AddTransient<ICacheService, RedisCacheService>();
+}
+else
+{
+    builder.Services
+        .AddTransient<ICacheService, MemoryCacheService>();
+}
 
 builder.Services.AddNotifyService(
     siteConfiguration.EmailSettings?.GovNotifyApiKey);
