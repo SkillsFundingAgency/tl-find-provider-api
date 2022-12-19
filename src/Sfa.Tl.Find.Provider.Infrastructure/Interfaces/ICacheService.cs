@@ -1,17 +1,16 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 
 namespace Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 public interface ICacheService
 {
-    T Get<T>(object key);
+    Task<T?> Get<T>(string key);
 
-    bool TryGetValue<T>(object key, out T value);
+    Task<bool> KeyExists<T>(string key);
 
-    T Set<T>(string key, T value);
+    Task Set<T>(string key, T item, CacheDuration cacheDuration = CacheDuration.Standard);
 
-    T Set<T>(string key, T value, DateTimeOffset absoluteExpiration);
-    
-    T Set<T>(string key, T value, MemoryCacheEntryOptions options);
+    Task Set<T>(string key, T value, DateTimeOffset absoluteExpiration);
 
-    void Remove(object key);
+    Task Remove<T>(string key);
 }

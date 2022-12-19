@@ -66,7 +66,7 @@ public class AccountController : Controller
     [Route("signout")]
     public new async Task<IActionResult> SignOut()
     {
-        _cacheService.Remove(User.GetUserSessionCacheKey());
+        await _cacheService.Remove<DateTime>(User.GetUserSessionCacheKey());
         _sessionService.Clear();
 
         if (bool.TryParse(_configuration[ConfigurationConstants.SkipProviderAuthenticationConfigKey], out var isStubProviderAuth) && isStubProviderAuth)

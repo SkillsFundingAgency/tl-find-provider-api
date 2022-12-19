@@ -11,7 +11,6 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
-using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
@@ -63,13 +62,13 @@ public class ProviderDataService : IProviderDataService
         }
 
         const string key = CacheKeys.IndustriesKey;
-        if (!_cacheService.TryGetValue(key, out IList<Industry> industries))
+        var industries = await _cacheService.Get<IList<Industry>?>(key);
+        if (industries is null)
         {
             industries = (await _industryRepository
                     .GetAll())
                 .ToList();
-            _cacheService.Set(key, industries,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeProvider, _logger));
+            await _cacheService.Set(key, industries);
         }
 
         return industries;
@@ -83,13 +82,13 @@ public class ProviderDataService : IProviderDataService
         }
 
         const string key = CacheKeys.QualificationsKey;
-        if (!_cacheService.TryGetValue(key, out IList<Qualification> qualifications))
+        var qualifications = await _cacheService.Get<IList<Qualification>?>(key);
+        if (qualifications is null)
         {
             qualifications = (await _qualificationRepository
                 .GetAll())
                 .ToList();
-            _cacheService.Set(key, qualifications,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeProvider, _logger));
+            await _cacheService.Set(key, qualifications);
         }
 
         return qualifications;
@@ -103,13 +102,13 @@ public class ProviderDataService : IProviderDataService
         }
 
         const string key = CacheKeys.RoutesKey;
-        if (!_cacheService.TryGetValue(key, out IList<Route> routes))
+        var routes = await _cacheService.Get<IList<Route>?>(key);
+        if (routes is null)
         {
             routes = (await _routeRepository
                 .GetAll(_mergeAdditionalProviderData))
                 .ToList();
-            _cacheService.Set(key, routes,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(_dateTimeProvider, _logger));
+            await _cacheService.Set(key, routes);
         }
 
         return routes;
@@ -295,7 +294,7 @@ public class ProviderDataService : IProviderDataService
             .ParseAsync(stream);
 
         var count = await LoadAdditionalProviderData(jsonDocument);
-        ClearCaches();
+        await ClearCaches();
 
         _logger.LogInformation("Loaded {count} providers from stream.", count);
     }
@@ -382,14 +381,12 @@ public class ProviderDataService : IProviderDataService
     {
         var key = CacheKeys.LatLongKey(latitude, longitude);
 
-        if (!_cacheService.TryGetValue(key, out GeoLocation geoLocation))
+        var geoLocation = await _cacheService.Get<GeoLocation?>(key);
+        if (geoLocation is null)
         {
             geoLocation = await _postcodeLookupService.GetNearestPostcode(latitude, longitude);
 
-            _cacheService.Set(key, geoLocation,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(
-                    _dateTimeProvider,
-                    _logger));
+            await _cacheService.Set(key, geoLocation, CacheDuration.Medium);
         }
 
         return geoLocation;
@@ -414,10 +411,10 @@ public class ProviderDataService : IProviderDataService
         };
     }
 
-    private void ClearCaches()
+    private async Task ClearCaches()
     {
-        _cacheService.Remove(CacheKeys.QualificationsKey);
-        _cacheService.Remove(CacheKeys.RoutesKey);
-        _cacheService.Remove(CacheKeys.ProviderDataDownloadInfoKey);
+        await _cacheService.Remove<IList<Qualification>>(CacheKeys.QualificationsKey);
+        await _cacheService.Remove<IList<Route>>(CacheKeys.RoutesKey);
+        await _cacheService.Remove<ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

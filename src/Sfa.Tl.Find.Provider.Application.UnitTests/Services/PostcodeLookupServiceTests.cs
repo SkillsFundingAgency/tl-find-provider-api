@@ -352,17 +352,9 @@ public class PostcodeLookupServiceTests
         var validPostcodeLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
-            .Returns(x =>
-            {
-                if (((string)x[0]).Contains(validPostcodeLocation.Location.Replace(" ", "")))
-                {
-                    x[1] = validPostcodeLocation;
-                    return true;
-                }
-
-                return false;
-            });
+        cacheService.Get<GeoLocation?>(Arg.Is<string>(x =>
+                x.Contains(validPostcodeLocation.Location.Replace(" ", ""))))
+            .Returns(validPostcodeLocation);
 
         var service = new PostcodeLookupServiceBuilder()
             .Build(cacheService: cacheService);
@@ -378,17 +370,9 @@ public class PostcodeLookupServiceTests
         var validOutcodeLocation = GeoLocationBuilder.BuildValidOutcodeLocation();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<GeoLocation>())
-            .Returns(x =>
-            {
-                if (((string)x[0]).Contains(validOutcodeLocation.Location.Replace(" ", "")))
-                {
-                    x[1] = validOutcodeLocation;
-                    return true;
-                }
-
-                return false;
-            });
+        cacheService.Get<GeoLocation?>(Arg.Is<string>(x =>
+                x.Contains(validOutcodeLocation.Location.Replace(" ", ""))))
+            .Returns(validOutcodeLocation);
 
         var service = new PostcodeLookupServiceBuilder()
             .Build(cacheService: cacheService);

@@ -82,7 +82,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
             return false;
         }
 
-        if (IsReplayRequest(nonce, requestTimeStamp))
+        if (await IsReplayRequest(nonce, requestTimeStamp))
         {
             return false;
         }
@@ -111,9 +111,9 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         return incomingBase64Signature.Equals(base64Signature, StringComparison.Ordinal);
     }
 
-    private bool IsReplayRequest(string nonce, string requestTimeStamp)
+    private async Task<bool> IsReplayRequest(string nonce, string requestTimeStamp)
     {
-        if (_cacheService.TryGetValue<string>(nonce, out _))
+        if (await _cacheService.KeyExists<string>(nonce))
         {
             _logger.LogWarning("Replay request detected - nonce found in cache.");
             return true;
@@ -139,7 +139,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
             return true;
         }
 
-        _cacheService.Set(nonce, requestTimeStamp,
+        await _cacheService.Set(nonce, requestTimeStamp,
             DateTimeOffset.UtcNow.AddSeconds(RequestMaxAgeInSeconds));
 
         return false;

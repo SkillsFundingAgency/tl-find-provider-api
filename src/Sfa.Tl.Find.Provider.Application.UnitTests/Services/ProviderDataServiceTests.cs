@@ -46,8 +46,13 @@ public class ProviderDataServiceTests
         industryRepository.GetAll()
             .Returns(industries);
 
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.Get<IList<Industry>?>(CacheKeys.IndustriesKey)
+            .Returns(default(IList<Industry>));
+
         var service = new ProviderDataServiceBuilder()
-            .Build(industryRepository: industryRepository);
+            .Build(industryRepository: industryRepository,
+                cacheService: cacheService);
 
         var results = (await service.GetIndustries()).ToList();
         results.Should().BeEquivalentTo(industries);
@@ -60,22 +65,13 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task GetIndustries_Returns_Expected_List_From_Cache()
     {
-        var industries = new IndustryBuilder().BuildList();
+        var industries = new IndustryBuilder().BuildList().ToList();
 
         var industryRepository = Substitute.For<IIndustryRepository>();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Industry>>())
-            .Returns(x =>
-            {
-                if ((string)x[0] == CacheKeys.IndustriesKey)
-                {
-                    x[1] = industries;
-                    return true;
-                }
-
-                return false;
-            });
+        cacheService.Get<IList<Industry>?>(CacheKeys.IndustriesKey)
+            .Returns(industries);
 
         var service = new ProviderDataServiceBuilder()
             .Build(industryRepository: industryRepository,
@@ -100,8 +96,13 @@ public class ProviderDataServiceTests
         qualificationRepository.GetAll()
             .Returns(qualifications);
 
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.Get<IList<Qualification>?>(CacheKeys.QualificationsKey)
+            .Returns(default(IList<Qualification>));
+
         var service = new ProviderDataServiceBuilder()
-            .Build(qualificationRepository: qualificationRepository);
+            .Build(qualificationRepository: qualificationRepository,
+                cacheService: cacheService);
 
         var results = (await service.GetQualifications()).ToList();
         results.Should().BeEquivalentTo(qualifications);
@@ -114,22 +115,13 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task GetQualifications_Returns_Expected_List_From_Cache()
     {
-        var qualifications = new QualificationBuilder().BuildList();
+        var qualifications = new QualificationBuilder().BuildList().ToList();
 
         var qualificationRepository = Substitute.For<IQualificationRepository>();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Qualification>>())
-            .Returns(x =>
-            {
-                if ((string)x[0] == CacheKeys.QualificationsKey)
-                {
-                    x[1] = qualifications;
-                    return true;
-                }
-
-                return false;
-            });
+        cacheService.Get<IList<Qualification>?>(CacheKeys.QualificationsKey)
+            .Returns(qualifications);
 
         var service = new ProviderDataServiceBuilder()
             .Build(qualificationRepository: qualificationRepository,
@@ -154,8 +146,13 @@ public class ProviderDataServiceTests
         routeRepository.GetAll(true)
             .Returns(routes);
 
+        var cacheService = Substitute.For<ICacheService>();
+        cacheService.Get<IList<Route>?>(CacheKeys.RoutesKey)
+            .Returns(default(IList<Route>));
+
         var service = new ProviderDataServiceBuilder()
-            .Build(routeRepository: routeRepository);
+            .Build(routeRepository: routeRepository,
+                cacheService: cacheService);
 
         var results = (await service.GetRoutes()).ToList();
         results.Should().BeEquivalentTo(routes);
@@ -168,22 +165,13 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task GetRoutes_Returns_Expected_List_From_Cache()
     {
-        var routes = new RouteBuilder().BuildList();
+        var routes = new RouteBuilder().BuildList().ToList();
 
         var routeRepository = Substitute.For<IRouteRepository>();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<IList<Route>>())
-            .Returns(x =>
-            {
-                if ((string)x[0] == CacheKeys.RoutesKey)
-                {
-                    x[1] = routes;
-                    return true;
-                }
-
-                return false;
-            });
+        cacheService.Get<IList<Route>?>(CacheKeys.RoutesKey)
+            .Returns(routes);
 
         var service = new ProviderDataServiceBuilder()
             .Build(routeRepository: routeRepository,
@@ -877,17 +865,15 @@ public class ProviderDataServiceTests
 
         await service.ImportProviderData(stream, true);
 
-        cacheService
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.QualificationsKey);
-
-        cacheService
+            .Remove<IList<Qualification>>(CacheKeys.QualificationsKey);
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.ProviderDataDownloadInfoKey);
-
-        cacheService
+            .Remove<IList<Route>>(CacheKeys.RoutesKey);
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.RoutesKey);
+            .Remove<ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey);
     }
 
     [Fact]

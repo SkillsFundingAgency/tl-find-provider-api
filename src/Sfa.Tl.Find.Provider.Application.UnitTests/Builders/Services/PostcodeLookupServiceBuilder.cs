@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
@@ -13,27 +12,19 @@ public class PostcodeLookupServiceBuilder
 
     public IPostcodeLookupService Build(
         HttpClient httpClient = null,
-        IDateTimeProvider dateTimeProvider = null,
-        ICacheService cacheService = null,
-        ILogger<PostcodeLookupService> logger = null)
+        ICacheService cacheService = null)
     {
         httpClient ??= Substitute.For<HttpClient>();
         cacheService ??= Substitute.For<ICacheService>();
-        dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
-        logger ??= Substitute.For<ILogger<PostcodeLookupService>>();
 
         return new PostcodeLookupService(
             httpClient,
-            dateTimeProvider,
-            cacheService,
-            logger);
+            cacheService);
     }
 
     public IPostcodeLookupService Build(
         IDictionary<string, HttpResponseMessage> responseMessages,
-        IDateTimeProvider dateTimeProvider = null,
-        ICacheService cacheService = null,
-        ILogger<PostcodeLookupService> logger = null)
+        ICacheService cacheService = null)
     {
         var responsesWithUri = responseMessages
             .ToDictionary(
@@ -45,16 +36,12 @@ public class PostcodeLookupServiceBuilder
 
         return Build(
             httpClient,
-            dateTimeProvider,
-            cacheService,
-            logger);
+            cacheService);
     }
 
     public IPostcodeLookupService Build(
         IDictionary<string, string> responseMessages,
-        IDateTimeProvider dateTimeProvider = null,
-        ICacheService cacheService = null,
-        ILogger<PostcodeLookupService> logger = null)
+        ICacheService cacheService = null)
     {
         var responsesWithUri = responseMessages
             .ToDictionary(
@@ -66,8 +53,6 @@ public class PostcodeLookupServiceBuilder
 
         return Build(
             httpClient,
-            dateTimeProvider,
-            cacheService,
-            logger);
+            cacheService);
     }
 }

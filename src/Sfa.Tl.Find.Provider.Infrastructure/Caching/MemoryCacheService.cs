@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
@@ -15,35 +16,50 @@ public class MemoryCacheService : ICacheService
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-
-    public T Get<T>(object key)
+    
+    public Task<T?> Get<T>(string key)
     {
-        TryGetValue(key, out T value);
-        return value;
+        key = GenerateCacheKey<T>(key);
+        return _cache.TryGetValue(key, out T value) 
+            ? Task.FromResult<T?>(value) 
+            : Task.FromResult(default(T));
     }
 
-    public bool TryGetValue<T>(object key, out T value)
+    public Task<bool> KeyExists<T>(string key)
     {
-        return _cache.TryGetValue(key, out value);
+        key = GenerateCacheKey<T>(key);
+        return Task.FromResult(_cache.TryGetValue(key, out _));
     }
 
-    public T Set<T>(string key, T value)
+    public Task Set<T>(string key, T value, CacheDuration cacheDuration = CacheDuration.Standard)
     {
-        return _cache.Set(key, value);
+        key = GenerateCacheKey<T>(key);
+        _cache.Set(key, JsonSerializer.Serialize(value), TimeSpan.FromHours((int)cacheDuration));
+        return Task.CompletedTask;
     }
 
-    public T Set<T>(string key, T value, DateTimeOffset absoluteExpiration)
+    public Task Set<T>(string key, T value, DateTimeOffset absoluteExpiration)
     {
-        return _cache.Set(key, value, absoluteExpiration);
+        key = GenerateCacheKey<T>(key);
+        _cache.Set(key, JsonSerializer.Serialize(value), absoluteExpiration);
+        return Task.CompletedTask;
     }
 
-    public T Set<T>(string key, T value, MemoryCacheEntryOptions options)
+    public Task Remove<T>(string key)
     {
-        return _cache.Set(key, value, options);
-    }
-
-    public void Remove(object key)
-    {
+        key = GenerateCacheKey<T>(key);
         _cache.Remove(key);
+
+        return Task.CompletedTask;
+    }
+
+    private static string GenerateCacheKey<T>(string key)
+    {
+        return GenerateCacheKey(typeof(T), key);
+    }
+
+    private static string GenerateCacheKey(Type objectType, string key)
+    {
+        return $"{key}:{objectType.Name}".ToLower();
     }
 }
