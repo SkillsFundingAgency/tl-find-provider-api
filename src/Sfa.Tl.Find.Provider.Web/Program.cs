@@ -87,6 +87,14 @@ builder.Services.AddRazorPages(options =>
 
 builder.Services.AddControllers();
 
+if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(o =>
+    {
+        o.Configuration = siteConfiguration.RedisCacheConnectionString;
+    });
+}
+
 builder.Services
     .AddTransient<IHttpContextAccessor, HttpContextAccessor>()
     .AddSession(options =>
@@ -100,14 +108,6 @@ builder.Services
         new SessionService(
             x.GetService<IHttpContextAccessor>()!,
             builder.Environment.EnvironmentName));
-
-if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
-{
-    builder.Services.AddStackExchangeRedisCache(o =>
-    {
-        o.Configuration = siteConfiguration.RedisCacheConnectionString;
-    });
-}
 
 if (!builder.Environment.IsDevelopment())
 {

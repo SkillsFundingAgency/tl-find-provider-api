@@ -64,6 +64,7 @@ public static class ConfigurationExtensions
             EmployerInterestSettings = configuration.GetSection(Constants.EmployerInterestSettingsConfigKey).Get<EmployerInterestSettings>(),
             GoogleMapsApiSettings = configuration.GetSection(Constants.GoogleMapsApiSettingsConfigKey).Get<GoogleMapsApiSettings>(),
             PostcodeApiSettings = configuration.GetSection(Constants.PostcodeApiSettingsConfigKey).Get<PostcodeApiSettings>(),
+            RedisCacheConnectionString = configuration[Constants.RedisCacheConnectionStringConfigKey],
             SearchSettings = configuration.GetSection(Constants.SearchSettingsConfigKey).Get<SearchSettings>(),
             SqlConnectionString = configuration[Constants.SqlConnectionStringConfigKey],
             BlobStorageConnectionString = configuration[Constants.BlobStorageConnectionStringConfigKey],
