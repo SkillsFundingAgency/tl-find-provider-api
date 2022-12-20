@@ -1,12 +1,16 @@
 $ErrorActionPreference = "Stop"
-# make sure we're on the right subscription to start with
-Set-AzContext -Tenant "9c7d9dd3-840c-4b3f-818e-552865082e16" -Subscription "s126-tlevelservice-development" 
 
 $location = "westeurope"
+$applicationPrefix = "fprapi"
 $envPrefix = "s126d99"
 $environmentNameAbbreviation = "xxx"
-$sharedResourceGroupName = $envPrefix + "-fprapi-shared"
-$envResourceGroupName = $envPrefix + "-fprapi-xxx"
+$certsToUpload = @{   
+    "dev-api-findatlevelprovider" = '7E73F2CADAAF4A270A07318453A105C8E97230E0'
+    "dev-connect-tlevels-gov-uk"  = 'DD76F0AFCDD2366AC750910C25D8AACE17D07DBB'
+}
+
+$sharedResourceGroupName = $envPrefix + "-$($applicationPrefix)-shared"
+$envResourceGroupName = $envPrefix + "-$($applicationPrefix)-$($environmentNameAbbreviation)"
 
 # purge the keyvault if it's in InRemoveState due to resource group deletion
 # this is up front as it's such a common reason for the script to fail
@@ -34,7 +38,7 @@ $sharedDeploymentParameters = @{
     ResourceGroupName       = $sharedResourceGroupName
     Mode                    = "Complete"
     Force                   = $true
-    TemplateFile            = "findproviderapi-shared.json"
+    TemplateFile            = "$($PSScriptRoot)/findproviderapi-shared.json"
     TemplateParameterObject = @{
         environmentNameAbbreviation             = "$($envPrefix)-fprapi"
         sqlServerAdminUsername                  = "xxxServerAdminxxx"
@@ -55,17 +59,6 @@ $sharedDeploymentParameters = @{
 }
 
 $sharedDeployment = New-AzResourceGroupDeployment @sharedDeploymentParameters
-
-# now upload the certificates to the keyvault for api and connect, these are sourced from 
-# the CurrentUser/my/ store your machine so you will need to have access to these up upload
-
-# 7E73F2CADAAF4A270A07318453A105C8E97230E0 = dev-api-findatlevelprovider
-# DD76F0AFCDD2366AC750910C25D8AACE17D07DBB = dev-connect-tlevels-gov-uk     
-
-$certsToUpload = @{   
-    "dev-api-findatlevelprovider" = '7E73F2CADAAF4A270A07318453A105C8E97230E0'
-    "dev-connect-tlevels-gov-uk"  = 'DD76F0AFCDD2366AC750910C25D8AACE17D07DBB'
-}
 
 foreach ($key in $certsToUpload.Keys) {
     # first get a random 32 character alphanumeric key into a SecureString
@@ -110,7 +103,7 @@ $deploymentParameters = @{
     Name                    = "test-{0:yyyyMMdd-HHmmss}" -f (Get-Date)
     ResourceGroupName       = $envResourceGroupName
     Mode                    = "Incremental"
-    TemplateFile            = "findproviderapi-environment.json"
+    TemplateFile            = "$($PSScriptRoot)/findproviderapi-environment.json"
     TemplateParameterObject = @{
         environmentNameAbbreviation             = $environmentNameAbbreviation
         resourceNamePrefix                      = ("$($envPrefix)-fprapi-" + $environmentNameAbbreviation)
@@ -134,7 +127,24 @@ if ($envDeployment.ProvisioningState -eq "Succeeded") {
 }
 
 
-<# A section to allow easy cleanup of the environments, the first line is because I've been looking at migration from app insights.
+<# 
+
+# you have to remove the diagnostic settings separately as they hang around if you don't and mess things up badly
+$subscriptionId = (Get-AzContext).Subscription.Id
+$diagnosticResourceIds = @(
+    "/subscriptions/$($subscriptionId)/resourceGroups/$($sharedResourceGroupName)/providers/Microsoft.KeyVault/vaults/$($envPrefix)$($applicationPrefix)sharedkv",
+    "/subscriptions/$($subscriptionId)/resourceGroups/$($envResourceGroupName)/providers/Microsoft.Web/sites/$($envPrefix)-$($applicationPrefix)-$($environmentNameAbbreviation)-web",
+    "/subscriptions/$($subscriptionId)/resourceGroups/$($envResourceGroupName)/providers/Microsoft.Web/sites/$($envPrefix)-$($applicationPrefix)-$($environmentNameAbbreviation)-ui"
+)
+foreach ($diagnosticResourceId in $diagnosticResourceIds) {
+    Write-Host "Finding settings in $($diagnosticResourceId) to remove"
+    foreach ($setting in (Get-AzDiagnosticSetting -ResourceId $diagnosticResourceId -ErrorAction SilentlyContinue)) {
+        Write-Host "Removing $(($setting).Name)"
+        Remove-AzDiagnosticSetting -ResourceId $diagnosticResourceId -Name $setting.Name
+    }   
+}
+
+
 Remove-AzOperationalInsightsWorkspace -ResourceGroupName $sharedResourceGroupName -Name "$($sharedResourceGroupName)-log" -ForceDelete -Force -ErrorAction SilentlyContinue
 Remove-AzResourceGroup -ResourceGroupName $envResourceGroupName -Force -ErrorAction SilentlyContinue
 Remove-AzResourceGroup -ResourceGroupName $sharedResourceGroupName -Force -ErrorAction SilentlyContinue
