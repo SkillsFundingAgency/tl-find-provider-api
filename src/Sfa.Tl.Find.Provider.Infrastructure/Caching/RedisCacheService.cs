@@ -5,7 +5,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using StackExchange.Redis;
 
 namespace Sfa.Tl.Find.Provider.Infrastructure.Caching;
-public class RedisCacheService : ICacheService, IDisposable
+public class RedisCacheService : ICacheService
 {
     private readonly IMemoryCache _cache;
     private readonly IConnectionMultiplexer _connectionMultiplexer;
@@ -68,21 +68,7 @@ public class RedisCacheService : ICacheService, IDisposable
         var database = GetDatabase();
         await database.StringSetAsync(key, JsonSerializer.Serialize(customType), cacheTime);
     }
-
-    //    public async Task RemoveAsync(string key)
-    //    {
-    //        var database = GetDatabase();
-    //        await database.KeyDeleteAsync(key, CommandFlags.FireAndForget);
-    //    }
-
-    //    //public async Task<T> GetAndRemoveAsync<T>(string key)
-    //    //{
-    //    //    var database = GetDatabase();
-    //    //    var cachedValue = await database.StringGetAsync(key);
-    //    //    await database.KeyDeleteAsync(key, CommandFlags.FireAndForget);
-    //    //    return cachedValue.HasValue ? JsonConvert.DeserializeObject<T>(cachedValue) : default(T);
-    //    //}
-
+    
     private IDatabase GetDatabase() => _connectionMultiplexer.GetDatabase();
 
     private static string GenerateCacheKey<T>(string key)
@@ -93,21 +79,5 @@ public class RedisCacheService : ICacheService, IDisposable
     private static string GenerateCacheKey(Type objectType, string key)
     {
         return $"{key}:{objectType.Name}".ToLower();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    public void Dispose(bool disposing)
-    {
-        if (!disposing)
-        {
-            return;
-        }
-
-        _connectionMultiplexer.Dispose();
     }
 }

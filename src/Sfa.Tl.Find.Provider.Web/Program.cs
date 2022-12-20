@@ -3,7 +3,6 @@ using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
-using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Providers;
@@ -12,7 +11,6 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Filters;
 using Sfa.Tl.Find.Provider.Web.Security;
-using StackExchange.Redis;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
@@ -24,13 +22,6 @@ builder.Services
     .AddApplicationInsightsTelemetry();
 
 builder.Services.AddConfigurationOptions(siteConfiguration);
-
-if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
-{
-    builder.Services.AddSingleton<IConnectionMultiplexer>(x =>
-        ConnectionMultiplexer.Connect(siteConfiguration.RedisCacheConnectionString));
-}
-builder.Services.AddMemoryCache();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -46,7 +37,7 @@ if (bool.TryParse(builder.Configuration[ConfigurationConstants.SkipProviderAuthe
 }
 else
 {
-    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment);
+    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings!, builder.Environment);
     builder.Services.AddWebDataProtection(siteConfiguration);
 }
 
@@ -86,14 +77,6 @@ builder.Services.AddRazorPages(options =>
     .AddSessionStateTempDataProvider();
 
 builder.Services.AddControllers();
-
-if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
-{
-    builder.Services.AddStackExchangeRedisCache(o =>
-    {
-        o.Configuration = siteConfiguration.RedisCacheConnectionString;
-    });
-}
 
 builder.Services
     .AddTransient<IHttpContextAccessor, HttpContextAccessor>()
@@ -141,16 +124,7 @@ builder.Services
     .AddTransient<IRouteRepository, RouteRepository>()
     .AddTransient<ITownRepository, TownRepository>();
 
-if (!string.IsNullOrEmpty(siteConfiguration.RedisCacheConnectionString))
-{
-    builder.Services
-        .AddTransient<ICacheService, RedisCacheService>();
-}
-else
-{
-    builder.Services
-        .AddTransient<ICacheService, MemoryCacheService>();
-}
+builder.Services.AddCachingServices(siteConfiguration.RedisCacheConnectionString);
 
 builder.Services.AddNotifyService(
     siteConfiguration.EmailSettings?.GovNotifyApiKey);
