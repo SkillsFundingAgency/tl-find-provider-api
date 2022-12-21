@@ -1,4 +1,5 @@
-﻿using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Caching;
 
@@ -35,7 +36,7 @@ public class CacheKeysTests
     [Fact]
     public void PostcodeKey_Throws_Exception_For_Null_Postcode()
     {
-        Action act = () => CacheKeys.PostcodeKey(null);
+        Action act = () => CacheKeys.PostcodeKey(null!);
 
         act.Should().Throw<ArgumentNullException>();
 
@@ -53,5 +54,25 @@ public class CacheKeysTests
         act.Should().Throw<ArgumentException>()
             .WithMessage("A non-empty postcode is required*")
             .WithParameterName("postcode");
+    }
+
+    [Fact]
+    public void GenerateTypedCacheKey_Returns_Expected_Value_For_String_Value()
+    {
+        const string key = "Test";
+        const string expectedCacheKey = "test:string";
+
+        var cacheKey = CacheKeys.GenerateTypedCacheKey<string>(key);
+        cacheKey.Should().Be(expectedCacheKey);
+    }
+
+    [Fact]
+    public void GenerateTypedCacheKey_Returns_Expected_Value_For_Generic_List_Value()
+    {
+        const string key = "Test";
+        const string expectedCacheKey = "test:list<geolocation>";
+
+        var cacheKey = CacheKeys.GenerateTypedCacheKey<List<GeoLocation>>(key);
+        cacheKey.Should().Be(expectedCacheKey);
     }
 }

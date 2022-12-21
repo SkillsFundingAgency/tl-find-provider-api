@@ -7,19 +7,22 @@ namespace Sfa.Tl.Find.Provider.Infrastructure.Caching;
 public class RedisCacheService : ICacheService
 {
     private readonly IConnectionMultiplexer _connectionMultiplexer;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<RedisCacheService> _logger;
 
     public RedisCacheService(
         IConnectionMultiplexer connectionMultiplexer,
+        IDateTimeProvider dateTimeProvider,
         ILogger<RedisCacheService> logger)
     {
-        _connectionMultiplexer = connectionMultiplexer ?? throw new ArgumentNullException(nameof(connectionMultiplexer)); ;
+        _connectionMultiplexer = connectionMultiplexer ?? throw new ArgumentNullException(nameof(connectionMultiplexer));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<T?> Get<T>(string key)
     {
-        key = GenerateCacheKey<T>(key);
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
         _logger.LogInformation("RedisCacheService::Get {key} of type {type}", key, typeof(T).Name);
 
         var database = GetDatabase();
@@ -29,7 +32,7 @@ public class RedisCacheService : ICacheService
 
     public Task<bool> KeyExists<T>(string key)
     {
-        key = GenerateCacheKey<T>(key);
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
         _logger.LogInformation("RedisCacheService::KeyExists {key} of type {type}", key, typeof(T).Name);
 
         var database = GetDatabase();
@@ -44,14 +47,12 @@ public class RedisCacheService : ICacheService
 
     public async Task Set<T>(string key, T value, DateTimeOffset absoluteExpiration)
     {
-        var cacheDuration = absoluteExpiration - DateTimeOffset.Now;
-
-        await SetCustomValueAsync(key, value, cacheDuration);
+        await SetCustomValueAsync(key, value, absoluteExpiration - _dateTimeProvider.NowOffset);
     }
 
     public async Task Remove<T>(string key)
     {
-        key = GenerateCacheKey<T>(key);
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
         _logger.LogInformation("RedisCacheService::Remove {key} of type {type}", key, typeof(T).Name);
 
         var database = GetDatabase();
@@ -62,22 +63,13 @@ public class RedisCacheService : ICacheService
     {
         if (customType == null) return;
 
-        key = GenerateCacheKey<T>(key);
-        _logger.LogInformation("RedisCacheService::SetCustomValueAsync {key} of type {type}", key, typeof(T).Name);
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
+        _logger.LogInformation("RedisCacheService::SetCustomValueAsync {key} of type {type}, cache time {cacheTime}",
+            key, typeof(T).Name, cacheTime);
 
         var database = GetDatabase();
         await database.StringSetAsync(key, JsonSerializer.Serialize(customType), cacheTime);
     }
 
     private IDatabase GetDatabase() => _connectionMultiplexer.GetDatabase();
-
-    private static string GenerateCacheKey<T>(string key)
-    {
-        return GenerateCacheKey(typeof(T), key);
-    }
-
-    private static string GenerateCacheKey(Type objectType, string key)
-    {
-        return $"{key}:{objectType.Name}".ToLower();
-    }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using StackExchange.Redis;
@@ -128,23 +129,24 @@ public class RedisCacheServiceTests
     public async Task Set_With_Absolute_Expiration_Calls_Inner_Cache()
     {
         var serializedValue = JsonSerializer.Serialize(TestValue);
-        const short offset = 10;
-        var expiration = DateTimeOffset.UtcNow.AddMinutes(offset);
 
-        var expectedCacheDuration = expiration - DateTimeOffset.Now;
+        var nowOffset = new DateTimeOffset(DateTime.Parse("2022-12-21 11:30:00"));
+        var expiration = new DateTimeOffset(DateTime.Parse("2022-12-21 11:40:00"));
+        var expectedCacheDuration = TimeSpan.FromMinutes(10);
 
-        //var expectedCacheDuration = TimeSpan.FromMinutes((int)cacheDuration);
-
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.NowOffset.Returns(nowOffset);
+        
         var (connectionMultiplexer, database) = CreateSubstituteConnectionMultiplexerAndDatabase();
 
-        var service = new RedisCacheServiceBuilder().Build(connectionMultiplexer);
+        var service = new RedisCacheServiceBuilder()
+            .Build(connectionMultiplexer, dateTimeProvider);
 
         await service.Set(TestKey, TestValue, expiration);
 
         await database
             .Received(1)
-            //.StringSetAsync(FormattedStringTestKey, serializedValue, expectedCacheDuration);
-            .StringSetAsync(FormattedStringTestKey, serializedValue, Arg.Any<TimeSpan>());
+            .StringSetAsync(FormattedStringTestKey, serializedValue, expectedCacheDuration);
     }
 
     [Fact]
