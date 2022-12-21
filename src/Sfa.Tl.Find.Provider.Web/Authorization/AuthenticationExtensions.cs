@@ -38,6 +38,12 @@ public static class AuthenticationExtensions
             options.Cookie.SecurePolicy = cookieSecurePolicy;
         });
 
+        services.AddSingleton<ITicketStore, RedisCacheTicketStore>();
+        services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+            .Configure<ITicketStore>((options, store) => {
+                options.SessionStore = store;
+            });
+
         services.AddAuthentication(options =>
         {
             options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
