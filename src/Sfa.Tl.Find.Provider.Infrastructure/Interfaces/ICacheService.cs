@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+﻿using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 
 namespace Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 public interface ICacheService
@@ -8,7 +7,7 @@ public interface ICacheService
 
     Task<bool> KeyExists<T>(string key);
 
-    Task Set<T>(string key, T item, CacheDuration cacheDuration = CacheDuration.Standard);
+    Task Set<T>(string key, T value, CacheDuration cacheDuration = CacheDuration.Standard);
 
     Task Set<T>(string key, T value, DateTimeOffset absoluteExpiration);
 

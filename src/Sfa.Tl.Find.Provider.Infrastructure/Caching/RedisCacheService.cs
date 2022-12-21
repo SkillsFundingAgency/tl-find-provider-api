@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using StackExchange.Redis;
@@ -27,7 +26,7 @@ public class RedisCacheService : ICacheService
         var cachedValue = await database.StringGetAsync(key);
         return cachedValue.HasValue ? JsonSerializer.Deserialize<T>(cachedValue) : default(T);
     }
-    
+
     public Task<bool> KeyExists<T>(string key)
     {
         key = GenerateCacheKey<T>(key);
@@ -38,14 +37,16 @@ public class RedisCacheService : ICacheService
         return database.KeyExistsAsync(key);
     }
 
-    public async Task Set<T>(string key, T item, CacheDuration cacheDuration = CacheDuration.Standard)
+    public async Task Set<T>(string key, T value, CacheDuration cacheDuration = CacheDuration.Standard)
     {
-        await SetCustomValueAsync(key, item, TimeSpan.FromMinutes((int)cacheDuration));
+        await SetCustomValueAsync(key, value, TimeSpan.FromMinutes((int)cacheDuration));
     }
 
     public async Task Set<T>(string key, T value, DateTimeOffset absoluteExpiration)
     {
-        throw new NotImplementedException();
+        var cacheDuration = absoluteExpiration - DateTimeOffset.Now;
+
+        await SetCustomValueAsync(key, value, cacheDuration);
     }
 
     public async Task Remove<T>(string key)
@@ -67,7 +68,7 @@ public class RedisCacheService : ICacheService
         var database = GetDatabase();
         await database.StringSetAsync(key, JsonSerializer.Serialize(customType), cacheTime);
     }
-    
+
     private IDatabase GetDatabase() => _connectionMultiplexer.GetDatabase();
 
     private static string GenerateCacheKey<T>(string key)
