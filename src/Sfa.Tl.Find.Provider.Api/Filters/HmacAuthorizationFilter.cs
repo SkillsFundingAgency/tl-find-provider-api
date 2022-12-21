@@ -20,15 +20,18 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
     private const ulong RequestMaxAgeInSeconds = 300;
 
     private readonly ICacheService _cacheService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<HmacAuthorizationFilter> _logger;
 
     public HmacAuthorizationFilter(
         IOptions<ApiSettings> apiOptions,
         ICacheService cacheService,
+        IDateTimeProvider dateTimeProvider,
         ILogger<HmacAuthorizationFilter> logger)
     {
         if (apiOptions is null) throw new ArgumentNullException(nameof(apiOptions));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         if (AllowedApps.IsEmpty)
@@ -74,7 +77,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         }
     }
 
-    private async Task<bool> IsValidRequest(HttpRequest request, string appId, string incomingBase64Signature, string nonce, string requestTimeStamp, bool skipBodyEncoding)
+    private async Task<bool> IsValidRequest(HttpRequest request, string appId, string incomingBase64Signature, string nonce, string requestTimestamp, bool skipBodyEncoding)
     {
         if (!AllowedApps.ContainsKey(appId))
         {
@@ -82,7 +85,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
             return false;
         }
 
-        if (await IsReplayRequest(nonce, requestTimeStamp))
+        if (await IsReplayRequest(nonce, requestTimestamp))
         {
             return false;
         }
@@ -101,7 +104,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         var requestUri = request.GetDisplayUrl().ToLower();
         var sharedKey = AllowedApps[appId];
 
-        var data = $"{appId}{request.Method.ToUpper()}{requestUri}{requestTimeStamp}{nonce}{requestContentBase64String}";
+        var data = $"{appId}{request.Method.ToUpper()}{requestUri}{requestTimestamp}{nonce}{requestContentBase64String}";
         var secretKeyBytes = Encoding.ASCII.GetBytes(sharedKey);
         var signature = Encoding.ASCII.GetBytes(data);
         using var hmac = new HMACSHA256(secretKeyBytes);
@@ -111,7 +114,7 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         return incomingBase64Signature.Equals(base64Signature, StringComparison.Ordinal);
     }
 
-    private async Task<bool> IsReplayRequest(string nonce, string requestTimeStamp)
+    private async Task<bool> IsReplayRequest(string nonce, string requestTimestamp)
     {
         if (await _cacheService.KeyExists<string>(nonce))
         {
@@ -120,10 +123,10 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
         }
 
         var epochStart = new DateTime(1970, 01, 01, 0, 0, 0, 0, DateTimeKind.Utc);
-        var currentTs = DateTime.UtcNow - epochStart;
+        var currentTs = _dateTimeProvider.UtcNow - epochStart;
 
         var serverTotalSeconds = Convert.ToUInt64(currentTs.TotalSeconds);
-        var requestTotalSeconds = Convert.ToUInt64(requestTimeStamp);
+        var requestTotalSeconds = Convert.ToUInt64(requestTimestamp);
 
         var difference = serverTotalSeconds > requestTotalSeconds
             ? serverTotalSeconds - requestTotalSeconds
@@ -139,8 +142,10 @@ public class HmacAuthorizationFilter : IAsyncAuthorizationFilter
             return true;
         }
 
-        await _cacheService.Set(nonce, requestTimeStamp,
-            DateTimeOffset.UtcNow.AddSeconds(RequestMaxAgeInSeconds));
+        await _cacheService.Set(nonce, requestTimestamp,
+            _dateTimeProvider
+                .UtcNowOffset
+                .AddSeconds(RequestMaxAgeInSeconds));
 
         return false;
     }
