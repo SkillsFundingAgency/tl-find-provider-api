@@ -1,5 +1,12 @@
 $ErrorActionPreference = "Stop"
 
+if ((Get-AzContext).Subscription.Name -ne 's126-tlevelservice-development') {
+    throw 'Azure Context references incorrect subscription'
+}
+
+$scriptRoot = $PSScriptRoot
+if (($PSScriptRoot).Length -eq 0) { $scriptRoot = $PWD.Path}
+
 $location = "westeurope"
 $applicationPrefix = "fprapi"
 $envPrefix = "s126d99"
@@ -38,7 +45,7 @@ $sharedDeploymentParameters = @{
     ResourceGroupName       = $sharedResourceGroupName
     Mode                    = "Complete"
     Force                   = $true
-    TemplateFile            = "$($PSScriptRoot)/findproviderapi-shared.json"
+    TemplateFile            = "$($scriptRoot)/findproviderapi-shared.json"
     TemplateParameterObject = @{
         environmentNameAbbreviation             = "$($envPrefix)-fprapi"
         sqlServerAdminUsername                  = "xxxServerAdminxxx"
@@ -103,7 +110,7 @@ $deploymentParameters = @{
     Name                    = "test-{0:yyyyMMdd-HHmmss}" -f (Get-Date)
     ResourceGroupName       = $envResourceGroupName
     Mode                    = "Incremental"
-    TemplateFile            = "$($PSScriptRoot)/findproviderapi-environment.json"
+    TemplateFile            = "$($scriptRoot)/findproviderapi-environment.json"
     TemplateParameterObject = @{
         environmentNameAbbreviation             = $environmentNameAbbreviation
         resourceNamePrefix                      = ("$($envPrefix)-fprapi-" + $environmentNameAbbreviation)
