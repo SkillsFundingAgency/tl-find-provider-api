@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -155,16 +156,18 @@ public class MemoryCacheServiceTests
         string key = FormattedStringTestKey, 
         string value = TestValue)
     {
+        var serializedValue = JsonSerializer.Serialize(value);
+
         var memoryCache = Substitute.For<IMemoryCache>();
         memoryCache.TryGetValue(Arg.Any<string>(), out Arg.Any<string>())
             .Returns(x =>
             {
-                if ((x[0] as string) != key)
+                if (x[0] as string != key)
                 {
                     return false;
                 }
 
-                x[1] = TestValue;
+                x[1] = serializedValue;
                 return true;
 
             });
