@@ -271,14 +271,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
     }
 
-    public async Task<bool> Extend(Guid uniqueId, int numberOfDays)
-    {
-        using var connection = _dbContextWrapper.CreateConnection();
-
-
-        return false;
-    }
-
     public async Task<IEnumerable<EmployerInterest>> GetAll()
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -518,5 +510,45 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             .ToList();
 
         return (searchResults, totalEmployerInterestsCount);
+    }
+
+    public async Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDays)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        connection.Open();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            uniqueId,
+            numberOfDays
+        });
+
+        var rowsAffected = await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "UPDATE dbo.EmployerInterest " +
+            "SET ExpiryDate = ExpiryDate.AddDays(numberOfDays) " +
+            "WHERE UniqueId = @uniqueId",
+            _dynamicParametersWrapper.DynamicParameters);
+        
+        return rowsAffected > 0;
+    }
+
+    public async Task UpdateExtensionEmailSentDate(int id)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+        connection.Open();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            id
+        });
+
+        await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "UPDATE dbo.EmployerInterest " +
+            "SET ExtensionEmailSentDate = GETUTCDATE() " +
+            "WHERE Id = @id",
+            _dynamicParametersWrapper.DynamicParameters);
     }
 }

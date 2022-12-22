@@ -16,7 +16,7 @@ public interface IEmployerInterestRepository
 
     Task<int> DeleteBefore(DateTime date);
 
-    Task<bool> Extend(Guid uniqueId, int numberOfDays);
+    Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDays);
 
     Task<IEnumerable<EmployerInterest>> GetAll();
     
@@ -30,4 +30,6 @@ public interface IEmployerInterestRepository
         double latitude, 
         double longitude, 
         int searchRadius);
+
+    Task UpdateExtensionEmailSentDate(int id);
 }

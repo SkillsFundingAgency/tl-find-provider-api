@@ -540,7 +540,7 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.Extend(uniqueId, Arg.Any<int>())
+        employerInterestRepository.ExtendExpiry(uniqueId, Arg.Any<int>())
             .Returns(true);
 
         var service = new EmployerInterestServiceBuilder()
@@ -553,7 +553,7 @@ public class EmployerInterestServiceTests
 
         await employerInterestRepository
             .Received(1)
-            .Extend(uniqueId, settings.RetentionDays);
+            .ExtendExpiry(uniqueId, settings.RetentionDays);
     }
 
     [Fact]

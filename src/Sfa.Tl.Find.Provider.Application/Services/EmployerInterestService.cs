@@ -90,7 +90,7 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<bool> ExtendEmployerInterest(Guid id)
     {
         return await _employerInterestRepository
-            .Extend(id, _employerInterestSettings.RetentionDays);
+            .ExtendExpiry(id, _employerInterestSettings.RetentionDays);
 
         return false;
     }

@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
@@ -6,6 +7,7 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
+using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -591,5 +593,175 @@ public class EmployerInterestRepositoryTests
         results.TotalResultsCount.Should().Be(employerInterestsCount);
         searchResults.First().Validate(employerInterestSummaryDtoList.First());
         searchResults[0].SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+    }
+
+    [Fact]
+    public async Task ExtendExpiry_Calls_Database_And_Returns_True_When_Update_Completed()
+    {
+        const int numberOfDays = 84;
+        var uniqueId = new Guid();
+        
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .ExecuteAsync(dbConnection,
+                Arg.Any<string>(),
+                Arg.Any<object>())
+            .Returns(1);
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .Build();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper);
+
+        var result = await repository.ExtendExpiry(uniqueId, numberOfDays);
+
+        result.Should().BeTrue();
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection, 
+                Arg.Is<string>(s => 
+                    s.Contains("UPDATE dbo.EmployerInterest") &&
+                    s.Contains("SET ExpiryDate = ExpiryDate.AddDays(numberOfDays)") &&
+                s.Contains("WHERE UniqueId = @uniqueId")),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+    }
+
+    [Fact]
+    public async Task ExtendExpiry_Calls_Database_And_Returns_False_When_No_Updates_Completed()
+    {
+        const int numberOfDays = 84;
+        var uniqueId = new Guid();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .ExecuteAsync(dbConnection,
+                Arg.Any<string>(),
+                Arg.Any<object>())
+            .Returns(0);
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .Build();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper);
+
+        var result = await repository.ExtendExpiry(uniqueId, numberOfDays);
+
+        result.Should().BeFalse();
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("UPDATE dbo.EmployerInterest") &&
+                    s.Contains("SET ExpiryDate = ExpiryDate.AddDays(numberOfDays)") &&
+                    s.Contains("WHERE UniqueId = @uniqueId")),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+    }
+
+    [Fact]
+    public async Task ExtendExpiry_Sets_Dynamic_Parameters()
+    {
+        const int numberOfDays = 84;
+        var uniqueId = new Guid();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .Build();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper);
+
+        await repository.ExtendExpiry(uniqueId, numberOfDays);
+
+        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
+            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+            .SingleOrDefault(p => p.Name == "templates");
+
+        fieldInfo.Should().NotBeNull();
+        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        templates.Should().NotBeNullOrEmpty();
+
+        var item = templates!.First();
+        var pi = item.GetType().GetProperties();
+        pi.Length.Should().Be(2);
+
+        var uniqueIdProperty = pi.SingleOrDefault(p => p.Name == "uniqueId");
+        uniqueIdProperty.Should().NotBeNull();
+        uniqueIdProperty!.GetValue(item).Should().Be(uniqueId);
+        
+        var numberOfDaysProperty = pi.SingleOrDefault(p => p.Name == "numberOfDays");
+        numberOfDaysProperty.Should().NotBeNull();
+        numberOfDaysProperty!.GetValue(item).Should().Be(numberOfDays);
+    }
+
+    [Fact]
+    public async Task UpdateExtensionEmailSentDate_Calls_Database()
+    {
+        const int id = 10;
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.UpdateExtensionEmailSentDate(id);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("UPDATE dbo.EmployerInterest") &&
+                    s.Contains("SET ExtensionEmailSentDate = GETUTCDATE()") &&
+                    s.Contains("WHERE Id = @id")),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+    }
+
+    [Fact]
+    public async Task UpdateExtensionEmailSentDate_Sets_Dynamic_Parameters()
+    {
+        const int id = 10;
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.UpdateExtensionEmailSentDate(id);
+        
+        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
+            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+            .SingleOrDefault(p => p.Name == "templates");
+
+        fieldInfo.Should().NotBeNull();
+        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        templates.Should().NotBeNullOrEmpty();
+
+        var item = templates!.First();
+        var pi = item.GetType().GetProperties();
+        pi.Length.Should().Be(1);
+
+        var dynamicProperty = pi.Single();
+        dynamicProperty.Name.Should().Be("id");
+        dynamicProperty.GetValue(item).Should().Be(id);
     }
 }
