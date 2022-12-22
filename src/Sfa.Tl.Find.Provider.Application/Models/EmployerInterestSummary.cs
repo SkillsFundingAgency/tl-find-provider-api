@@ -11,9 +11,9 @@ public class EmployerInterestSummary
     public IList<string> SkillAreas { get; init; }
     public string Postcode { get; init; }
     public double? Distance { get; init; }
+    public DateTime? ExpiryDate { get; init; }
     public DateTime CreatedOn { get; init; }
     public DateTime? ModifiedOn { get; init; }
     public bool IsNew { get; set; }
     public bool IsExpiring { get; set; }
-    public DateTime? ExpiryDate { get; set; }
 }

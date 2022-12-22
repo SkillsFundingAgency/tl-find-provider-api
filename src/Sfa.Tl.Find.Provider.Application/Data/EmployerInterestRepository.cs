@@ -32,7 +32,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
     public async Task<(int, Guid)> Create(
         EmployerInterest employerInterest,
-        GeoLocation geoLocation)
+        GeoLocation geoLocation,
+        DateTime expiryDate)
     {
         try
         {
@@ -54,7 +55,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,
                             Website = employerInterest.Website,
-                            ContactPreferenceType = (int?)employerInterest.ContactPreferenceType
+                            ContactPreferenceType = (int?)employerInterest.ContactPreferenceType,
+                            ExpiryDate = expiryDate
                         }
                     }
                     .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
@@ -268,6 +270,15 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             throw;
         }
     }
+
+    public async Task<bool> Extend(Guid uniqueId, int numberOfDays)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+
+        return false;
+    }
+
     public async Task<IEnumerable<EmployerInterest>> GetAll()
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -286,6 +297,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             "Email, " +
             "Telephone, " +
             "ContactPreferenceType, " +
+            "ExpiryDate, " +
             "CreatedOn, " +
             "ModifiedOn " +
             "FROM dbo.EmployerInterest " +
@@ -324,6 +336,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Telephone = e.Telephone,
                             Website = e.Website,
                             ContactPreferenceType = e.ContactPreferenceType,
+                            ExpiryDate = e.ExpiryDate,
                             CreatedOn = e.CreatedOn,
                             ModifiedOn = e.ModifiedOn,
                             SkillAreas = new List<string>()
@@ -419,6 +432,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 Postcode = e.Postcode,
                                 Distance = e.Distance,
                                 Industry = e.Industry,
+                                ExpiryDate = e.ExpiryDate,
                                 CreatedOn = e.CreatedOn,
                                 ModifiedOn = e.ModifiedOn,
                                 SkillAreas = new List<string>()
@@ -474,6 +488,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 OrganisationName = e.OrganisationName,
                                 Distance = e.Distance,
                                 Industry = e.Industry,
+                                ExpiryDate = e.ExpiryDate,
                                 CreatedOn = e.CreatedOn,
                                 ModifiedOn = e.ModifiedOn,
                                 SkillAreas = new List<string>()

@@ -26,6 +26,7 @@ public class EmployerInterestRepositoryTests
     {
         var employerInterest = new EmployerInterestBuilder().Build();
         var geoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        var expiryDate = DateTime.Parse("2022-12-31 23:59:59.9999999");
 
         var pollyPolicy = PollyPolicyBuilder.BuildPolicy<(int, Guid)>();
         var pollyPolicyRegistry = PollyPolicyBuilder.BuildPolicyRegistry(pollyPolicy);
@@ -37,7 +38,7 @@ public class EmployerInterestRepositoryTests
                 policyRegistry: pollyPolicyRegistry,
                 logger: logger);
 
-        await repository.Create(employerInterest, geoLocation);
+        await repository.Create(employerInterest, geoLocation, expiryDate);
 
         await pollyPolicy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task<(int, Guid)>>>(),
@@ -52,6 +53,7 @@ public class EmployerInterestRepositoryTests
     {
         var employerInterest = new EmployerInterestBuilder().Build();
         var geoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        var expiryDate = DateTime.Parse("2022-12-31 23:59:59.9999999");
 
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();
@@ -63,7 +65,7 @@ public class EmployerInterestRepositoryTests
             .Build(dbContextWrapper,
                 policyRegistry: pollyPolicyRegistry);
 
-        await repository.Create(employerInterest, geoLocation);
+        await repository.Create(employerInterest, geoLocation, expiryDate);
 
         dbContextWrapper
             .Received(1)
@@ -93,6 +95,7 @@ public class EmployerInterestRepositoryTests
 
         var employerInterest = new EmployerInterestBuilder().Build();
         var geoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
+        var expiryDate = DateTime.Parse("2022-12-31 23:59:59.9999999");
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
@@ -114,7 +117,7 @@ public class EmployerInterestRepositoryTests
                 policyRegistry: pollyPolicyRegistry,
                 guidProvider: guidProvider);
 
-        var result = await repository.Create(employerInterest, geoLocation);
+        var result = await repository.Create(employerInterest, geoLocation, expiryDate);
 
         result.Count.Should().Be(1);
         result.UniqueId.Should().Be(uniqueId);
@@ -531,13 +534,7 @@ public class EmployerInterestRepositoryTests
         var results = (await repository.GetSummaryList()).ToList();
         results.Should().NotBeNullOrEmpty();
         results.Count.Should().Be(1);
-
-        results[0].Id.Should().Be(employerInterestSummaryDtoList[0].Id);
-        results[0].OrganisationName.Should().Be(employerInterestSummaryDtoList[0].OrganisationName);
-        results[0].Industry.Should().Be(employerInterestSummaryDtoList[0].Industry);
-        results[0].Distance.Should().Be(employerInterestSummaryDtoList[0].Distance);
-        results[0].CreatedOn.Should().Be(employerInterestSummaryDtoList[0].CreatedOn);
-        results[0].ModifiedOn.Should().Be(employerInterestSummaryDtoList[0].ModifiedOn);
+        results.First().Validate(employerInterestSummaryDtoList.First());
         results[0].SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
     }
 
@@ -591,15 +588,8 @@ public class EmployerInterestRepositoryTests
 
         searchResults.Should().NotBeNullOrEmpty();
         searchResults!.Count.Should().Be(1);
-
         results.TotalResultsCount.Should().Be(employerInterestsCount);
-
-        searchResults[0].Id.Should().Be(employerInterestSummaryDtoList[0].Id);
-        searchResults[0].OrganisationName.Should().Be(employerInterestSummaryDtoList[0].OrganisationName);
-        searchResults[0].Industry.Should().Be(employerInterestSummaryDtoList[0].Industry);
-        searchResults[0].Distance.Should().Be(employerInterestSummaryDtoList[0].Distance);
-        searchResults[0].CreatedOn.Should().Be(employerInterestSummaryDtoList[0].CreatedOn);
-        searchResults[0].ModifiedOn.Should().Be(employerInterestSummaryDtoList[0].ModifiedOn);
+        searchResults.First().Validate(employerInterestSummaryDtoList.First());
         searchResults[0].SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
     }
 }

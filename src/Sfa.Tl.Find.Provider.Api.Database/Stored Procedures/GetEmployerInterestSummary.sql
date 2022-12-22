@@ -13,6 +13,7 @@ AS
 			ei.[OrganisationName],
 			ei.[Postcode],
 			ei.[OtherIndustry],
+			ei.[ExpiryDate],
 			ei.[CreatedOn],
 			ei.[ModifiedOn]
 		FROM [dbo].[EmployerInterest] ei),
@@ -29,6 +30,7 @@ AS
 			ei.[Postcode],
 			NULL AS [Distance],
 			COALESCE (i.[Name], ei.[OtherIndustry]) AS Industry,
+			ei.[ExpiryDate],
 			ei.[CreatedOn],
 			ei.[ModifiedOn],
 			r.[Id] AS [RouteId],

@@ -11,5 +11,6 @@
 	[Telephone] NVARCHAR(150) NULL,
 	[Website] NVARCHAR(500) NULL,
 	[ContactPreferenceType] INT NULL,
-	[AdditionalInformation] NVARCHAR(MAX) NULL
+	[AdditionalInformation] NVARCHAR(MAX) NULL,
+	[ExpiryDate] DATETIME2 NULL
 )

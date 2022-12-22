@@ -46,11 +46,17 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
-        
+
+        var expiryDate = _dateTimeProvider
+            .Today
+            .AddDays(_employerInterestSettings.RetentionDays + 1)
+            .AddTicks(-1); //Set to last instant of the expiry day
+
         var (_, uniqueId) = await _employerInterestRepository
             .Create(
                 employerInterest,
-                geoLocation);
+                geoLocation,
+                expiryDate);
 
         if (uniqueId != Guid.Empty)
         {
@@ -79,6 +85,14 @@ public class EmployerInterestService : IEmployerInterestService
             count, uniqueId);
 
         return count;
+    }
+
+    public async Task<bool> ExtendEmployerInterest(Guid id)
+    {
+        return await _employerInterestRepository
+            .Extend(id, _employerInterestSettings.RetentionDays);
+
+        return false;
     }
 
     public async Task<int> NotifyExpiringEmployerInterest()
@@ -121,6 +135,10 @@ public class EmployerInterestService : IEmployerInterestService
         var date = _dateTimeProvider.Today.AddDays(-_employerInterestSettings.RetentionDays);
         var count = await _employerInterestRepository.DeleteBefore(date);
 
+        //TODO: Need to send emails - will need basic details to do this - Email, UniqueId (for reference - maybe just the emails?
+        //TODO: Should this email be sent when 
+        //await SendEmployerInterestRemovedEmail(employerInterest);
+
         _logger.LogInformation("Removed {count} employer interest records because they are over {days} days (older than {date:yyyy-MM-dd})",
             count, _employerInterestSettings.RetentionDays, date);
 
@@ -131,15 +149,9 @@ public class EmployerInterestService : IEmployerInterestService
     {
         return (await _employerInterestRepository
             .GetSummaryList())
-            .Select(x =>
-            {
-                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
-                return x;
-            });
+            .SetSummaryListFlags(_dateTimeProvider.Today);
     }
-
+   
     public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(string postcode)
     {
         var geoLocation = await GetPostcode(postcode);
@@ -158,13 +170,7 @@ public class EmployerInterestService : IEmployerInterestService
 
         var summaryList = results
             .SearchResults
-            .Select(x =>
-            {
-                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
-                return x;
-            });
+            .SetSummaryListFlags(_dateTimeProvider.Today);
 
         return (summaryList, results.TotalResultsCount);
     }

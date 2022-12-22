@@ -7,13 +7,16 @@ public interface IEmployerInterestRepository
 {
     Task<(int Count, Guid UniqueId)> Create(
         EmployerInterest employerInterest,
-        GeoLocation geoLocation);
+        GeoLocation geoLocation,
+        DateTime expiryDate);
 
     Task<int> Delete(int id);
 
     Task<int> Delete(Guid uniqueId);
 
     Task<int> DeleteBefore(DateTime date);
+
+    Task<bool> Extend(Guid uniqueId, int numberOfDays);
 
     Task<IEnumerable<EmployerInterest>> GetAll();
     
