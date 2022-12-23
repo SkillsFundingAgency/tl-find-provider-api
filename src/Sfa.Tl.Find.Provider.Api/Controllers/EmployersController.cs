@@ -85,7 +85,7 @@ public class EmployersController : ControllerBase
     /// Deletes an Employer Interest record based on it's unique identifier.
     /// </summary>
     /// <returns>A status result indicating whether the action succeeded.</returns>
-    [HttpDelete, HttpGet]
+    [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     // ReSharper disable once StringLiteralTypo
@@ -100,6 +100,31 @@ public class EmployersController : ControllerBase
         var deleted = await _employerInterestService.DeleteEmployerInterest(id);
         return deleted > 0
             ? NoContent()
+            : NotFound();
+    }
+
+
+    /// <summary>
+    /// Extends an Employer Interest record based on it's unique identifier.
+    /// </summary>
+    /// <returns>A status result indicating whether the action succeeded.</returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // ReSharper disable once StringLiteralTypo
+    [Route("extendinterest/{*id:guid}")]
+    public async Task<IActionResult> ExtendInterest(Guid id)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug($"{nameof(EmployersController)} {nameof(ExtendInterest)} called.");
+        }
+
+        var extended = await _employerInterestService.ExtendEmployerInterest(id);
+        return extended
+            ? Ok()
             : NotFound();
     }
 }

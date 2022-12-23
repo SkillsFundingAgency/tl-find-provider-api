@@ -3,7 +3,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Extensions;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Extensions;
 
 public class ClaimsExtensionsTests
 {

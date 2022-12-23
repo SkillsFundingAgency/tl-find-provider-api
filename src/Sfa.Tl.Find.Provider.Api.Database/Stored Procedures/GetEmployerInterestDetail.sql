@@ -13,6 +13,7 @@ AS
 				ei.[Telephone],
 				ei.[ContactPreferenceType],
 				ei.[AdditionalInformation],
+				ei.[ExpiryDate],
 				eil.[Latitude],
 				eil.[Longitude],
 				ei.[CreatedOn],

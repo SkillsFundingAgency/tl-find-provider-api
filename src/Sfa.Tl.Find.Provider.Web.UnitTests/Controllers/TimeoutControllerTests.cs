@@ -27,9 +27,9 @@ public class TimeoutControllerTests
 
         await controller.ActivityTimeout();
 
-        cacheService
+        await cacheService
             .Received(1)
-            .Remove(Arg.Is<string>(k => k.StartsWith("USERID")));
+            .Remove<DateTime>(Arg.Is<string>(k => k.StartsWith("USERID")));
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public class TimeoutControllerTests
 
         await controller.RenewSessionActivity();
 
-        cacheService
+        await cacheService
             .Received(1)
             .Set(Arg.Is<string>(k => k.StartsWith("USER")),
                 timeNowUtc);

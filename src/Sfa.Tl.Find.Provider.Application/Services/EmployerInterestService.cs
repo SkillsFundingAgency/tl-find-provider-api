@@ -46,11 +46,17 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<Guid> CreateEmployerInterest(EmployerInterest employerInterest)
     {
         var geoLocation = await GetPostcode(employerInterest.Postcode);
-        
+
+        var expiryDate = _dateTimeProvider
+            .Today
+            .AddDays(_employerInterestSettings.RetentionDays + 1)
+            .AddTicks(-1); //Set to last instant of the expiry day
+
         var (_, uniqueId) = await _employerInterestRepository
             .Create(
                 employerInterest,
-                geoLocation);
+                geoLocation,
+                expiryDate);
 
         if (uniqueId != Guid.Empty)
         {
@@ -81,6 +87,42 @@ public class EmployerInterestService : IEmployerInterestService
         return count;
     }
 
+    public async Task<bool> ExtendEmployerInterest(Guid id)
+    {
+        return await _employerInterestRepository
+            .ExtendExpiry(id, _employerInterestSettings.RetentionDays);
+
+        return false;
+    }
+
+    public async Task<int> NotifyExpiringEmployerInterest()
+    {
+        if (_employerInterestSettings.RetentionDays <= 0)
+        {
+            _logger.LogInformation("{service} {method} processing skipped because retention dates was not greater than zero.",
+                nameof(EmployerInterestService), nameof(NotifyExpiringEmployerInterest));
+            return 0;
+        }
+
+        var date = _dateTimeProvider.Today.AddDays(
+            -(_employerInterestSettings.RetentionDays + 
+              _employerInterestSettings.ExpiryNotificationDays));
+
+        var expiringInterestList = (await _employerInterestRepository
+            .GetExpiringInterest(date))
+            .ToList();
+
+        foreach (var employerInterest in expiringInterestList)
+        {
+            await SendEmployerExtendInterestEmail(employerInterest);
+        }
+
+        _logger.LogInformation("Notified {count} employers that their interest is about to expire because they are over {days} days (older than {date:yyyy-MM-dd})",
+            expiringInterestList.Count, _employerInterestSettings.RetentionDays, date);
+
+        return expiringInterestList.Count;
+    }
+
     public async Task<int> RemoveExpiredEmployerInterest()
     {
         if (_employerInterestSettings.RetentionDays <= 0)
@@ -93,6 +135,10 @@ public class EmployerInterestService : IEmployerInterestService
         var date = _dateTimeProvider.Today.AddDays(-_employerInterestSettings.RetentionDays);
         var count = await _employerInterestRepository.DeleteBefore(date);
 
+        //TODO: Need to send emails - will need basic details to do this - Email, UniqueId (for reference - maybe just the emails?
+        //TODO: Should this email be sent when 
+        //await SendEmployerInterestRemovedEmail(employerInterest);
+
         _logger.LogInformation("Removed {count} employer interest records because they are over {days} days (older than {date:yyyy-MM-dd})",
             count, _employerInterestSettings.RetentionDays, date);
 
@@ -103,15 +149,9 @@ public class EmployerInterestService : IEmployerInterestService
     {
         return (await _employerInterestRepository
             .GetSummaryList())
-            .Select(x =>
-            {
-                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
-                return x;
-            });
+            .SetSummaryListFlags(_dateTimeProvider.Today);
     }
-
+   
     public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(string postcode)
     {
         var geoLocation = await GetPostcode(postcode);
@@ -130,13 +170,7 @@ public class EmployerInterestService : IEmployerInterestService
 
         var summaryList = results
             .SearchResults
-            .Select(x =>
-            {
-                x.ExpiryDate = x.InterestExpiryDate(RetentionDays);
-                x.IsNew = x.IsInterestNew(_dateTimeProvider.Today);
-                x.IsExpiring = x.IsInterestExpiring(_dateTimeProvider.Today, RetentionDays);
-                return x;
-            });
+            .SetSummaryListFlags(_dateTimeProvider.Today);
 
         return (summaryList, results.TotalResultsCount);
     }
@@ -146,30 +180,67 @@ public class EmployerInterestService : IEmployerInterestService
         return _employerInterestRepository.GetDetail(id);
     }
 
-    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geolocation)
+    private async Task<bool> SendEmployerExtendInterestEmail(EmployerInterest employerInterest)
     {
-        var unsubscribeUri = new Uri(QueryHelpers.AddQueryString(
-            _employerInterestSettings.UnsubscribeEmployerUri.TrimEnd('/'),
-            "id",
-            employerInterest.UniqueId.ToString("D").ToLower()));
-        
-        var detailsList = await BuildEmployerInterestDetailsList(employerInterest, geolocation);
-
-        var tokens = new Dictionary<string, string>
+        var geoLocation = new GeoLocation
         {
-            { "details_list", detailsList },
-            { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
-            { "employer_unsubscribe_uri", unsubscribeUri.ToString() }
+            Location = employerInterest.Postcode,
+            Latitude = employerInterest.Latitude,
+            Longitude = employerInterest.Longitude
         };
 
         return await _emailService.SendEmail(
             employerInterest.Email,
-            EmailTemplateNames.EmployerRegisterInterest,
-            tokens, 
+            EmailTemplateNames.EmployerExtendInterest,
+            new Dictionary<string, string>
+            {
+                { "details_list", await BuildEmployerInterestDetailsList(employerInterest, geoLocation) },
+                { "employer_extend_uri", BuildUriWithUniqueId(_employerInterestSettings.ExtendEmployerUri, employerInterest) },
+                { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
+                { "employer_unsubscribe_uri", BuildUriWithUniqueId(_employerInterestSettings.UnsubscribeEmployerUri, employerInterest) }
+            },
             employerInterest.UniqueId.ToString());
     }
 
-    private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest, GeoLocation geolocation)
+    private async Task<bool> SendEmployerInterestRemovedEmail(EmployerInterest employerInterest)
+    {
+        return await _emailService.SendEmail(
+            employerInterest.Email,
+            EmailTemplateNames.EmployerInterestRemoved,
+            new Dictionary<string, string>
+            {
+                { "register_interest_uri", _employerInterestSettings.RegisterInterestUri ?? "" },
+                { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" }
+            },
+            employerInterest.UniqueId.ToString());
+    }
+
+    private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geoLocation)
+    {
+        return await _emailService.SendEmail(
+            employerInterest.Email,
+            EmailTemplateNames.EmployerRegisterInterest,
+            new Dictionary<string, string>
+            {
+                { "details_list", await BuildEmployerInterestDetailsList(employerInterest, geoLocation) },
+                { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
+                { "employer_unsubscribe_uri", BuildUriWithUniqueId(_employerInterestSettings.UnsubscribeEmployerUri, employerInterest) }
+            }, 
+            employerInterest.UniqueId.ToString());
+    }
+
+    private static string BuildUriWithUniqueId(string baseUri, EmployerInterest employerInterest)
+    {
+        return !string.IsNullOrEmpty(baseUri) 
+            ? new Uri(QueryHelpers.AddQueryString(
+                baseUri.TrimEnd('/'),
+                "id",
+                employerInterest.UniqueId.ToString("D").ToLower()))
+                .ToString()
+            : "";
+    }
+
+    private async Task<string> BuildEmployerInterestDetailsList(EmployerInterest employerInterest, GeoLocation geoLocation)
     {
         var industries = await _providerDataService.GetIndustries();
         var routes = await _providerDataService.GetRoutes();
@@ -208,7 +279,9 @@ public class EmployerInterestService : IEmployerInterestService
 
             detailsList.AppendLine($"* How would you prefer to be contacted: {contactPreference}");
         }
+
         detailsList.AppendLine($"* Organisation name: {employerInterest.OrganisationName}");
+
         if (!string.IsNullOrEmpty(employerInterest.Website))
         {
             detailsList.AppendLine($"* Website: {employerInterest.Website}");
@@ -216,7 +289,7 @@ public class EmployerInterestService : IEmployerInterestService
         
         detailsList.AppendLine($"* Organisation’s primary industry: {industry}");
         detailsList.AppendLine($"* Industry placement area{(skillAreas.Count > 1 ? "s" : "")}: {placementAreas}");
-        detailsList.AppendLine($"* Postcode: {geolocation.Location}");
+        detailsList.AppendLine($"* Postcode: {geoLocation.Location}");
         if (!string.IsNullOrEmpty(employerInterest.AdditionalInformation))
         {
             detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks() }");

@@ -28,7 +28,7 @@ public class UserSessionActivityPageFilter : IAsyncPageFilter
         if (context.HttpContext.User.Identity is { IsAuthenticated: true })
         {
             var cacheKey = context.HttpContext.User.GetUserSessionCacheKey();
-            _cacheService.Set(cacheKey, _dateTimeProvider.UtcNow);
+            await _cacheService.Set(cacheKey, _dateTimeProvider.UtcNow);
         }
 
         await next.Invoke();

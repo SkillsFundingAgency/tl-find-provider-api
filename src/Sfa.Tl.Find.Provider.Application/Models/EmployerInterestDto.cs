@@ -18,4 +18,5 @@ public class EmployerInterestDto
     public string Website { get; init; }
     public int? ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
+    public DateTime ExpiryDate { get; init; }
 }

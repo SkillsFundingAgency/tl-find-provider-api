@@ -86,4 +86,38 @@ public class EmployersControllerTests
         var result = await controller.DeleteInterest(uniqueId);
         result.Should().BeOfType(typeof(NotFoundResult));
     }
+
+    [Fact]
+    public async Task ExtendInterest_Returns_Ok_Result_For_Successful_Extension()
+    {
+        var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .ExtendEmployerInterest(uniqueId)
+            .Returns(true);
+
+        var controller = new EmployersControllerBuilder()
+            .Build(employerInterestService);
+
+        var result = await controller.ExtendInterest(uniqueId);
+
+        result.Should().BeOfType(typeof(OkResult));
+    }
+
+    [Fact]
+    public async Task ExtendInterest_Returns_Not_Found_For_Successful_Extension()
+    {
+        var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .ExtendEmployerInterest(uniqueId)
+            .Returns(false);
+
+        var controller = new EmployersControllerBuilder()
+            .Build(employerInterestService);
+
+        var result = await controller.ExtendInterest(uniqueId);
+
+        result.Should().BeOfType(typeof(NotFoundResult));
+    }
 }

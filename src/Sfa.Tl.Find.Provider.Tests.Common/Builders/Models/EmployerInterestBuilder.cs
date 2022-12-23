@@ -5,7 +5,8 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class EmployerInterestBuilder
 {
-    private IList<Guid> _uniqueIds = new List<Guid>();
+    private readonly List<Guid> _uniqueIds = new();
+    private readonly List<int> _skillAreaIds = new();
 
     private string _additionalInformation;
 
@@ -28,7 +29,7 @@ public class EmployerInterestBuilder
                 Telephone = "020 555 6666 ext 1",
                 Website = "https://employer-one.co.uk",
                 ContactPreferenceType = ContactPreference.Email,
-                SkillAreaIds = new List<int>{ 1, 2 }
+                SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int>{ 1, 2 }
             },
             new()
             {
@@ -46,7 +47,7 @@ public class EmployerInterestBuilder
                 Telephone = "020 555 6666 ext 2",
                 Website = "https://employer-two.co.uk",
                 ContactPreferenceType = ContactPreference.Telephone,
-                SkillAreaIds = new List<int>{ 1 }
+                SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int>{ 1 }
             }
         };
 
@@ -72,7 +73,7 @@ public class EmployerInterestBuilder
             Website = null,
             ContactPreferenceType = default,
             AdditionalInformation = null,
-            SkillAreaIds = new List<int> { 1 }
+            SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int> { 1 }
         };
     }
 
@@ -117,7 +118,16 @@ public class EmployerInterestBuilder
 
     public EmployerInterestBuilder WithUniqueIds(IEnumerable<Guid> uniqueIds)
     {
-        _uniqueIds = uniqueIds.ToList();
+        _uniqueIds.Clear();
+        _uniqueIds.AddRange(uniqueIds);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithSkillAreaIds(IList<int> skillAreaIds)
+    {
+        _skillAreaIds.Clear();
+        _skillAreaIds.AddRange(skillAreaIds);
 
         return this;
     }

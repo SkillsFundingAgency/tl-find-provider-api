@@ -9,17 +9,28 @@ public static class BusinessRuleExtensions
         || (deliveryYear == today.Year && today.Month >= 9);
 
     public static bool IsInterestExpiring(this EmployerInterestSummary employerInterest,
-        DateTime today, 
-        int retentionDays, 
+        DateTime today,
         int numberOfDays = 7) =>
-        employerInterest.InterestExpiryDate(retentionDays).AddDays(-numberOfDays) < today;
+        employerInterest.ExpiryDate != null && employerInterest.ExpiryDate.Value.AddDays(-numberOfDays) < today;
 
-    public static bool IsInterestNew(this EmployerInterestSummary employerInterest, 
-        DateTime today, 
+    public static bool IsInterestNew(this EmployerInterestSummary employerInterest,
+        DateTime today,
         int numberOfDays = 7) =>
         employerInterest.CreatedOn.Date > today.AddDays(-numberOfDays);
 
     public static DateTime InterestExpiryDate(this EmployerInterestSummary employerInterest,
         int retentionDays) =>
         employerInterest.CreatedOn.AddDays(retentionDays).Date;
+
+    public static IEnumerable<EmployerInterestSummary> SetSummaryListFlags(this IEnumerable<EmployerInterestSummary> employerInterestSummary,
+        DateTime today)
+    {
+        return employerInterestSummary
+            .Select(x =>
+            {
+                x.IsNew = x.IsInterestNew(today);
+                x.IsExpiring = x.IsInterestExpiring(today);
+                return x;
+            });
+    }
 }

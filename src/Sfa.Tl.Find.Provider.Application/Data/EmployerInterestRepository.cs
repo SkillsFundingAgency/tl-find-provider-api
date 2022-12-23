@@ -32,7 +32,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
     public async Task<(int, Guid)> Create(
         EmployerInterest employerInterest,
-        GeoLocation geoLocation)
+        GeoLocation geoLocation,
+        DateTime expiryDate)
     {
         try
         {
@@ -54,7 +55,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Email = employerInterest.Email,
                             Telephone = employerInterest.Telephone,
                             Website = employerInterest.Website,
-                            ContactPreferenceType = (int?)employerInterest.ContactPreferenceType
+                            ContactPreferenceType = (int?)employerInterest.ContactPreferenceType,
+                            ExpiryDate = expiryDate
                         }
                     }
                     .AsTableValuedParameter("dbo.EmployerInterestDataTableType")
@@ -269,6 +271,31 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
     }
 
+    public async Task<IEnumerable<EmployerInterest>> GetAll()
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        return await _dbContextWrapper.QueryAsync<EmployerInterest>(
+            connection,
+            "SELECT Id, " +
+            "UniqueId, " +
+            "OrganisationName, " +
+            "ContactName, " +
+            "Postcode, " +
+            "HasMultipleLocations, " +
+            "LocationCount, " +
+            "IndustryId,  " +
+            "AdditionalInformation, " +
+            "Email, " +
+            "Telephone, " +
+            "ContactPreferenceType, " +
+            "ExpiryDate, " +
+            "CreatedOn, " +
+            "ModifiedOn " +
+            "FROM dbo.EmployerInterest " +
+            "ORDER BY OrganisationName");
+    }
+
     public async Task<EmployerInterestDetail> GetDetail(int id)
     {
         using var connection = _dbContextWrapper.CreateConnection();
@@ -301,6 +328,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Telephone = e.Telephone,
                             Website = e.Website,
                             ContactPreferenceType = e.ContactPreferenceType,
+                            ExpiryDate = e.ExpiryDate,
                             CreatedOn = e.CreatedOn,
                             ModifiedOn = e.ModifiedOn,
                             SkillAreas = new List<string>()
@@ -320,28 +348,58 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         return detailItem;
     }
 
-    public async Task<IEnumerable<EmployerInterest>> GetAll()
+    public async Task<IEnumerable<EmployerInterest>> GetExpiringInterest(DateTime date)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
-        return await _dbContextWrapper.QueryAsync<EmployerInterest>(
-            connection,
-            "SELECT Id, " +
-            "UniqueId, " +
-            "OrganisationName, " +
-            "ContactName, " +
-            "Postcode, " +
-            "HasMultipleLocations, " +
-            "LocationCount, " +
-            "IndustryId,  " +
-            "AdditionalInformation, " +
-            "Email, " +
-            "Telephone, " +
-            "ContactPreferenceType, " +
-            "CreatedOn, " +
-            "ModifiedOn " +
-            "FROM dbo.EmployerInterest " +
-            "ORDER BY OrganisationName");
+        var employerInterestList = new List<EmployerInterest>();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            date
+        });
+
+        //EmployerInterest employerInterestItem = null;
+        var employerInterests = new Dictionary<Guid, EmployerInterest>();
+
+        await _dbContextWrapper
+            //.QueryAsync<EmployerInterest, RouteDto, EmployerInterest>(
+            .QueryAsync<EmployerInterest, int, EmployerInterest>(
+                connection,
+                "GetExpiringEmployerInterest",
+                (e, r) =>
+                {
+                    if (!employerInterests.TryGetValue(e.UniqueId, out var employerInterestItem))
+                    {
+                        employerInterests.Add(e.UniqueId,
+                            employerInterestItem = new EmployerInterest
+                            {
+                                Id = e.Id,
+                                UniqueId = e.UniqueId,
+                                OrganisationName = e.OrganisationName,
+                                ContactName = e.ContactName,
+                                Postcode = e.Postcode,
+                                Latitude = e.Latitude,
+                                Longitude = e.Longitude,
+                                IndustryId = e.IndustryId,
+                                AdditionalInformation = e.AdditionalInformation,
+                                Email = e.Email,
+                                Telephone = e.Telephone,
+                                Website = e.Website,
+                                ContactPreferenceType = e.ContactPreferenceType,
+                                SkillAreaIds = new List<int>()
+                            });
+                    }
+
+                    employerInterestItem.SkillAreaIds!.Add(r);
+
+                    return employerInterestItem;
+                },
+                _dynamicParametersWrapper.DynamicParameters,
+                splitOn: "Id, RouteId",
+                commandType: CommandType.StoredProcedure);
+
+        return employerInterests.Values;
     }
 
     public async Task<IEnumerable<EmployerInterestSummary>> GetSummaryList()
@@ -366,6 +424,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 Postcode = e.Postcode,
                                 Distance = e.Distance,
                                 Industry = e.Industry,
+                                ExpiryDate = e.ExpiryDate,
                                 CreatedOn = e.CreatedOn,
                                 ModifiedOn = e.ModifiedOn,
                                 SkillAreas = new List<string>()
@@ -421,6 +480,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 OrganisationName = e.OrganisationName,
                                 Distance = e.Distance,
                                 Industry = e.Industry,
+                                ExpiryDate = e.ExpiryDate,
                                 CreatedOn = e.CreatedOn,
                                 ModifiedOn = e.ModifiedOn,
                                 SkillAreas = new List<string>()
@@ -450,5 +510,45 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             .ToList();
 
         return (searchResults, totalEmployerInterestsCount);
+    }
+
+    public async Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDays)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        connection.Open();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            uniqueId,
+            numberOfDays
+        });
+
+        var rowsAffected = await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "UPDATE dbo.EmployerInterest " +
+            "SET ExpiryDate = ExpiryDate.AddDays(numberOfDays) " +
+            "WHERE UniqueId = @uniqueId",
+            _dynamicParametersWrapper.DynamicParameters);
+        
+        return rowsAffected > 0;
+    }
+
+    public async Task UpdateExtensionEmailSentDate(int id)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+        connection.Open();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            id
+        });
+
+        await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "UPDATE dbo.EmployerInterest " +
+            "SET ExtensionEmailSentDate = GETUTCDATE() " +
+            "WHERE Id = @id",
+            _dynamicParametersWrapper.DynamicParameters);
     }
 }

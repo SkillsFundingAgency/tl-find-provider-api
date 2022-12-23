@@ -1,0 +1,14 @@
+If you are still interested in T Levels and industry placements, let us know and we’ll continue sharing your organisation’s details with T Level schools and colleges for another 12 weeks.
+
+[Keep sharing my interest](((employer_extend_uri)))
+
+If we don't hear from you within 7 days, we'll automatically stop sharing your interest.
+ 
+Here’s a reminder of the details we’re sharing:
+
+((details_list))
+
+You can [withdraw your interest in hosting industry placements](((employer_unsubscribe_uri))) at any time.
+
+T Levels support
+[((employer_support_site))](((employer_support_site)))

@@ -21,6 +21,7 @@ public class EmployerInterestDetail
     public ContactPreference? ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
     public List<string> SkillAreas { get; init; }
+    public DateTime? ExpiryDate { get; init; }
     public DateTime CreatedOn { get; init; }
     public DateTime? ModifiedOn { get; init; }
 }

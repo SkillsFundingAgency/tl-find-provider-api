@@ -9,6 +9,8 @@ public class HmacAuthorizationHeaderBuilder
     private string _appId;
     private string _apiKey;
     private HttpMethod _method;
+    private string _nonce;
+    private string _requestTimestamp;
     private string _uri;
     private Stream _body;
 
@@ -55,6 +57,17 @@ public class HmacAuthorizationHeaderBuilder
         _method = method;
         return this;
     }
+    public HmacAuthorizationHeaderBuilder WithNonce(string nonce)
+    {
+        _nonce = nonce;
+        return this;
+    }
+
+    public HmacAuthorizationHeaderBuilder WithRequestTimestamp(string requestTimestamp)
+    {
+        _requestTimestamp = requestTimestamp;
+        return this;
+    }
 
     public HmacAuthorizationHeaderBuilder WithUri(string uri)
     {
@@ -75,7 +88,16 @@ public class HmacAuthorizationHeaderBuilder
             return _headers;
         }
 
-        return _uri.GetHmacHeader(_method.Method, _body, _appId, _apiKey)
+        var requestTimestamp = _requestTimestamp 
+                               ?? Convert.ToUInt64(
+                                       (DateTime.UtcNow - 
+                                        new DateTime(1970, 01, 01, 0, 0, 0, 0, DateTimeKind.Utc))
+                                       .TotalSeconds)
+                                   .ToString();
+
+        var nonce = _nonce ?? Guid.NewGuid().ToString("N");
+
+        return _uri.GetHmacHeader(_method.Method, _body, _appId, _apiKey, nonce, requestTimestamp)
             .GetAwaiter()
             .GetResult()
             .ConvertToDictionary();

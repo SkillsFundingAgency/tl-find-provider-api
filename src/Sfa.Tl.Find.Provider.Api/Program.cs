@@ -75,7 +75,7 @@ try
     });
 
     builder.Services
-        .AddScoped<IDateTimeProvider, DateTimeProvider>()
+        .AddSingleton<IDateTimeProvider, DateTimeProvider>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddScoped<IGuidProvider, GuidProvider>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()

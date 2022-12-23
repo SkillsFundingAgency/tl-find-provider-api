@@ -95,6 +95,7 @@ Add a new row to the table with:
 ```
 {
     "BlobStorageConnectionString": "UseDevelopmentStorage=true;",
+    "RedisCacheConnectionString": "",
     "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;",
     "EmailSettings": {
         "GovNotifyApiKey": "<key from GOV.UK Notify>"
@@ -121,6 +122,21 @@ Add a new row to the table with:
     }
 }
 ```
+
+### Redis
+
+Redis is used for caching and session data storage in the Connect web site.
+If `RedisCacheConnectionString` is left empty then in-memory cache/session stores will be used.
+
+Redis can be run on a developer machine by installing it or by using Docker. To use it in docker:
+
+- make sure Docker Desktop is installed and running
+- install the latest redis image directly from Docker Desktop, or use the command line commands below
+    ```docker pull redis```
+- start the container by running
+    ```docker run -d --name redis -p 6379:6379 redis```
+- set `RedisCacheConnectionString` in configuration to 
+    ```localhost:6379,abortConnect=false```
 
 
 ### Troubleshooting

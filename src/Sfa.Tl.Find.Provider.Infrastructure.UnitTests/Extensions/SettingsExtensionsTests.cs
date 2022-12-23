@@ -2,7 +2,7 @@
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Extensions;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Extensions;
 public class SettingsExtensionsTests
 {
     [Fact]

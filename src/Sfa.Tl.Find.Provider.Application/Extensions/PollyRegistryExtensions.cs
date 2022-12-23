@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using Notify.Exceptions;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Registry;
@@ -61,11 +60,8 @@ public static class PollyRegistryExtensions
         var retryPolicy = Policy
             .Handle<AggregateException>(e => 
                 e.InnerExceptions.Any(i =>
-                    i is HttpRequestException ||
-                    i is TimeoutException ||
-                    i is NotifyClientException))
+                    i is HttpRequestException or TimeoutException))
             .Or<HttpRequestException>()
-            .Or<NotifyClientException>()
             .Or<TimeoutException>()
             .WaitAndRetryAsync(
                 backoff,

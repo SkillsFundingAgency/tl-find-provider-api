@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders;
 public class MemoryCacheServiceBuilder
 {
     public MemoryCacheService Build(

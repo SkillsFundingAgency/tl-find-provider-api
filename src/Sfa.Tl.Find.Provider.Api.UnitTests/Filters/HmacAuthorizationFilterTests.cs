@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Filters;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Filters;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -112,5 +113,55 @@ public class HmacAuthorizationFilterTests
 
         context.HttpContext.Request.Headers.Should().ContainKey("Authorization", "Invalid precondition");
         context.Result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Hmac_Authorization_Filter_Should_Set_Expiry_Time_In_Cache()
+    {
+        var timeSpan = DateTime.UtcNow - new DateTime(1970, 01, 01, 0, 0, 0, 0, DateTimeKind.Utc);
+        var requestTimestamp = Convert.ToUInt64(timeSpan.TotalSeconds).ToString();
+
+        const string nonce = "E2BDD944A880499D99DC24E3CA750CDF";
+
+        var apiSettings = new SettingsBuilder()
+            .BuildApiSettings();
+
+        var cacheService = Substitute.For<ICacheService>();
+
+        var utcNow = DateTime.UtcNow;
+        var baseOffset = new DateTimeOffset(utcNow);
+        var expectedOffset = baseOffset.AddSeconds(300);
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(utcNow);
+        dateTimeProvider.UtcNowOffset.Returns(baseOffset);
+
+        var filter = new HmacAuthorizationFilterBuilder()
+            .Build(apiSettings, cacheService, dateTimeProvider);
+
+        var header = new HmacAuthorizationHeaderBuilder()
+            .WithAppId(apiSettings.AppId)
+            .WithApiKey(apiSettings.ApiKey)
+            .WithMethod(HttpMethod.Get)
+            .WithUri(TestUri)
+            .WithRequestTimestamp(requestTimestamp)
+            .WithNonce(nonce)
+            .WithBody(null)
+            .Build();
+
+        var context = new AuthorizationFilterContextBuilder()
+            .Build(TestUri, header);
+
+        await filter.OnAuthorizationAsync(context);
+
+        context.HttpContext.Request.Headers.Should().ContainKey("Authorization", "Invalid precondition");
+        context.Result.Should().BeNull();
+
+        await cacheService
+            .Received(1)
+            .Set(
+                nonce,
+                requestTimestamp,
+                expectedOffset);
     }
 }

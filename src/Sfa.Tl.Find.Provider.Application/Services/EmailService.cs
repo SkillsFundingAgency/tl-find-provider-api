@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Notify.Exceptions;
 using Notify.Interfaces;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
@@ -85,10 +86,21 @@ public class EmailService : IEmailService
                         emailResponse.id, emailResponse.reference, emailResponse.content);
                 }
             }
+            catch (NotifyAuthException notifyAuthEx)
+            {
+                allEmailsSent = false;
+                _logger.LogError(notifyAuthEx, "GOV.UK Notify Authentication failed. Email template {emailTemplateId} to {recipient}.",
+                    emailTemplate.TemplateId, recipient);
+            }
+            catch (NotifyClientException notifyClientEx)
+            {
+                allEmailsSent = false;
+                _logger.LogError(notifyClientEx, "GOV.UK Notify error when sending email template {emailTemplateId} to {recipient}.",
+                    emailTemplate.TemplateId, recipient);
+            }
             catch (Exception ex)
             {
                 allEmailsSent = false;
-
                 _logger.LogError(ex, "Error sending email template {emailTemplateId} to {recipient}.",
                 emailTemplate.TemplateId, recipient);
             }

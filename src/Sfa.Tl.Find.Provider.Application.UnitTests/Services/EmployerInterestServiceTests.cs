@@ -1,6 +1,5 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
@@ -37,6 +36,18 @@ public class EmployerInterestServiceTests
 
         var geoLocation = GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode);
         var expectedEmployerInterest = employerInterestBuilder.BuildWithGeoLocation(geoLocation);
+        const int retentionDays = 10;
+        var expectedExpiryDate = DateTime.Parse("2022-08-23 23:59:59.9999999");
+
+        var d = expectedExpiryDate.Date.AddDays(1).AddTicks(-1);
+        d.Should().Be(expectedExpiryDate);
+
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            retentionDays: retentionDays);
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
         postcodeLookupService.GetPostcode(
@@ -46,38 +57,20 @@ public class EmployerInterestServiceTests
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.Create(
                 Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>())
+                Arg.Any<GeoLocation>(),
+                Arg.Any<DateTime>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
-            .Build(
+        .Build(
+                dateTimeProvider,
                 postcodeLookupService: postcodeLookupService,
-                employerInterestRepository: employerInterestRepository);
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
 
         var result = await service.CreateEmployerInterest(employerInterest);
 
         result.Should().Be(uniqueId);
-
-        await employerInterestRepository
-            .Received(1)
-            .Create(Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>());
-
-        await employerInterestRepository
-            .Received(1)
-            .Create(Arg.Is<EmployerInterest>(e =>
-                    e.Validate(expectedEmployerInterest,
-                        false,
-                        false,
-                        false,
-                        false)),
-                Arg.Any<GeoLocation>());
-
-        await employerInterestRepository
-            .Received(1)
-            .Create(Arg.Any<EmployerInterest>(),
-                Arg.Is<GeoLocation>(g =>
-                    g.Validate(geoLocation)));
 
         await employerInterestRepository
             .Received(1)
@@ -87,8 +80,12 @@ public class EmployerInterestServiceTests
                     false,
                     false,
                     false)),
-                Arg.Is<GeoLocation>(g =>
-                    g.Validate(geoLocation)));
+                Arg.Is<GeoLocation>(g => 
+                    g.Validate(geoLocation)),
+                Arg.Is<DateTime>(d => 
+                    d.Date == expectedExpiryDate.Date
+                    && d == expectedExpiryDate
+                    ));
     }
 
     [Fact]
@@ -114,7 +111,8 @@ public class EmployerInterestServiceTests
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.Create(
                 Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>())
+                Arg.Any<GeoLocation>(),
+                Arg.Any<DateTime>())
             .Returns((1, uniqueId));
 
         var service = new EmployerInterestServiceBuilder()
@@ -166,7 +164,8 @@ public class EmployerInterestServiceTests
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.Create(
                 Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>())
+                Arg.Any<GeoLocation>(),
+                Arg.Any<DateTime>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -262,7 +261,8 @@ public class EmployerInterestServiceTests
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.Create(
                 Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>())
+                Arg.Any<GeoLocation>(), 
+                Arg.Any<DateTime>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -354,7 +354,8 @@ public class EmployerInterestServiceTests
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.Create(
                 Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>())
+                Arg.Any<GeoLocation>(),
+                Arg.Any<DateTime>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -413,7 +414,8 @@ public class EmployerInterestServiceTests
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.Create(
                 Arg.Any<EmployerInterest>(),
-                Arg.Any<GeoLocation>())
+                Arg.Any<GeoLocation>(),
+                Arg.Any<DateTime>())
             .Returns((1, uniqueId));
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
@@ -531,19 +533,253 @@ public class EmployerInterestServiceTests
     }
 
     [Fact]
-    public async Task RemoveExpiredEmployerInterest_Does_Not_Call_Repository_For_Zero_RetentionDays()
+    public async Task ExtendEmployerInterest_By_UniqueId_Calls_Repository()
     {
-        var settings = new EmployerInterestSettings
-        {
-            RetentionDays = 0
-        };
+        var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.ExtendExpiry(uniqueId, Arg.Any<int>())
+            .Returns(true);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.ExtendEmployerInterest(uniqueId);
+
+        result.Should().BeTrue();
+
+        await employerInterestRepository
+            .Received(1)
+            .ExtendExpiry(uniqueId, settings.RetentionDays);
+    }
+
+    [Fact]
+    public async Task NotifyExpiringEmployerInterest_Does_Not_Call_Repository_For_Zero_RetentionDays()
+    {
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            retentionDays: 0);
 
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.Today.Returns(_defaultDateToday);
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.DeleteBefore(Arg.Any<DateTime>())
-            .Returns(0);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(dateTimeProvider,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.NotifyExpiringEmployerInterest();
+
+        result.Should().Be(0);
+
+        await employerInterestRepository
+            .DidNotReceive()
+            .GetExpiringInterest(Arg.Any<DateTime>());
+    }
+
+    [Fact]
+    public async Task NotifyExpiringEmployerInterest_Calls_Repository()
+    {
+        var employerInterestList = new EmployerInterestBuilder()
+            .BuildList()
+            .ToList();
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            expiryNotificationDays: 7,
+            retentionDays: 12);
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
+
+        //Expected date is Today - (RetentionDays + ExpiryNotificationDays)
+        var expectedDate = DateTime.Parse("2022-07-25");
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.GetExpiringInterest(Arg.Any<DateTime>())
+            .Returns(employerInterestList);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                dateTimeProvider,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.NotifyExpiringEmployerInterest();
+
+        result.Should().Be(employerInterestList.Count);
+
+        await employerInterestRepository
+            .Received(1)
+            .GetExpiringInterest(Arg.Is<DateTime>(d => d == expectedDate));
+    }
+
+    [Fact]
+    public async Task NotifyExpiringEmployerInterest_Calls_EmailService()
+    {
+        var employerInterest = new EmployerInterestBuilder().Build();
+        var employerInterestList = new EmployerInterestBuilder()
+            .WithUniqueId(Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC"))
+            .BuildList()
+            .ToList();
+
+       var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            expiryNotificationDays: 7,
+            retentionDays: 12);
+
+       var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+       dateTimeProvider.Today.Returns(_defaultDateToday);
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.GetExpiringInterest(Arg.Any<DateTime>())
+            .Returns(employerInterestList);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                dateTimeProvider,
+                emailService,
+                postcodeLookupService,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.NotifyExpiringEmployerInterest();
+
+        result.Should().Be(employerInterestList.Count);
+
+        await emailService
+            .Received(1)
+            .SendEmail(
+                employerInterest.Email,
+                EmailTemplateNames.EmployerExtendInterest,
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task NotifyExpiringEmployerInterest_Calls_EmailService_With_Expected_Tokens()
+    {
+        var uniqueId = Guid.Parse("916ED6B3-DF1D-4E03-9E7F-32BFD13583FC");
+        
+        var employerInterestList = new EmployerInterestBuilder()
+            .WithUniqueId(uniqueId)
+            .BuildList()
+            .Take(1)
+            .ToList();
+
+        var employerInterest = new EmployerInterestBuilder().Build();
+        var routes = new RouteBuilder().BuildList().ToList();
+        var industries = new IndustryBuilder().BuildList().ToList();
+        
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>())
+            .Returns(true);
+
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(
+                Arg.Any<string>())
+            .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService.GetIndustries()
+            .Returns(industries);
+        providerDataService.GetRoutes()
+            .Returns(routes);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.GetExpiringInterest(Arg.Any<DateTime>())
+            .Returns(employerInterestList);
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            expiryNotificationDays: 7,
+            retentionDays: 12);
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                dateTimeProvider,
+                emailService,
+                postcodeLookupService,
+                providerDataService: providerDataService,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.NotifyExpiringEmployerInterest();
+
+        result.Should().Be(employerInterestList.Count);
+
+        const string expectedContactPreference = "Email";
+        var expectedIndustry =
+            $"{industries.Single(i => i.Id == 9).Name}";
+
+        var expectedSkillAreas =
+            $"{routes.Single(r => r.Id == 1).Name}" +
+            $", {routes.Single(r => r.Id == 2).Name}";
+
+        var expectedExtendUri =
+            $"{settings.ExtendEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+        var expectedUnsubscribeUri =
+            $"{settings.UnsubscribeEmployerUri?.TrimEnd('/')}?id={uniqueId.ToString("D").ToLower()}";
+
+        var expectedDetails =
+            $"* Name: {employerInterest.ContactName}\r\n" +
+            $"* Email address: {employerInterest.Email}\r\n" +
+            $"* Telephone: {employerInterest.Telephone}\r\n" +
+            $"* How would you prefer to be contacted: {expectedContactPreference}\r\n" +
+            $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
+            $"* Website: {employerInterest.Website}\r\n" +
+            $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
+            $"* Industry placement areas: {expectedSkillAreas}\r\n" +
+            $"* Postcode: {employerInterest.Postcode}\r\n" +
+            $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
+
+        await emailService
+            .Received(1)
+            .SendEmail(
+                employerInterest.Email,
+                EmailTemplateNames.EmployerExtendInterest,
+                Arg.Is<IDictionary<string, string>>(tokens =>
+                    tokens.ValidateTokens(
+                        new Dictionary<string, string>
+                        {
+                            { "details_list", expectedDetails },
+                            { "employer_support_site", settings.EmployerSupportSiteUri },
+                            { "employer_unsubscribe_uri", expectedUnsubscribeUri },
+                            { "employer_extend_uri", expectedExtendUri }
+                        })),
+                Arg.Any<string>());
+    }
+    
+    [Fact]
+    public async Task RemoveExpiredEmployerInterest_Does_Not_Call_Repository_For_Zero_RetentionDays()
+    {
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            retentionDays: 0);
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
 
         var service = new EmployerInterestServiceBuilder()
             .Build(dateTimeProvider,
@@ -562,10 +798,8 @@ public class EmployerInterestServiceTests
     [Fact]
     public async Task RemoveExpiredEmployerInterest_Calls_Repository()
     {
-        var settings = new EmployerInterestSettings
-        {
-            RetentionDays = 12
-        };
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            retentionDays: 12);
 
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.Today.Returns(_defaultDateToday);
@@ -593,7 +827,7 @@ public class EmployerInterestServiceTests
             .Received(1)
             .DeleteBefore(Arg.Is<DateTime>(d => d == expectedDate));
     }
-
+    
     [Fact]
     public async Task FindEmployerInterest_By_Lat_Long_Returns_Expected_List()
     {
@@ -643,10 +877,11 @@ public class EmployerInterestServiceTests
         const int daysToRetain = 10;
         var today = DateTime.Parse("2022-12-07");
         var creationDate = DateTime.Parse("2022-12-01 11:30");
-        var expectedExpiryDate = DateTime.Parse("2022-12-11");
+        var expiryDate = DateTime.Parse("2022-12-11");
 
         var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
             .WithCreationDate(creationDate)
+            .WithExpiryDate(expiryDate)
             .BuildList()
             .ToList();
 
@@ -677,7 +912,6 @@ public class EmployerInterestServiceTests
             .ToList();
 
         results.Should().NotBeNullOrEmpty();
-        results.First().ExpiryDate.Should().Be(expectedExpiryDate);
         results.First().IsExpiring.Should().BeTrue();
         results.First().IsNew.Should().BeTrue();
     }
@@ -735,10 +969,11 @@ public class EmployerInterestServiceTests
         const int daysToRetain = 10;
         var today = DateTime.Parse("2022-12-07");
         var creationDate = DateTime.Parse("2022-12-01 11:30");
-        var expectedExpiryDate = DateTime.Parse("2022-12-11");
+        var expiryDate = DateTime.Parse("2022-12-11");
 
         var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
             .WithCreationDate(creationDate)
+            .WithExpiryDate(expiryDate)
             .BuildList()
             .ToList();
 
@@ -775,7 +1010,6 @@ public class EmployerInterestServiceTests
 
         results.Should().NotBeNull();
         results.SearchResults.Should().NotBeNullOrEmpty();
-        results.SearchResults.First().ExpiryDate.Should().Be(expectedExpiryDate);
         results.SearchResults.First().IsExpiring.Should().BeTrue();
         results.SearchResults.First().IsNew.Should().BeTrue();
     }
@@ -829,10 +1063,11 @@ public class EmployerInterestServiceTests
         const int daysToRetain = 10;
         var today = DateTime.Parse("2022-12-07");
         var creationDate = DateTime.Parse("2022-12-01 11:30");
-        var expectedExpiryDate = DateTime.Parse("2022-12-11");
+        var expiryDate = DateTime.Parse("2022-12-11");
 
         var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
             .WithCreationDate(creationDate)
+            .WithExpiryDate(expiryDate)
             .BuildList()
             .ToList();
 
@@ -858,7 +1093,7 @@ public class EmployerInterestServiceTests
         results.Should().BeEquivalentTo(employerInterestSummaryList);
 
         results.Should().NotBeNullOrEmpty();
-        results.First().ExpiryDate.Should().Be(expectedExpiryDate);
+        results.First().ExpiryDate.Should().Be(expiryDate);
         results.First().IsExpiring.Should().BeTrue();
         results.First().IsNew.Should().BeTrue();
 

@@ -24,4 +24,21 @@ public static class CacheKeys
 
     public static string UserCacheKey(string userId, string key) => 
         $"USERID:{userId}:{key}";
+
+    public static string GenerateTypedCacheKey<T>(string key)
+    {
+        return GenerateTypedCacheKey(typeof(T), key);
+    }
+
+    private static string GenerateTypedCacheKey(Type objectType, string key)
+    {
+        var typeName = ExpandTypeName(objectType);
+        return $"{key}:{typeName}".ToLower();
+    }
+
+    private static string ExpandTypeName(Type t) =>
+        !t.IsGenericType || t.IsGenericTypeDefinition
+            ? !t.IsGenericTypeDefinition ? t.Name : t.Name.Remove(t.Name.IndexOf('`'))
+            : $"{ExpandTypeName(t.GetGenericTypeDefinition())}<{string.Join(',', t.GetGenericArguments().Select(x => ExpandTypeName(x)))}>";
+
 }
