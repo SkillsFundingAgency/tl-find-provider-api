@@ -1,3 +1,12 @@
+parameters:
+  - name: devEnvId
+    displayName: The development environment id (defaults to 'd01')
+    type: string
+    default: d01
+    values: 
+      - d01
+      - d02
+      
 resources:
   repositories:
     - repository: self
@@ -25,3 +34,5 @@ variables:
   applicationName: findpvdrapi
 stages:
   - template: ./yaml/stages/findproviderapi-master-stage.yml
+    parameters:
+      devEndId: ${{parameters.devEnvId}}
