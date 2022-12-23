@@ -1,7 +1,15 @@
 ﻿CREATE PROCEDURE [dbo].[GetExpiringEmployerInterest]
-	@date [DateTime2]
+	@daysToExpiry [INT]
 AS
-	--SET NOCOUNT ON;
+
+	DECLARE @minDate [DATETIME2] = 
+			DATEADD(day, 
+				-@daysToExpiry, 
+				CAST(CONVERT(CHAR(8), GETUTCDATE(), 112) + ' 23:59:59.9999999' AS DATETIME2))
+	DECLARE @expiryDate [DATETIME2] = 
+			DATEADD(day, 
+				@daysToExpiry, 
+				CAST(CONVERT(CHAR(8), GETUTCDATE(), 112) + ' 23:59:59.9999999' AS DATETIME2))
 
 	SELECT		ei.[Id],
 				ei.[UniqueId],
@@ -29,8 +37,6 @@ AS
 	ON			eil.[EmployerInterestId] = ei.[Id]
 	LEFT JOIN	[dbo].[EmployerInterestRoute] eir
 	ON			eir.[EmployerInterestId] = ei.[Id]
-	WHERE		--(ei.[RenewalEmailSentOn] IS NULL 
-				-- OR ei.[RenewalEmailSentOn] < ei.[ModifiedOn])
-		--AND		
-				((ei.[CreatedOn] < @date AND ei.[ModifiedOn] IS NULL)
-				 OR	ei.[ModifiedOn] < @date)
+	WHERE		ei.[ExpiryDate] < @expiryDate
+	  AND		(ei.[ExtensionEmailSentDate] IS NULL 
+				 OR ei.[ExtensionEmailSentDate] < @minDate)

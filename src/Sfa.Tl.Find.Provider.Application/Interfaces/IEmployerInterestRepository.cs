@@ -1,5 +1,4 @@
-﻿
-using Sfa.Tl.Find.Provider.Application.Models;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
@@ -14,7 +13,7 @@ public interface IEmployerInterestRepository
 
     Task<int> Delete(Guid uniqueId);
 
-    Task<int> DeleteBefore(DateTime date);
+    Task<IEnumerable<ExpiredEmployerInterestDto>> DeleteExpired(DateTime date);
 
     Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDays);
 
@@ -22,7 +21,7 @@ public interface IEmployerInterestRepository
     
     Task<EmployerInterestDetail> GetDetail(int id);
 
-    Task<IEnumerable<EmployerInterest>> GetExpiringInterest(DateTime date);
+    Task<IEnumerable<EmployerInterest>> GetExpiringInterest(int daysToExpiry);
 
     Task<IEnumerable<EmployerInterestSummary>> GetSummaryList();
 

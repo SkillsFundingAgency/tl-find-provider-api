@@ -91,8 +91,6 @@ public class EmployerInterestService : IEmployerInterestService
     {
         return await _employerInterestRepository
             .ExtendExpiry(id, _employerInterestSettings.RetentionDays);
-
-        return false;
     }
 
     public async Task<int> NotifyExpiringEmployerInterest()
@@ -104,21 +102,18 @@ public class EmployerInterestService : IEmployerInterestService
             return 0;
         }
 
-        var date = _dateTimeProvider.Today.AddDays(
-            -(_employerInterestSettings.RetentionDays + 
-              _employerInterestSettings.ExpiryNotificationDays));
-
         var expiringInterestList = (await _employerInterestRepository
-            .GetExpiringInterest(date))
+            .GetExpiringInterest(_employerInterestSettings.ExpiryNotificationDays))
             .ToList();
 
         foreach (var employerInterest in expiringInterestList)
         {
             await SendEmployerExtendInterestEmail(employerInterest);
+            await _employerInterestRepository.UpdateExtensionEmailSentDate(employerInterest.Id);
         }
 
-        _logger.LogInformation("Notified {count} employers that their interest is about to expire because they are over {days} days (older than {date:yyyy-MM-dd})",
-            expiringInterestList.Count, _employerInterestSettings.RetentionDays, date);
+        _logger.LogInformation("Notified {count} employers that their interest is about to expire",
+            expiringInterestList.Count);
 
         return expiringInterestList.Count;
     }
@@ -132,17 +127,22 @@ public class EmployerInterestService : IEmployerInterestService
             return 0;
         }
 
-        var date = _dateTimeProvider.Today.AddDays(-_employerInterestSettings.RetentionDays);
-        var count = await _employerInterestRepository.DeleteBefore(date);
+        var expiredInterest= (await _employerInterestRepository
+                .DeleteExpired(_dateTimeProvider.Today))
+            .ToList();
 
-        //TODO: Need to send emails - will need basic details to do this - Email, UniqueId (for reference - maybe just the emails?
-        //TODO: Should this email be sent when 
-        //await SendEmployerInterestRemovedEmail(employerInterest);
+        if (expiredInterest.Any())
+        {
+            _logger.LogInformation("Removed {count} expired employer interest records",
+                expiredInterest.Count);
 
-        _logger.LogInformation("Removed {count} employer interest records because they are over {days} days (older than {date:yyyy-MM-dd})",
-            count, _employerInterestSettings.RetentionDays, date);
+            foreach (var item in expiredInterest)
+            {
+                await SendEmployerInterestRemovedEmail(item);
+            }
+        }
 
-        return count;
+        return expiredInterest.Count;
     }
 
     public async Task<IEnumerable<EmployerInterestSummary>> GetSummaryList()
@@ -202,17 +202,17 @@ public class EmployerInterestService : IEmployerInterestService
             employerInterest.UniqueId.ToString());
     }
 
-    private async Task<bool> SendEmployerInterestRemovedEmail(EmployerInterest employerInterest)
+    private async Task<bool> SendEmployerInterestRemovedEmail(ExpiredEmployerInterestDto item)
     {
         return await _emailService.SendEmail(
-            employerInterest.Email,
+            item.Email,
             EmailTemplateNames.EmployerInterestRemoved,
             new Dictionary<string, string>
             {
                 { "register_interest_uri", _employerInterestSettings.RegisterInterestUri ?? "" },
                 { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" }
             },
-            employerInterest.UniqueId.ToString());
+            item.UniqueId.ToString());
     }
 
     private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geoLocation)

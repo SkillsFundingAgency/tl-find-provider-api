@@ -172,7 +172,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         }
     }
 
-    public async Task<int> DeleteBefore(DateTime date)
+    public async Task<IEnumerable<ExpiredEmployerInterestDto>> DeleteExpired(DateTime date)
     {
         try
         {
@@ -186,27 +186,25 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                 date
             });
 
-            //TODO: Add logic to allow users to ask for extension on date - 
-            //      Maybe add a flag to the table for use here, together with the ModifiedOn" +
-            //      "WHERE([CreatedOn] < @date ",
-            //    "  --AND [ModifiedOn] IS NULL)" +
-            //    "  --OR [ModifiedOn] < @date";
-            var idsToDelete = (await _dbContextWrapper.QueryAsync<int>(
-                connection,
-                "SELECT Id " +
-                "FROM [dbo].[EmployerInterest] " +
-                "WHERE [CreatedOn] < @date",
-                 new { date },
-                transaction
-            ))?.ToList();
+            var itemsToDelete = (await 
+                _dbContextWrapper.QueryAsync<ExpiredEmployerInterestDto>(
+                    connection,
+                    "SELECT Id, UniqueId, Email " +
+                    "FROM [dbo].[EmployerInterest] " +
+                    "WHERE [ExpiryDate] < @date",
+                     new { date },
+                    transaction
+                    ))?.ToList();
 
-            var employerInterestsDeleted = idsToDelete != null && idsToDelete.Any()
-                ? await PerformDelete(idsToDelete, connection, transaction)
-                : 0;
+           if(itemsToDelete != null && itemsToDelete.Any())
+           {
+               await PerformDelete(itemsToDelete.Select(x => x.Id), 
+                   connection, transaction);
+           }
 
             transaction.Commit();
 
-            return employerInterestsDeleted;
+            return itemsToDelete;
         }
         catch (Exception ex)
         {
@@ -292,7 +290,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         return detailItem;
     }
 
-    public async Task<IEnumerable<EmployerInterest>> GetExpiringInterest(DateTime date)
+    public async Task<IEnumerable<EmployerInterest>> GetExpiringInterest(int daysToExpiry)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -300,7 +298,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            date
+            daysToExpiry
         });
 
         //EmployerInterest employerInterestItem = null;

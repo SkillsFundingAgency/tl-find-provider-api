@@ -10,8 +10,6 @@ For local run:
 USE TLevelProviders
 */
 
---SET NOCOUNT OFF;
-	
 WITH ProvidersCTE AS (
 	SELECT	p.[Id],
 			p.[UkPrn],

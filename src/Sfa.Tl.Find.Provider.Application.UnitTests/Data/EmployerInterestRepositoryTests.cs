@@ -332,34 +332,41 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task DeleteBefore_Returns_Expected_Result()
+    public async Task DeleteExpired_Returns_Expected_Result()
     {
-        const int employerInterestsCount = 10;
         var date = DateTime.Parse("2022-09-13");
+
+        var expiredEmployerInterest = new ExpiredEmployerInterestDtoBuilder()
+            .BuildList()
+            .ToList();
+        var employerInterestsCount = expiredEmployerInterest.Count;
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
             .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
-        
+
+
         dbContextWrapper
-            .QueryAsync<int>(dbConnection,
+            .QueryAsync<ExpiredEmployerInterestDto>(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("SELECT Id") &&
+                    s.Contains("SELECT Id, UniqueId, Email") &&
                     s.Contains("FROM [dbo].[EmployerInterest]") &&
-                    s.Contains("[CreatedOn] < @date")),
+                    s.Contains("[ExpiryDate] < @date")),
                 Arg.Any<object>(),
                 Arg.Is<IDbTransaction>(t => t != null))
-            .Returns(Enumerable.Range(1, 10));
+            .Returns(expiredEmployerInterest);
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper, 
                 dynamicParametersWrapper);
 
-        var result = await repository.DeleteBefore(date);
+        var results = await repository.DeleteExpired(date);
 
-        result.Should().Be(employerInterestsCount);
+        results.Should().NotBeNullOrEmpty();
+        results.Count().Should().Be(employerInterestsCount);
+        results.Should().BeEquivalentTo(expiredEmployerInterest);
     }
 
     [Fact]
@@ -445,7 +452,7 @@ public class EmployerInterestRepositoryTests
     [Fact]
     public async Task GetExpiringInterest_Returns_Expected_Item()
     {
-        var date = DateTime.Parse("2022-09-13");
+        const int expiryNotificationDays = 7;
         var uniqueId = Guid.Parse("69e33e1f-2dc3-40bf-a1a7-52493025d3d1");
 
         var routeIdList = new RouteDtoBuilder()
@@ -490,7 +497,7 @@ public class EmployerInterestRepositoryTests
         var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
 
         var result = (await repository
-            .GetExpiringInterest(date))
+            .GetExpiringInterest(expiryNotificationDays))
             .ToList();
 
         result.Should().NotBeNullOrEmpty();
