@@ -119,24 +119,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
                         using var transaction = _dbContextWrapper.BeginTransaction(connection);
 
-                        _dynamicParametersWrapper.CreateParameters(new
-                        {
-                            employerInterestIds =
-                                new List<int> { id }
-                                    .AsTableValuedParameter("dbo.IdListTableType")
-                        })
-                            .AddOutputParameter("@employerInterestsDeleted", DbType.Int32);
-
-                        await _dbContextWrapper.ExecuteAsync(
-                            connection,
-                            "DeleteEmployerInterest",
-                            _dynamicParametersWrapper.DynamicParameters,
-                            transaction,
-                            commandType: CommandType.StoredProcedure);
-
-                        var employerInterestsDeleted = _dynamicParametersWrapper
-                            .DynamicParameters
-                            .Get<int>("@employerInterestsDeleted");
+                        var employerInterestsDeleted = await PerformDelete(new List<int> { id }, connection, transaction);
 
                         transaction.Commit();
                         return employerInterestsDeleted;
@@ -154,8 +137,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
-            var employerInterestsDeleted = 0;
-
             var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
 
             return await retryPolicy
@@ -175,27 +156,9 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             transaction
                         );
 
-                        if (id.HasValue)
-                        {
-                            _dynamicParametersWrapper.CreateParameters(new
-                            {
-                                employerInterestIds =
-                                    new List<int> { id.Value }
-                                        .AsTableValuedParameter("dbo.IdListTableType")
-                            })
-                                .AddOutputParameter("@employerInterestsDeleted", DbType.Int32);
-
-                            await _dbContextWrapper.ExecuteAsync(
-                                connection,
-                                "DeleteEmployerInterest",
-                                _dynamicParametersWrapper.DynamicParameters,
-                                transaction,
-                                commandType: CommandType.StoredProcedure);
-
-                            employerInterestsDeleted = _dynamicParametersWrapper
-                                .DynamicParameters
-                                .Get<int>("@employerInterestsDeleted");
-                        }
+                        var employerInterestsDeleted = id.HasValue
+                            ? await PerformDelete(new List<int> { id.Value }, connection, transaction)
+                            : 0;
 
                         transaction.Commit();
                         return employerInterestsDeleted;
@@ -213,8 +176,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     {
         try
         {
-            var employerInterestsDeleted = 0;
-
             using var connection = _dbContextWrapper.CreateConnection();
             connection.Open();
 
@@ -239,26 +200,9 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                 transaction
             ))?.ToList();
 
-            if (idsToDelete != null && idsToDelete.Any())
-            {
-                _dynamicParametersWrapper.CreateParameters(new
-                {
-                    employerInterestIds = idsToDelete
-                        .AsTableValuedParameter("dbo.IdListTableType")
-                })
-                    .AddOutputParameter("@employerInterestsDeleted", DbType.Int32);
-
-                await _dbContextWrapper.ExecuteAsync(
-                    connection,
-                    "DeleteEmployerInterest",
-                    _dynamicParametersWrapper.DynamicParameters,
-                    transaction,
-                    commandType: CommandType.StoredProcedure);
-
-                employerInterestsDeleted = _dynamicParametersWrapper
-                    .DynamicParameters
-                    .Get<int>("@employerInterestsDeleted");
-            }
+            var employerInterestsDeleted = idsToDelete != null && idsToDelete.Any()
+                ? await PerformDelete(idsToDelete, connection, transaction)
+                : 0;
 
             transaction.Commit();
 
@@ -527,10 +471,11 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         var rowsAffected = await _dbContextWrapper.ExecuteAsync(
             connection,
             "UPDATE dbo.EmployerInterest " +
-            "SET ExpiryDate = ExpiryDate.AddDays(numberOfDays) " +
+            "SET ExpiryDate = ExpiryDate.AddDays(numberOfDays), " +
+            "    ModifiedOn = GETUTCDATE() " +
             "WHERE UniqueId = @uniqueId",
             _dynamicParametersWrapper.DynamicParameters);
-        
+
         return rowsAffected > 0;
     }
 
@@ -547,8 +492,33 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         await _dbContextWrapper.ExecuteAsync(
             connection,
             "UPDATE dbo.EmployerInterest " +
-            "SET ExtensionEmailSentDate = GETUTCDATE() " +
+            "SET ExtensionEmailSentDate = GETUTCDATE(), " +
+            "    ModifiedOn = GETUTCDATE() " +
             "WHERE Id = @id",
             _dynamicParametersWrapper.DynamicParameters);
+    }
+
+    private async Task<int> PerformDelete(IEnumerable<int> idsToDelete, IDbConnection connection, IDbTransaction transaction)
+    {
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            employerInterestIds =
+                    idsToDelete
+                        .AsTableValuedParameter("dbo.IdListTableType")
+        })
+            .AddOutputParameter("@employerInterestsDeleted", DbType.Int32);
+
+        await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "DeleteEmployerInterest",
+            _dynamicParametersWrapper.DynamicParameters,
+            transaction,
+            commandType: CommandType.StoredProcedure);
+
+        var employerInterestsDeleted = _dynamicParametersWrapper
+            .DynamicParameters
+            .Get<int>("@employerInterestsDeleted");
+
+        return employerInterestsDeleted;
     }
 }

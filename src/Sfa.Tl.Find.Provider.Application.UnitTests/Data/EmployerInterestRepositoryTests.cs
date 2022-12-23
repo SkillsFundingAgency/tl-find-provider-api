@@ -662,7 +662,8 @@ public class EmployerInterestRepositoryTests
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
                     s.Contains("UPDATE dbo.EmployerInterest") &&
-                    s.Contains("SET ExpiryDate = ExpiryDate.AddDays(numberOfDays)") &&
+                    s.Contains("SET ExpiryDate = ExpiryDate.AddDays(numberOfDays),") &&
+                    s.Contains("ModifiedOn = GETUTCDATE()") &&
                     s.Contains("WHERE UniqueId = @uniqueId")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
@@ -727,7 +728,8 @@ public class EmployerInterestRepositoryTests
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
                     s.Contains("UPDATE dbo.EmployerInterest") &&
-                    s.Contains("SET ExtensionEmailSentDate = GETUTCDATE()") &&
+                    s.Contains("SET ExtensionEmailSentDate = GETUTCDATE(),") &&
+                    s.Contains("ModifiedOn = GETUTCDATE()") &&
                     s.Contains("WHERE Id = @id")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
