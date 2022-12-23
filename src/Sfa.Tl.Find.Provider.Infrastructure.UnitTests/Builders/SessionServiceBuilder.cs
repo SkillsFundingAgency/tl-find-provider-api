@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Infrastructure.Services;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders;
 public class  SessionServiceBuilder
 {
     public SessionService Build(

@@ -1,10 +1,10 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
-using Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
+using Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Caching;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Caching;
 
 public class MemoryCacheServiceTests
 {

@@ -4,7 +4,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 using StackExchange.Redis;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders;
 public class RedisCacheServiceBuilder
 {
     public RedisCacheService Build(

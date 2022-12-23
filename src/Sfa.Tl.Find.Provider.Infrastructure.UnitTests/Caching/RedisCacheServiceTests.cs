@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
+using Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using StackExchange.Redis;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Caching;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Caching;
 public class RedisCacheServiceTests
 {
     private const string MissingKey = "non_existent_key";

@@ -1,7 +1,7 @@
 ﻿using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Authorization;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Authorization;
 public class RedisCacheTicketStoreTests
 {
     [Fact]
