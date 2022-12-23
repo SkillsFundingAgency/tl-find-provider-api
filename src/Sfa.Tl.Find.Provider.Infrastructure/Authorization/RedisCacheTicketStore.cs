@@ -1,27 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
-using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
-namespace Sfa.Tl.Find.Provider.Web.Authorization;
+namespace Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 
 public class RedisCacheTicketStore : ITicketStore
 {
     private const string KeyPrefix = "AuthSessionStore-";
-    private IDistributedCache _cache;
+    private readonly IDistributedCache _cache;
 
-    public RedisCacheTicketStore(IDistributedCache cache)//RedisCacheOptions options)
+    public RedisCacheTicketStore(IDistributedCache cache)
     {
-        //_cache = new RedisCache(options);
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     }
 
     public async Task<string> StoreAsync(AuthenticationTicket ticket)
     {
         var guid = Guid.NewGuid();
-        var key = KeyPrefix + guid.ToString();
+        var key = $"{KeyPrefix}{guid}";
         await RenewAsync(key, ticket);
         return key;
     }
@@ -34,17 +30,15 @@ public class RedisCacheTicketStore : ITicketStore
         {
             options.SetAbsoluteExpiration(expiresUtc.Value);
         }
-        byte[] val = SerializeToBytes(ticket);
+        var val = SerializeToBytes(ticket);
         _cache.Set(key, val, options);
         return Task.FromResult(0);
     }
 
-    public Task<AuthenticationTicket> RetrieveAsync(string key)
+    public Task<AuthenticationTicket?> RetrieveAsync(string key)
     {
-        AuthenticationTicket ticket;
-        byte[] bytes = null;
-        bytes = _cache.Get(key);
-        ticket = DeserializeFromBytes(bytes);
+        var bytes = _cache.Get(key);
+        var ticket = DeserializeFromBytes(bytes);
         return Task.FromResult(ticket);
     }
 
@@ -59,7 +53,7 @@ public class RedisCacheTicketStore : ITicketStore
         return TicketSerializer.Default.Serialize(source);
     }
 
-    private static AuthenticationTicket DeserializeFromBytes(byte[] source)
+    private static AuthenticationTicket? DeserializeFromBytes(byte[]? source)
     {
         return source == null ? null : TicketSerializer.Default.Deserialize(source);
     }
