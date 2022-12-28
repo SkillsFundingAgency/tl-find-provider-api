@@ -20,8 +20,8 @@ public class EmployerInterestCleanupJob : IJob
     {
         try
         {
-            await _employerInterestService.NotifyExpiringEmployerInterest();
             await _employerInterestService.RemoveExpiredEmployerInterest();
+            await _employerInterestService.NotifyExpiringEmployerInterest();
 
             _logger.LogInformation($"{nameof(EmployerInterestCleanupJob)} job completed successfully.");
         }

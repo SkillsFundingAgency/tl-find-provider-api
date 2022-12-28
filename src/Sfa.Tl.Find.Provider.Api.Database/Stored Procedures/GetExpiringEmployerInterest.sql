@@ -2,10 +2,6 @@
 	@daysToExpiry [INT]
 AS
 
-	DECLARE @minDate [DATETIME2] = 
-			DATEADD(day, 
-				-@daysToExpiry, 
-				CAST(CONVERT(CHAR(8), GETUTCDATE(), 112) + ' 23:59:59.9999999' AS DATETIME2))
 	DECLARE @expiryDate [DATETIME2] = 
 			DATEADD(day, 
 				@daysToExpiry, 
@@ -37,6 +33,8 @@ AS
 	ON			eil.[EmployerInterestId] = ei.[Id]
 	LEFT JOIN	[dbo].[EmployerInterestRoute] eir
 	ON			eir.[EmployerInterestId] = ei.[Id]
+	--We want items that expire in next n days, 
+	--but not where email has been sent in the previous n days
 	WHERE		ei.[ExpiryDate] < @expiryDate
 	  AND		(ei.[ExtensionEmailSentDate] IS NULL 
-				 OR ei.[ExtensionEmailSentDate] < @minDate)
+				 OR	ei.[ExtensionEmailSentDate] < DATEADD(day, -@daysToExpiry, ei.[ExpiryDate]))

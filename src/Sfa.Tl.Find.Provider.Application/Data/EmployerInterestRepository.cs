@@ -301,11 +301,9 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             daysToExpiry
         });
 
-        //EmployerInterest employerInterestItem = null;
         var employerInterests = new Dictionary<Guid, EmployerInterest>();
 
         await _dbContextWrapper
-            //.QueryAsync<EmployerInterest, RouteDto, EmployerInterest>(
             .QueryAsync<EmployerInterest, int, EmployerInterest>(
                 connection,
                 "GetExpiringEmployerInterest",
@@ -321,9 +319,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 OrganisationName = e.OrganisationName,
                                 ContactName = e.ContactName,
                                 Postcode = e.Postcode,
-                                Latitude = e.Latitude,
-                                Longitude = e.Longitude,
                                 IndustryId = e.IndustryId,
+                                OtherIndustry = e.OtherIndustry,
                                 AdditionalInformation = e.AdditionalInformation,
                                 Email = e.Email,
                                 Telephone = e.Telephone,

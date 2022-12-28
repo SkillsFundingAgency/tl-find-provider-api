@@ -463,11 +463,17 @@ public class EmployerInterestRepositoryTests
         
         var employerInterest = new EmployerInterestBuilder()
             .WithUniqueId(uniqueId)
+            .WithLatLong(0, 0)
+            .WithIndustryId(9)
+            .WithOtherIndustry("Testing")
             .WithSkillAreaIds(routeIdList)
             .Build();
         
         var expectedEmployerInterest = new EmployerInterestBuilder()
             .WithUniqueId(uniqueId)
+            .WithLatLong(0, 0)
+            .WithIndustryId(9)
+            .WithOtherIndustry("Testing")
             .WithSkillAreaIds(routeIdList)
             .Build();
 
