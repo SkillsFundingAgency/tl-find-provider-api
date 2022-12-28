@@ -22,7 +22,7 @@ AS
 				ei.[CreatedOn],
 				ei.[ModifiedOn],
 				ei.[OtherIndustry],
-				(SELECT TOP(1) [Id]
+				(SELECT TOP(1) eii.[IndustryId]
 				 FROM	[dbo].[EmployerInterestIndustry] eii
 				 WHERE eii.[EmployerInterestId] = ei.[Id]
 				 ORDER BY eii.[IndustryId]
