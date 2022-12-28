@@ -28,11 +28,6 @@ public static class Constants
 
     public const int TownSearchDefaultMaxResults = 50;
 
-    public const string CourseDirectoryImportJobKeyName = "Import Course Data";
-    public const string EmployerInterestCleanupJobKeyName = "Employer Interest Cleanup";
-    public const string ImportTownDataJobKeyName = "Import Town Data";
-    public const string StartupTasksJobKeyName = "Perform Startup Tasks";
-
     public const string CssPathPattern = @"^\/css\/.*\.css$";
     public const string FontsPathPattern = @"^\/assets\/fonts\/.*\.woff\d?$";
     public const string JsPathPattern = @"^\/js\/.*\.js$";

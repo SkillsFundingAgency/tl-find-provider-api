@@ -10,6 +10,7 @@ using Quartz;
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
@@ -207,7 +208,7 @@ public static class ServiceCollectionExtensions
 
             q.UseMicrosoftDependencyInjectionJobFactory();
 
-            var startupJobKey = new JobKey(Constants.StartupTasksJobKeyName);
+            var startupJobKey = new JobKey(JobKeys.StartupTasks);
             q.AddJob<InitializationJob>(opts =>
                     opts.WithIdentity(startupJobKey))
                 .AddTrigger(opts => opts
@@ -216,7 +217,7 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
-                var courseDataImportJobKey = new JobKey(Constants.CourseDirectoryImportJobKeyName);
+                var courseDataImportJobKey = new JobKey(JobKeys.CourseDirectoryImport);
                 q.AddJob<CourseDataImportJob>(opts =>
                         opts.WithIdentity(courseDataImportJobKey))
                     .AddTrigger(opts => opts
@@ -228,7 +229,7 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(townDataImportCronSchedule))
             {
-                var townDataImportJobKey = new JobKey(Constants.ImportTownDataJobKeyName);
+                var townDataImportJobKey = new JobKey(JobKeys.ImportTownData);
                 q.AddJob<TownDataImportJob>(opts =>
                         opts.WithIdentity(townDataImportJobKey))
                     .AddTrigger(opts => opts
@@ -240,7 +241,7 @@ public static class ServiceCollectionExtensions
 
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
             {
-                var employerInterestCleanupJobKey = new JobKey(Constants.EmployerInterestCleanupJobKeyName);
+                var employerInterestCleanupJobKey = new JobKey(JobKeys.EmployerInterestCleanup);
                 q.AddJob<EmployerInterestCleanupJob>(opts =>
                         opts.WithIdentity(employerInterestCleanupJobKey))
                     .AddTrigger(opts => opts
