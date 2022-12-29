@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.HealthChecks;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 using Sfa.Tl.Find.Provider.Infrastructure.Services;
@@ -69,6 +71,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToPage("/Help/Cookies");
     options.Conventions.AllowAnonymousToPage("/Help/Privacy");
     options.Conventions.AllowAnonymousToPage("/TermsAndConditions");
+    //options.Conventions.AllowAnonymousToPage("/health");
 })
     .AddMvcOptions(options =>
     {
@@ -91,6 +94,8 @@ builder.Services
         new SessionService(
             x.GetService<IHttpContextAccessor>()!,
             builder.Environment.EnvironmentName));
+
+builder.Services.AddHealthChecks();
 
 if (!builder.Environment.IsDevelopment())
 {
@@ -161,6 +166,11 @@ app.UseWhen(ctx =>
                     await next.Invoke();
                 })
     );
+
+app.UseHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = HealthCheckResponseWriter.WriteJsonResponse
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

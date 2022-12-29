@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Sfa.Tl.Find.Provider.Application.HealthChecks;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.HealthChecks;
+using Sfa.Tl.Find.Provider.Infrastructure.HealthChecks;
+using Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders.HealthChecks;
 
-namespace Sfa.Tl.Find.Provider.Application.UnitTests.HealthChecks;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.HealthChecks;
 public class HealthCheckResponseWriterTests
 {
     [Fact]

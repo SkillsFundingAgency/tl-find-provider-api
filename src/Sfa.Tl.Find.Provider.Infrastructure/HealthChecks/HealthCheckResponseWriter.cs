@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Sfa.Tl.Find.Provider.Application.HealthChecks;
+namespace Sfa.Tl.Find.Provider.Infrastructure.HealthChecks;
 public static class HealthCheckResponseWriter
 {
     public static Task WriteJsonResponse(HttpContext httpContext, HealthReport result)
