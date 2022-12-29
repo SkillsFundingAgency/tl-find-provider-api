@@ -21,7 +21,4 @@ public static class Constants
     public const string SqlConnectionStringConfigKey = "SqlConnectionString";
     public const string TownDataImportScheduleConfigKey = "TownDataImportSchedule";
     public const string SkipProviderAuthenticationConfigKey = "StubProviderAuth";
-
-    public const int DefaultAbsoluteExpirationInMinutes = 60;
-    public const int DefaultSlidingExpirationInMinutes = 10;
 }
