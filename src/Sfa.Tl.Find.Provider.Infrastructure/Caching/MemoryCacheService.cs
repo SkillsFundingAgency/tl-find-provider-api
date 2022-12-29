@@ -1,20 +1,16 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Infrastructure.Caching;
 public class MemoryCacheService : ICacheService
 {
     private readonly IMemoryCache _cache;
-    private readonly ILogger<MemoryCacheService> _logger;
 
     public MemoryCacheService(
-        IMemoryCache cache,
-        ILogger<MemoryCacheService> logger)
+        IMemoryCache cache)
     {
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public Task<T?> Get<T>(string key)
@@ -49,7 +45,6 @@ public class MemoryCacheService : ICacheService
     {
         key = CacheKeys.GenerateTypedCacheKey<T>(key);
         _cache.Remove(key);
-
         return Task.CompletedTask;
     }
 }

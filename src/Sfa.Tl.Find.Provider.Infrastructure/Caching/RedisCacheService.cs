@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using StackExchange.Redis;
 
@@ -8,33 +7,26 @@ public class RedisCacheService : ICacheService
 {
     private readonly IConnectionMultiplexer _connectionMultiplexer;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<RedisCacheService> _logger;
 
     public RedisCacheService(
         IConnectionMultiplexer connectionMultiplexer,
-        IDateTimeProvider dateTimeProvider,
-        ILogger<RedisCacheService> logger)
+        IDateTimeProvider dateTimeProvider)
     {
         _connectionMultiplexer = connectionMultiplexer ?? throw new ArgumentNullException(nameof(connectionMultiplexer));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<T?> Get<T>(string key)
     {
         key = CacheKeys.GenerateTypedCacheKey<T>(key);
-        _logger.LogInformation("RedisCacheService::Get {key} of type {type}", key, typeof(T).Name);
-
         var database = GetDatabase();
         var cachedValue = await database.StringGetAsync(key);
-        return cachedValue.HasValue ? JsonSerializer.Deserialize<T>(cachedValue) : default(T);
+        return cachedValue.HasValue ? JsonSerializer.Deserialize<T>(cachedValue!) : default;
     }
 
     public Task<bool> KeyExists<T>(string key)
     {
         key = CacheKeys.GenerateTypedCacheKey<T>(key);
-        _logger.LogInformation("RedisCacheService::KeyExists {key} of type {type}", key, typeof(T).Name);
-
         var database = GetDatabase();
 
         return database.KeyExistsAsync(key);
@@ -53,8 +45,6 @@ public class RedisCacheService : ICacheService
     public async Task Remove<T>(string key)
     {
         key = CacheKeys.GenerateTypedCacheKey<T>(key);
-        _logger.LogInformation("RedisCacheService::Remove {key} of type {type}", key, typeof(T).Name);
-
         var database = GetDatabase();
         await database.KeyDeleteAsync(key, CommandFlags.FireAndForget);
     }
@@ -64,9 +54,6 @@ public class RedisCacheService : ICacheService
         if (customType == null) return;
 
         key = CacheKeys.GenerateTypedCacheKey<T>(key);
-        _logger.LogInformation("RedisCacheService::SetCustomValueAsync {key} of type {type}, cache time {cacheTime}",
-            key, typeof(T).Name, cacheTime);
-
         var database = GetDatabase();
         await database.StringSetAsync(key, JsonSerializer.Serialize(customType), cacheTime);
     }
