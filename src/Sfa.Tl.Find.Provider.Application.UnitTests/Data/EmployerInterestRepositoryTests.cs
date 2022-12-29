@@ -362,7 +362,9 @@ public class EmployerInterestRepositoryTests
             .Build(dbContextWrapper, 
                 dynamicParametersWrapper);
 
-        var results = await repository.DeleteExpired(date);
+        var results = (await repository
+            .DeleteExpired(date))
+            .ToList();
 
         results.Should().NotBeNullOrEmpty();
         results.Count().Should().Be(employerInterestsCount);
@@ -612,6 +614,7 @@ public class EmployerInterestRepositoryTests
     public async Task ExtendExpiry_Calls_Database_And_Returns_True_When_Update_Completed()
     {
         const int numberOfDaysToExtend = 84;
+        const int expiryNotificationDays = 7;
         var uniqueId = new Guid();
         
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
@@ -630,7 +633,10 @@ public class EmployerInterestRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper);
 
-        var result = await repository.ExtendExpiry(uniqueId, numberOfDaysToExtend);
+        var result = await repository.ExtendExpiry(
+            uniqueId, 
+            numberOfDaysToExtend,
+            expiryNotificationDays);
 
         result.Should().BeTrue();
 
@@ -640,7 +646,8 @@ public class EmployerInterestRepositoryTests
                 Arg.Is<string>(s => 
                     s.Contains("UPDATE dbo.EmployerInterest") &&
                     s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate)") &&
-                s.Contains("WHERE UniqueId = @uniqueId")),
+                    s.Contains("WHERE UniqueId = @uniqueId") &&
+                    s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
@@ -648,6 +655,7 @@ public class EmployerInterestRepositoryTests
     public async Task ExtendExpiry_Calls_Database_And_Returns_False_When_No_Updates_Completed()
     {
         const int numberOfDaysToExtend = 84;
+        const int expiryNotificationDays = 7;
         var uniqueId = new Guid();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
@@ -666,7 +674,10 @@ public class EmployerInterestRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper);
 
-        var result = await repository.ExtendExpiry(uniqueId, numberOfDaysToExtend);
+        var result = await repository.ExtendExpiry(
+            uniqueId, 
+            numberOfDaysToExtend,
+            expiryNotificationDays);
 
         result.Should().BeFalse();
 
@@ -677,7 +688,8 @@ public class EmployerInterestRepositoryTests
                     s.Contains("UPDATE dbo.EmployerInterest") &&
                     s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate),") &&
                     s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE UniqueId = @uniqueId")),
+                    s.Contains("WHERE UniqueId = @uniqueId") &&
+                    s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
@@ -685,6 +697,7 @@ public class EmployerInterestRepositoryTests
     public async Task ExtendExpiry_Sets_Dynamic_Parameters()
     {
         const int numberOfDaysToExtend = 84;
+        const int expiryNotificationDays = 7;
         var uniqueId = new Guid();
 
         var dbContextWrapper = new DbContextWrapperBuilder()
@@ -697,7 +710,9 @@ public class EmployerInterestRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper);
 
-        await repository.ExtendExpiry(uniqueId, numberOfDaysToExtend);
+        await repository.ExtendExpiry(uniqueId, 
+            numberOfDaysToExtend,
+            expiryNotificationDays);
 
         var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
             .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -709,15 +724,19 @@ public class EmployerInterestRepositoryTests
 
         var item = templates!.First();
         var pi = item.GetType().GetProperties();
-        pi.Length.Should().Be(2);
+        pi.Length.Should().Be(3);
 
         var uniqueIdProperty = pi.SingleOrDefault(p => p.Name == "uniqueId");
         uniqueIdProperty.Should().NotBeNull();
         uniqueIdProperty!.GetValue(item).Should().Be(uniqueId);
         
-        var numberOfDaysProperty = pi.SingleOrDefault(p => p.Name == "numberOfDaysToExtend");
-        numberOfDaysProperty.Should().NotBeNull();
-        numberOfDaysProperty!.GetValue(item).Should().Be(numberOfDaysToExtend);
+        var numberOfDaysToExtendProperty = pi.SingleOrDefault(p => p.Name == "numberOfDaysToExtend");
+        numberOfDaysToExtendProperty.Should().NotBeNull();
+        numberOfDaysToExtendProperty!.GetValue(item).Should().Be(numberOfDaysToExtend);
+
+        var expiryNotificationDaysProperty = pi.SingleOrDefault(p => p.Name == "expiryNotificationDays");
+        expiryNotificationDaysProperty.Should().NotBeNull();
+        expiryNotificationDaysProperty!.GetValue(item).Should().Be(expiryNotificationDays);
     }
 
     [Fact]

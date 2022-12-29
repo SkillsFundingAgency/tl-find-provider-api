@@ -536,7 +536,10 @@ public class EmployerInterestServiceTests
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
-        employerInterestRepository.ExtendExpiry(uniqueId, Arg.Any<int>())
+        employerInterestRepository.ExtendExpiry(
+                uniqueId, 
+                Arg.Any<int>(),
+                Arg.Any<int>())
             .Returns(true);
 
         var service = new EmployerInterestServiceBuilder()
@@ -549,7 +552,10 @@ public class EmployerInterestServiceTests
 
         await employerInterestRepository
             .Received(1)
-            .ExtendExpiry(uniqueId, settings.RetentionDays);
+            .ExtendExpiry(
+                uniqueId, 
+                settings.RetentionDays, 
+                settings.ExpiryNotificationDays);
     }
 
     [Fact]
@@ -854,7 +860,6 @@ public class EmployerInterestServiceTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.Today.Returns(_defaultDateToday);
 
-        const int count = 9;
         var expiredEmployerInterest = new ExpiredEmployerInterestDtoBuilder()
             .BuildList()
             .ToList();

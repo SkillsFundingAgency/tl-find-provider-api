@@ -451,7 +451,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         return (searchResults, totalEmployerInterestsCount);
     }
 
-    public async Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDaysToExtend)
+    public async Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDaysToExtend, int expiryNotificationDays)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -460,7 +460,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         _dynamicParametersWrapper.CreateParameters(new
         {
             uniqueId, 
-            numberOfDaysToExtend
+            numberOfDaysToExtend,
+            expiryNotificationDays
         });
 
         var rowsAffected = await _dbContextWrapper.ExecuteAsync(
@@ -468,7 +469,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             "UPDATE dbo.EmployerInterest " +
             "SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate), " +
             "    ModifiedOn = GETUTCDATE() " +
-            "WHERE UniqueId = @uniqueId",
+            "WHERE UniqueId = @uniqueId " +
+            "AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())",
             _dynamicParametersWrapper.DynamicParameters);
 
         return rowsAffected > 0;
