@@ -6,9 +6,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.2" />
-		<PackageReference Include="Aspose.Zip" Version="22.10.0" />
-		<PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
+		<PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
+		<PackageReference Include="Aspose.Zip" Version="22.11.0" />
+		<PackageReference Include="Azure.Data.Tables" Version="12.7.1" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />

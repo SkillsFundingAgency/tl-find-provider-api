@@ -10,6 +10,7 @@ public class EmployerInterestSummaryDto
     public string Industry { get; init; }
     public string Postcode { get; init; }
     public double? Distance { get; init; }
+    public DateTime? ExpiryDate { get; init; }
     public DateTime CreatedOn { get; init; }
     public DateTime? ModifiedOn { get; init; }
 }

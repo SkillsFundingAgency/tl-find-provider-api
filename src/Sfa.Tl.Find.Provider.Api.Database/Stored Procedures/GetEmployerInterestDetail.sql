@@ -1,8 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[GetEmployerInterestDetail]
 	@id [INT]
 AS
-	--SET NOCOUNT ON;
-
 	SELECT		ei.[Id],
 				ei.[UniqueId],
 				ei.[OrganisationName],
@@ -13,6 +11,7 @@ AS
 				ei.[Telephone],
 				ei.[ContactPreferenceType],
 				ei.[AdditionalInformation],
+				ei.[ExpiryDate],
 				eil.[Latitude],
 				eil.[Longitude],
 				ei.[CreatedOn],

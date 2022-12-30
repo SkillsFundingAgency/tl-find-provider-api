@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Api.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
-using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
@@ -147,7 +146,8 @@ public class ProvidersController : ControllerBase
     public async Task<IActionResult> GetProviderDataCsvFileInfo()
     {
         const string key = CacheKeys.ProviderDataDownloadInfoKey;
-        if (!_cacheService.TryGetValue(key, out ProviderDataDownloadInfoResponse info))
+        var info = await _cacheService.Get<ProviderDataDownloadInfoResponse?>(key);
+        if (info is null)
         {
             var bytes = await _providerDataService.GetCsv();
 
@@ -157,11 +157,7 @@ public class ProvidersController : ControllerBase
                 FileSize = bytes.Length
             };
 
-            _cacheService.Set(key, info,
-                CacheUtilities.DefaultMemoryCacheEntryOptions(
-                    _dateTimeProvider,
-                    _logger));
-
+            await _cacheService.Set(key, info, CacheDuration.Long);
         }
 
         return Ok(info);

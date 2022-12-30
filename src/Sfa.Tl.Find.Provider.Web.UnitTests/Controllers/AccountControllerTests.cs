@@ -144,9 +144,9 @@ public class AccountControllerTests
 
         await controller.SignOut();
 
-        cacheService
+        await cacheService
             .Received(1)
-            .Remove(Arg.Is<string>(k => k.StartsWith("USERID")));
+            .Remove<DateTime>(Arg.Is<string>(k => k.StartsWith("USERID")));
     }
     
     [Fact]

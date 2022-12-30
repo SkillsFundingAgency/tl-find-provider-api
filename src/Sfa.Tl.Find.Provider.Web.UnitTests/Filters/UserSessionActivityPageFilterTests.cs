@@ -56,7 +56,7 @@ public class UserSessionActivityPageFilterTests
 
         await filter.OnPageHandlerExecutionAsync(context, Next);
 
-        cacheService
+        await cacheService
             .Received(1)
             .Set(Arg.Is<string>(k => k.StartsWith("USER")),
                 timeNowUtc);
@@ -104,7 +104,7 @@ public class UserSessionActivityPageFilterTests
 
         await filter.OnPageHandlerExecutionAsync(context, Next);
 
-        cacheService
+        await cacheService
             .DidNotReceive()
             .Set(Arg.Any<string>(),
                 Arg.Any<object>());

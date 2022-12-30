@@ -21,7 +21,8 @@ AS
         [Telephone], 
         [Website], 
         [ContactPreferenceType],
-        [AdditionalInformation]) 
+        [AdditionalInformation],
+        [ExpiryDate]) 
     SELECT [UniqueId], 
         [OrganisationName], 
         [ContactName], 
@@ -31,7 +32,8 @@ AS
         [Telephone], 
         [Website], 
         [ContactPreferenceType],
-        [AdditionalInformation] 
+        [AdditionalInformation],
+        [ExpiryDate]
     FROM @data
 
     --This works for one insert - if we have multiple see https://stackoverflow.com/questions/55606203/get-multiple-scope-identity-while-inserting-data-with-table-valued-parameter

@@ -3,7 +3,6 @@ using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
-using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Providers;
@@ -24,8 +23,6 @@ builder.Services
 
 builder.Services.AddConfigurationOptions(siteConfiguration);
 
-builder.Services.AddMemoryCache();
-
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -40,7 +37,7 @@ if (bool.TryParse(builder.Configuration[ConfigurationConstants.SkipProviderAuthe
 }
 else
 {
-    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings, builder.Environment);
+    builder.Services.AddProviderAuthentication(siteConfiguration.DfeSignInSettings!, builder.Environment);
     builder.Services.AddWebDataProtection(siteConfiguration);
 }
 
@@ -87,7 +84,7 @@ builder.Services
     {
         options.Cookie.Name = ".cookies.session";
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.IdleTimeout = TimeSpan.FromMinutes(siteConfiguration.DfeSignInSettings.Timeout);
+        options.IdleTimeout = TimeSpan.FromMinutes(siteConfiguration.DfeSignInSettings?.Timeout ?? 20);
         options.Cookie.IsEssential = true;
     })
     .AddTransient<ISessionService>(x =>
@@ -111,7 +108,7 @@ builder.Services
 builder.Services.AddHttpClients();
 
 builder.Services
-    .AddScoped<IDateTimeProvider, DateTimeProvider>()
+    .AddSingleton<IDateTimeProvider, DateTimeProvider>()
     .AddScoped<IDbContextWrapper, DbContextWrapper>()
     .AddScoped<IGuidProvider, GuidProvider>()
     .AddTransient<IDfeSignInTokenService, DfeSignInTokenService>()
@@ -127,8 +124,7 @@ builder.Services
     .AddTransient<IRouteRepository, RouteRepository>()
     .AddTransient<ITownRepository, TownRepository>();
 
-builder.Services
-    .AddTransient<ICacheService, MemoryCacheService>();
+builder.Services.AddCachingServices(siteConfiguration.RedisCacheConnectionString);
 
 builder.Services.AddNotifyService(
     siteConfiguration.EmailSettings?.GovNotifyApiKey);

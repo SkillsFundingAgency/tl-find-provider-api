@@ -4,7 +4,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.HttpClientHelpers;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Extensions;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Extensions;
 
 public class HttpRequestExtensionsTests
 {

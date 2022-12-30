@@ -588,17 +588,8 @@ public class ProvidersControllerTests
             };
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.TryGetValue(Arg.Any<string>(), out Arg.Any<ProviderDataDownloadInfoResponse>())
-            .Returns(x =>
-            {
-                if ((string)x[0] == CacheKeys.ProviderDataDownloadInfoKey)
-                {
-                    x[1] = cachedInfo;
-                    return true;
-                }
-
-                return false;
-            });
+        cacheService.Get<ProviderDataDownloadInfoResponse?>(CacheKeys.ProviderDataDownloadInfoKey)
+            .Returns(cachedInfo);
 
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.Today.Returns(DateTime.Parse("2022-08-19"));

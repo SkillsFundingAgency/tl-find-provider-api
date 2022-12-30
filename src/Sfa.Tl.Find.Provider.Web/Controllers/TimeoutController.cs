@@ -38,7 +38,7 @@ public class TimeoutController : Controller
     [Route("active-duration", Name = "ActiveDuration")]
     public async Task<IActionResult> GetActiveDuration()
     {
-        var registeredSessionTime = _cacheService.Get<DateTime?>(User.GetUserSessionCacheKey());
+        var registeredSessionTime = await _cacheService.Get<DateTime?>(User.GetUserSessionCacheKey());
         var remainingActiveDuration =
             registeredSessionTime != null && registeredSessionTime != DateTime.MinValue
                 ? registeredSessionTime.Value.AddMinutes(_signInSettings.Timeout) - _dateTimeProvider.UtcNow 
@@ -51,7 +51,7 @@ public class TimeoutController : Controller
     [Route("renew-activity", Name = "RenewSessionActivity")]
     public async Task<IActionResult> RenewSessionActivity()
     {
-        _cacheService.Set(User.GetUserSessionCacheKey(), _dateTimeProvider.UtcNow);
+        await _cacheService.Set(User.GetUserSessionCacheKey(), _dateTimeProvider.UtcNow);
         return Json(new SessionActivityData { Minutes = _signInSettings.Timeout, Seconds = 0 });
     }
 
@@ -59,7 +59,7 @@ public class TimeoutController : Controller
     [Route("activity-timeout", Name = "ActivityTimeout")]
     public async Task ActivityTimeout()
     {
-        _cacheService.Remove(User.GetUserSessionCacheKey());
+        await _cacheService.Remove<DateTime>(User.GetUserSessionCacheKey());
 
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

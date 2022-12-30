@@ -14,8 +14,7 @@ public static class PollyPolicyBuilder
             .When(x =>
                 x.ExecuteAsync(
                     Arg.Any<Func<Context, Task>>(),
-                    Arg.Any<Context>()
-                    ))
+                    Arg.Any<Context>()))
             .Do(x =>
             {
                 var func = x.Arg<Func<Context, Task>>();
@@ -31,9 +30,8 @@ public static class PollyPolicyBuilder
         var policy = Substitute.For<IAsyncPolicy>();
         policy
             .ExecuteAsync(
-                    Arg.Any<Func<Context, Task<TResult>>>(),
-                    Arg.Any<Context>()
-                )
+                Arg.Any<Func<Context, Task<TResult>>>(),
+                Arg.Any<Context>())
             .Returns(x =>
             {
                 var func = x.Arg<Func<Context, Task<TResult>>>();
@@ -75,21 +73,6 @@ public static class PollyPolicyBuilder
 
         return (policy, policyRegistry);
     }
-
-    //public static (IAsyncPolicy<T>, IReadOnlyPolicyRegistry<string>) BuildDapperPolicyAndRegistry<T>(
-    //    IAsyncPolicy<T> policy = null)
-    //{
-    //    policy ??= BuildPolicy<T>();
-    //    //var innerPolicy = policy != null 
-    //    //    ? policy
-    //    //    : BuildPolicy<T>();
-
-    //    var policyRegistry = BuildPolicyRegistry(
-    //        policy,
-    //        policyKey: Constants.DapperRetryPolicyName);
-
-    //    return (policy, policyRegistry);
-    //}
 
     public static (IAsyncPolicy Policy, IReadOnlyPolicyRegistry<string> Registry) BuildGovNotifyPolicyAndRegistry(
         IAsyncPolicy policy = null)

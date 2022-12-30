@@ -19,6 +19,7 @@ AS
 			ei.[OrganisationName],
 			ei.[OtherIndustry],
 			el.[Location].STDistance(@fromLocation) / @metersPerMile AS [Distance], --(Miles)
+			ei.[ExpiryDate],
 			ei.[CreatedOn],
 			ei.[ModifiedOn]
 		FROM [dbo].[EmployerInterest] ei
@@ -39,6 +40,7 @@ AS
 			ei.[OrganisationName],
 			ei.[Distance],
 			COALESCE (i.[Name], ei.[OtherIndustry]) AS Industry,
+			ei.[ExpiryDate],
 			ei.[CreatedOn],
 			ei.[ModifiedOn],
 			r.[Id] AS [RouteId],

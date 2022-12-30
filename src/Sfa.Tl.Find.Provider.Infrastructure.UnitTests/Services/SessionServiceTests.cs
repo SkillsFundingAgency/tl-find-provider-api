@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Sfa.Tl.Find.Provider.Infrastructure.Services;
-using Sfa.Tl.Find.Provider.Infrastructure.Tests.Builders;
-using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Sfa.Tl.Find.Provider.Infrastructure.Services;
+using Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Services;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Services;
 public class SessionServiceTests
 {
     private const string TestEnvironment = "TEST";

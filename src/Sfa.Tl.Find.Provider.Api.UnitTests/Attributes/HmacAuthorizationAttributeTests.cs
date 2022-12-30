@@ -33,11 +33,13 @@ public class HmacAuthorizationAttributeTests
                 .BuildApiSettings());
 
         var cacheService = Substitute.For<ICacheService>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var logger = Substitute.For<ILogger<HmacAuthorizationFilter>>();
 
         var serviceProvider = new ServiceCollection()
             .AddScoped(_ => apiSettingOptions)
             .AddScoped(_ => cacheService)
+            .AddScoped(_ => dateTimeProvider)
             .AddScoped(_ => logger)
             .BuildServiceProvider();
 

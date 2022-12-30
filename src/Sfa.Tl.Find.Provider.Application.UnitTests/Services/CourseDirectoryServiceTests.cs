@@ -158,17 +158,16 @@ public class CourseDirectoryServiceTests
 
         await service.ImportProviders();
 
-        cacheService
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.QualificationsKey);
-        cacheService
+            .Remove<IList<Qualification>>(CacheKeys.QualificationsKey);
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.RoutesKey);
-        cacheService
+            .Remove<IList<Route>>(CacheKeys.RoutesKey);
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.ProviderDataDownloadInfoKey);
+            .Remove<ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey);
     }
-
 
     [Fact]
     public async Task ImportQualifications_Clears_Caches()
@@ -186,14 +185,14 @@ public class CourseDirectoryServiceTests
 
         await service.ImportQualifications();
 
-        cacheService
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.QualificationsKey);
-        cacheService
+            .Remove<IList<Qualification>>(CacheKeys.QualificationsKey);
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.RoutesKey);
-        cacheService
+            .Remove<IList<Route>>(CacheKeys.RoutesKey);
+        await cacheService
             .Received(1)
-            .Remove(CacheKeys.ProviderDataDownloadInfoKey);
+            .Remove<ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

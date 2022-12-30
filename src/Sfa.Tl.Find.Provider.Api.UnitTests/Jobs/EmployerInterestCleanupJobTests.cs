@@ -41,6 +41,7 @@ public class EmployerInterestCleanupJobTests
 
         await job.Execute(jobContext);
 
+        await employerInterestService.Received(1).NotifyExpiringEmployerInterest();
         await employerInterestService.Received(1).RemoveExpiredEmployerInterest();
     }
 }
