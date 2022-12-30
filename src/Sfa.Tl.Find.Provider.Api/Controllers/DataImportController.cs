@@ -14,17 +14,19 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 public class DataImportController : ControllerBase
 {
     private readonly IProviderDataService _providerDataService;
+    private readonly ITownDataService _townDataService;
     private readonly ILogger<DataImportController> _logger;
 
     public DataImportController(
         IProviderDataService providerDataService,
+        ITownDataService townDataService,
         ILogger<DataImportController> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    [HttpGet]
     [HttpPost]
     [Route("provider/contacts")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -57,7 +59,6 @@ public class DataImportController : ControllerBase
         }
     }
 
-    [HttpGet]
     [HttpPost]
     [Route("provider/data")]
     //[RequestSizeLimit(500 * 1024 * 1024)] //unit is bytes => 500Mb
@@ -100,7 +101,7 @@ public class DataImportController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
-    [HttpGet]
+
     [HttpPost]
     [Route("provider/data/zip")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -166,4 +167,35 @@ public class DataImportController : ControllerBase
         }
     }
 
+    [HttpPost]
+    [Route("towns")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UploadTowns(IFormFile file)
+    {
+        try
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadTowns)} called.");
+            }
+
+            if (file is null)
+            {
+                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadTowns)} has no file.");
+                return BadRequest("File is required.");
+            }
+
+            await _townDataService.ImportTowns(
+                file.OpenReadStream());
+
+            return Accepted();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
 }

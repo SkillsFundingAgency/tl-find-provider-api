@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Builders\Csv\Assets\IndexOfPlaceNames.csv" />
     <None Remove="Builders\Csv\Assets\ProviderContacts.csv" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tlevels.json" />
@@ -34,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Builders\Csv\Assets\IndexOfPlaceNames.csv" />
     <EmbeddedResource Include="Builders\Csv\Assets\ProviderContacts.csv" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tlevels.json" />

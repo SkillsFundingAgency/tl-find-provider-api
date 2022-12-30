@@ -1,6 +1,10 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Globalization;
+using System.Net;
 using System.Text.Json;
+using CsvHelper;
 using Microsoft.Extensions.Logging;
+using Sfa.Tl.Find.Provider.Application.ClassMaps;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -40,36 +44,23 @@ public class TownDataService : ITownDataService
     public async Task ImportTowns()
     {
         var items = await ReadOnsLocationData();
+        await SaveTowns(items);
+    }
 
-        var towns = items
-            .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
-                           !string.IsNullOrEmpty(item.LocalAuthorityName) &&
-                           !string.IsNullOrEmpty(item.LocationAuthorityDistrict) &&
-                           item.PlaceName != PlaceNameDescription.None)
-            .GroupBy(c => new
-            {
-                c.LocalAuthorityName,
-                Name = c.LocationName,
-                c.LocationAuthorityDistrict
-            })
-            .Select(item => item.First())
-            .GroupBy(c => new
-            {
-                c.Id
-            })
-            .Select(SelectDuplicateByLocalAuthorityDistrictDescription)
-            .Select(item => new Town
-            {
-                Id = item.Id,
-                Name = item.LocationName,
-                County = item.CountyName,
-                LocalAuthority = item.LocalAuthorityName,
-                Latitude = item.Latitude,
-                Longitude = item.Longitude
-            })
+    public async Task ImportTowns(Stream stream)
+    {
+        using var reader = new StreamReader(stream);
+        using var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
+        csvReader.Context.RegisterClassMap<OnsLocationApiItemClassMap>();
+
+        var items = csvReader
+            .GetRecords<OnsLocationApiItem>()
+            //Need to filter because file includes all nations, unlike the pre-filtered API call
+            .Where(item => string.Compare(item.Country, "England", StringComparison.InvariantCultureIgnoreCase) == 0
+                           && item.PopulationCount is >= 500 and <= 10000000)
             .ToList();
-
-        await _townRepository.Save(towns);
+        
+        await SaveTowns(items);
     }
 
     public async Task<IEnumerable<Town>> Search(string searchTerm, int maxResults = Constants.TownSearchDefaultMaxResults)
@@ -155,6 +146,65 @@ public class TownDataService : ITownDataService
             });
 
         return (towns, exceededTransferLimit);
+    }
+
+    private async Task SaveTowns(IEnumerable<OnsLocationApiItem> rawData)
+    {
+        foreach (var item in rawData)
+        {
+            Debug.WriteLine($"{item.LocationName} - {item.LocalAuthorityName} - {item.LocationAuthorityDistrict} - {item.PlaceName}");
+        }
+        var t1 = rawData
+            .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
+                           !string.IsNullOrEmpty(item.LocalAuthorityName) &&
+                           !string.IsNullOrEmpty(item.LocationAuthorityDistrict) &&
+                           item.PlaceName != PlaceNameDescription.None)
+            .ToList();
+
+        var t2 = rawData
+            .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
+                           !string.IsNullOrEmpty(item.LocalAuthorityName) &&
+                           !string.IsNullOrEmpty(item.LocationAuthorityDistrict) &&
+                           item.PlaceName != PlaceNameDescription.None)
+            .GroupBy(c => new
+            {
+                c.LocalAuthorityName,
+                Name = c.LocationName,
+                c.LocationAuthorityDistrict
+            })
+            .Select(item => item.First())
+            .ToList();
+
+
+        var towns = rawData
+            .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
+                           !string.IsNullOrEmpty(item.LocalAuthorityName) &&
+                           !string.IsNullOrEmpty(item.LocationAuthorityDistrict) &&
+                           item.PlaceName != PlaceNameDescription.None)
+            .GroupBy(c => new
+            {
+                c.LocalAuthorityName,
+                Name = c.LocationName,
+                c.LocationAuthorityDistrict
+            })
+            .Select(item => item.First())
+            .GroupBy(c => new
+            {
+                c.Id
+            })
+            .Select(SelectDuplicateByLocalAuthorityDistrictDescription)
+            .Select(item => new Town
+            {
+                Id = item.Id,
+                Name = item.LocationName,
+                County = item.CountyName,
+                LocalAuthority = item.LocalAuthorityName,
+                Latitude = item.Latitude,
+                Longitude = item.Longitude
+            })
+            .ToList();
+
+        await _townRepository.Save(towns);
     }
 
     private static OnsLocationApiItem SelectDuplicateByLocalAuthorityDistrictDescription(IEnumerable<OnsLocationApiItem> items)

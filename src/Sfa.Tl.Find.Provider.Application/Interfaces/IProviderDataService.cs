@@ -20,7 +20,7 @@ public interface IProviderDataService
         int pageSize = Constants.DefaultPageSize);
 
     Task<byte[]> GetCsv();
-    
+
     Task<ProviderDetailResponse> GetAllProviders();
 
     Task<IEnumerable<Industry>> GetIndustries();
@@ -31,14 +31,11 @@ public interface IProviderDataService
 
     Task<IEnumerable<Route>> GetRoutes();
 
-    
     Task<bool> HasQualifications();
 
     Task<bool> HasProviders();
-    
+
     Task ImportProviderContacts(Stream stream);
 
     Task ImportProviderData(Stream stream, bool isAdditionalData);
-
-
 }
