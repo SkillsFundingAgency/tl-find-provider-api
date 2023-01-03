@@ -7,6 +7,9 @@ using System.Net.Http.Headers;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using StackExchange.Redis;
 
 // ReSharper disable UnusedMethodReturnValue.Global
 
@@ -83,7 +86,7 @@ public static class ServiceCollectionExtensions
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 })
             .AddRetryPolicyHandler<DfeSignInApiService>();
-        
+
         return services;
     }
 
@@ -95,6 +98,31 @@ public static class ServiceCollectionExtensions
         {
             services.AddTransient<IAsyncNotificationClient>(
                 _ => new NotificationClient(govNotifyApiKey));
+        }
+
+        return services;
+    }
+
+    public static IServiceCollection AddCachingServices(
+        this IServiceCollection services,
+        string? redisCacheConnectionString)
+    {
+        if (!string.IsNullOrEmpty(redisCacheConnectionString))
+        {
+            services
+                .AddStackExchangeRedisCache(o =>
+                {
+                    o.Configuration = redisCacheConnectionString;
+                })
+                .AddSingleton<IConnectionMultiplexer>(x =>
+                    ConnectionMultiplexer.Connect(redisCacheConnectionString))
+                .AddSingleton<ICacheService, RedisCacheService>();
+        }
+        else
+        {
+            services
+                .AddMemoryCache()
+                .AddSingleton<ICacheService, MemoryCacheService>();
         }
 
         return services;

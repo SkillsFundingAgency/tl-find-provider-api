@@ -1,5 +1,4 @@
-﻿
-using Sfa.Tl.Find.Provider.Application.Models;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
@@ -7,17 +6,22 @@ public interface IEmployerInterestRepository
 {
     Task<(int Count, Guid UniqueId)> Create(
         EmployerInterest employerInterest,
-        GeoLocation geoLocation);
+        GeoLocation geoLocation,
+        DateTime expiryDate);
 
     Task<int> Delete(int id);
 
     Task<int> Delete(Guid uniqueId);
 
-    Task<int> DeleteBefore(DateTime date);
+    Task<IEnumerable<ExpiredEmployerInterestDto>> DeleteExpired(DateTime date);
 
-    Task<EmployerInterestDetail> GetDetail(int id);
+    Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDaysToExtend, int expiryNotificationDays);
 
     Task<IEnumerable<EmployerInterest>> GetAll();
+    
+    Task<EmployerInterestDetail> GetDetail(int id);
+
+    Task<IEnumerable<EmployerInterest>> GetExpiringInterest(int daysToExpiry);
 
     Task<IEnumerable<EmployerInterestSummary>> GetSummaryList();
 
@@ -25,4 +29,6 @@ public interface IEmployerInterestRepository
         double latitude, 
         double longitude, 
         int searchRadius);
+
+    Task UpdateExtensionEmailSentDate(int id);
 }

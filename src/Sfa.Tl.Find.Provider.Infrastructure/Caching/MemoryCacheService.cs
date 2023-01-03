@@ -1,49 +1,50 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Infrastructure.Caching;
 public class MemoryCacheService : ICacheService
 {
     private readonly IMemoryCache _cache;
-    private readonly ILogger<MemoryCacheService> _logger;
 
     public MemoryCacheService(
-        IMemoryCache cache,
-        ILogger<MemoryCacheService> logger)
+        IMemoryCache cache)
     {
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public T Get<T>(object key)
+    public Task<T?> Get<T>(string key)
     {
-        TryGetValue(key, out T value);
-        return value;
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
+        return _cache.TryGetValue<string>(key, out var value) 
+            ? Task.FromResult(JsonSerializer.Deserialize<T>(value)) 
+            : Task.FromResult(default(T));
     }
 
-    public bool TryGetValue<T>(object key, out T value)
+    public Task<bool> KeyExists<T>(string key)
     {
-        return _cache.TryGetValue(key, out value);
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
+        return Task.FromResult(_cache.TryGetValue<string>(key, out _));
     }
 
-    public T Set<T>(string key, T value)
+    public Task Set<T>(string key, T value, CacheDuration cacheDuration = CacheDuration.Standard)
     {
-        return _cache.Set(key, value);
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
+        _cache.Set(key, JsonSerializer.Serialize(value), TimeSpan.FromMinutes((int)cacheDuration));
+        return Task.CompletedTask;
     }
 
-    public T Set<T>(string key, T value, DateTimeOffset absoluteExpiration)
+    public Task Set<T>(string key, T value, DateTimeOffset absoluteExpiration)
     {
-        return _cache.Set(key, value, absoluteExpiration);
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
+        _cache.Set(key, JsonSerializer.Serialize(value), absoluteExpiration);
+        return Task.CompletedTask;
     }
 
-    public T Set<T>(string key, T value, MemoryCacheEntryOptions options)
+    public Task Remove<T>(string key)
     {
-        return _cache.Set(key, value, options);
-    }
-
-    public void Remove(object key)
-    {
+        key = CacheKeys.GenerateTypedCacheKey<T>(key);
         _cache.Remove(key);
+        return Task.CompletedTask;
     }
 }

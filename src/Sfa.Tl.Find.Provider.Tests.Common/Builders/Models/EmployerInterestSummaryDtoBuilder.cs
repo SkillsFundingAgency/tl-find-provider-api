@@ -15,6 +15,7 @@ public class EmployerInterestSummaryDtoBuilder
                 Distance = 1.0,
                 Industry = "",
                 CreatedOn = DateTime.Parse("2022-10-01 12:00"),
+                ExpiryDate = DateTime.Parse("2022-12-24 23:59:59.9999999"),
                 ModifiedOn = null
             },
             new()
@@ -25,6 +26,7 @@ public class EmployerInterestSummaryDtoBuilder
                 Distance = 1.0,
                 Industry = "",
                 CreatedOn = DateTime.Parse("2022-10-01 12:00"),
+                ExpiryDate = DateTime.Parse("2022-12-24 23:59:59.9999999"),
                 ModifiedOn = null
             }
         };

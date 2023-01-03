@@ -16,4 +16,4 @@ Post-Deployment Script
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
 
-	
+:r ".\Set Expiry Dates.sql"

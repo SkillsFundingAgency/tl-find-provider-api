@@ -16,11 +16,9 @@ public static class Constants
     public const string EmployerInterestSettingsConfigKey = "EmployerInterestSettings";
     public const string GoogleMapsApiSettingsConfigKey = "GoogleMapsApiSettings";
     public const string PostcodeApiSettingsConfigKey = "PostcodeApiSettings";
-    public const string SqlConnectionStringConfigKey = "SqlConnectionString";
+    public const string RedisCacheConnectionStringConfigKey = "RedisCacheConnectionString";
     public const string SearchSettingsConfigKey = "SearchSettings";
+    public const string SqlConnectionStringConfigKey = "SqlConnectionString";
     public const string TownDataImportScheduleConfigKey = "TownDataImportSchedule";
     public const string SkipProviderAuthenticationConfigKey = "StubProviderAuth";
-
-    public const int DefaultAbsoluteExpirationInMinutes = 60;
-    public const int DefaultSlidingExpirationInMinutes = 10;
 }

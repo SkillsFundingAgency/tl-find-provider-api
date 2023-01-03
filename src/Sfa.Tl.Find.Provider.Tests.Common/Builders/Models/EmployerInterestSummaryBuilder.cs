@@ -5,6 +5,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 public class EmployerInterestSummaryBuilder
 {
     private DateTime _creationDate = DateTime.Parse("2022-10-01 12:00");
+    private DateTime? _expiryDate = null;
     private DateTime? _modificationDate = null;
 
     public IEnumerable<EmployerInterestSummary> BuildList() =>
@@ -21,6 +22,7 @@ public class EmployerInterestSummaryBuilder
                 {
                     "Digital and IT"
                 },
+                ExpiryDate = _expiryDate,
                 CreatedOn = _creationDate,
                 ModifiedOn = _modificationDate
             },
@@ -36,6 +38,7 @@ public class EmployerInterestSummaryBuilder
                     "Creative and design",
                     "Digital and IT"
                 },
+                ExpiryDate = _creationDate,
                 CreatedOn = _creationDate,
                 ModifiedOn = _modificationDate
             }
@@ -53,10 +56,14 @@ public class EmployerInterestSummaryBuilder
         return this;
     }
 
+    public EmployerInterestSummaryBuilder WithExpiryDate(DateTime dateTime)
+    {
+        _expiryDate = dateTime;
+        return this;
+    }
     public EmployerInterestSummaryBuilder WithModificationDate(DateTime dateTime)
     {
         _modificationDate = dateTime;
         return this;
     }
-
 }

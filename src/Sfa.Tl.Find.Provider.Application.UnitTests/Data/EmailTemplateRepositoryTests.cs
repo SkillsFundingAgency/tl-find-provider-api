@@ -40,8 +40,7 @@ public class EmailTemplateRepositoryTests
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
-                dynamicParametersWrapper.DapperParameterFactory
-                );
+                dynamicParametersWrapper.DapperParameterFactory);
 
         var emailTemplate = (await repository
             .GetEmailTemplate(_testEmailTemplate.Name));
@@ -79,8 +78,7 @@ public class EmailTemplateRepositoryTests
                     && sql.Contains("SELECT TOP(1) TemplateId, Name")
                     && sql.Contains("FROM dbo.EmailTemplate")
                     && sql.Contains("WHERE TemplateId = @templateId")),
-                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters)
-                );
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
     [Fact]
@@ -138,8 +136,7 @@ public class EmailTemplateRepositoryTests
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
-                dynamicParametersWrapper.DapperParameterFactory
-                );
+                dynamicParametersWrapper.DapperParameterFactory);
 
         var emailTemplate = (await repository
             .GetEmailTemplateByName(_testEmailTemplate.Name));
@@ -173,11 +170,11 @@ public class EmailTemplateRepositoryTests
             .Received(1)
             .QueryAsync<EmailTemplate>(dbConnection,
                 Arg.Is<string>(sql =>
-                    !string.IsNullOrEmpty(sql)                    && sql.Contains("SELECT TOP(1) TemplateId, Name")
+                    !string.IsNullOrEmpty(sql)
+                    && sql.Contains("SELECT TOP(1) TemplateId, Name")
                     && sql.Contains("FROM dbo.EmailTemplate")
                     && sql.Contains("WHERE Name = @templateName")),
-                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters)
-                );
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
     [Fact]

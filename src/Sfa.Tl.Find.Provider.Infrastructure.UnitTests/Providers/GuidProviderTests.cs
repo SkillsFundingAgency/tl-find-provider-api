@@ -1,6 +1,6 @@
 ﻿using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 
-namespace Sfa.Tl.Find.Provider.Infrastructure.Tests.Providers;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Providers;
 
 public class GuidProviderTests
 {

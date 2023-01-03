@@ -5,7 +5,9 @@ Insert initial data for Email Templates
 MERGE INTO [dbo].[EmailTemplate] AS Target 
 USING (VALUES 
 	(N'EmailDeliveryStatus', N'42c160e8-8cf5-4ca0-96cf-202aa224dc67'),
-	(N'EmployerRegisterInterest', N'e4e773c1-09ed-4f66-82f9-289e6184b325')
+	(N'EmployerRegisterInterest', N'e4e773c1-09ed-4f66-82f9-289e6184b325'),
+	(N'EmployerExtendInterest', N'e0ead036-07c9-4b67-80b0-9249be59908f'),
+	(N'EmployerInterestRemoved', N'48b0d919-9a03-4707-991d-38e4393d42f8')
   )
   AS Source ([Name], [TemplateId]) 
 ON Target.[Name] = Source.[Name] 

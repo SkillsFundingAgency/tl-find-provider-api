@@ -1,12 +1,10 @@
 ﻿using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
-using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
@@ -15,26 +13,21 @@ public class PostcodeLookupService : IPostcodeLookupService
 {
     private readonly HttpClient _httpClient;
     private readonly ICacheService _cacheService;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<PostcodeLookupService> _logger;
 
     public PostcodeLookupService(
         HttpClient httpClient,
-        IDateTimeProvider dateTimeProvider,
-        ICacheService cacheService,
-        ILogger<PostcodeLookupService> logger)
+        ICacheService cacheService)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<GeoLocation> GetPostcode(string postcode)
     {
         var key = CacheKeys.PostcodeKey(postcode);
 
-        if (!_cacheService.TryGetValue(key, out GeoLocation geoLocation))
+        var geoLocation = await _cacheService.Get<GeoLocation?>(key);
+        if (geoLocation is null)
         {
             var responseMessage = await _httpClient.GetAsync($"postcodes/{postcode.FormatPostcodeForUri()}");
 
@@ -48,7 +41,7 @@ public class PostcodeLookupService : IPostcodeLookupService
                 ? await ReadPostcodeLocationFromResponse(responseMessage)
                 : null;
 
-            Cache(geoLocation, key);
+            await Cache(geoLocation, key);
         }
 
         return geoLocation;
@@ -58,7 +51,8 @@ public class PostcodeLookupService : IPostcodeLookupService
     {
         var key = CacheKeys.PostcodeKey(outcode);
 
-        if (!_cacheService.TryGetValue(key, out GeoLocation geoLocation))
+        var geoLocation = await _cacheService.Get<GeoLocation?>(key);
+        if (geoLocation is null)
         {
             var responseMessage = await _httpClient.GetAsync($"outcodes/{outcode}");
 
@@ -67,7 +61,7 @@ public class PostcodeLookupService : IPostcodeLookupService
                     "outcode")
                 : null;
 
-            Cache(geoLocation, key);
+            await Cache(geoLocation, key);
         }
 
         return geoLocation;
@@ -128,16 +122,13 @@ public class PostcodeLookupService : IPostcodeLookupService
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void Cache(GeoLocation geoLocation, string key)
+    private async Task Cache(GeoLocation geoLocation, string key)
     {
         if (geoLocation is null)
         {
             return;
         }
 
-        _cacheService.Set(key, geoLocation,
-            CacheUtilities.DefaultMemoryCacheEntryOptions(
-                _dateTimeProvider,
-                _logger));
+        await _cacheService.Set(key, geoLocation, CacheDuration.Medium);
     }
 }

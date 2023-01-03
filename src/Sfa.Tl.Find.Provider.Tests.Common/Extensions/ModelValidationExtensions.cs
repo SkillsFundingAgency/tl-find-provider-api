@@ -333,4 +333,18 @@ public static class ModelValidationExtensions
         town.Latitude.Should().Be(latitude);
         town.Longitude.Should().Be(longitude);
     }
+
+    public static void Validate(this EmployerInterestSummary employerInterestSummary, EmployerInterestSummaryDto expected)
+    {
+        employerInterestSummary.Id.Should().Be(expected.Id);
+        employerInterestSummary.OrganisationName.Should().Be(expected.OrganisationName);
+        employerInterestSummary.Industry.Should().Be(expected.Industry);
+        employerInterestSummary.Distance.Should().Be(expected.Distance);
+        employerInterestSummary.ExpiryDate.Should().Be(expected.ExpiryDate);
+        employerInterestSummary.CreatedOn.Should().Be(expected.CreatedOn);
+        employerInterestSummary.ModifiedOn.Should().Be(expected.ModifiedOn);
+        //employerInterestSummary.SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+        //employerInterestSummary.SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+
+    }
 }

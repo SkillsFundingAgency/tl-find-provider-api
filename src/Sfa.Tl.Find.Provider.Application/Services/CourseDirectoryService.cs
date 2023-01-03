@@ -54,7 +54,7 @@ public class CourseDirectoryService : ICourseDirectoryService
 
         _logger.LogInformation($"{nameof(CourseDirectoryService)} saved providers.");
 
-        ClearCaches();
+        await ClearCaches();
     }
 
     public async Task ImportQualifications()
@@ -76,7 +76,7 @@ public class CourseDirectoryService : ICourseDirectoryService
 
         _logger.LogInformation($"{nameof(CourseDirectoryService)} saved qualifications.");
 
-        ClearCaches();
+        await ClearCaches();
     }
 
     private async Task<IEnumerable<Models.Provider>> ReadTLevelProvidersFromResponse(
@@ -217,10 +217,10 @@ public class CourseDirectoryService : ICourseDirectoryService
             }).ToList();
     }
 
-    private void ClearCaches()
+    private async Task ClearCaches()
     {
-        _cacheService.Remove(CacheKeys.QualificationsKey);
-        _cacheService.Remove(CacheKeys.RoutesKey);
-        _cacheService.Remove(CacheKeys.ProviderDataDownloadInfoKey);
+        await _cacheService.Remove<IList<Qualification>>(CacheKeys.QualificationsKey);
+        await _cacheService.Remove<IList<Route>>(CacheKeys.RoutesKey);
+        await _cacheService.Remove <ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

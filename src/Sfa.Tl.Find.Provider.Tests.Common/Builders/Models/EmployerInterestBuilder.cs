@@ -5,9 +5,21 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class EmployerInterestBuilder
 {
-    private IList<Guid> _uniqueIds = new List<Guid>();
-
     private string _additionalInformation;
+    private readonly List<int> _skillAreaIds 
+        = new();
+    private readonly List<int?> _industryIds 
+        = new() { 9, null };
+    private readonly List<string> _otherIndustries 
+        = new() { null, "Test Industry" };
+    private readonly List<(double, double)> _latitudesAndLongitudes 
+        = new()
+        {
+            (52.400997, -1.508122),
+            (52.406587, -1.523157)
+        };
+    private readonly List<Guid> _uniqueIds = new();
+
 
     public IEnumerable<EmployerInterest> BuildList() =>
         new List<EmployerInterest>
@@ -19,16 +31,16 @@ public class EmployerInterestBuilder
                 OrganisationName = "Test Employer",
                 ContactName = "Test Contact",
                 Postcode = "CV1 2WT",
-                Latitude = 52.400997,
-                Longitude = -1.508122,
-                IndustryId = 9,
-                OtherIndustry = null,
+                Latitude = GetLatitude(0),
+                Longitude = GetLongitude(0),
+                IndustryId = _industryIds.FirstOrDefault(),
+                OtherIndustry = _otherIndustries.FirstOrDefault(),
                 AdditionalInformation = _additionalInformation ?? "These are my requirements: none",
                 Email = "test.contact1@employer.co.uk",
                 Telephone = "020 555 6666 ext 1",
                 Website = "https://employer-one.co.uk",
                 ContactPreferenceType = ContactPreference.Email,
-                SkillAreaIds = new List<int>{ 1, 2 }
+                SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int>{ 1, 2 }
             },
             new()
             {
@@ -36,17 +48,17 @@ public class EmployerInterestBuilder
                 UniqueId = _uniqueIds.Skip(1).FirstOrDefault(),
                 OrganisationName = "Test Employer 2",
                 ContactName = "Test Contact 2",
-                Postcode = "CV1 3XT",
-                Latitude = 52.400997,
-                Longitude = -1.508122,
-                IndustryId = null,
-                OtherIndustry = "Test Industry",
+                Postcode = "CV1 3GT",
+                Latitude = GetLatitude(0),
+                Longitude = GetLongitude(0),
+                IndustryId = _industryIds.Skip(1).FirstOrDefault(),
+                OtherIndustry = _otherIndustries.Skip(1).FirstOrDefault(),
                 AdditionalInformation = _additionalInformation ?? "These are my requirements: a few good people",
                 Email = "test.contact2@employer.co.uk",
                 Telephone = "020 555 6666 ext 2",
                 Website = "https://employer-two.co.uk",
                 ContactPreferenceType = ContactPreference.Telephone,
-                SkillAreaIds = new List<int>{ 1 }
+                SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int>{ 1 }
             }
         };
 
@@ -72,7 +84,7 @@ public class EmployerInterestBuilder
             Website = null,
             ContactPreferenceType = default,
             AdditionalInformation = null,
-            SkillAreaIds = new List<int> { 1 }
+            SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int> { 1 }
         };
     }
 
@@ -98,11 +110,74 @@ public class EmployerInterestBuilder
             SkillAreaIds = employerInterest.SkillAreaIds
         };
     }
-
-
+    
     public EmployerInterestBuilder WithAdditionalInformation(string additionalInformation)
     {
         _additionalInformation = additionalInformation;
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithLatLong(double latitude, double longitude)
+    {
+        _latitudesAndLongitudes.Clear();
+        _latitudesAndLongitudes.Add((latitude, longitude));
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithLatLongs(IEnumerable<(double, double)> latLongs)
+    {
+        _latitudesAndLongitudes.Clear();
+        _latitudesAndLongitudes.AddRange(latLongs);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithIndustryId(int? industryId)
+    {
+        _industryIds.Clear();
+        _industryIds.Add(industryId);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithIndustryIds(IEnumerable<int?> industryIds)
+    {
+        _industryIds.Clear();
+        _industryIds.AddRange(industryIds);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithOtherIndustry(string? otherIndustry)
+    {
+        _otherIndustries.Clear();
+        _otherIndustries.Add(otherIndustry);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithOtherIndustries(IEnumerable<string?> otherIndustries)
+    {
+        _otherIndustries.Clear();
+        _otherIndustries.AddRange(otherIndustries);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithUniqueIds(IEnumerable<Guid> uniqueIds)
+    {
+        _uniqueIds.Clear();
+        _uniqueIds.AddRange(uniqueIds);
+
+        return this;
+    }
+
+    public EmployerInterestBuilder WithSkillAreaIds(IList<int> skillAreaIds)
+    {
+        _skillAreaIds.Clear();
+        _skillAreaIds.AddRange(skillAreaIds);
 
         return this;
     }
@@ -115,10 +190,13 @@ public class EmployerInterestBuilder
         return this;
     }
 
-    public EmployerInterestBuilder WithUniqueIds(IEnumerable<Guid> uniqueIds)
-    {
-        _uniqueIds = uniqueIds.ToList();
+    private double GetLatitude(int index) => 
+        _latitudesAndLongitudes.Count > index 
+            ? _latitudesAndLongitudes[index].Item1 
+            : 0;
 
-        return this;
-    }
+    private double GetLongitude(int index) => 
+        _latitudesAndLongitudes.Count > index 
+            ? _latitudesAndLongitudes[index].Item2 
+            : 0;
 }

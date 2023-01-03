@@ -41,20 +41,19 @@ public class BusinessRuleExtensionsTests
     }
 
     [Theory(DisplayName = nameof(BusinessRuleExtensions.IsInterestExpiring) + " Data Tests")]
-    [InlineData("2022-12-01 11:30", null, "2022-12-01", 30, false)]
-    [InlineData("2022-12-01 11:30", null, "2022-12-24", 30, false)]
-    [InlineData("2022-12-01 11:30", null, "2022-12-25", 30, true)]
-    public void EmployerInterestSummary_IsInterestExpiring_Data_Tests(string createdDate, string modifiedDate, string currentDate, int daysToRetain, bool expectedResult)
+    [InlineData("2022-12-08 23:59:59.999999", "2022-12-01", false)]
+    [InlineData("2022-12-08 23:59:59.999999", "2022-12-02", true)]
+    [InlineData("2022-12-08 23:59:59.999999", "2022-12-08", true)]
+    public void EmployerInterestSummary_IsInterestExpiring_Data_Tests(string expiryDate, string currentDate, bool expectedResult)
     {
         var today = DateTime.Parse(currentDate);
 
         var target = new EmployerInterestSummary
         {
-            CreatedOn = DateTime.Parse(createdDate),
-            ModifiedOn = modifiedDate is not null ? DateTime.Parse(modifiedDate) : null
+            ExpiryDate = DateTime.Parse(expiryDate)
         };
 
-        var result = target.IsInterestExpiring(today, daysToRetain);
+        var result = target.IsInterestExpiring(today);
         result.Should().Be(expectedResult);
     }
 
@@ -75,5 +74,30 @@ public class BusinessRuleExtensionsTests
 
         var result = target.IsInterestNew(today);
         result.Should().Be(expectedResult);
+    }
+
+    [Theory(DisplayName = nameof(BusinessRuleExtensions.SetSummaryListFlags) + " Data Tests")]
+    [InlineData("2022-12-01 11:30", "2022-12-08 23:59:59.999999", "2022-12-01", true, false)]
+    [InlineData("2022-12-01 11:30","2022-12-08 23:59:59.999999", "2022-12-02", true, true)]
+    [InlineData("2022-12-01 11:30","2022-12-08 23:59:59.999999", "2022-12-08", false, true)]
+    public void EmployerInterestSummary_SetSummaryListFlags_Data_Tests(string createdDate, string expiryDate, string currentDate, bool expectedIsNew, bool expectedIsExpiring)
+    {
+        var today = DateTime.Parse(currentDate);
+        
+        var target = new List<EmployerInterestSummary>
+        {
+            new()
+            {
+                OrganisationName = "Test",
+                CreatedOn = DateTime.Parse(createdDate),
+                ExpiryDate = DateTime.Parse(expiryDate)}
+            };
+
+        var result = target.SetSummaryListFlags(today).ToList();
+
+        result.Should().NotBeNullOrEmpty();
+        result.First().OrganisationName.Should().Be(target.First().OrganisationName);
+        result.First().IsNew.Should().Be(expectedIsNew);
+        result.First().IsExpiring.Should().Be(expectedIsExpiring);
     }
 }

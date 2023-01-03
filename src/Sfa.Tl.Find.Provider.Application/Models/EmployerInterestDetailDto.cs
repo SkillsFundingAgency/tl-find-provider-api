@@ -20,6 +20,7 @@ public class EmployerInterestDetailDto
     public string Website { get; init; }
     public ContactPreference? ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
+    public DateTime? ExpiryDate { get; init; }
     public DateTime CreatedOn { get; init; }
     public DateTime? ModifiedOn { get; init; }
 }
