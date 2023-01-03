@@ -172,7 +172,7 @@ public static class AuthenticationExtensions
                         //});
 
                         claims
-                            //.AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
+                            .AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
                             //.AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationId, organisationId)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationName, organisationInfo?.Name)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn?.ToString())
