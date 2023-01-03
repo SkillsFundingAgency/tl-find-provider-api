@@ -1,6 +1,8 @@
 ﻿using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
+using System.Globalization;
 
 // ReSharper disable StringLiteralTypo
 
@@ -26,8 +28,12 @@ public sealed class OnsLocationApiItemClassMap : ClassMap<OnsLocationApiItem>
             Enum.TryParse<PlaceNameDescription>(
                 row.Row.GetField("descnm"), out var placeName)
                     ? placeName : default);
-        Map(m => m.Latitude).Name("lat");
-        Map(m => m.Longitude).Name("long");
+        Map(m => m.Latitude).Name("lat")
+            .TypeConverterOption
+            .NumberStyles(NumberStyles.Number | NumberStyles.AllowExponent);
+        Map(m => m.Longitude).Name("long")
+            .TypeConverterOption
+            .NumberStyles(NumberStyles.Number | NumberStyles.AllowExponent);
         Map(m => m.PopulationCount).Name("popcnt");
     }
 }

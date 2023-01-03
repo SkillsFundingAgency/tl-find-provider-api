@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Text.Json;
 using CsvHelper;
@@ -150,10 +149,6 @@ public class TownDataService : ITownDataService
 
     private async Task SaveTowns(IEnumerable<OnsLocationApiItem> rawData)
     {
-        foreach (var item in rawData)
-        {
-            Debug.WriteLine($"{item.LocationName} - {item.LocalAuthorityName} - {item.LocationAuthorityDistrict} - {item.PlaceName}");
-        }
         var t1 = rawData
             .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
                            !string.IsNullOrEmpty(item.LocalAuthorityName) &&
