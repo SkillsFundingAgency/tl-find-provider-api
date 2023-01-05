@@ -90,6 +90,14 @@ public static class SettingsExtensions
         settings.BaseUri = configuration.PostcodeApiSettings?.BaseUri;
     }
 
+    public static void ConfigureProviderSettings(this ProviderSettings settings, SiteConfiguration configuration)
+    {
+        if (settings == null) throw new ArgumentNullException(nameof(settings));
+        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+
+        settings.ConnectSiteUri = configuration.ProviderSettings?.ConnectSiteUri;
+    }
+
     public static void ConfigureSearchSettings(this SearchSettings settings, SiteConfiguration configuration)
     {
         if (settings == null) throw new ArgumentNullException(nameof(settings));

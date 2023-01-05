@@ -100,6 +100,18 @@ public class SettingsExtensionsTests
 
         targetSettings.Should().BeEquivalentTo(expectedSettings);
     }
+    
+    [Fact]
+    public void ConfigureProviderSettings_Returns_Expected_Value()
+    {
+        var configuration = new SettingsBuilder().BuildConfigurationOptions();
+        var expectedSettings = new SettingsBuilder().BuildProviderSettings();
+
+        var targetSettings = new ProviderSettings();
+        targetSettings.ConfigureProviderSettings(configuration);
+
+        targetSettings.Should().BeEquivalentTo(expectedSettings);
+    }
 
     [Fact]
     public void ConfigureSearchSettings_Returns_Expected_Value()

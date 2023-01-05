@@ -27,6 +27,8 @@ public class SettingsBuilder
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
 
+    private const string ConnectSiteUri = "https://test.connect.tlevels.gov.uk/";
+
     private const string EmployerSupportCleanupJobSchedule = "0 0 3 ? * MON-FRI";
     private const int EmployerInterestExpiryNotificationDays = 7;
     private const int EmployerInterestRetentionDays = 10;
@@ -143,7 +145,13 @@ public class SettingsBuilder
             BaseUri = postcodeRetrieverUri
         };
 
-    public SearchSettings BuildSearchSettings(
+    public ProviderSettings BuildProviderSettings(
+        string connectSiteUri = ConnectSiteUri) => new ()
+    {
+        ConnectSiteUri = connectSiteUri
+        };
+
+public SearchSettings BuildSearchSettings(
         bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
         {
             MergeAdditionalProviderData = mergeAdditionalProviderData
@@ -157,6 +165,7 @@ public class SettingsBuilder
         EmployerInterestSettings employerInterestSettings = null,
         GoogleMapsApiSettings googleMapsApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
+        ProviderSettings providerSettings = null,
         SearchSettings searchSettings = null,
         string blobStorageConnectionString = BlobStorageConnectionString,
         string sqlConnectionString = SqlConnectionString,
@@ -171,6 +180,7 @@ public class SettingsBuilder
             EmployerInterestSettings = employerInterestSettings ?? BuildEmployerInterestSettings(),
             GoogleMapsApiSettings = googleMapsApiSettings ?? BuildGoogleMapsApiSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
+            ProviderSettings = providerSettings ?? BuildProviderSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             BlobStorageConnectionString = blobStorageConnectionString,
             SqlConnectionString = sqlConnectionString,

@@ -135,6 +135,20 @@
       ],
       "type": "object"
     },
+    "ProviderSettings": {
+      "properties": {
+        "ConnectSiteUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ProviderSettings_ConnectSiteUri"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "ConnectSiteUri"
+      ],
+      "type": "object"
+    },
     "SearchSettings": {
       "properties": {
         "MergeAdditionalProviderData": {
