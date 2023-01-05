@@ -10,7 +10,7 @@ public static class ProviderStubAuthentication
         services.AddAuthentication("Provider-stub")
             .AddScheme<AuthenticationSchemeOptions, ProviderStubAuthHandler>(
                 "Provider-stub",
-                options => { })
+                _ => { })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(AuthenticationExtensions.AuthenticationCookieName);
     }
