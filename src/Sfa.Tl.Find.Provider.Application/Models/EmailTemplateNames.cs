@@ -7,4 +7,5 @@ public static class EmailTemplateNames
     public const string EmployerRegisterInterest = "EmployerRegisterInterest";
 
     public const string ProviderNotification = "ProviderNotification";
+    public const string ProviderVerification = "ProviderVerification";
 }
