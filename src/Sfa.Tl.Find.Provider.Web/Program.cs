@@ -63,6 +63,13 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
     options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
     options.Conventions.AddPageRoute("/Help/TermsAndConditions", "/terms-and-conditions");
+    options.Conventions.AddPageRoute("/Provider/SearchFilters", "/search-filters");
+    options.Conventions.AddPageRoute("/Provider/SearchFilterDetails", "/search-filter-details");
+    options.Conventions.AddPageRoute("/Provider/Notifications", "/notifications");
+    options.Conventions.AddPageRoute("/Provider/AddNotification", "/add-notification");
+    options.Conventions.AddPageRoute("/Provider/EditNotification", "/edit-notification");
+    options.Conventions.AddPageRoute("/Provider/RemoveNotification", "/remove-notification");
+
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/AccessibilityStatement");

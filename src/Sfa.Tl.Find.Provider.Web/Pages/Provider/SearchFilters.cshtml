@@ -1,0 +1,19 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.Provider.SearchFiltersModel
+@{
+    ViewData["Title"] = "Search filters";
+}
+
+@section breadcrumbs {
+    <a asp-page="/Employer/EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Search filters</h1>
+    </div>
+</div>
+
+<div style="background: pink">
+    <a asp-page="./SearchFilterDetails" class="govuk-link govuk-link--no-visited-state">Details page</a>
+</div>

@@ -8,6 +8,11 @@
             Employers have agreed for their details to be shared for @Model.EmployerInterestRetentionWeeks weeks.<br />
             After @Model.EmployerInterestRetentionWeeks weeks, <strong>their details will expire</strong> unless they agree to extend their interest.
         </p>
+        <p class="govuk-body">
+            <a asp-page="./Providers/SearchFilters" class="govuk-link govuk-link--no-visited-state">Customise your results</a> 
+            and <a asp-page="./Providers/Notifications" class="govuk-link govuk-link--no-visited-state">set up notifications</a> 
+            to be alerted when new employers are added.
+        </p>
 
         @if (!ViewData.ModelState.IsValid)
         {
@@ -25,7 +30,7 @@
             <div class="govuk-form-group tl-inline-form-group" sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-form-group--error">
 
                 <label class="govuk-label govuk-!-margin-bottom-4" asp-for="Input!.SelectedPostcode">
-                    Select or enter a postcode to see contact details for employers within @Model.SearchRadius miles:
+                    Select or enter a postcode to see contact details for employers:
                 </label>
                 <span class="govuk-error-message" asp-validation-for="Input!.CustomPostcode"></span>
 

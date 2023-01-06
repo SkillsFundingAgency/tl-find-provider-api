@@ -1,0 +1,15 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.Provider.RemoveNotificationModel
+@{
+    ViewData["Title"] = "Remove notification";
+}
+
+@section breadcrumbs {
+    <a asp-page="./Notifications" class="govuk-back-link" id="tl-back">Return to notifications</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Do you want to remove notification for @Model.NotificationEmail?</h1>
+    </div>
+</div>
