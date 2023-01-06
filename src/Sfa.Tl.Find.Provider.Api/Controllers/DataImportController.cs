@@ -167,6 +167,7 @@ public class DataImportController : ControllerBase
         }
     }
 
+    [HttpGet]
     [HttpPost]
     [Route("towns")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -200,15 +201,7 @@ public class DataImportController : ControllerBase
         }
     }
 
-    [HttpGet]
-    [Route("towns3")]
-    public async Task<IActionResult> UploadTowns3()
-    {
-            _logger.LogInformation($"{nameof(DataImportController)} {nameof(UploadTowns3)} called.");
-            return Ok();
-    }
-
-    [HttpPost]
+    [HttpGet, HttpPost]
     [Route("towns2")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
