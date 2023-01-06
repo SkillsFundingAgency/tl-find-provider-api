@@ -205,7 +205,7 @@ public class EmployerListModel : PageModel
 
         Postcodes = ProviderLocations?.Select(p
                     => new SelectListItem(
-                        p.Key,
+                        $"{p.Value.Name} [{p.Value.Postcode}]",
                         p.Key,
                         p.Key == Input?.SelectedPostcode)
             )

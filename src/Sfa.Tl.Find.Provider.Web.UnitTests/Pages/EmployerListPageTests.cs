@@ -229,7 +229,8 @@ public class EmployerListPageTests
         var orderedPostcodes = locationPostcodes.OrderBy(x => x.Postcode).ToArray();
         for (var i = 0; i < orderedPostcodes.Length; i++)
         {
-            employerListModel.Postcodes[i].Text.Should().Be(orderedPostcodes[i].Postcode);
+            var displayText = $"{orderedPostcodes[i].Name} [{orderedPostcodes[i].Postcode}]";
+            employerListModel.Postcodes[i].Text.Should().Be(displayText);
             employerListModel.Postcodes[i].Value.Should().Be(orderedPostcodes[i].Postcode);
         }
 
