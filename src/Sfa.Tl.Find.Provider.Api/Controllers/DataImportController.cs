@@ -174,6 +174,7 @@ public class DataImportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UploadTowns(IFormFile file)
     {
+        _logger.LogInformation($"{nameof(DataImportController)} {nameof(UploadTowns)} called.");
         try
         {
             if (_logger.IsEnabled(LogLevel.Debug))
@@ -189,6 +190,40 @@ public class DataImportController : ControllerBase
 
             await _townDataService.ImportTowns(
                 file.OpenReadStream());
+
+            return Accepted();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpGet]
+    [Route("towns3")]
+    public async Task<IActionResult> UploadTowns3()
+    {
+            _logger.LogInformation($"{nameof(DataImportController)} {nameof(UploadTowns3)} called.");
+            return Ok();
+    }
+
+    [HttpPost]
+    [Route("towns2")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UploadTowns2(IFormFile file)
+    {
+        try
+        {
+            _logger.LogInformation($"{nameof(DataImportController)} {nameof(UploadTowns2)} called.");
+
+            if (file is null)
+            {
+                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadTowns)} has no file.");
+                return BadRequest("File is required.");
+            }
 
             return Accepted();
         }
