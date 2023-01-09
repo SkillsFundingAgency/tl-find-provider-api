@@ -5,7 +5,7 @@ using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
-public class IndexPageTests
+public class IndexTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()

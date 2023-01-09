@@ -6,8 +6,8 @@ using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
-namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
-public class EmployerDetailsPageTests
+namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Employer;
+public class EmployerDetailsTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()

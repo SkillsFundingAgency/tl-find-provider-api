@@ -5,7 +5,7 @@ using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
-public class StartPageTests
+public class StartTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()

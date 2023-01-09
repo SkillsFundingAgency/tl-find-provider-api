@@ -6,8 +6,8 @@ using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
-namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
-public class RemoveEmployerPageTests
+namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Employer;
+public class RemoveEmployerTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
@@ -80,7 +80,7 @@ public class RemoveEmployerPageTests
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Employer/EmployerList");
-        
+
         await employerInterestService
             .Received(1)
             .DeleteEmployerInterest(id);

@@ -9,8 +9,8 @@ using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
-namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
-public class EmployerListPageTests
+namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Employer;
+public class EmployerListTests
 {
     private const string CustomPostcodeKey = "Input.CustomPostcode";
     private const string InvalidFormatPostcode = "CVX XXX";
@@ -220,12 +220,12 @@ public class EmployerListPageTests
 
         employerListModel.Postcodes.Should().NotBeNullOrEmpty();
         employerListModel.Postcodes!.Length.Should().Be(locationPostcodes.Count + 1);
-        
+
         employerListModel.Postcodes
             .Last()
             .Should()
             .BeEquivalentTo(new SelectListItem(EmployerListModel.EnterPostcodeValue, EmployerListModel.EnterPostcodeValue));
-        
+
         var orderedPostcodes = locationPostcodes.OrderBy(x => x.Postcode).ToArray();
         for (var i = 0; i < orderedPostcodes.Length; i++)
         {
@@ -260,7 +260,7 @@ public class EmployerListPageTests
 
         employerListModel.Postcodes
             .Should()
-            .Contain(x => 
+            .Contain(x =>
                 x.Text == EmployerListModel.EnterPostcodeValue);
         employerListModel.Postcodes
             .Should()
@@ -370,7 +370,7 @@ public class EmployerListPageTests
         employerListModel.ModelState.Should().ContainKey(CustomPostcodeKey);
         employerListModel.ModelState[CustomPostcodeKey]!.Errors.Should().Contain(x => x.ErrorMessage == "Enter a postcode with numbers and letters only");
     }
-    
+
     [Fact]
     public async Task EmployerListModel_OnPost_Validates_Invalid_Custom_Postcode()
     {
