@@ -210,7 +210,6 @@ public class EmployerListModel : PageModel
                         p.Key == Input?.SelectedPostcode)
             )
             .OrderBy(x => x.Text)
-            //.Prepend(new SelectListItem("Select postcode", "", true))
             .Append(new SelectListItem(EnterPostcodeValue, EnterPostcodeValue, Input?.SelectedPostcode == EnterPostcodeValue))
             .ToArray();
     }
