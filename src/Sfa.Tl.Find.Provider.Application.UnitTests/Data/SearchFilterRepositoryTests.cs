@@ -98,7 +98,7 @@ public class SearchFilterRepositoryTests
 
         await dbContextWrapper
             .QueryAsync(dbConnection,
-                "GetSearchFilter",
+                "GetSearchFilterDetail",
                 Arg.Do<Func<SearchFilterDto, RouteDto, SearchFilter>>(
                     x =>
                     {
