@@ -343,8 +343,11 @@ public static class ModelValidationExtensions
         employerInterestSummary.ExpiryDate.Should().Be(expected.ExpiryDate);
         employerInterestSummary.CreatedOn.Should().Be(expected.CreatedOn);
         employerInterestSummary.ModifiedOn.Should().Be(expected.ModifiedOn);
-        //employerInterestSummary.SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
-        //employerInterestSummary.SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+    }
 
+    public static void Validate(this SearchFilter employerInterestSummary, SearchFilterDto expected)
+    {
+        employerInterestSummary.Id.Should().Be(expected.Id);
+        employerInterestSummary.SearchRadius.Should().Be(expected.SearchRadius);
     }
 }

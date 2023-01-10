@@ -4,9 +4,8 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class RouteDtoBuilder
 {
-    public IEnumerable<RouteDto> BuildList()
-    {
-        return new RouteBuilder()
+    public IEnumerable<RouteDto> BuildList() =>
+        new RouteBuilder()
             .BuildList()
             .Select(r => new RouteDto
             {
@@ -14,5 +13,4 @@ public class RouteDtoBuilder
                 RouteName = r.Name
             })
             .ToList();
-    }
 }

@@ -71,6 +71,7 @@
     <Build Include="Types\IdListTableType.sql" />
     <None Include="PostDeployment\Seed Email Templates.sql" />
     <None Include="PostDeployment\Set Expiry Dates.sql" />
+    <None Include="Indexes\IX_SearchFilterRoute_SearchFilterId.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
@@ -126,6 +127,13 @@
     <Build Include="Indexes\IX_EmployerInterestIndustry_IndustryId.sql" />
     <Build Include="Stored Procedures\GetEmployerInterestDetail.sql" />
     <Build Include="Stored Procedures\GetExpiringEmployerInterest.sql" />
+    <Build Include="Tables\SearchFilter.sql" />
+    <Build Include="Tables\SearchFilterRoute.sql" />
+    <None Include="Indexes\IX_SearchFilterRoute_RouteId.sql" />
+    <Build Include="Stored Procedures\GetSearchFilters.sql" />
+    <Build Include="Stored Procedures\GetSearchFilterDetail.sql" />
+    <Build Include="Stored Procedures\DeleteSearchFilter.sql" />
+    <Build Include="Stored Procedures\CreateOrUpdateSearchFilter.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
