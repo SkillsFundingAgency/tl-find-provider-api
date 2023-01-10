@@ -226,10 +226,15 @@ public class EmployerListPageTests
             .Should()
             .BeEquivalentTo(new SelectListItem(EmployerListModel.EnterPostcodeValue, EmployerListModel.EnterPostcodeValue));
         
-        var orderedPostcodes = locationPostcodes.OrderBy(x => x.Postcode).ToArray();
+        var orderedPostcodes = locationPostcodes.OrderBy(x => x.Name).ToArray();
         for (var i = 0; i < orderedPostcodes.Length; i++)
         {
-            employerListModel.Postcodes[i].Text.Should().Be(orderedPostcodes[i].Postcode);
+            var campusName = orderedPostcodes[i].Name?.Length > 15 
+                ? orderedPostcodes[i].Name[..15] + "..."
+                : orderedPostcodes[i].Name;
+            var displayText = $"{campusName.ToUpper()} [{orderedPostcodes[i].Postcode}]";
+         
+            employerListModel.Postcodes[i].Text.Should().Be(displayText);
             employerListModel.Postcodes[i].Value.Should().Be(orderedPostcodes[i].Postcode);
         }
 
