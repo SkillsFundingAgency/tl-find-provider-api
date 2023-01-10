@@ -189,4 +189,20 @@ public class StringExtensionsTests
         var result = input.Truncate(length);
         result.Should().Be(expectedResult);
     }
+
+    [Theory(DisplayName = nameof(StringExtensions.Truncate) + " Data Tests")]
+    // ReSharper disable StringLiteralTypo
+    [InlineData(null, 15, null)]
+    [InlineData("", 15, "")]
+    [InlineData(" ", 15, " ")]
+    [InlineData("ABC", 3, "ABC")]
+    [InlineData("ALESFORD CAMPUS", 15, "ALESFORD CAMPUS")]
+    [InlineData("ST MARY'S CATHOLIC COLLEGE, A VOLUNTARY ACADEMY", 15, "ST MARY'S CATHO...")]
+    [InlineData("Warwick Green", 15, "Warwick Green")]
+    // ReSharper restore StringLiteralTypo
+    public void String_TruncateWithEllipsis_Data_Tests(string input, int length, string expectedResult)
+    {
+        var result = input.TruncateWithEllipsis(length);
+        result.Should().Be(expectedResult);
+    }
 }

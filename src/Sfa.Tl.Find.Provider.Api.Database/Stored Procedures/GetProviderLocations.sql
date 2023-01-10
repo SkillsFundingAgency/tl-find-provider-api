@@ -14,7 +14,7 @@ AS
 	)
 	  SELECT p.[Id],
 			 l.[Postcode],
-			 l.[Name] AS [LocationName],
+			 l.[Name],
 			 l.[Latitude],
 			 l.[Longitude]
 		FROM ProvidersCTE p
@@ -24,4 +24,3 @@ AS
 		  --Only include the first row to make sure main data set takes priority
 		  AND	p.[ProviderRowNum] = 1
 		ORDER BY l.[Postcode]
-
