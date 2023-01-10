@@ -24,6 +24,13 @@ public class LocationPostcodeBuilder
                 Name = "Test Location B",
                 Latitude = 51.0,
                 Longitude = -1.0
+            },
+            new()
+            {
+                Postcode = "CC1 1CC",
+                Name = "ST MARY'S CATHOLIC COLLEGE",
+                Latitude = 5.0,
+                Longitude = -3.0
             }
         };
 }
