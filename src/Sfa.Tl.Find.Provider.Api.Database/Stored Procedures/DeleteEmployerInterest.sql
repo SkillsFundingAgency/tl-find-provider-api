@@ -8,8 +8,6 @@ AS
 	DELETE FROM [dbo].[EmployerInterestLocation]
 	WHERE [EmployerInterestId] IN (SELECT [Id] FROM @employerInterestIds);
 
-	SELECT @employerInterestsDeleted = @@ROWCOUNT
-
 	DELETE FROM [dbo].[EmployerInterestIndustry]
 	WHERE [EmployerInterestId] IN (SELECT [Id] FROM @employerInterestIds);
 
@@ -18,3 +16,5 @@ AS
 
 	DELETE FROM [dbo].[EmployerInterest]
 	WHERE [Id] IN (SELECT [Id] FROM @employerInterestIds);
+
+	SELECT @employerInterestsDeleted = @@ROWCOUNT
