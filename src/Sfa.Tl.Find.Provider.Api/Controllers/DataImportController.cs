@@ -32,7 +32,7 @@ public class DataImportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadProviderContacts(IFormFile file)
+    public async Task<IActionResult> UploadProviderContacts([FromForm] IFormFile file)
     {
         try
         {
@@ -102,6 +102,7 @@ public class DataImportController : ControllerBase
         }
     }
 
+    [HttpGet]
     [HttpPost]
     [Route("provider/data/zip")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -173,7 +174,7 @@ public class DataImportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadTowns(IFormFile file)
+    public async Task<IActionResult> UploadTowns([FromForm] IFormFile file)
     {
         _logger.LogInformation($"{nameof(DataImportController)} {nameof(UploadTowns)} called.");
         try
@@ -191,32 +192,6 @@ public class DataImportController : ControllerBase
 
             await _townDataService.ImportTowns(
                 file.OpenReadStream());
-
-            return Accepted();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
-    }
-
-    [HttpGet, HttpPost]
-    [Route("towns2")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadTowns2(IFormFile file)
-    {
-        try
-        {
-            _logger.LogInformation($"{nameof(DataImportController)} {nameof(UploadTowns2)} called.");
-
-            if (file is null)
-            {
-                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadTowns)} has no file.");
-                return BadRequest("File is required.");
-            }
 
             return Accepted();
         }
