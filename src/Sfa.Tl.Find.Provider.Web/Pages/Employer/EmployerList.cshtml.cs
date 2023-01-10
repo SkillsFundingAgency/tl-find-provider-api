@@ -205,12 +205,11 @@ public class EmployerListModel : PageModel
 
         Postcodes = ProviderLocations?.Select(p
                     => new SelectListItem(
-                        p.Key,
+                        $"{p.Value.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Value.Postcode}]",
                         p.Key,
                         p.Key == Input?.SelectedPostcode)
             )
             .OrderBy(x => x.Text)
-            //.Prepend(new SelectListItem("Select postcode", "", true))
             .Append(new SelectListItem(EnterPostcodeValue, EnterPostcodeValue, Input?.SelectedPostcode == EnterPostcodeValue))
             .ToArray();
     }
