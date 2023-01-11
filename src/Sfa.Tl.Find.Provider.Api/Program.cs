@@ -87,9 +87,11 @@ try
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
         .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
         .AddTransient<IIndustryRepository, IndustryRepository>()
+        .AddTransient<INotificationRepository, NotificationRepository>()
         .AddTransient<IProviderRepository, ProviderRepository>()
         .AddTransient<IQualificationRepository, QualificationRepository>()
         .AddTransient<IRouteRepository, RouteRepository>()
+        .AddTransient<ISearchFilterRepository, SearchFilterRepository>()
         .AddTransient<ITownRepository, TownRepository>();
 
     builder.Services

@@ -24,6 +24,8 @@ public class ProviderDataService : IProviderDataService
     private readonly IQualificationRepository _qualificationRepository;
     private readonly IRouteRepository _routeRepository;
     private readonly IIndustryRepository _industryRepository;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly ISearchFilterRepository _searchFilterRepository;
     private readonly ICacheService _cacheService;
     private readonly ILogger<ProviderDataService> _logger;
     private readonly bool _mergeAdditionalProviderData;
@@ -35,6 +37,8 @@ public class ProviderDataService : IProviderDataService
         IQualificationRepository qualificationRepository,
         IRouteRepository routeRepository,
         IIndustryRepository industryRepository,
+        INotificationRepository notificationRepository,
+        ISearchFilterRepository searchFilterRepository,
         ITownDataService townDataService,
         ICacheService cacheService,
         IOptions<SearchSettings> searchOptions,
@@ -46,6 +50,8 @@ public class ProviderDataService : IProviderDataService
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
         _industryRepository = industryRepository ?? throw new ArgumentNullException(nameof(industryRepository));
+        _notificationRepository = notificationRepository ?? throw new ArgumentNullException(nameof(notificationRepository));
+        _searchFilterRepository = searchFilterRepository ?? throw new ArgumentNullException(nameof(searchFilterRepository));
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -112,6 +118,32 @@ public class ProviderDataService : IProviderDataService
         }
 
         return routes;
+    }
+
+    public async Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting search filters");
+        }
+
+        var searchFilters = (await _searchFilterRepository
+                .GetSearchFilters(ukPrn, _mergeAdditionalProviderData));
+        
+        return searchFilters;
+    }
+
+    public async Task<SearchFilter> GetSearchFilter(int id)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting search filters");
+        }
+
+        var searchFilter = await _searchFilterRepository
+            .GetSearchFilter(id);
+
+        return searchFilter;
     }
 
     public async Task<ProviderSearchResponse> FindProviders(

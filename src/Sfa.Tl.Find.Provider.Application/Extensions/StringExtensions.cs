@@ -139,10 +139,18 @@ public static class StringExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string Truncate(this string input, int maxLength)
+    public static string Truncate(this string input, int length)
     {
-        return input is null || input.Length <= maxLength
+        return input is null || input.Length <= length
             ? input
-            : input[..maxLength];
+            : input[..length];
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string TruncateWithEllipsis(this string input, int length)
+    {
+        return input is null || input.Length <= length
+            ? input
+            : input[..length] + "...";
     }
 }

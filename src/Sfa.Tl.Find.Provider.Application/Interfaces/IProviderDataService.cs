@@ -31,7 +31,10 @@ public interface IProviderDataService
 
     Task<IEnumerable<Route>> GetRoutes();
 
+    Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn);
     
+    Task<SearchFilter> GetSearchFilter(int id);
+
     Task<bool> HasQualifications();
 
     Task<bool> HasProviders();

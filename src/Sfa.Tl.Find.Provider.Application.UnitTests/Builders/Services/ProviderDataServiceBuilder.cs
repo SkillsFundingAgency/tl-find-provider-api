@@ -17,6 +17,8 @@ public class ProviderDataServiceBuilder
         IQualificationRepository qualificationRepository = null,
         IRouteRepository routeRepository = null,
         IIndustryRepository industryRepository = null,
+        INotificationRepository notificationRepository = null,
+        ISearchFilterRepository searchFilterRepository = null,
         ITownDataService townDataService = null,
         ICacheService cacheService = null,
         SearchSettings searchSettings = null,
@@ -28,6 +30,8 @@ public class ProviderDataServiceBuilder
         qualificationRepository ??= Substitute.For<IQualificationRepository>();
         routeRepository ??= Substitute.For<IRouteRepository>();
         industryRepository ??= Substitute.For<IIndustryRepository>();
+        notificationRepository ??= Substitute.For<INotificationRepository>();
+        searchFilterRepository ??= Substitute.For<ISearchFilterRepository>();
         townDataService ??= Substitute.For<ITownDataService>();
         cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<ProviderDataService>>();
@@ -43,6 +47,8 @@ public class ProviderDataServiceBuilder
             qualificationRepository,
             routeRepository,
             industryRepository,
+            notificationRepository,
+            searchFilterRepository,
             townDataService,
             cacheService,
             searchOptions,
