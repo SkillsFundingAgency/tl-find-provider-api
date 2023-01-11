@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Application.Models;
 [DebuggerDisplay("{DebuggerDisplay(), nq}")]
 public class SearchFilter
 {
-    public int Id { get; init; }
+    public int? Id { get; init; }
 
     public int LocationId { get; init; }
 

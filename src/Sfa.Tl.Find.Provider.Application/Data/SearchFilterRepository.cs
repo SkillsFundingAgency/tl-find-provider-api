@@ -44,9 +44,9 @@ public class SearchFilterRepository : ISearchFilterRepository
                 "GetSearchFilters",
                 (e, r) =>
                 {
-                    if (!searchFilters.TryGetValue(e.Id, out var searchFilter))
+                    if (!searchFilters.TryGetValue(e.LocationId, out var searchFilter))
                     {
-                        searchFilters.Add(e.Id,
+                        searchFilters.Add(e.LocationId,
                             searchFilter = new SearchFilter
                             {
                                 Id = e.Id,
@@ -78,13 +78,13 @@ public class SearchFilterRepository : ISearchFilterRepository
     }
 
     public async Task<SearchFilter> GetSearchFilter(
-        int id)
+        int locationId)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            searchFilterId = id
+            locationId
         });
 
         SearchFilter searchFilter = null;

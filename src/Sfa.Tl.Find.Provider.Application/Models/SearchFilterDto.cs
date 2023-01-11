@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Application.Models;
                  " SearchRadius {" + nameof(SearchRadius) + ", nq}")]
 public class SearchFilterDto
 {
-    public int Id { get; init; }
+    public int? Id { get; init; }
 
     public int LocationId { get; init; }
 

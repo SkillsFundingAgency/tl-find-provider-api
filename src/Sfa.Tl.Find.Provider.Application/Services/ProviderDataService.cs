@@ -133,7 +133,7 @@ public class ProviderDataService : IProviderDataService
         return searchFilters;
     }
 
-    public async Task<SearchFilter> GetSearchFilter(int id)
+    public async Task<SearchFilter> GetSearchFilter(int locationId)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -141,7 +141,7 @@ public class ProviderDataService : IProviderDataService
         }
 
         var searchFilter = await _searchFilterRepository
-            .GetSearchFilter(id);
+            .GetSearchFilter(locationId);
 
         return searchFilter;
     }

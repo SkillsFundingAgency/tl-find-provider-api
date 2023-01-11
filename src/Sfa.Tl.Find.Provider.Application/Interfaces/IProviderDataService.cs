@@ -33,7 +33,7 @@ public interface IProviderDataService
 
     Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn);
     
-    Task<SearchFilter> GetSearchFilter(int id);
+    Task<SearchFilter> GetSearchFilter(int locationId);
 
     Task<bool> HasQualifications();
 

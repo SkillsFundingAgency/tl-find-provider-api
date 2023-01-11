@@ -17,8 +17,6 @@ public class SearchFilterDetailsModel : PageModel
     public int DefaultSearchRadius { get; private set; }
     public SearchFilter? SearchFilter { get; private set; }
 
-    public string? LocationName { get; private set; }
-
     public SearchFilterDetailsModel(
         IProviderDataService providerDataService,
         IOptions<ProviderSettings> providerOptions,
@@ -37,9 +35,6 @@ public class SearchFilterDetailsModel : PageModel
             : Constants.DefaultProviderSearchRadius;
 
         SearchFilter = await _providerDataService.GetSearchFilter(id);
-
-        //TODO: Remove this field
-        LocationName = SearchFilter?.LocationName;
 
         return SearchFilter != null ?
             Page() :

@@ -21,7 +21,7 @@ AS
 		   r.[Name] AS [RouteName]
 		FROM ProvidersCTE p
 		INNER JOIN	[dbo].[Location] l
-	  	ON		p.[Id] = l.[ProviderId]
+	  	ON	p.[Id] = l.[ProviderId]
 		LEFT JOIN [dbo].[SearchFilter] sf
 		ON sf.[LocationId] = l.[Id]
 		LEFT JOIN [dbo].[SearchFilterRoute] sfsa
