@@ -7,12 +7,58 @@
 @section breadcrumbs {
     <a asp-page="/Employer/EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
 }
-
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    <strong>We have sent a verification email to ana.amari@havendalecollege.ac.uk</strong><br /><br />Click the link in the email to start receiving notifications.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0" href="#">Close</a>
+                </div>
+            </div>
+    </div>
+</div>
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Notifications</h1>
+        <p class="govuk-body">Set up and manage notifications to alert you when new employers have been added to the service. </p>
     </div>
 </div>
+
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <table class="govuk-table tl-employers--table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Email</th>
+                        <th scope="col" class="govuk-table__header">Campus</th>
+                        <th scope="col" class="govuk-table__header"></th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header tl-wordwrap">ana.amari@havendalecollege.ac.uk 
+                                <strong class="govuk-tag govuk-tag--red">Pending</strong>
+                            </th>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
+                                <div class="tl-employers--table--inline-cell">
+                                    <p>	Alesford Campus</p>
+                                </div>
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>
+                                <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state">Remove</a>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+
+            <button class="govuk-button">Add a new email</button>
+        </div>
+    </div>
+
 
 <div style="background: pink">
     <a asp-page="./AddNotification" class="govuk-link govuk-link--no-visited-state">Add notification page</a>
