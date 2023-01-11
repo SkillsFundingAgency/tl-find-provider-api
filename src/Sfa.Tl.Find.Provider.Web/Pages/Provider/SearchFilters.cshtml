@@ -11,9 +11,49 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Search filters</h1>
+        <p class="govuk-body">Select a campus to change what you see on the <a asp-page="/Employer/EmployerList" class="govuk-link govuk-link--no-visited-state">employer list page</a></p>
     </div>
 </div>
 
-<div style="background: pink">
-    <a asp-page="./SearchFilterDetails" class="govuk-link govuk-link--no-visited-state">Details page</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <table class="govuk-table tl-employers--table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Campus</th>
+                    <th scope="col" class="govuk-table__header">Search raduis</th>
+                    <th scope="col" class="govuk-table__header">T Levels</th>
+                    <th scope="col" class="govuk-table__header"></th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header tl-wordwrap">
+                        <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
+                        <div class="tl-employers--table--inline-cell">
+                            <p>	Alesford Campus</p>
+                        </div>
+                    </th>
+                    <td class="govuk-table__cell tl-table__cell__list">
+                        <div class="tl-employers--table--inline-header"><strong>Search radius</strong></div>
+                        <div class="tl-employers--table--inline-cell">
+                            <p>20 miles</p>
+                        </div>
+                    </td>
+
+                    <td class="govuk-table__cell tl-table__cell__list">
+                        <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
+                        <div class="tl-employers--table--inline-cell">
+                            <p>T Level 1</p>
+                            <p>T Level 2</p>
+                        </div>
+                    </td>
+                    <td class="govuk-table__cell">
+                        <a asp-page="./SearchFilterDetails" class="govuk-link govuk-link--no-visited-state">Change</a>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
 </div>
