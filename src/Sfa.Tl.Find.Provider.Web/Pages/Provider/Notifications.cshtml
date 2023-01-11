@@ -15,6 +15,20 @@
                     <br /><br /><a class="govuk-link govuk-!-margin-bottom-0" href="#">Close</a>
                 </div>
             </div>
+
+            <div class="tl-notification tl-notification--green">
+                <div>
+                elizabeth.ashe@havendalecollege.ac.uk has been removed.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0" href="#">Close</a>
+                </div>
+            </div>
+
+            <div class="tl-notification tl-notification--green">
+                <div>
+                elizabeth.ashe@havendalecollege.ac.uk has been added.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0" href="#">Close</a>
+                </div>
+            </div>
     </div>
 </div>
 <div class="govuk-grid-row">
@@ -49,19 +63,30 @@
 
                             <td class="govuk-table__cell">
                                 <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>
-                                <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state">Remove</a>
+                                <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
+                            </td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header tl-wordwrap">
+                                ana.amari@havendalecollege.ac.uk
+                            </th>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
+                                <div class="tl-employers--table--inline-cell">
+                                    <p>	Alesford Campus</p>
+                                </div>
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                <a asp-page="./EditNotification" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
+                                <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
                             </td>
                         </tr>
                 </tbody>
             </table>
 
-            <button class="govuk-button">Add a new email</button>
+            <a asp-page="./AddNotification" class="govuk-button">Add a new email</a>
         </div>
     </div>
 
 
-<div style="background: pink">
-    <a asp-page="./AddNotification" class="govuk-link govuk-link--no-visited-state">Add notification page</a>
-    <a asp-page="./EditNotification" class="govuk-link govuk-link--no-visited-state">Edit notification page</a>
-    <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove notification page</a>
-</div>

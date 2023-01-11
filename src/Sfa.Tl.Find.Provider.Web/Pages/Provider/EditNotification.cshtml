@@ -52,14 +52,14 @@
                         </div>
                     </td>
                     <td class="govuk-table__cell">
-                        <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
-                        <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state">Remove</a>
+                        <a asp-page="./AddNotification" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
+                        <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <button class="govuk-button">Add notification for another campus</button>
+        <a asp-page="./AddNotification" class="govuk-button">Add notification for another campus</a>
     </div>
 </div>
 
