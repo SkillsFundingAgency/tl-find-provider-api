@@ -52,12 +52,10 @@
                                 }
                                 else
                                 {
-                                    <ul class="govuk-list">
                                     @foreach (var route in searchFilter.Routes)
                                     {
-                                        <li>@route.Name</li>
+                                        <p>@route.Name</p>
                                     }
-                                    </ul>
                                 }
                             </div>
                         </td>
