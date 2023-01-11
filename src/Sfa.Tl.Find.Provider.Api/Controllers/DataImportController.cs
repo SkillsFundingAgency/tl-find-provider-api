@@ -136,7 +136,7 @@ public class DataImportController : ControllerBase
                 {
                     _logger.LogWarning(
                         $"{nameof(DataImportController)} {nameof(UploadProviderData)} zip archive has no json file.");
-                    return BadRequest("A zip file containing a json file is required.");
+                    return BadRequest("A 7-zip file containing a json file is required.");
                 }
 
                 await using var entryStream = entry.Open();
@@ -190,8 +190,43 @@ public class DataImportController : ControllerBase
                 return BadRequest("File is required.");
             }
 
-            await _townDataService.ImportTowns(
-                file.OpenReadStream());
+            await using var ms = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            
+            var extension = Path.GetExtension(file.FileName).ToLower();
+            if (extension == ".csv")
+            {
+                await _townDataService.ImportTowns(ms);
+            }
+            else if (Path.GetExtension(file.FileName) == ".7z")
+            {
+                using var archive = new SevenZipArchive(ms);
+                var entry = archive.Entries.FirstOrDefault(e => e.Name.EndsWith(".csv"));
+                if (entry is null)
+                {
+                    _logger.LogWarning(
+                        $"{nameof(DataImportController)} {nameof(UploadProviderData)} zip archive has no csv file.");
+                    return BadRequest("A 7-zip file containing a csv file is required.");
+                }
+
+                await using var entryStream = entry.Open();
+                await _townDataService.ImportTowns(entryStream);
+            }
+            else if (Path.GetExtension(file.FileName) == ".zip")
+            {
+                using var zipArchive = new ZipArchive(ms, ZipArchiveMode.Read);
+                var entry = zipArchive.Entries.FirstOrDefault(e => e.Name.EndsWith(".csv"));
+                if (entry is null)
+                {
+                    _logger.LogWarning(
+                        $"{nameof(DataImportController)} {nameof(UploadProviderData)} zip archive has no csv file.");
+                    return BadRequest("A zip file containing a csv file is required.");
+                }
+
+                await using var entryStream = entry.Open();
+                await _townDataService.ImportTowns(entryStream);
+            }
 
             return Accepted();
         }
