@@ -3,8 +3,11 @@
 AS
 	SET NOCOUNT ON;
 
-	SELECT l.[Name] AS [LocationName],
-		   [SearchRadius],		   
+	SELECT sf.[Id],
+		   l.[Id] AS [LocationId],
+		   l.[Name] AS [LocationName],
+		   l.[Postcode],
+		   sf.[SearchRadius],		   
 		   r.[Id] AS [RouteId],
 		   r.[Name] AS [RouteName]
 	FROM [dbo].[SearchFilter] sf
@@ -16,4 +19,3 @@ AS
 	ON r.[Id] = sfsa.[RouteId]
 	WHERE sf.[Id] = @searchFilterId
 	ORDER BY	r.[Name]
-

@@ -96,6 +96,7 @@ public static class SettingsExtensions
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
         settings.ConnectSiteUri = configuration.ProviderSettings?.ConnectSiteUri;
+        settings.DefaultSearchRadius = configuration.ProviderSettings?.DefaultSearchRadius ?? 0;
     }
 
     public static void ConfigureSearchSettings(this SearchSettings settings, SiteConfiguration configuration)

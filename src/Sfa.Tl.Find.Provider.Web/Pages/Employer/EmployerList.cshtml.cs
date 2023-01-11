@@ -71,7 +71,7 @@ public class EmployerListModel : PageModel
 
     public async Task OnGet()
     {
-        UkPrn = GetUkPrn();
+        UkPrn = HttpContext.User.GetUkPrn();
         if (UkPrn is not null && UkPrn > 0)
         {
             await LoadProviderView(UkPrn.Value);
@@ -114,7 +114,7 @@ public class EmployerListModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        UkPrn = GetUkPrn();
+        UkPrn = HttpContext.User.GetUkPrn();
         await LoadProviderPostcodes(UkPrn);
         ZeroResultsFound = false;
 

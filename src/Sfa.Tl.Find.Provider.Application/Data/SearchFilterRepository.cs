@@ -50,6 +50,9 @@ public class SearchFilterRepository : ISearchFilterRepository
                             searchFilter = new SearchFilter
                             {
                                 Id = e.Id,
+                                LocationId = e.LocationId,
+                                LocationName = e.LocationName,
+                                Postcode = e.Postcode,
                                 SearchRadius = e.SearchRadius,
                                 Routes = new List<Route>()
                             });
@@ -95,6 +98,9 @@ public class SearchFilterRepository : ISearchFilterRepository
                     searchFilter ??= new SearchFilter
                     {
                         Id = e.Id,
+                        LocationId = e.LocationId,
+                        LocationName = e.LocationName,
+                        Postcode = e.Postcode,
                         SearchRadius = e.SearchRadius,
                         Routes = new List<Route>()
                     };

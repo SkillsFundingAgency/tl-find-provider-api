@@ -73,6 +73,31 @@ public class ClaimsExtensionsTests
     }
 
     [Fact]
+    public void GetUkPrn_Returns_Null_For_Missing_Claim()
+    {
+        var claimsPrincipal = new ClaimsPrincipal(
+            new ClaimsIdentity(new List<Claim>()));
+
+        var result = claimsPrincipal.GetUkPrn();
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void GetUkPrn_Returns_Expected_Value()
+    {
+        var claimsPrincipal = new ClaimsPrincipal(
+            new ClaimsIdentity(
+                new List<Claim>
+                {
+                    new(CustomClaimTypes.UkPrn, TestUkPrn)
+                }));
+
+        var result = claimsPrincipal.GetUkPrn();
+        result.Should().NotBeNull();
+        result!.Value.Should().Be(long.Parse(TestUkPrn));
+    }
+
+    [Fact]
     public void GetUserSessionCacheKey_Returns_Expected_Value()
     {
         const string userId = "0879e78c-1858-47c8-a373-96b9bb4516d5";

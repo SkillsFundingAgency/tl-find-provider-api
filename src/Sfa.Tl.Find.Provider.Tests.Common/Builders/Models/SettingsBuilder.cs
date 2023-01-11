@@ -28,6 +28,7 @@ public class SettingsBuilder
     private const bool MergeAdditionalProviderData = true;
 
     private const string ConnectSiteUri = "https://test.connect.tlevels.gov.uk/";
+    private const int DefaultSearchRadius = 20;
 
     private const string EmployerSupportCleanupJobSchedule = "0 0 3 ? * MON-FRI";
     private const int EmployerInterestExpiryNotificationDays = 7;
@@ -146,16 +147,18 @@ public class SettingsBuilder
         };
 
     public ProviderSettings BuildProviderSettings(
-        string connectSiteUri = ConnectSiteUri) => new ()
-    {
-        ConnectSiteUri = connectSiteUri
+        string connectSiteUri = ConnectSiteUri,
+        int defaultSearchRadius = DefaultSearchRadius) => new()
+        {
+            ConnectSiteUri = connectSiteUri,
+            DefaultSearchRadius = defaultSearchRadius
         };
 
-public SearchSettings BuildSearchSettings(
-        bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
-        {
-            MergeAdditionalProviderData = mergeAdditionalProviderData
-        };
+    public SearchSettings BuildSearchSettings(
+            bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
+            {
+                MergeAdditionalProviderData = mergeAdditionalProviderData
+            };
 
     public SiteConfiguration BuildConfigurationOptions(
         ApiSettings apiSettings = null,

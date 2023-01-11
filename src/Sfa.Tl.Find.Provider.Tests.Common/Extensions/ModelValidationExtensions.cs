@@ -348,6 +348,9 @@ public static class ModelValidationExtensions
     public static void Validate(this SearchFilter employerInterestSummary, SearchFilterDto expected)
     {
         employerInterestSummary.Id.Should().Be(expected.Id);
+        employerInterestSummary.LocationId.Should().Be(expected.LocationId);
+        employerInterestSummary.LocationId.Should().Be(expected.LocationId);
+        employerInterestSummary.Postcode.Should().Be(expected.Postcode);
         employerInterestSummary.SearchRadius.Should().Be(expected.SearchRadius);
     }
 }

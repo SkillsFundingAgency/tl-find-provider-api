@@ -10,6 +10,9 @@ public class SearchFilterBuilder
             new()
             {
                 Id = 1,
+                LocationId = 1,
+                LocationName= "Test Location",
+                Postcode = "CV1 2WT",
                 SearchRadius = 20,
             },
             new()

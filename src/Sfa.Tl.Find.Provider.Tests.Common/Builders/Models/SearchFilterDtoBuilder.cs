@@ -9,6 +9,10 @@ public class SearchFilterDtoBuilder
             .BuildList()
             .Select(s => new SearchFilterDto
             {
+                Id = s.Id,
+                LocationId = s.LocationId,
+                LocationName = s.LocationName,
+                Postcode = s.Postcode,
                 SearchRadius = s.SearchRadius,
             })
             .ToList();
