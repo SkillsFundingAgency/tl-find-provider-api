@@ -4,6 +4,8 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 public class SearchFilterBuilder
 {
+    private int? _searchRadius = 20;
+
     public IEnumerable<SearchFilter> BuildList() =>
         new List<SearchFilter>
         {
@@ -13,7 +15,7 @@ public class SearchFilterBuilder
                 LocationId = 1,
                 LocationName= "Test Location",
                 Postcode = "CV1 2WT",
-                SearchRadius = 20,
+                SearchRadius = _searchRadius,
             },
             new()
             {
@@ -38,4 +40,10 @@ public class SearchFilterBuilder
     public SearchFilter Build() =>
         BuildList()
             .First();
+
+    public SearchFilterBuilder WithSearchRadius(int? searchRadius)
+    {
+        _searchRadius = searchRadius;
+        return this;
+    }
 }

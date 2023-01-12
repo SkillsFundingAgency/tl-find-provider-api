@@ -9,7 +9,8 @@ public class EmployerInterestDetailBuilder
     private readonly List<string> _skillAreas = new();
 
     public EmployerInterestDetail Build() => 
-        BuildList().First();
+        BuildList()
+            .First();
 
     public IEnumerable<EmployerInterestDetail> BuildList() =>
         new List<EmployerInterestDetail>
