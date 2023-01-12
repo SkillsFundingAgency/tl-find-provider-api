@@ -2,6 +2,7 @@
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
 public  class NotificationsTests
@@ -22,5 +23,33 @@ public  class NotificationsTests
             .Build(providerSettings: settings);
 
         await notificationsModel.OnGet();
+    }
+
+    [Fact]
+    public async Task NotificationsModel_OnGet_Populates_EmployerInterest_List_For_Administrator()
+    {
+        var notificationList = new NotificationBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotifications(PageContextBuilder.DefaultUkPrn)
+            .Returns(notificationList);
+
+        var notificationsModel = new NotificationsModelBuilder()
+            .Build(providerDataService);
+
+        await notificationsModel.OnGet();
+
+        notificationsModel
+            .NotificationList
+            .Should()
+            .NotBeNullOrEmpty();
+
+        notificationsModel
+            .NotificationList
+            .Should()
+            .BeEquivalentTo(notificationList);
     }
 }

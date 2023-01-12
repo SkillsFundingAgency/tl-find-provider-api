@@ -45,11 +45,13 @@ public  class SearchFiltersTests
 
         await searchFiltersModel.OnGet();
 
-        searchFiltersModel.SearchFilterList
+        searchFiltersModel
+            .SearchFilterList
             .Should()
             .NotBeNullOrEmpty();
 
-        searchFiltersModel.SearchFilterList
+        searchFiltersModel
+            .SearchFilterList
             .Should()
             .BeEquivalentTo(searchFilterList);
     }

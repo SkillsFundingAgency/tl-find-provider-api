@@ -31,6 +31,8 @@ public interface IProviderDataService
 
     Task<IEnumerable<Route>> GetRoutes();
 
+    Task<IEnumerable<Notification>> GetNotifications(long ukPrn);
+
     Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn);
     
     Task<SearchFilter> GetSearchFilter(int locationId);

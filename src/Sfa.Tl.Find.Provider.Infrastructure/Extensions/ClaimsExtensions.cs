@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 

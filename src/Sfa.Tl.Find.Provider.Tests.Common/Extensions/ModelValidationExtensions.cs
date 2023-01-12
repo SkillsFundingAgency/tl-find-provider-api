@@ -345,12 +345,22 @@ public static class ModelValidationExtensions
         employerInterestSummary.ModifiedOn.Should().Be(expected.ModifiedOn);
     }
 
-    public static void Validate(this SearchFilter employerInterestSummary, SearchFilterDto expected)
+    public static void Validate(this SearchFilter searchFilter, SearchFilterDto expected)
     {
-        employerInterestSummary.Id.Should().Be(expected.Id);
-        employerInterestSummary.LocationId.Should().Be(expected.LocationId);
-        employerInterestSummary.LocationId.Should().Be(expected.LocationId);
-        employerInterestSummary.Postcode.Should().Be(expected.Postcode);
-        employerInterestSummary.SearchRadius.Should().Be(expected.SearchRadius);
+        searchFilter.Id.Should().Be(expected.Id);
+        searchFilter.LocationId.Should().Be(expected.LocationId);
+        searchFilter.LocationName.Should().Be(expected.LocationName);
+        searchFilter.Postcode.Should().Be(expected.Postcode);
+        searchFilter.SearchRadius.Should().Be(expected.SearchRadius);
+    }
+
+    public static void Validate(this Notification notification, NotificationDto expected)
+    {
+        notification.Id.Should().Be(expected.Id);
+        notification.LocationId.Should().Be(expected.LocationId);
+        notification.LocationName.Should().Be(expected.LocationName);
+        notification.Email.Should().Be(expected.Email);
+        notification.Postcode.Should().Be(expected.Postcode);
+        notification.SearchRadius.Should().Be(expected.SearchRadius);
     }
 }

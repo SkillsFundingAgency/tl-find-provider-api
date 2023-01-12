@@ -120,6 +120,20 @@ public class ProviderDataService : IProviderDataService
         return routes;
     }
 
+    public async Task<IEnumerable<Notification>> GetNotifications(long ukPrn)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notifications");
+        }
+
+        var notifications = 
+            (await _notificationRepository
+            .GetNotifications(ukPrn, _mergeAdditionalProviderData));
+
+        return notifications;
+    }
+
     public async Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -128,8 +142,8 @@ public class ProviderDataService : IProviderDataService
         }
 
         var searchFilters = (await _searchFilterRepository
-                .GetSearchFilters(ukPrn, _mergeAdditionalProviderData));
-        
+            .GetSearchFilters(ukPrn, _mergeAdditionalProviderData));
+
         return searchFilters;
     }
 
