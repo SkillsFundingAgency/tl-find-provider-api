@@ -3,13 +3,15 @@
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("{DebuggerDisplay(), nq}")]
-public class SearchFilter
+public class Notification
 {
     public int? Id { get; init; }
 
     public int LocationId { get; init; }
 
     public string LocationName { get; init; }
+
+    public string Email { get; init; }
 
     public string Postcode { get; init; }
 
@@ -19,7 +21,7 @@ public class SearchFilter
 
     private string DebuggerDisplay()
         => $"Id {Id}, " +
-           $"{LocationName}, " +
+           $"{Email}, " +
            $"SearchRadius {SearchRadius}, " +
            $"{(Routes != null ? Routes.Count : "null")} Routes";
 }

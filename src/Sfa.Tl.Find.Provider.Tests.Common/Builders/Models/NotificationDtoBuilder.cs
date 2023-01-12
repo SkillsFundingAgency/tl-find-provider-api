@@ -2,16 +2,17 @@
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
-public class SearchFilterDtoBuilder
+public class NotificationDtoBuilder
 {
-    public IEnumerable<SearchFilterDto> BuildList() =>
-        new SearchFilterBuilder()
+    public IEnumerable<NotificationDto> BuildList() =>
+        new NotificationBuilder()
             .BuildList()
-            .Select(s => new SearchFilterDto
+            .Select(s => new NotificationDto
             {
                 Id = s.Id,
                 LocationId = s.LocationId,
                 LocationName = s.LocationName,
+                Email = s.Email,
                 Postcode = s.Postcode,
                 SearchRadius = s.SearchRadius
             })

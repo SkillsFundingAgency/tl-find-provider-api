@@ -21,38 +21,49 @@
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">Campus</th>
-                    <th scope="col" class="govuk-table__header">Search raduis</th>
+                    <th scope="col" class="govuk-table__header">Search radius</th>
                     <th scope="col" class="govuk-table__header">T Levels</th>
                     <th scope="col" class="govuk-table__header"></th>
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header tl-wordwrap">
-                        <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
-                        <div class="tl-employers--table--inline-cell">
-                            <p>	Alesford Campus</p>
-                        </div>
-                    </th>
-                    <td class="govuk-table__cell tl-table__cell__list">
-                        <div class="tl-employers--table--inline-header"><strong>Search radius</strong></div>
-                        <div class="tl-employers--table--inline-cell">
-                            <p>20 miles</p>
-                        </div>
-                    </td>
+                @foreach (var searchFilter in Model.SearchFilterList)
+                {
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header tl-wordwrap">
+                            <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
+                            <div class="tl-employers--table--inline-cell">
+                                <p>@($"{searchFilter.LocationName?.ToUpper()} [{searchFilter.Postcode}]")</p>
+                            </div>
+                        </th>
+                        <td class="govuk-table__cell tl-table__cell__list">
+                            <div class="tl-employers--table--inline-header"><strong>Search radius</strong></div>
+                            <div class="tl-employers--table--inline-cell">
+                                <p>@(searchFilter.SearchRadius ?? Model.DefaultSearchRadius) miles</p>
+                            </div>
+                        </td>
 
-                    <td class="govuk-table__cell tl-table__cell__list">
-                        <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
-                        <div class="tl-employers--table--inline-cell">
-                            <p>T Level 1</p>
-                            <p>T Level 2</p>
-                        </div>
-                    </td>
-                    <td class="govuk-table__cell">
-                        <a asp-page="./SearchFilterDetails" class="govuk-link govuk-link--no-visited-state">Change</a>
-                    </td>
-                </tr>
-
+                        <td class="govuk-table__cell tl-table__cell__list">
+                            <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
+                            <div class="tl-employers--table--inline-cell">
+                                @if (searchFilter.Routes is not { Count: > 0 })
+                                {
+                                    <p>All</p>
+                                }
+                                else
+                                {
+                                    @foreach (var route in searchFilter.Routes)
+                                    {
+                                        <p>@route.Name</p>
+                                    }
+                                }
+                            </div>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <a asp-page="./SearchFilterDetails" asp-route-id="@searchFilter.LocationId" class="govuk-link govuk-link--no-visited-state">Change</a>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

@@ -2,22 +2,27 @@
 
 namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
-public class SearchFilterBuilder
+public class NotificationBuilder
 {
-    public IEnumerable<SearchFilter> BuildList() =>
-        new List<SearchFilter>
+    public IEnumerable<Notification> BuildList() =>
+        new List<Notification>
         {
             new()
             {
                 Id = 1,
                 LocationId = 1,
-                LocationName= "Test Location",
+                LocationName= "Test Location 1",
                 Postcode = "CV1 2WT",
+                Email = "test@provider1.co.uk",
                 SearchRadius = 20,
             },
             new()
             {
                 Id = 2,
+                LocationId = 1,
+                LocationName= "Test Location 2",
+                Postcode = "CV1 2WT",
+                Email = "test@provider2.co.uk",
                 SearchRadius = 25,
                 Routes = new List<Route>
                 {
@@ -35,7 +40,7 @@ public class SearchFilterBuilder
             }
         };
 
-    public SearchFilter Build() =>
+    public Notification Build() =>
         BuildList()
             .First();
 }

@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
@@ -15,6 +17,8 @@ public class NotificationsModel : PageModel
     private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<NotificationsModel> _logger;
+
+    public IEnumerable<Notification>? NotificationList { get; private set; }
 
     public NotificationsModel(
         IProviderDataService providerDataService,
@@ -32,5 +36,10 @@ public class NotificationsModel : PageModel
 
     public async Task OnGet()
     {
+        var ukPrn = HttpContext.User.GetUkPrn();
+        if (ukPrn is not null && ukPrn > 0)
+        {
+            NotificationList = await _providerDataService.GetNotifications(ukPrn.Value);
+        }
     }
 }

@@ -44,12 +44,15 @@ public class SearchFilterRepository : ISearchFilterRepository
                 "GetSearchFilters",
                 (e, r) =>
                 {
-                    if (!searchFilters.TryGetValue(e.Id, out var searchFilter))
+                    if (!searchFilters.TryGetValue(e.LocationId, out var searchFilter))
                     {
-                        searchFilters.Add(e.Id,
+                        searchFilters.Add(e.LocationId,
                             searchFilter = new SearchFilter
                             {
                                 Id = e.Id,
+                                LocationId = e.LocationId,
+                                LocationName = e.LocationName,
+                                Postcode = e.Postcode,
                                 SearchRadius = e.SearchRadius,
                                 Routes = new List<Route>()
                             });
@@ -75,13 +78,13 @@ public class SearchFilterRepository : ISearchFilterRepository
     }
 
     public async Task<SearchFilter> GetSearchFilter(
-        int id)
+        int locationId)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            searchFilterId = id
+            locationId
         });
 
         SearchFilter searchFilter = null;
@@ -95,6 +98,9 @@ public class SearchFilterRepository : ISearchFilterRepository
                     searchFilter ??= new SearchFilter
                     {
                         Id = e.Id,
+                        LocationId = e.LocationId,
+                        LocationName = e.LocationName,
+                        Postcode = e.Postcode,
                         SearchRadius = e.SearchRadius,
                         Routes = new List<Route>()
                     };

@@ -163,6 +163,30 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task GetNotifications_Returns_Expected_List()
+    {
+        const long ukPrn = 12345678;
+
+        var notifications = new NotificationBuilder()
+            .BuildList()
+            .ToList();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetNotifications(ukPrn, Arg.Any<bool>())
+            .Returns(notifications);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(notificationRepository: notificationRepository);
+
+        var results = (await service.GetNotifications(ukPrn)).ToList();
+        results.Should().BeEquivalentTo(notifications);
+
+        await notificationRepository
+            .Received(1)
+            .GetNotifications(ukPrn, true);
+    }
+
+    [Fact]
     public async Task GetSearchFilters_Returns_Expected_List()
     {
         const long ukPrn = 12345678;
@@ -172,7 +196,7 @@ public class ProviderDataServiceTests
             .ToList();
 
         var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
-        searchFilterRepository.GetSearchFilters(ukPrn, true)
+        searchFilterRepository.GetSearchFilters(ukPrn, Arg.Any<bool>())
             .Returns(searchFilters);
         
         var service = new ProviderDataServiceBuilder()

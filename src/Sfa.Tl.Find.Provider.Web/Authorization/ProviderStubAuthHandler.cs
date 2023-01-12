@@ -19,7 +19,6 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
     {
         var claims = new[]
         {
-            new Claim(ClaimsIdentity.DefaultNameClaimType, "10000001"),
             new Claim(CustomClaimTypes.DisplayName, "Test User"),
             new Claim(CustomClaimTypes.UkPrn, "10000001")
         };
@@ -29,7 +28,6 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
 
         var result = AuthenticateResult.Success(ticket);
 
-        _httpContextAccessor.HttpContext?.Items.Add(ClaimsIdentity.DefaultNameClaimType, "10000001");
         _httpContextAccessor.HttpContext?.Items.Add(CustomClaimTypes.DisplayName, "Test User");
         _httpContextAccessor.HttpContext?.Items.Add(CustomClaimTypes.OrganisationName, "Test Organisation");
 

@@ -12,5 +12,5 @@ public interface ISearchFilterRepository
         long ukPrn,
         bool includeAdditionalData);
 
-    Task<SearchFilter> GetSearchFilter(int id);
+    Task<SearchFilter> GetSearchFilter(int locationId);
 }

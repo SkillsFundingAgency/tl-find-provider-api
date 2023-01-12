@@ -3,14 +3,16 @@
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("Id {" + nameof(Id) + "}" +
-                 " SearchRadius {" + nameof(SearchRadius) + ", nq}")]
-public class SearchFilterDto
+                 " {" + nameof(Email) + ", nq}")]
+public class NotificationDto
 {
     public int? Id { get; init; }
 
     public int LocationId { get; init; }
 
     public string LocationName { get; init; }
+
+    public string Email { get; init; }
 
     public string Postcode { get; init; }
 

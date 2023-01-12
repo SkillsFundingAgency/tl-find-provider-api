@@ -40,7 +40,7 @@ public class EmployerListTests
 
         employerListModel.UkPrn
             .Should()
-            .Be(long.Parse(PageContextBuilder.DefaultUkPrn));
+            .Be(PageContextBuilder.DefaultUkPrn);
 
         employerListModel.SearchRadius.Should().Be(settings.SearchRadius);
         employerListModel.EmployerInterestRetentionDays.Should().Be(retentionDays);
@@ -64,10 +64,6 @@ public class EmployerListTests
                 isAdministrator: true);
 
         await employerListModel.OnGet();
-
-        employerListModel.EmployerInterestList
-            .Should()
-            .NotBeNullOrEmpty();
 
         employerListModel.EmployerInterestList
             .Should()
@@ -178,10 +174,9 @@ public class EmployerListTests
             .BuildList()
             .ToList();
 
-        var ukPrn = long.Parse(PageContextBuilder.DefaultUkPrn);
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetLocationPostcodes(ukPrn)
+            .GetLocationPostcodes(PageContextBuilder.DefaultUkPrn)
             .Returns(locationPostcodes);
 
         var employerListModel = new EmployerListModelBuilder()
@@ -207,10 +202,9 @@ public class EmployerListTests
             .BuildList()
             .ToList();
 
-        var ukPrn = long.Parse(PageContextBuilder.DefaultUkPrn);
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetLocationPostcodes(ukPrn)
+            .GetLocationPostcodes(PageContextBuilder.DefaultUkPrn)
             .Returns(locationPostcodes);
 
         var employerListModel = new EmployerListModelBuilder()
@@ -229,11 +223,11 @@ public class EmployerListTests
         var orderedPostcodes = locationPostcodes.OrderBy(x => x.Name).ToArray();
         for (var i = 0; i < orderedPostcodes.Length; i++)
         {
-            var campusName = orderedPostcodes[i].Name?.Length > 15 
+            var campusName = orderedPostcodes[i].Name?.Length > 15
                 ? orderedPostcodes[i].Name[..15] + "..."
                 : orderedPostcodes[i].Name;
             var displayText = $"{campusName.ToUpper()} [{orderedPostcodes[i].Postcode}]";
-         
+
             employerListModel.Postcodes[i].Text.Should().Be(displayText);
             employerListModel.Postcodes[i].Value.Should().Be(orderedPostcodes[i].Postcode);
         }
@@ -249,10 +243,9 @@ public class EmployerListTests
     {
         var locationPostcodes = Enumerable.Empty<LocationPostcode>().ToList();
 
-        var ukPrn = long.Parse(PageContextBuilder.DefaultUkPrn);
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetLocationPostcodes(ukPrn)
+            .GetLocationPostcodes(PageContextBuilder.DefaultUkPrn)
             .Returns(locationPostcodes);
 
         var employerListModel = new EmployerListModelBuilder()
@@ -263,10 +256,6 @@ public class EmployerListTests
         employerListModel.Postcodes.Should().NotBeNullOrEmpty();
         employerListModel.Postcodes!.Length.Should().Be(1);
 
-        employerListModel.Postcodes
-            .Should()
-            .Contain(x =>
-                x.Text == EmployerListModel.EnterPostcodeValue);
         employerListModel.Postcodes
             .Should()
             .Contain(x =>

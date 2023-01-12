@@ -79,7 +79,7 @@
       "required": [
         "GovNotifyApiKey"
       ],
-      "type":"object"
+      "type": "object"
     },
     "EmployerInterestSettings": {
       "properties": {
@@ -110,6 +110,20 @@
       "additionalProperties": false,
       "required": [
         "BaseUri"
+      ],
+      "type": "object"
+    },
+    "ProviderSettings": {
+      "properties": {
+        "DefaultSearchRadius": {
+          "minLength": 1,
+          "type": "integer",
+          "environmentVariable": "ProviderSettings_DefaultSearchRadius"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "DefaultSearchRadius"
       ],
       "type": "object"
     },
