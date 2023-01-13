@@ -95,6 +95,50 @@ public class SearchFilterDetailsTests
     }
 
     [Fact]
+    public async Task SearchFilterDetailsModel_OnGet_Sets_Skill_Area_Select_List()
+    {
+        var settings = new SettingsBuilder().BuildProviderSettings();
+
+        var routes = new RouteBuilder()
+            .BuildList()
+            .ToList();
+
+        var searchFilter = new SearchFilterBuilder()
+            .Build();
+        var id = searchFilter.LocationId;
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetSearchFilter(id)
+            .Returns(searchFilter);
+        providerDataService
+            .GetRoutes()
+            .Returns(routes);
+
+        var searchFilterDetailsModel = new SearchFilterDetailsModelBuilder()
+            .Build(providerDataService, settings);
+
+        await searchFilterDetailsModel.OnGet(id);
+
+        searchFilterDetailsModel.Input.Should().NotBeNull();
+        searchFilterDetailsModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
+        var skillAreas = searchFilterDetailsModel.Input.SkillAreas;
+
+        skillAreas!.Length.Should().Be(routes.Count);
+        
+        skillAreas[0].Should().Match<SelectListItem>(x =>
+            x.Text == "Agriculture, environment and animal care" && x.Value == "1");
+
+        var orderedRoutes = routes.OrderBy(r => r.Name).ToArray();
+        for (var i = 1; i < skillAreas.Length; i++)
+        {
+            skillAreas[i].Should().Match<SelectListItem>(x =>
+                x.Text == orderedRoutes[i].Name && 
+                x.Value == orderedRoutes[i].Id.ToString());
+        }
+    }
+
+    [Fact]
     public async Task SearchFilterDetailsModel_OnGet_Sets_Default_SelectedSearchRadius()
     {
         const int expectedDefaultSearchRadius = 20;

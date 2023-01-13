@@ -35,86 +35,20 @@
                         If nothing is selected, all skill areas will show on the employer list
                     </div>
                     <div class="govuk-checkboxes govuk-!-margin-top-4" data-module="govuk-checkboxes">
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="agriculture" name="agriculture" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="agriculture">
-                                Agriculture, Environment and Animal Care
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="business" name="business" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="business">
-                                Business and Administration
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="arts" name="arts" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="arts">
-                                Arts, Entertainment, and Recreation
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="catering" name="catering" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="catering">
-                                Catering
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="construction" name="construction" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="construction">
-                                Construction and the Built Environment
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="craft" name="craft" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="craft">
-                                Craft and Design
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="creative" name="creative" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="creative">
-                                Creative and Design
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="digital" name="digital" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="digital">
-                                Digital and IT
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="education" name="education" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="education">
-                                Education and Childcare
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="engineering" name="engineering" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="engineering">
-                                Engineering and Manufacturing
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="hair" name="hair" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="hair">
-                                Hair and Beauty
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="health" name="health" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="health">
-                                Health and Science
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="legal" name="legal" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="legal">
-                                Legal, Finance and Accounting
-                            </label>
-                        </div>
+                        @foreach (var skillArea in Model?.Input.SkillAreas.Select((value, i) => (value, i)))
+                        {
+                            var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
+                            var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
+                                        @skillArea.value.Text
+                                    </label>
+                                    <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
+                                    <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Text" />
+                            </div>
+                        }
                     </div>
-
                 </fieldset>
             </div>
 

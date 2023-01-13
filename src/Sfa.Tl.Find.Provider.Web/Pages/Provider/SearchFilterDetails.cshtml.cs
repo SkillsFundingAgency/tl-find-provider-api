@@ -39,9 +39,9 @@ public class SearchFilterDetailsModel : PageModel
         DefaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
             ? _providerSettings.DefaultSearchRadius
             : Constants.DefaultProviderSearchRadius;
-        
+
         SearchFilter = await _providerDataService.GetSearchFilter(id);
-        
+
         if (SearchFilter is null)
         {
             //Does this happen? should be loading from the location id so always succeeds?
@@ -54,7 +54,7 @@ public class SearchFilterDetailsModel : PageModel
                 (SearchFilter.SearchRadius ?? DefaultSearchRadius)
                 .ToString();
 
-            SearchRadiusOptions = 
+            SearchRadiusOptions =
                 new List<int> { 5, 10, 20, 30, 40, 50 }
                     .Select(p => new SelectListItem(
                         $"{p} miles",
@@ -64,7 +64,15 @@ public class SearchFilterDetailsModel : PageModel
                 .OrderBy(x => int.Parse(x.Value))
                 .ToArray();
 
-            var skillAreas = await _providerDataService.GetRoutes();
+            Input.SkillAreas = (await _providerDataService
+                .GetRoutes())
+                .Select(r => new SelectListItem(
+                    r.Name,
+                    r.Id.ToString(),
+                    SearchFilter.Routes.Any(x => r.Id == x.Id))
+                )
+                .OrderBy(x => x.Text)
+                .ToArray();
         }
 
         return SearchFilter != null ?
@@ -74,9 +82,17 @@ public class SearchFilterDetailsModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            Debug.WriteLine($"SelectedSearchRadius = {Input?.SelectedSearchRadius}");
+        }
+
+        Debug.WriteLine($"SelectedSearchRadius = {Input?.SelectedSearchRadius}");
+        if (Input.SkillAreas is not null)
+        {
+            foreach (var s in Input.SkillAreas)
+            {
+                Debug.WriteLine($"Skill area {s.Value} - {s.Selected} - {s.Text}");
+            }
         }
 
         return RedirectToPage("/Provider/SearchFilters");
@@ -85,5 +101,7 @@ public class SearchFilterDetailsModel : PageModel
     public class InputModel
     {
         public string? SelectedSearchRadius { get; set; }
+
+        public SelectListItem[]? SkillAreas { get; set; }
     }
 }
