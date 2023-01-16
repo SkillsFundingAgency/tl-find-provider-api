@@ -13,6 +13,7 @@ public class LocationPostcodeBuilder
         {
             new()
             {
+                Id = 1,
                 Postcode = "AA1 1AA",
                 Name = "Test Location A",
                 Latitude = 50.0,
@@ -21,6 +22,7 @@ public class LocationPostcodeBuilder
             },
             new()
             {
+                Id = 2,
                 Postcode = "BB1 1BB",
                 Name = "Test Location B",
                 Latitude = 51.0,
@@ -29,6 +31,7 @@ public class LocationPostcodeBuilder
             },
             new()
             {
+                Id = 3,
                 Postcode = "CC1 1CC",
                 Name = "ST MARY'S CATHOLIC COLLEGE",
                 Latitude = 5.0,

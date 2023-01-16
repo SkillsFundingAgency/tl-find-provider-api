@@ -45,6 +45,8 @@ public class EmployerListTests
         employerListModel.SearchRadius.Should().Be(settings.SearchRadius);
         employerListModel.EmployerInterestRetentionDays.Should().Be(retentionDays);
         employerListModel.EmployerInterestRetentionWeeks.Should().Be(expectedRetentionWeeks);
+
+        employerListModel.SelectedPostcodeHasFilters.Should().BeFalse();
     }
 
     [Fact]
@@ -71,6 +73,7 @@ public class EmployerListTests
 
         employerListModel.ZeroResultsFound.Should().NotBeNull();
         employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
+        employerListModel.SelectedPostcodeHasFilters.Should().BeFalse();
     }
 
     [Fact]
@@ -101,6 +104,7 @@ public class EmployerListTests
             .BeNullOrEmpty();
 
         employerListModel.ZeroResultsFound.Should().BeNull();
+        employerListModel.SelectedPostcodeHasFilters.Should().BeFalse();
     }
 
     [Fact]
@@ -135,6 +139,7 @@ public class EmployerListTests
 
         employerListModel.ZeroResultsFound.Should().NotBeNull();
         employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
+        employerListModel.SelectedPostcodeHasFilters.Should().BeFalse();
     }
 
     [Fact]
@@ -165,6 +170,7 @@ public class EmployerListTests
 
         employerListModel.ZeroResultsFound.Should().NotBeNull();
         employerListModel.ZeroResultsFound!.Value.Should().BeTrue();
+        employerListModel.SelectedPostcodeHasFilters.Should().BeFalse();
     }
 
     [Fact]

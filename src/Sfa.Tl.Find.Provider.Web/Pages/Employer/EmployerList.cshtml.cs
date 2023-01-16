@@ -33,6 +33,10 @@ public class EmployerListModel : PageModel
 
     public SelectListItem[]? Postcodes { get; private set; }
 
+    public int? SelectedLocationId { get; private set; }
+
+    public bool SelectedPostcodeHasFilters { get; private set; }
+
     [TempData]
     public string? DeletedOrganisationName { get; set; }
 
@@ -76,7 +80,7 @@ public class EmployerListModel : PageModel
         {
             await LoadProviderView(UkPrn.Value);
         }
-        else if(User.IsInRole(CustomRoles.Administrator))
+        else if (User.IsInRole(CustomRoles.Administrator))
         {
             await LoadAdministratorView();
         }
@@ -101,6 +105,8 @@ public class EmployerListModel : PageModel
             if (ProviderLocations != null && ProviderLocations.ContainsKey(postcodeLocation.Postcode))
             {
                 Input.SelectedPostcode = postcodeLocation.Postcode;
+                SelectedPostcodeHasFilters = postcodeLocation.HasSearchFilters;
+                SelectedLocationId = postcodeLocation.Id;
             }
             else
             {
@@ -119,7 +125,7 @@ public class EmployerListModel : PageModel
         ZeroResultsFound = false;
 
         LocationPostcode? postcodeLocation = null;
-        
+
         //User has selected a postcode from the dropdown
         if (Input?.SelectedPostcode != EnterPostcodeValue)
         {
