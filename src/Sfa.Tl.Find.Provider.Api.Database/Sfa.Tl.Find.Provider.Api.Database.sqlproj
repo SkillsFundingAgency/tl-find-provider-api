@@ -72,6 +72,7 @@
     <None Include="PostDeployment\Seed Email Templates.sql" />
     <None Include="PostDeployment\Set Expiry Dates.sql" />
     <None Include="Indexes\IX_SearchFilterRoute_SearchFilterId.sql" />
+    <None Include="Indexes\IX_SearchFilter_LocationId.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
