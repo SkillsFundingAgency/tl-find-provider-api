@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Dapper;
+﻿using Dapper;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
@@ -103,21 +102,9 @@ public class EmailTemplateRepositoryTests
         await repository
             .GetEmailTemplate(_testEmailTemplate.TemplateId);
         
-        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-            .SingleOrDefault(p => p.Name == "templates");
-
-        fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-        pi.Length.Should().Be(1);
-
-        var dynamicProperty = pi.Single();
-        dynamicProperty.Name.Should().Be("templateId");
-        dynamicProperty.GetValue(item).Should().Be(_testEmailTemplate.TemplateId);
+        templates.ContainsNameAndValue("templateId", _testEmailTemplate.TemplateId);
     }
 
     [Fact]
@@ -199,20 +186,8 @@ public class EmailTemplateRepositoryTests
         await repository
             .GetEmailTemplateByName(_testEmailTemplate.Name);
 
-        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-            .SingleOrDefault(p => p.Name == "templates");
-
-        fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-        pi.Length.Should().Be(1);
-
-        var dynamicProperty = pi.Single();
-        dynamicProperty.Name.Should().Be("templateName");
-        dynamicProperty.GetValue(item).Should().Be(_testEmailTemplate.Name);
+        templates.ContainsNameAndValue("templateName", _testEmailTemplate.Name);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
@@ -714,29 +713,12 @@ public class EmployerInterestRepositoryTests
             numberOfDaysToExtend,
             expiryNotificationDays);
 
-        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-            .SingleOrDefault(p => p.Name == "templates");
-
-        fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-        pi.Length.Should().Be(3);
-
-        var uniqueIdProperty = pi.SingleOrDefault(p => p.Name == "uniqueId");
-        uniqueIdProperty.Should().NotBeNull();
-        uniqueIdProperty!.GetValue(item).Should().Be(uniqueId);
-        
-        var numberOfDaysToExtendProperty = pi.SingleOrDefault(p => p.Name == "numberOfDaysToExtend");
-        numberOfDaysToExtendProperty.Should().NotBeNull();
-        numberOfDaysToExtendProperty!.GetValue(item).Should().Be(numberOfDaysToExtend);
-
-        var expiryNotificationDaysProperty = pi.SingleOrDefault(p => p.Name == "expiryNotificationDays");
-        expiryNotificationDaysProperty.Should().NotBeNull();
-        expiryNotificationDaysProperty!.GetValue(item).Should().Be(expiryNotificationDays);
+        templates.GetDynamicTemplatesCount().Should().Be(3);
+        templates.ContainsNameAndValue("uniqueId", uniqueId);
+        templates.ContainsNameAndValue("numberOfDaysToExtend", numberOfDaysToExtend);
+        templates.ContainsNameAndValue("expiryNotificationDays", expiryNotificationDays);
     }
 
     [Fact]
@@ -782,20 +764,8 @@ public class EmployerInterestRepositoryTests
 
         await repository.UpdateExtensionEmailSentDate(id);
         
-        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-            .SingleOrDefault(p => p.Name == "templates");
-
-        fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-        pi.Length.Should().Be(1);
-
-        var dynamicProperty = pi.Single();
-        dynamicProperty.Name.Should().Be("id");
-        dynamicProperty.GetValue(item).Should().Be(id);
+        templates.ContainsNameAndValue("id", id);
     }
 }

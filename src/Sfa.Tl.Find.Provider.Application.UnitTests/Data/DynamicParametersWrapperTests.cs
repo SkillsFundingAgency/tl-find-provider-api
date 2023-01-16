@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Reflection;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -57,14 +56,8 @@ public class DynamicParametersWrapperTests
 
         dynamicParametersWrapper.CreateParameters(obj);
 
-        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-            .SingleOrDefault(p => p.Name == "templates");
-
-        fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
-        templates.Should().NotBeNullOrEmpty();
-        templates!.First().Should().Be(obj);
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+         templates!.First().Should().Be(obj);
     }
 
     [Fact]
