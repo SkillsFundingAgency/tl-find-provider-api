@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 
@@ -122,5 +123,33 @@ public class SearchFilterRepository : ISearchFilterRepository
                 commandType: CommandType.StoredProcedure);
 
         return searchFilter;
+    }
+
+    public async Task Save(SearchFilter searchFilter)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                locationId = searchFilter.LocationId,
+                searchRadius = searchFilter.SearchRadius,
+                routeIds = searchFilter.Routes
+                    .Select(r => r.Id)
+                    .AsTableValuedParameter("dbo.IdListTableType")
+            });
+
+            var result = await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "CreateOrUpdateSearchFilter",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when saving employer interest");
+            throw;
+        }
     }
 }

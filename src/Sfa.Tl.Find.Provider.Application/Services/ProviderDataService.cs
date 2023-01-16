@@ -345,6 +345,11 @@ public class ProviderDataService : IProviderDataService
         _logger.LogInformation("Loaded {count} providers from stream.", count);
     }
 
+    public async Task SaveSearchFilter(SearchFilter searchFilter)
+    {
+        await _searchFilterRepository.Save(searchFilter);
+    }
+
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
     {
         try

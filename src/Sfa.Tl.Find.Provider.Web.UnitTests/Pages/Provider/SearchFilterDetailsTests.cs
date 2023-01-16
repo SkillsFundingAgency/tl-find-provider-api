@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
 
@@ -187,11 +186,12 @@ public class SearchFilterDetailsTests
         await searchFilterDetailsModel.OnGet(id);
 
         searchFilterDetailsModel.Input.Should().NotBeNull();
+        searchFilterDetailsModel.Input!.LocationId.Should().Be(id);
         searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(expectedDefaultSearchRadius.ToString());
     }
 
     [Fact]
-    public async Task SearchFilterDetailsModel_OnGet_Redirects_To_404_If_Employer_Not_Found()
+    public async Task SearchFilterDetailsModel_OnGet_Redirects_To_404_If_Filter_Not_Found()
     {
         const int id = 999;
 
@@ -211,14 +211,62 @@ public class SearchFilterDetailsTests
     }
 
     [Fact]
+    public async Task SearchFilterDetailsModel_OnPost_Calls_Service()
+    {
+        var providerDataService = Substitute.For<IProviderDataService>();
+
+        var detailsModel = new SearchFilterDetailsModelBuilder()
+            .Build(providerDataService);
+
+        var id = 10;
+        var searchRadius = 30;
+
+        var skillAreas = new SelectListItem[]
+        {
+            new("Agriculture, environment and animal care",
+                "1", 
+                false),
+            new("Digital and IT", "6", true),
+            new("Health and science", "10", true)
+        };
+            
+        detailsModel.Input = new SearchFilterDetailsModel.InputModel
+        {
+            LocationId = id,
+            SelectedSearchRadius = searchRadius.ToString(),
+            SkillAreas = skillAreas
+        };
+
+        await detailsModel.OnPost();
+        
+        await providerDataService
+            .Received(1)
+            .SaveSearchFilter(Arg.Is<SearchFilter>(
+                s => s.LocationId == id &&
+                     s.SearchRadius == searchRadius));
+
+        await providerDataService
+            .Received(1)
+            .SaveSearchFilter(Arg.Is<SearchFilter>(
+                s => s.Routes.Count == 2 &&
+                     s.Routes.Any(r => r.Id == 6) &&
+                     s.Routes.Any(r => r.Id == 10)));
+    }
+
+    [Fact]
     public async Task SearchFilterDetailsModel_OnPost_Redirects_To_Search_Filters_List_Page()
     {
         var detailsModel = new SearchFilterDetailsModelBuilder()
             .Build();
 
+        var id = 10;
+        var searchRadius = 30;
+
         detailsModel.Input = new SearchFilterDetailsModel.InputModel
         {
-            SelectedSearchRadius = EmployerListModel.EnterPostcodeValue,
+            LocationId = id,
+            SelectedSearchRadius = searchRadius.ToString(),
+            SkillAreas = Array.Empty<SelectListItem>()
         };
 
         var result = await detailsModel.OnPost();

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
+using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
@@ -17,6 +17,7 @@ public class SearchFilterDetailsModel : PageModel
     private readonly ILogger<SearchFilterDetailsModel> _logger;
 
     public int DefaultSearchRadius { get; private set; }
+
     public SelectListItem[]? SearchRadiusOptions { get; private set; }
 
     public SearchFilter? SearchFilter { get; private set; }
@@ -50,6 +51,7 @@ public class SearchFilterDetailsModel : PageModel
         if (SearchFilter is not null)
         {
             Input ??= new InputModel();
+            Input.LocationId = id;
             Input.SelectedSearchRadius =
                 (SearchFilter.SearchRadius ?? DefaultSearchRadius)
                 .ToString();
@@ -86,20 +88,36 @@ public class SearchFilterDetailsModel : PageModel
         {
         }
 
-        Debug.WriteLine($"SelectedSearchRadius = {Input?.SelectedSearchRadius}");
-        if (Input.SkillAreas is not null)
+        var routes = Input?.SkillAreas != null 
+        ? Input
+            .SkillAreas
+            .Where(s => s.Selected)
+            .Select(s => 
+                new Route
+                {
+                    Id = int.Parse(s.Value)
+                })
+            .ToList()
+        : new List<Route>();
+
+        var searchFilter = new SearchFilter
         {
-            foreach (var s in Input.SkillAreas)
-            {
-                Debug.WriteLine($"Skill area {s.Value} - {s.Selected} - {s.Text}");
-            }
-        }
+            LocationId = Input!.LocationId,
+            SearchRadius = Input?.SelectedSearchRadius is not null ? 
+                int.Parse(Input!.SelectedSearchRadius)
+                : _providerSettings.DefaultSearchRadius,
+            Routes = routes
+        };
+
+        await _providerDataService.SaveSearchFilter(searchFilter);
 
         return RedirectToPage("/Provider/SearchFilters");
     }
 
     public class InputModel
     {
+        public int LocationId { get; set; }
+
         public string? SelectedSearchRadius { get; set; }
 
         public SelectListItem[]? SkillAreas { get; set; }

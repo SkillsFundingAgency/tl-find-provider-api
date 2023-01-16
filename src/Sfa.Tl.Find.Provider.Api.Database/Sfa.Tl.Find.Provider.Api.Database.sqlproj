@@ -132,7 +132,6 @@
     <None Include="Indexes\IX_SearchFilterRoute_RouteId.sql" />
     <Build Include="Stored Procedures\GetSearchFilters.sql" />
     <Build Include="Stored Procedures\GetSearchFilterDetail.sql" />
-    <Build Include="Stored Procedures\DeleteSearchFilter.sql" />
     <Build Include="Stored Procedures\CreateOrUpdateSearchFilter.sql" />
     <Build Include="Stored Procedures\GetNotifications.sql" />
   </ItemGroup>

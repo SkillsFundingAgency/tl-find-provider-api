@@ -1,8 +1,10 @@
 ﻿using System.Data;
+using Dapper;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
+using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -120,5 +122,67 @@ public class SearchFilterRepositoryTests
         result.Validate(searchFilterDtoList.First());
         result.Routes.First().Id.Should().Be(routeDtoList[0].RouteId);
         result.Routes.First().Name.Should().Be(routeDtoList[0].RouteName);
+    }
+
+    [Fact]
+    public async Task SaveSearchFilter_Calls_Database()
+    {
+        var searchFilter = new SearchFilterBuilder()
+            .Build();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new SearchFilterRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.Save(searchFilter);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s => s == "CreateOrUpdateSearchFilter"),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+				commandType: CommandType.StoredProcedure);
+    }
+
+    [Fact]
+    public async Task SaveSearchFilter_Sets_Dynamic_Parameters()
+    {
+        var searchFilter = new SearchFilterBuilder()
+            .Build();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new SearchFilterRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.Save(searchFilter);
+      
+
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+        templates.Should().NotBeNullOrEmpty();
+
+        var item = templates!.First();
+        var pi = item.GetType().GetProperties();
+        
+        var expectedRouteIds = searchFilter.Routes
+                            .Select(r => r.Id);
+        
+        templates.GetDynamicTemplatesCount().Should().Be(3);
+        templates.ContainsNameAndValue("locationId", searchFilter.LocationId);
+        templates.ContainsNameAndValue("searchRadius", searchFilter.SearchRadius);
+        var routeIds = templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds");
+        routeIds.Should().NotBeNull();
+        var t = routeIds.GetType().Name;
     }
 }

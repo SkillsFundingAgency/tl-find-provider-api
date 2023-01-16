@@ -990,4 +990,22 @@ public class ProviderDataServiceTests
         providerContacts.Validate(expectedContacts);
 
     }
+
+    [Fact]
+    public async Task GetSearchFilters_Calls_Repository()
+    {
+        var searchFilter = new SearchFilterBuilder()
+            .Build();
+
+        var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(searchFilterRepository: searchFilterRepository);
+
+        await service.SaveSearchFilter(searchFilter);
+
+        await searchFilterRepository
+            .Received(1)
+            .Save(searchFilter);
+    }
 }

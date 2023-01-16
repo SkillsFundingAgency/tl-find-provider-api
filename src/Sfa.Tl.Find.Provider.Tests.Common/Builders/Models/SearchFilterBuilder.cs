@@ -16,6 +16,14 @@ public class SearchFilterBuilder
                 LocationName= "Test Location",
                 Postcode = "CV1 2WT",
                 SearchRadius = _searchRadius,
+                Routes = new List<Route>
+                {
+                    new()
+                    {
+                        Id = 6,
+                        Name = "Digital and IT"
+                    }
+                }
             },
             new()
             {
