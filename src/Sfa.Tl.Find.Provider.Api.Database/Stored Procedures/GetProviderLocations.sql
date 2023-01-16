@@ -16,10 +16,18 @@ AS
 			 l.[Postcode],
 			 l.[Name],
 			 l.[Latitude],
-			 l.[Longitude]
+			 l.[Longitude],
+			 sf.[Id],
+			 CAST(
+				CASE WHEN sf.[Id] IS NOT NULL 
+					THEN 1 
+					ELSE 0 
+				END AS BIT) AS [HasSearchFilters]
 		FROM ProvidersCTE p
 		INNER JOIN	[dbo].[Location] l
 	  	ON		p.[Id] = l.[ProviderId]
+		LEFT JOIN [dbo].[SearchFilter] sf
+		ON sf.[LocationId] = l.[Id]
 		WHERE	l.[IsDeleted] = 0
 		  --Only include the first row to make sure main data set takes priority
 		  AND	p.[ProviderRowNum] = 1
