@@ -611,7 +611,7 @@ public class EmployerInterestRepositoryTests
     [Fact]
     public async Task Search_By_Location_Returns_Expected_List()
     {
-        const int location = 1;
+        const int locationId = 1;
         const int defaultSearchRadius = 25;
         const int employerInterestsCount = 1000;
         const bool searchFiltersApplied = true;
@@ -657,7 +657,7 @@ public class EmployerInterestRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper);
 
-        var results = await repository.Search(location, defaultSearchRadius);
+        var results = await repository.Search(locationId, defaultSearchRadius);
 
         var searchResults = results.SearchResults?.ToList();
 

@@ -1027,12 +1027,11 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var results =
-            (await service.FindEmployerInterest(latitude, longitude))
-            .SearchResults
-            .ToList();
+        var (searchResults, count) = 
+            await service.FindEmployerInterest(latitude, longitude);
 
-        results.Should().BeEquivalentTo(employerInterestSummaryList);
+        searchResults.Should().BeEquivalentTo(employerInterestSummaryList);
+        count.Should().Be(employerInterestsCount);
     }
 
     [Fact]
@@ -1074,14 +1073,103 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var results =
-            (await service.FindEmployerInterest(latitude, longitude))
-            .SearchResults
+        var (employerInterestSummaries, count) = 
+            await service.FindEmployerInterest(latitude, longitude);
+        
+        var searchResults = employerInterestSummaries
+            .ToList();
+        searchResults.Should().NotBeNullOrEmpty();
+        searchResults.First().IsExpiring.Should().BeTrue();
+        searchResults.First().IsNew.Should().BeTrue();
+        count.Should().Be(employerInterestsCount);
+    }
+
+    [Fact]
+    public async Task FindEmployerInterest_By_Location_Returns_Expected_List()
+    {
+        const int locationId = 1;
+        const int employerInterestsCount = 1000;
+        const bool searchFiltersApplied = true;
+
+        var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
+        .BuildList()
+        .ToList();
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings();
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository
+            .Search(
+                locationId,
+                settings.SearchRadius
+            )
+            .Returns((employerInterestSummaryList, employerInterestsCount, searchFiltersApplied));
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                dateTimeProvider,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var (searchResults, count, filtersApplied) = 
+            await service.FindEmployerInterest(locationId);
+        
+        searchResults.Should().BeEquivalentTo(employerInterestSummaryList);
+        count.Should().Be(employerInterestsCount);
+        filtersApplied.Should().Be(searchFiltersApplied);
+    }
+
+    [Fact]
+    public async Task FindEmployerInterest_By_Location_Returns_Expected_List_Sets_New_And_Expiry()
+    {
+        const int locationId = 1;
+        const int employerInterestsCount = 1000;
+        const bool searchFiltersApplied = true;
+
+        const int daysToRetain = 10;
+        var today = DateTime.Parse("2022-12-07");
+        var creationDate = DateTime.Parse("2022-12-01 11:30");
+        var expiryDate = DateTime.Parse("2022-12-11");
+
+        var employerInterestSummaryList = new EmployerInterestSummaryBuilder()
+            .WithCreationDate(creationDate)
+            .WithExpiryDate(expiryDate)
+            .BuildList()
             .ToList();
 
-        results.Should().NotBeNullOrEmpty();
-        results.First().IsExpiring.Should().BeTrue();
-        results.First().IsNew.Should().BeTrue();
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            retentionDays: daysToRetain);
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(today);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository
+            .Search(
+                locationId,
+                settings.SearchRadius
+            )
+            .Returns((employerInterestSummaryList, employerInterestsCount, searchFiltersApplied));
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                dateTimeProvider,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var (employerInterestSummaries, count, filtersApplied) = 
+            await service.FindEmployerInterest(locationId);
+        
+        var searchResults = employerInterestSummaries
+            .ToList();
+        searchResults.Should().NotBeNullOrEmpty();
+        searchResults.First().IsExpiring.Should().BeTrue();
+        searchResults.First().IsNew.Should().BeTrue();
+        count.Should().Be(employerInterestsCount);
+        filtersApplied.Should().Be(searchFiltersApplied);
     }
 
     [Fact]
@@ -1121,11 +1209,13 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var results = await service.FindEmployerInterest(postcode);
+        var (employerInterestSummaries, count) = 
+            await service.FindEmployerInterest(postcode);
 
-        results.Should().NotBeNull();
-        results.SearchResults.Should().BeEquivalentTo(employerInterestSummaryList);
-        results.TotalResultsCount.Should().Be(employerInterestsCount);
+        var searchResults = employerInterestSummaries
+            .ToList();
+        searchResults.Should().BeEquivalentTo(employerInterestSummaryList);
+        count.Should().Be(employerInterestsCount);
     }
 
     [Fact]
@@ -1173,13 +1263,15 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var results = await service
-            .FindEmployerInterest(postcode);
+        var (employerInterestSummaries, count) = 
+            await service.FindEmployerInterest(postcode);
 
-        results.Should().NotBeNull();
-        results.SearchResults.Should().NotBeNullOrEmpty();
-        results.SearchResults.First().IsExpiring.Should().BeTrue();
-        results.SearchResults.First().IsNew.Should().BeTrue();
+        var searchResults = employerInterestSummaries
+            .ToList();
+        searchResults.Should().NotBeNullOrEmpty();
+        searchResults.First().IsExpiring.Should().BeTrue();
+        searchResults.First().IsNew.Should().BeTrue();
+        count.Should().Be(employerInterestsCount);
     }
 
     [Fact]
