@@ -17,7 +17,6 @@ AS
 			 l.[Name],
 			 l.[Latitude],
 			 l.[Longitude],
-			 sf.[Id],
 			 CAST(
 				CASE WHEN sf.[Id] IS NOT NULL 
 					THEN 1 
