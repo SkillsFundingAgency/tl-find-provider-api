@@ -30,5 +30,9 @@ public interface IEmployerInterestRepository
         double longitude, 
         int searchRadius);
 
+    Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount, bool SearchFiltersApplied)> Search(
+        int locationId,
+        int defaultSearchRadius);
+
     Task UpdateExtensionEmailSentDate(int id);
 }

@@ -346,7 +346,6 @@ public class EmployerInterestRepositoryTests
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
             .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
 
-
         dbContextWrapper
             .QueryAsync<ExpiredEmployerInterestDto>(dbConnection,
                 Arg.Is<string>(s =>
@@ -555,7 +554,7 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task Search_Returns_Expected_List()
+    public async Task Search_By_Lat_Long_Returns_Expected_List()
     {
         const double latitude = 52.400997;
         const double longitude = -1.508122;
@@ -599,6 +598,66 @@ public class EmployerInterestRepositoryTests
                 dynamicParametersWrapper);
 
         var results = await repository.Search(latitude, longitude, searchRadius);
+
+        var searchResults = results.SearchResults?.ToList();
+
+        searchResults.Should().NotBeNullOrEmpty();
+        searchResults!.Count.Should().Be(1);
+        results.TotalResultsCount.Should().Be(employerInterestsCount);
+        searchResults.First().Validate(employerInterestSummaryDtoList.First());
+        searchResults[0].SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+    }
+
+    [Fact]
+    public async Task Search_By_Location_Returns_Expected_List()
+    {
+        const int location = 1;
+        const int defaultSearchRadius = 25;
+        const int employerInterestsCount = 1000;
+        const bool searchFiltersApplied = true;
+
+        var employerInterestSummaryDtoList = new EmployerInterestSummaryDtoBuilder()
+            .BuildList()
+            .ToList();
+        var routeDtoList = new RouteDtoBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameters(
+                new List<(string, object, DbType)>
+                {
+                    new ("totalEmployerInterestsCount", employerInterestsCount, DbType.Int32),
+                    new ("@searchFiltersApplied", searchFiltersApplied, DbType.Binary)
+                });
+
+        var callIndex = 0;
+
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
+                "SearchEmployerInterestByLocation",
+                Arg.Do<Func<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>>(
+                    x =>
+                    {
+                        var e = employerInterestSummaryDtoList[callIndex];
+                        var r = routeDtoList[callIndex];
+                        x.Invoke(e, r);
+
+                        callIndex++;
+                    }),
+                Arg.Any<object>(),
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper);
+
+        var results = await repository.Search(location, defaultSearchRadius);
 
         var searchResults = results.SearchResults?.ToList();
 

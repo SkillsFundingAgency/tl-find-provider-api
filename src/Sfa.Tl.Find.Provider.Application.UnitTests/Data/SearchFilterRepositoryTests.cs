@@ -146,7 +146,7 @@ public class SearchFilterRepositoryTests
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s => s == "CreateOrUpdateSearchFilter"),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
-				commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure);
     }
 
     [Fact]
@@ -165,8 +165,6 @@ public class SearchFilterRepositoryTests
                 dynamicParametersWrapper.DapperParameterFactory);
 
         await repository.Save(searchFilter);
-      
-
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
@@ -174,10 +172,10 @@ public class SearchFilterRepositoryTests
 
         var item = templates!.First();
         var pi = item.GetType().GetProperties();
-        
+
         var expectedRouteIds = searchFilter.Routes
                             .Select(r => r.Id);
-        
+
         templates.GetDynamicTemplatesCount().Should().Be(3);
         templates.ContainsNameAndValue("locationId", searchFilter.LocationId);
         templates.ContainsNameAndValue("searchRadius", searchFilter.SearchRadius);
