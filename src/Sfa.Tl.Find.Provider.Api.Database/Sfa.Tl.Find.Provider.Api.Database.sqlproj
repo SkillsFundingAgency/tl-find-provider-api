@@ -135,6 +135,7 @@
     <Build Include="Stored Procedures\GetSearchFilterDetail.sql" />
     <Build Include="Stored Procedures\CreateOrUpdateSearchFilter.sql" />
     <Build Include="Stored Procedures\GetNotifications.sql" />
+    <Build Include="Stored Procedures\DeleteNotification.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
