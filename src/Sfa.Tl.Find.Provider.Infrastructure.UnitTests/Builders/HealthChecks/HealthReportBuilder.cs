@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 
-namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.HealthChecks;
+namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.Builders.HealthChecks;
 public class HealthReportBuilder
 {
     private const string AssetFolderPath = "Assets";

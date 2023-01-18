@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Builders\Csv\Assets\IndexOfPlaceNames.csv" />
     <None Remove="Builders\Csv\Assets\ProviderContacts.csv" />
-    <None Remove="Builders\HealthChecks\Assets\health.json" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <None Remove="Builders\Json\Assets\CourseDirectory\tlevels.json" />
     <None Remove="Builders\Json\Assets\DfeSignInApi\dfe_organisations.json" />
@@ -35,8 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Builders\Csv\Assets\IndexOfPlaceNames.csv" />
     <EmbeddedResource Include="Builders\Csv\Assets\ProviderContacts.csv" />
-    <EmbeddedResource Include="Builders\HealthChecks\Assets\health.json" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tleveldefinitions.json" />
     <EmbeddedResource Include="Builders\Json\Assets\CourseDirectory\tlevels.json" />
     <EmbeddedResource Include="Builders\Json\Assets\DfeSignInApi\dfe_organisations.json" />

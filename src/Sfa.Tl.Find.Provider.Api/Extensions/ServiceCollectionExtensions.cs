@@ -231,17 +231,18 @@ public static class ServiceCollectionExtensions
                                 .CronSchedule(courseDirectoryImportCronSchedule)));
             }
 
-            if (!string.IsNullOrEmpty(townDataImportCronSchedule))
-            {
-                var townDataImportJobKey = new JobKey(JobKeys.ImportTownData);
-                q.AddJob<TownDataImportJob>(opts =>
-                        opts.WithIdentity(townDataImportJobKey))
-                    .AddTrigger(opts => opts
-                        .ForJob(townDataImportJobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(townDataImportCronSchedule)));
-            }
+            // Removed because the ONS API now requires a key. Use the manual file upload instead
+            //if (!string.IsNullOrEmpty(townDataImportCronSchedule))
+            //{
+            //    var townDataImportJobKey = new JobKey(JobKeys.ImportTownData);
+            //    q.AddJob<TownDataImportJob>(opts =>
+            //            opts.WithIdentity(townDataImportJobKey))
+            //        .AddTrigger(opts => opts
+            //            .ForJob(townDataImportJobKey)
+            //            .WithSchedule(
+            //                CronScheduleBuilder
+            //                    .CronSchedule(townDataImportCronSchedule)));
+            //}
 
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
             {

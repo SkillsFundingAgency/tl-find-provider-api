@@ -8,5 +8,7 @@ public interface ITownDataService
 
     Task ImportTowns();
 
+    Task ImportTowns(Stream stream);
+
     Task<IEnumerable<Town>> Search(string searchTerm, int maxResults = Constants.TownSearchDefaultMaxResults);
 }
