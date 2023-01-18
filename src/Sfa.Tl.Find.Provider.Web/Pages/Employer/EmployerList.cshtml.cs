@@ -102,19 +102,21 @@ public class EmployerListModel : PageModel
         if (postcodeLocation is not null)
         {
             Input ??= new InputModel();
-            if (ProviderLocations != null && ProviderLocations.ContainsKey(postcodeLocation.Postcode))
+            if (ProviderLocations != null && 
+                ProviderLocations.ContainsKey(postcodeLocation.Postcode) &&
+                postcodeLocation.Id is not null)
             {
                 Input.SelectedPostcode = postcodeLocation.Postcode;
-                SelectedPostcodeHasFilters = postcodeLocation.HasSearchFilters;
+                //SelectedPostcodeHasFilters = postcodeLocation.HasSearchFilters;
                 SelectedLocationId = postcodeLocation.Id;
+                await PerformSearch(postcodeLocation.Id.Value);
             }
             else
             {
                 Input.SelectedPostcode = EnterPostcodeValue;
                 Input.CustomPostcode = postcodeLocation.Postcode;
+                await PerformSearch(postcodeLocation);
             }
-
-            await PerformSearch(postcodeLocation);
         }
     }
 
@@ -220,12 +222,22 @@ public class EmployerListModel : PageModel
             .ToArray();
     }
 
+    private async Task PerformSearch(int locationId)
+    {
+        (EmployerInterestList, _, SelectedPostcodeHasFilters) =
+            await _employerInterestService.FindEmployerInterest(locationId);
+
+        ZeroResultsFound = !EmployerInterestList.Any();
+    }
+
     private async Task PerformSearch(LocationPostcode postcodeLocation)
     {
-        EmployerInterestList = (await _employerInterestService
-            .FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude))
-            .SearchResults;
+        (EmployerInterestList, _) = 
+            await _employerInterestService
+            .FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude);
+        
         ZeroResultsFound = !EmployerInterestList.Any();
+        SelectedPostcodeHasFilters = false;
     }
 
     public class InputModel

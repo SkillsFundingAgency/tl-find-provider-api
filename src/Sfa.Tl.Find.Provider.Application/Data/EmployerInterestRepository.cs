@@ -454,14 +454,14 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount, bool SearchFiltersApplied)> Search(int locationId, int defaultSearchRadius)
     {
         using var connection = _dbContextWrapper.CreateConnection();
-
+        
         _dynamicParametersWrapper.CreateParameters(new
         {
             locationId,
             defaultSearchRadius
         })
             .AddOutputParameter("@totalEmployerInterestsCount", DbType.Int32)
-            .AddOutputParameter("@searchFiltersApplied", DbType.Binary);
+            .AddOutputParameter("@searchFiltersApplied", DbType.Boolean);
 
         var summaryList = new Dictionary<int, EmployerInterestSummary>();
 

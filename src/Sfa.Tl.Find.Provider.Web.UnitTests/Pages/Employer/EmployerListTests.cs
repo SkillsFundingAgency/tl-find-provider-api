@@ -143,6 +143,111 @@ public class EmployerListTests
     }
 
     [Fact]
+    public async Task EmployerListModel_OnGet_Populates_EmployerInterest_List_For_Known_Location()
+    {
+        var locationPostcode = new LocationPostcodeBuilder()
+            .Build();
+
+        var employerInterestSummary = new EmployerInterestSummaryBuilder()
+            .BuildList()
+            .ToList();
+
+        var locationPostcodes = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetLocationPostcodes(PageContextBuilder.DefaultUkPrn)
+            .Returns(locationPostcodes);
+
+        var sessionService = Substitute.For<ISessionService>();
+        sessionService
+            .Get<LocationPostcode>(EmployerListModel.SessionKeyPostcodeLocation)
+            .Returns(locationPostcode);
+
+        var geoLocation = GeoLocationBuilder.BuildGeoLocation(ValidPostcode);
+        var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
+        postcodeLookupService.GetPostcode(ValidPostcode)
+            .Returns(geoLocation);
+
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .FindEmployerInterest(locationPostcode.Id!.Value)
+            .Returns((employerInterestSummary, 2, true));
+
+        var employerListModel = new EmployerListModelBuilder()
+            .Build(employerInterestService,
+                postcodeLookupService,
+                providerDataService,
+                sessionService);
+
+        employerListModel.Input = new EmployerListModel.InputModel
+        {
+            SelectedPostcode = EmployerListModel.EnterPostcodeValue,
+            CustomPostcode = ValidPostcode
+        };
+
+
+        await employerListModel.OnGet();
+
+        employerListModel.EmployerInterestList
+            .Should()
+            .BeEquivalentTo(employerInterestSummary);
+
+        employerListModel.ZeroResultsFound.Should().NotBeNull();
+        employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
+        employerListModel.SelectedPostcodeHasFilters.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task EmployerListModel_OnGet_Populates_EmployerInterest_List_For_Custom_Location()
+    {
+        var locationPostcode = new LocationPostcodeBuilder()
+            .Build();
+
+        var employerInterestSummary = new EmployerInterestSummaryBuilder()
+            .BuildList()
+            .ToList();
+
+        //
+        var locationPostcodes = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        //providerDataService
+        //    .GetLocationPostcodes(PageContextBuilder.DefaultUkPrn)
+        //    .Returns(locationPostcodes);
+        //
+
+        var sessionService = Substitute.For<ISessionService>();
+        sessionService
+            .Get<LocationPostcode>(EmployerListModel.SessionKeyPostcodeLocation)
+            .Returns(locationPostcode);
+
+        var employerInterestService = Substitute.For<IEmployerInterestService>();
+        employerInterestService
+            .FindEmployerInterest(locationPostcode.Latitude, locationPostcode.Longitude)
+            .Returns((employerInterestSummary, 2));
+
+        var employerListModel = new EmployerListModelBuilder()
+            .Build(employerInterestService,
+                providerDataService: providerDataService,
+                sessionService: sessionService);
+
+        await employerListModel.OnGet();
+
+        employerListModel.EmployerInterestList
+            .Should()
+            .BeEquivalentTo(employerInterestSummary);
+
+        employerListModel.ZeroResultsFound.Should().NotBeNull();
+        employerListModel.ZeroResultsFound!.Value.Should().BeFalse();
+        employerListModel.SelectedPostcodeHasFilters.Should().BeFalse();
+    }
+
+    [Fact]
     public async Task EmployerListModel_OnGet_Sets_Expected_Values_For_Zero_Results_When_Session_Has_Postcode()
     {
         var locationPostcode = new LocationPostcodeBuilder()
