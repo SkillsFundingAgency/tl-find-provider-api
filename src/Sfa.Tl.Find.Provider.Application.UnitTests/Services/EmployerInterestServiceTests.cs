@@ -801,13 +801,6 @@ public class EmployerInterestServiceTests
                 .Returns(GeoLocationBuilder.BuildGeoLocation(employerInterest.Postcode));
         }
 
-        //var emailService = Substitute.For<IEmailService>();
-        //emailService.SendEmail(
-        //        Arg.Any<string>(),
-        //        Arg.Any<string>(),
-        //        Arg.Any<IDictionary<string, string>>(),
-        //        Arg.Any<string>())
-        //    .Returns(true);
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.GetExpiringInterest(Arg.Any<int>())
             .Returns(employerInterestList);

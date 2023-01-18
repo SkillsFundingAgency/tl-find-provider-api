@@ -187,8 +187,7 @@ public class EmployerListTests
             SelectedPostcode = EmployerListModel.EnterPostcodeValue,
             CustomPostcode = ValidPostcode
         };
-
-
+        
         await employerListModel.OnGet();
 
         employerListModel.EmployerInterestList
@@ -210,17 +209,6 @@ public class EmployerListTests
             .BuildList()
             .ToList();
 
-        //
-        var locationPostcodes = new LocationPostcodeBuilder()
-            .BuildList()
-            .ToList();
-
-        var providerDataService = Substitute.For<IProviderDataService>();
-        //providerDataService
-        //    .GetLocationPostcodes(PageContextBuilder.DefaultUkPrn)
-        //    .Returns(locationPostcodes);
-        //
-
         var sessionService = Substitute.For<ISessionService>();
         sessionService
             .Get<LocationPostcode>(EmployerListModel.SessionKeyPostcodeLocation)
@@ -233,7 +221,6 @@ public class EmployerListTests
 
         var employerListModel = new EmployerListModelBuilder()
             .Build(employerInterestService,
-                providerDataService: providerDataService,
                 sessionService: sessionService);
 
         await employerListModel.OnGet();
