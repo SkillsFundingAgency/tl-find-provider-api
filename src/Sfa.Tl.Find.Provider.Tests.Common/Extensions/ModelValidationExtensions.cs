@@ -198,7 +198,6 @@ public static class ModelValidationExtensions
         locationPostcode.Name.Should().Be(expected.Name);
         locationPostcode.Latitude.Should().Be(expected.Latitude);
         locationPostcode.Longitude.Should().Be(expected.Longitude);
-        locationPostcode.HasSearchFilters.Should().Be(expected.HasSearchFilters);
     }
 
     public static void Validate(this DeliveryYearSearchResult deliveryYear, DeliveryYearSearchResult expected)

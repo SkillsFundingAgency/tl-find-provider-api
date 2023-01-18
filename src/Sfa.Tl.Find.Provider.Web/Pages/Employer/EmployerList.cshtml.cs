@@ -107,7 +107,6 @@ public class EmployerListModel : PageModel
                 postcodeLocation.Id is not null)
             {
                 Input.SelectedPostcode = postcodeLocation.Postcode;
-                //SelectedPostcodeHasFilters = postcodeLocation.HasSearchFilters;
                 SelectedLocationId = postcodeLocation.Id;
                 await PerformSearch(postcodeLocation.Id.Value);
             }
