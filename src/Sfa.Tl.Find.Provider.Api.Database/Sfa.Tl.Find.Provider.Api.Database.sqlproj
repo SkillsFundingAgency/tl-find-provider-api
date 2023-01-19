@@ -70,7 +70,6 @@
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
     <Build Include="Types\IdListTableType.sql" />
     <None Include="PostDeployment\Seed Email Templates.sql" />
-    <None Include="PostDeployment\Set Expiry Dates.sql" />
     <None Include="Indexes\IX_SearchFilterRoute_SearchFilterId.sql" />
     <None Include="Indexes\IX_SearchFilter_LocationId.sql" />
     <None Include="Indexes\IX_Notification_LocationId.sql" />
