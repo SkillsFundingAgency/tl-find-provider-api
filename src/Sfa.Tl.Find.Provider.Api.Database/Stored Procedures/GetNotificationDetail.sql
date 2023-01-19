@@ -1,7 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[GetNotificationDetail]
 	@notificationId INT
 AS
-	SELECT 1
 	SELECT n.[Id],
 		   n.[Email],
 		   n.[Frequency],

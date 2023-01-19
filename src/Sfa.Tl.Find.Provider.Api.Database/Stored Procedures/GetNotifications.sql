@@ -26,7 +26,7 @@ AS
 	  	ON	p.[Id] = l.[ProviderId]
 		LEFT JOIN [dbo].[Notification] n
 		ON n.[LocationId] = l.[Id]
-		LEFT JOIN [dbo].[NotificationRoute] nr
+		INNER JOIN [dbo].[NotificationRoute] nr
 		ON nr.[NotificationId] = n.[Id]
 		LEFT JOIN [Route] r
 		ON r.[Id] = nr.[RouteId]

@@ -9,30 +9,35 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+        @if (Model.AddedNotificationEmail != null)
+        {
             <div class="tl-notification tl-notification--green">
                 <div>
-                    <strong>We have sent a verification email to ana.amari@havendalecollege.ac.uk</strong><br /><br />Click the link in the email to start receiving notifications.
-                <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
-                </div>
-            </div>
-
-            <div class="tl-notification tl-notification--green">
-                <div>
-                elizabeth.ashe@havendalecollege.ac.uk has been removed.
-                <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
-                </div>
-            </div>
-
-            <div class="tl-notification tl-notification--green">
-                <div>
-                elizabeth.ashe@havendalecollege.ac.uk has been added.
+                    <strong>We have sent a verification email to @Model.VerificationEmail</strong><br /><br />Click the link in the email to start receiving notifications.
                     <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
                 </div>
             </div>
+        }
 
-            <script>
+        @if (Model.DeletedNotificationEmail != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    @Model.DeletedNotificationEmail has been removed.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
 
-            </script>
+        @if (Model.AddedNotificationEmail != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    @Model.DeletedNotificationEmail has been added.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
     </div>
 </div>
 <div class="govuk-grid-row">
@@ -42,9 +47,11 @@
     </div>
 </div>
 
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+        @if (Model.NotificationList != null && Model.NotificationList.Any())
+        {
             <table class="govuk-table tl-employers--table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -54,43 +61,51 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header tl-wordwrap">
+                            ana.amari@havendalecollege.ac.uk
+                            <strong class="govuk-tag govuk-tag--red">Pending</strong>
+                        </th>
+                        <td class="govuk-table__cell tl-table__cell__list">
+                            <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
+                            <div class="tl-employers--table--inline-cell">
+                                <p> Alesford Campus</p>
+                            </div>
+                        </td>
+
+                        <td class="govuk-table__cell">
+                            <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>
+                            <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
+                        </td>
+                    </tr>
+                    @foreach (var notification in Model.NotificationList)
+                    {
                         <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header tl-wordwrap">ana.amari@havendalecollege.ac.uk 
+                            <th scope="row" class="govuk-table__header tl-wordwrap">
+                                @notification.Email
+                                @*TODO: Add Pending flag*@
                                 <strong class="govuk-tag govuk-tag--red">Pending</strong>
                             </th>
                             <td class="govuk-table__cell tl-table__cell__list">
                                 <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
                                 <div class="tl-employers--table--inline-cell">
-                                    <p>	Alesford Campus</p>
+                                    <p>@notification.LocationName</p>
                                 </div>
                             </td>
 
                             <td class="govuk-table__cell">
-                                <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>
-                                <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
+                                @*TODO: either resend verification or show edit*@
+                                @*<a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>*@
+                                <a asp-page="./EditNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
+                                <a asp-page="./RemoveNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state">Remove</a>
                             </td>
                         </tr>
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header tl-wordwrap">
-                                ana.amari@havendalecollege.ac.uk
-                            </th>
-                            <td class="govuk-table__cell tl-table__cell__list">
-                                <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
-                                <div class="tl-employers--table--inline-cell">
-                                    <p>	Alesford Campus</p>
-                                </div>
-                            </td>
-
-                            <td class="govuk-table__cell">
-                                <a asp-page="./EditNotification" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
-                                <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
-                            </td>
-                        </tr>
+                    }
                 </tbody>
             </table>
-
-            <a asp-page="./AddNotification" class="govuk-button">Add a new email</a>
-        </div>
+        }
+        <a asp-page="./AddNotification" class="govuk-button">Add a new email</a>
     </div>
+</div>
 
 

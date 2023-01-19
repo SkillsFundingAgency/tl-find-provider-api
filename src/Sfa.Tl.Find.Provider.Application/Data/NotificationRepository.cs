@@ -95,13 +95,18 @@ public class NotificationRepository : INotificationRepository
     }
 
     public async Task<Notification> GetNotification(
-        int locationId)
+        int notificationId)
     {
+        if (notificationId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(notificationId));
+        }
+
         using var connection = _dbContextWrapper.CreateConnection();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            locationId
+            notificationId
         });
 
         Notification notification = null;

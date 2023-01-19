@@ -2,9 +2,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Sfa.Tl.Find.Provider.Web.Authorization;
-using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
@@ -12,28 +11,40 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 public class RemoveNotificationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
-    private readonly ISessionService _sessionService;
-    private readonly ProviderSettings _providerSettings;
     private readonly ILogger<RemoveNotificationModel> _logger;
 
-    public string? NotificationEmail { get; private set; }
+    public Notification? Notification { get; private set; }
 
     public RemoveNotificationModel(
         IProviderDataService providerDataService,
-        ISessionService? sessionService,
-        IOptions<ProviderSettings> providerOptions,
         ILogger<RemoveNotificationModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-        _providerSettings = providerOptions?.Value
-                            ?? throw new ArgumentNullException(nameof(providerOptions));
     }
 
-    public async Task OnGet()
+    public async Task<IActionResult> OnGet(int id)
     {
-        NotificationEmail = "test@education.gov.uk";
+        Notification = await _providerDataService.GetNotification(id);
+
+        return Notification != null ?
+            Page() :
+            RedirectToPage("/Error/404");
+    }
+
+    public async Task<IActionResult> OnPost(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        Notification = await _providerDataService.GetNotification(id.Value);
+
+        TempData["DeletedNotificationEmail"] = Notification?.Email;
+
+        await _providerDataService.DeleteNotification(id.Value);
+
+        return RedirectToPage("/Provider/Notifications");
     }
 }

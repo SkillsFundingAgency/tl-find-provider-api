@@ -2,6 +2,9 @@
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
 public  class RemoveNotificationTests
@@ -16,13 +19,100 @@ public  class RemoveNotificationTests
     [Fact]
     public async Task RemoveNotificationModel_OnGet_Sets_ExpectedProperties()
     {
-        var settings = new SettingsBuilder().BuildProviderSettings();
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var id = notification.Id!.Value;
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotification(id)
+            .Returns(notification);
 
         var removeNotificationsModel = new RemoveNotificationModelBuilder()
-            .Build(providerSettings: settings);
+            .Build(providerDataService);
 
-        await removeNotificationsModel.OnGet();
+        await removeNotificationsModel.OnGet(id);
 
-        removeNotificationsModel.NotificationEmail.Should().NotBeNull();
+        removeNotificationsModel.Notification
+            .Should()
+            .BeEquivalentTo(notification);
+    }
+
+    [Fact]
+    public async Task RemoveNotificationModel_OnGet_Redirects_To_404_If_Employer_Not_Found()
+    {
+        const int id = 999;
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotification(id)
+            .Returns(null as Notification);
+
+        var removeNotificationsModel = new RemoveNotificationModelBuilder()
+            .Build(providerDataService);
+
+        var result = await removeNotificationsModel.OnGet(id);
+
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Error/404");
+    }
+
+    [Fact]
+    public async Task RemoveNotification_OnPost_Deletes_From_Repository_And_Redirects()
+    {
+        const int id = 999;
+
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotification(id)
+            .Returns(notification);
+
+        var removeNotificationsModel = new RemoveNotificationModelBuilder()
+            .Build(providerDataService);
+
+        var result = await removeNotificationsModel.OnPost(id);
+
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Provider/Notifications");
+
+        await providerDataService
+            .Received(1)
+            .DeleteNotification(id);
+    }
+
+    [Fact]
+    public async Task RemoveNotification_OnPost_Sets_TempData()
+    {
+        const int id = 999;
+
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotification(id)
+            .Returns(notification);
+
+        var removeNotificationsModel = new RemoveNotificationModelBuilder()
+            .Build(providerDataService);
+
+        await removeNotificationsModel.OnPost(id);
+
+        removeNotificationsModel.TempData.Should().NotBeNull();
+        removeNotificationsModel.TempData
+            .Keys
+            .Should()
+            .Contain("DeletedNotificationEmail");
+
+        removeNotificationsModel.TempData
+            .Peek("DeletedNotificationEmail")
+            .Should()
+            .Be(notification.Email);
     }
 }

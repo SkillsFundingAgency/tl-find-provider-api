@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -19,6 +20,15 @@ public class NotificationsModel : PageModel
     private readonly ILogger<NotificationsModel> _logger;
 
     public IEnumerable<Notification>? NotificationList { get; private set; }
+
+    [TempData]
+    public string? AddedNotificationEmail { get; set; }
+
+    [TempData]
+    public string? DeletedNotificationEmail { get; set; }
+
+    [TempData]
+    public string? VerificationEmail { get; set; }
 
     public NotificationsModel(
         IProviderDataService providerDataService,

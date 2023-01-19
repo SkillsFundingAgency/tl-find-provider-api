@@ -4,7 +4,7 @@
 @model Sfa.Tl.Find.Provider.Web.Pages.Employer.RemoveEmployerModel
 @{
     ViewData["Title"] = PageExtensions.FormatTitleWithAdministratorTag(
-        $"{Model.EmployerInterest?.OrganisationName} | Remove employer", 
+        $"{Model.EmployerInterest?.OrganisationName} | Remove employer",
         HttpContext.User);
 }
 
@@ -15,105 +15,103 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Do you want to remove @Model.EmployerInterest?.OrganisationName?</h1>
-         <p class="govuk-body">
-            If you remove this employer, it will no longer be visible to providers using this service.        </p>
+        <p class="govuk-body">
+            If you remove this employer, it will no longer be visible to providers using this service.
+        </p>
         <div class="govuk-details__text govuk-!-margin-bottom-8">
-        <table class="govuk-table">
-            <caption class="govuk-table__caption govuk-table__caption--m">Organisation details</caption>
-            <tbody class="govuk-table__body">
-                @if (!string.IsNullOrEmpty(Model.EmployerInterest?.Website))
-                {
-                    <tr class="govuk-table__row">
-                        @{
-                            var website = Model.EmployerInterest?.Website;
-                            if (!website!.StartsWith("http://") &&
-                                !website.StartsWith("https://"))
-                            {
-                                website = $"https://{website}";
-                            }
-                        }
-                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Website</th>
-                        <td class="govuk-table__cell">
-                            <a href="@website" class="govuk-link" id="tl-employer--info--website">@website</a>
-                        </td>
-                    </tr>
-                }
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Primary industry</th>
-                    <td class="govuk-table__cell">@Model.EmployerInterest?.Industry</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">
-                        Industry placement skill area@(Model.EmployerInterest?.SkillAreas is { Count: > 1 } ? "s" : "")
-                    </th>
-                    <td class="govuk-table__cell">
-                        @if (Model.EmployerInterest?.SkillAreas is { Count: > 0 })
-                        {
-                            <ul class="govuk-list">
-                                @foreach (var skillArea in Model.EmployerInterest.SkillAreas)
-                                {
-                                    <li>@skillArea</li>
-                                }
-                            </ul>
-                        }
-                    </td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Location</th>
-                    <td class="govuk-table__cell">@Model.EmployerInterest?.Postcode</td>
-                </tr>
-                @if (!string.IsNullOrEmpty(Model.EmployerInterest?.AdditionalInformation))
-                {
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Additional details</th>
-                        <td class="govuk-table__cell tl-wordwrap tl-prewrap">@Model.EmployerInterest.AdditionalInformation</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-
-        <table class="govuk-table govuk-!-margin-top-8">
-            <caption class="govuk-table__caption govuk-table__caption--m">Contact details</caption>
-            <tbody class="govuk-table__body">
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Name</th>
-                    <td class="govuk-table__cell">@Model.EmployerInterest?.ContactName</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Email</th>
-                    <td class="govuk-table__cell">@Model.EmployerInterest?.Email</td>
-                </tr>
-                @if (!string.IsNullOrEmpty(Model.EmployerInterest?.Telephone))
-                {
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Telephone</th>
-                        <td class="govuk-table__cell">@Model.EmployerInterest?.Telephone</td>
-                    </tr>
-                }
-                @if (Model.EmployerInterest?.ContactPreferenceType != null)
-                {
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Contact preference</th>
-                        <td class="govuk-table__cell">
+            <table class="govuk-table">
+                <caption class="govuk-table__caption govuk-table__caption--m">Organisation details</caption>
+                <tbody class="govuk-table__body">
+                    @if (!string.IsNullOrEmpty(Model.EmployerInterest?.Website))
+                    {
+                        <tr class="govuk-table__row">
                             @{
-                                var contactPreference = (Model.EmployerInterest?.ContactPreferenceType).GetContactPreferenceDisplayName();
+                                var website = Model.EmployerInterest?.Website;
+                                if (!website!.StartsWith("http://") &&
+                                !website.StartsWith("https://"))
+                                {
+                                    website = $"https://{website}";
+                                }
                             }
-                            @contactPreference
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Website</th>
+                            <td class="govuk-table__cell">
+                                <a href="@website" class="govuk-link" id="tl-employer--info--website">@website</a>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Primary industry</th>
+                        <td class="govuk-table__cell">@Model.EmployerInterest?.Industry</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">
+                            Industry placement skill area@(Model.EmployerInterest?.SkillAreas is { Count: > 1 } ? "s" : "")
+                        </th>
+                        <td class="govuk-table__cell">
+                            @if (Model.EmployerInterest?.SkillAreas is { Count: > 0 })
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var skillArea in Model.EmployerInterest.SkillAreas)
+                                    {
+                                        <li>@skillArea</li>
+                                    }
+                                </ul>
+                            }
                         </td>
                     </tr>
-                }
-            </tbody>
-        </table>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Location</th>
+                        <td class="govuk-table__cell">@Model.EmployerInterest?.Postcode</td>
+                    </tr>
+                    @if (!string.IsNullOrEmpty(Model.EmployerInterest?.AdditionalInformation))
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Additional details</th>
+                            <td class="govuk-table__cell tl-wordwrap tl-prewrap">@Model.EmployerInterest.AdditionalInformation</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <table class="govuk-table govuk-!-margin-top-8">
+                <caption class="govuk-table__caption govuk-table__caption--m">Contact details</caption>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Name</th>
+                        <td class="govuk-table__cell">@Model.EmployerInterest?.ContactName</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Email</th>
+                        <td class="govuk-table__cell">@Model.EmployerInterest?.Email</td>
+                    </tr>
+                    @if (!string.IsNullOrEmpty(Model.EmployerInterest?.Telephone))
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Telephone</th>
+                            <td class="govuk-table__cell">@Model.EmployerInterest?.Telephone</td>
+                        </tr>
+                    }
+                    @if (Model.EmployerInterest?.ContactPreferenceType != null)
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Contact preference</th>
+                            <td class="govuk-table__cell">
+                                @{
+                                    var contactPreference = (Model.EmployerInterest?.ContactPreferenceType).GetContactPreferenceDisplayName();
+                                }
+                                @contactPreference
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
 
         <form method="post">
-           
-                        <p class="govuk-body">
-
-            <button type="submit" asp-route-id="@Model.EmployerInterest?.Id" id="tl-employers--delete--submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-2">Remove employer</button>
-                <a asp-page="./EmployerList" class="govuk-link govuk-link--no-visited-state tl-lineheight--40 govuk-!-margin-left-4">Cancel and return to employer list</a>            
+            <p class="govuk-body">
+                <button type="submit" asp-route-id="@Model.EmployerInterest?.Id" id="tl-employers--delete--submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-2">Remove employer</button>
+                <a asp-page="./EmployerList" class="govuk-link govuk-link--no-visited-state tl-lineheight--40 govuk-!-margin-left-4">Cancel and return to employer list</a>
             </p>
-
         </form>
     </div>
 </div>
