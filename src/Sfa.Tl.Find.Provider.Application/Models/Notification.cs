@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Sfa.Tl.Find.Provider.Application.Models.Enums;
+using System.Diagnostics;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
@@ -7,15 +8,17 @@ public class Notification
 {
     public int? Id { get; init; }
 
-    public int LocationId { get; init; }
+    public string Email { get; init; }
+
+    public NotificationFrequency Frequency { get; init; }
+
+    public int? SearchRadius { get; init; }
+    
+    public int? LocationId { get; init; }
 
     public string LocationName { get; init; }
 
-    public string Email { get; init; }
-
     public string Postcode { get; init; }
-
-    public int? SearchRadius { get; init; }
 
     public ICollection<Route> Routes { get; init; } = new List<Route>();
 

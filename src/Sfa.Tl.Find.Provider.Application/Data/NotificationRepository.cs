@@ -59,9 +59,9 @@ public class NotificationRepository : INotificationRepository
                 "GetNotifications",
                 (e, r) =>
                 {
-                    if (!notifications.TryGetValue(e.LocationId, out var notification))
+                    if (!notifications.TryGetValue(e.Id!.Value, out var notification))
                     {
-                        notifications.Add(e.LocationId,
+                        notifications.Add(e.Id.Value,
                             notification = new Notification
                             {
                                 Id = e.Id,

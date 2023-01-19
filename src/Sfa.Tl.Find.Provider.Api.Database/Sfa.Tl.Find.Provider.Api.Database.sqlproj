@@ -73,6 +73,7 @@
     <None Include="PostDeployment\Set Expiry Dates.sql" />
     <None Include="Indexes\IX_SearchFilterRoute_SearchFilterId.sql" />
     <None Include="Indexes\IX_SearchFilter_LocationId.sql" />
+    <None Include="Indexes\IX_Notification_LocationId.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
@@ -137,6 +138,12 @@
     <Build Include="Stored Procedures\GetNotifications.sql" />
     <Build Include="Stored Procedures\SearchEmployerInterestByLocation.sql" />
     <Build Include="Stored Procedures\DeleteNotification.sql" />
+    <Build Include="Stored Procedures\GetNotificationDetail.sql" />
+    <Build Include="Tables\Notification.sql" />
+    <Build Include="Tables\NotificationRoute.sql" />
+    <None Include="Indexes\IX_NotificationRoute_RouteId.sql" />
+    <None Include="Indexes\IX_NotificationRoute_NotificationId.sql" />
+    <Build Include="Stored Procedures\CreateOrUpdateNotification.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
