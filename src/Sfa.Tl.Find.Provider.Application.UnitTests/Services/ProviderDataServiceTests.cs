@@ -162,6 +162,24 @@ public class ProviderDataServiceTests
             .GetAll(true);
     }
 
+
+    [Fact]
+    public async Task DeleteNotification_Calls_Repository()
+    {
+        const int id = 101;
+     
+        var notificationRepository = Substitute.For<INotificationRepository>();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(notificationRepository: notificationRepository);
+
+        await service.DeleteNotification(id);
+
+        await notificationRepository
+            .Received(1)
+            .Delete(id);
+    }
+
     [Fact]
     public async Task GetNotifications_Returns_Expected_List()
     {
@@ -184,6 +202,29 @@ public class ProviderDataServiceTests
         await notificationRepository
             .Received(1)
             .GetNotifications(ukPrn, true);
+    }
+
+    [Fact]
+    public async Task GetNotification_Returns_Expected_Item()
+    {
+        const int id = 1;
+
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetNotification(id)
+            .Returns(notification);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(notificationRepository: notificationRepository);
+
+        var result = await service.GetNotification(id);
+        result.Should().BeEquivalentTo(notification);
+
+        await notificationRepository
+            .Received(1)
+            .GetNotification(id);
     }
 
     [Fact]

@@ -358,9 +358,10 @@ public static class ModelValidationExtensions
     public static void Validate(this Notification notification, NotificationDto expected)
     {
         notification.Id.Should().Be(expected.Id);
+        notification.Email.Should().Be(expected.Email);
+        notification.Frequency.Should().Be(expected.Frequency);
         notification.LocationId.Should().Be(expected.LocationId);
         notification.LocationName.Should().Be(expected.LocationName);
-        notification.Email.Should().Be(expected.Email);
         notification.Postcode.Should().Be(expected.Postcode);
         notification.SearchRadius.Should().Be(expected.SearchRadius);
     }

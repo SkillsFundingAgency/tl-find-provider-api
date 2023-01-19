@@ -120,6 +120,16 @@ public class ProviderDataService : IProviderDataService
         return routes;
     }
 
+    public async Task DeleteNotification(int notificationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Deleting notification {notificationId}", notificationId);
+        }
+
+        await _notificationRepository.Delete(notificationId);
+    }
+
     public async Task<IEnumerable<Notification>> GetNotifications(long ukPrn)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -132,6 +142,17 @@ public class ProviderDataService : IProviderDataService
             .GetNotifications(ukPrn, _mergeAdditionalProviderData));
 
         return notifications;
+    }
+
+    public async Task<Notification> GetNotification(int notificationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notification {notificationId}", notificationId);
+        }
+
+        return await _notificationRepository
+            .GetNotification(notificationId);
     }
 
     public async Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn)
@@ -151,13 +172,11 @@ public class ProviderDataService : IProviderDataService
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("Getting search filters");
+            _logger.LogDebug("Getting search filter for location {locationId}", locationId);
         }
 
-        var searchFilter = await _searchFilterRepository
+        return await _searchFilterRepository
             .GetSearchFilter(locationId);
-
-        return searchFilter;
     }
 
     public async Task<ProviderSearchResponse> FindProviders(

@@ -31,7 +31,11 @@ public interface IProviderDataService
 
     Task<IEnumerable<Route>> GetRoutes();
 
+    Task DeleteNotification(int notificationId);
+
     Task<IEnumerable<Notification>> GetNotifications(long ukPrn);
+    
+    Task<Notification> GetNotification(int notificationId);
 
     Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn);
     

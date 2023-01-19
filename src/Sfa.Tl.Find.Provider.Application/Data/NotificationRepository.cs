@@ -65,11 +65,12 @@ public class NotificationRepository : INotificationRepository
                             notification = new Notification
                             {
                                 Id = e.Id,
+                                Email = e.Email,
+                                Frequency = e.Frequency,
+                                SearchRadius = e.SearchRadius,
                                 LocationId = e.LocationId,
                                 LocationName = e.LocationName,
                                 Postcode = e.Postcode,
-                                Email = e.Email,
-                                SearchRadius = e.SearchRadius,
                                 Routes = new List<Route>()
                             });
                     }
@@ -114,11 +115,12 @@ public class NotificationRepository : INotificationRepository
                     notification ??= new Notification
                     {
                         Id = e.Id,
+                        Email = e.Email,
+                        Frequency = e.Frequency,
+                        SearchRadius = e.SearchRadius,
                         LocationId = e.LocationId,
                         LocationName = e.LocationName,
                         Postcode = e.Postcode,
-                        Email = e.Email,
-                        SearchRadius = e.SearchRadius,
                         Routes = new List<Route>()
                     };
 
