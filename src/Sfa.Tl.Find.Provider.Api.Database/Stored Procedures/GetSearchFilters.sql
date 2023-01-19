@@ -24,10 +24,10 @@ AS
 	  	ON	p.[Id] = l.[ProviderId]
 		LEFT JOIN [dbo].[SearchFilter] sf
 		ON sf.[LocationId] = l.[Id]
-		LEFT JOIN [dbo].[SearchFilterRoute] sfsa
-		ON sfsa.[SearchFilterId] = sf.[Id]
+		LEFT JOIN [dbo].[SearchFilterRoute] sfr
+		ON sfr.[SearchFilterId] = sf.[Id]
 		LEFT JOIN [Route] r
-		ON r.[Id] = sfsa.[RouteId]
+		ON r.[Id] = sfr.[RouteId]
 		WHERE	l.[IsDeleted] = 0
 		  --Only include the first row to make sure main data set takes priority
 		  AND	p.[ProviderRowNum] = 1

@@ -13,10 +13,10 @@ AS
 	FROM [Location] l
 	LEFT JOIN [dbo].[SearchFilter] sf
 	ON sf.[LocationId] = l.[Id]
-	LEFT JOIN [dbo].[SearchFilterRoute] sfsa
-	ON sfsa.[SearchFilterId] = sf.[Id]
+	LEFT JOIN [dbo].[SearchFilterRoute] sfr
+	ON sfr.[SearchFilterId] = sf.[Id]
 	LEFT JOIN [Route] r
-	ON r.[Id] = sfsa.[RouteId]
+	ON r.[Id] = sfr.[RouteId]
 	WHERE l.[Id] = @locationId
 	  AND l.[IsDeleted] = 0
 	ORDER BY	r.[Name]
