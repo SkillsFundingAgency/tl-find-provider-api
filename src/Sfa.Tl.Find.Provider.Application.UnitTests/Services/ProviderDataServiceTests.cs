@@ -237,18 +237,18 @@ public class ProviderDataServiceTests
             .ToList();
 
         var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
-        searchFilterRepository.GetSearchFilters(ukPrn, Arg.Any<bool>())
+        searchFilterRepository.GetSearchFilterSummaryList(ukPrn, Arg.Any<bool>())
             .Returns(searchFilters);
         
         var service = new ProviderDataServiceBuilder()
             .Build(searchFilterRepository: searchFilterRepository);
 
-        var results = (await service.GetSearchFilters(ukPrn)).ToList();
+        var results = (await service.GetSearchFilterSummaryList(ukPrn)).ToList();
         results.Should().BeEquivalentTo(searchFilters);
 
         await searchFilterRepository
             .Received(1)
-            .GetSearchFilters(ukPrn, true);
+            .GetSearchFilterSummaryList(ukPrn, true);
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[GetSearchFilters]
+﻿CREATE PROCEDURE [dbo].[GetSearchFilterSummary]
 	@ukPrn BIGINT,
 	@includeAdditionalData BIT
 AS

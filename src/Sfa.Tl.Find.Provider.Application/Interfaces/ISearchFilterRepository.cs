@@ -4,7 +4,7 @@ namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface ISearchFilterRepository
 {
-    Task<IEnumerable<SearchFilter>> GetSearchFilters(
+    Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(
         long ukPrn,
         bool includeAdditionalData);
 

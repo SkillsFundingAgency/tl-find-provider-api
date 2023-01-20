@@ -46,7 +46,7 @@ public class SearchFilterRepositoryTests
 
         await dbContextWrapper
             .QueryAsync(dbConnection,
-                "GetSearchFilters",
+                "GetSearchFilterSummary",
                 Arg.Do<Func<SearchFilterDto, RouteDto, SearchFilter>>(
                     x =>
                     {
@@ -63,7 +63,7 @@ public class SearchFilterRepositoryTests
 
         var repository = new SearchFilterRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetSearchFilters(ukPrn, includeAdditionalData))
+        var results = (await repository.GetSearchFilterSummaryList(ukPrn, includeAdditionalData))
             .ToList();
 
         results.Should().NotBeNullOrEmpty();
@@ -71,6 +71,31 @@ public class SearchFilterRepositoryTests
         results.First().Validate(searchFilterDtoList.First());
         results[0].Routes.First().Id.Should().Be(routeDtoList[0].RouteId);
         results[0].Routes.First().Name.Should().Be(routeDtoList[0].RouteName);
+    }
+
+    [Fact]
+    public async Task GetSearchFilterSummaryList_Sets_Dynamic_Parameters()
+    {
+        const long ukPrn = 12345678;
+        const bool includeAdditionalData = true;
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new SearchFilterRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetSearchFilterSummaryList(ukPrn, includeAdditionalData);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(2);
+        templates.ContainsNameAndValue("ukPrn", ukPrn);
+        templates.ContainsNameAndValue("includeAdditionalData", includeAdditionalData);
     }
 
     [Fact]
@@ -122,6 +147,27 @@ public class SearchFilterRepositoryTests
         result.Validate(searchFilterDtoList.First());
         result.Routes.First().Id.Should().Be(routeDtoList[0].RouteId);
         result.Routes.First().Name.Should().Be(routeDtoList[0].RouteName);
+    }
+    [Fact]
+    public async Task GetSearchFilter_Sets_Dynamic_Parameters()
+    {
+        const int locationId = 1;
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new SearchFilterRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetSearchFilter(locationId);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("locationId", locationId);
     }
 
     [Fact]

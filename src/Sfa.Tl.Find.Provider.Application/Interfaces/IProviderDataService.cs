@@ -37,7 +37,7 @@ public interface IProviderDataService
     
     Task<Notification> GetNotification(int notificationId);
 
-    Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn);
+    Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn);
     
     Task<SearchFilter> GetSearchFilter(int locationId);
 

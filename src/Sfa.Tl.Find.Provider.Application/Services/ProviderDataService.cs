@@ -158,7 +158,7 @@ public class ProviderDataService : IProviderDataService
             .GetNotification(notificationId);
     }
 
-    public async Task<IEnumerable<SearchFilter>> GetSearchFilters(long ukPrn)
+    public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -166,7 +166,7 @@ public class ProviderDataService : IProviderDataService
         }
 
         var searchFilters = (await _searchFilterRepository
-            .GetSearchFilters(ukPrn, _mergeAdditionalProviderData));
+            .GetSearchFilterSummaryList(ukPrn, _mergeAdditionalProviderData));
 
         return searchFilters;
     }

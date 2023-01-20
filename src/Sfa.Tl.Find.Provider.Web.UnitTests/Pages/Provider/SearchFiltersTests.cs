@@ -37,7 +37,7 @@ public  class SearchFiltersTests
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetSearchFilters(PageContextBuilder.DefaultUkPrn)
+            .GetSearchFilterSummaryList(PageContextBuilder.DefaultUkPrn)
             .Returns(searchFilterList);
 
         var searchFiltersModel = new SearchFiltersModelBuilder()

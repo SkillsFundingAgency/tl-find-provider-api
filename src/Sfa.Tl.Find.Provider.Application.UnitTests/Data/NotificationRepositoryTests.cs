@@ -73,6 +73,31 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
+    public async Task GetNotificationSummaryList_Sets_Dynamic_Parameters()
+    {
+        const long ukPrn = 12345678;
+        const bool includeAdditionalData = true;
+        
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetNotificationSummaryList(ukPrn, includeAdditionalData);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(2);
+        templates.ContainsNameAndValue("ukPrn", ukPrn);
+        templates.ContainsNameAndValue("includeAdditionalData", includeAdditionalData);
+    }
+
+    [Fact]
     public async Task GetNotification_Returns_Expected_Results()
     {
         const int id = 1;
@@ -121,6 +146,28 @@ public class NotificationRepositoryTests
         result.Validate(notificationDtoList.First());
         result.Routes.First().Id.Should().Be(routeDtoList[0].RouteId);
         result.Routes.First().Name.Should().Be(routeDtoList[0].RouteName);
+    }
+
+    [Fact]
+    public async Task GetNotification_Sets_Dynamic_Parameters()
+    {
+        const int notificationId = 1;
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetNotification(notificationId);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("notificationId", notificationId);
     }
 
     [Fact]

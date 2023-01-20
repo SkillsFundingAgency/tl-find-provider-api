@@ -36,7 +36,7 @@ public class SearchFiltersModel : PageModel
         var ukPrn = HttpContext.User.GetUkPrn();
         if (ukPrn is not null && ukPrn > 0)
         {
-            SearchFilterList = await _providerDataService.GetSearchFilters(ukPrn.Value);
+            SearchFilterList = await _providerDataService.GetSearchFilterSummaryList(ukPrn.Value);
         }
 
         DefaultSearchRadius = _providerSettings.DefaultSearchRadius > 0

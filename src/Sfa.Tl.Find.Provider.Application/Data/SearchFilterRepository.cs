@@ -25,7 +25,7 @@ public class SearchFilterRepository : ISearchFilterRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<IEnumerable<SearchFilter>> GetSearchFilters(
+    public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(
         long ukPrn,
         bool includeAdditionalData)
     {
@@ -42,7 +42,7 @@ public class SearchFilterRepository : ISearchFilterRepository
         await _dbContextWrapper
             .QueryAsync<SearchFilterDto, RouteDto, SearchFilter>(
                 connection,
-                "GetSearchFilters",
+                "GetSearchFilterSummary",
                 (e, r) =>
                 {
                     if (!searchFilters.TryGetValue(e.LocationId, out var searchFilter))
