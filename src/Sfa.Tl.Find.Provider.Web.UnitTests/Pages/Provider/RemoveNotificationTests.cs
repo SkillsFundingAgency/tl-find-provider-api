@@ -1,10 +1,10 @@
-﻿using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
-using Sfa.Tl.Find.Provider.Web.Pages.Provider;
-using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
-using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Sfa.Tl.Find.Provider.Web.Pages.Provider;
+using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
 public  class RemoveNotificationTests
@@ -22,17 +22,17 @@ public  class RemoveNotificationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var id = notification.Id!.Value;
+        var notificationId = notification.Id!.Value;
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetNotification(id)
+            .GetNotification(notificationId)
             .Returns(notification);
 
         var removeNotificationsModel = new RemoveNotificationModelBuilder()
             .Build(providerDataService);
 
-        await removeNotificationsModel.OnGet(id);
+        await removeNotificationsModel.OnGet(notificationId);
 
         removeNotificationsModel.Notification
             .Should()

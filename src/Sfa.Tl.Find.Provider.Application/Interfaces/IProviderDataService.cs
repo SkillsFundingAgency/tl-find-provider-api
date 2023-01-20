@@ -49,6 +49,8 @@ public interface IProviderDataService
 
     Task ImportProviderData(Stream stream, bool isAdditionalData);
 
+    Task SaveNotification(Notification notification);
+
     Task SaveSearchFilter(SearchFilter searchFilter);
     
     Task SendEmailVerification(int notificationId);

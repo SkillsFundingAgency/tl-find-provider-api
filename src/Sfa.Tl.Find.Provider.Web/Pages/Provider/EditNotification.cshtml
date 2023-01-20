@@ -1,23 +1,37 @@
-﻿@page
+﻿@page "{id}"
 @model Sfa.Tl.Find.Provider.Web.Pages.Provider.EditNotificationModel
 @{
-    ViewData["Title"] = "Edit notifications";
+    ViewData["Title"] = $"Edit notification for {Model.Notification?.LocationName?.ToUpper()} [{Model.Notification?.Postcode}]";
 }
 
 @section breadcrumbs {
     <a asp-page="./Notifications" class="govuk-back-link" id="tl-back">Return to notifications</a>
 }
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+        <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+                @*<li><a sfa-validation-for="Input!.Email" href="#Input_Email"></a></li>*@
+            </ul>
+        </div>
+    </div>
+}
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">Edit notifications for @Model.NotificationEmail</h1>
+        <h1 class="govuk-heading-xl">Edit notifications for @Model.Notification?.Email</h1>
     </div>
 </div>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <table class="govuk-table tl-employers--table">
-            <thead class="govuk-table__head">
+        <form method="post">
+            <input asp-for="Input!.Id" type="hidden" />
+            <table class="govuk-table tl-employers--table">
+                <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">Campus</th>
                     <th scope="col" class="govuk-table__header">Radius</th>
@@ -25,8 +39,8 @@
                     <th scope="col" class="govuk-table__header">Frequency</th>
                     <th scope="col" class="govuk-table__header"></th>
                 </tr>
-            </thead>
-            <tbody class="govuk-table__body">
+                </thead>
+                <tbody class="govuk-table__body">
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header tl-wordwrap">
                         Alesford Campus
@@ -34,21 +48,20 @@
                     <td class="govuk-table__cell tl-table__cell__list">
                         <div class="tl-employers--table--inline-header"><strong>Radius</strong></div>
                         <div class="tl-employers--table--inline-cell">
-                            <p>	20 miles</p>
+                            <p> 20 miles</p>
                         </div>
-
                     </td>
                     <td class="govuk-table__cell tl-table__cell__list">
                         <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
                         <div class="tl-employers--table--inline-cell">
-                        <p>Test</p>
-                        <p>Test 2</p>
+                            <p>Test</p>
+                            <p>Test 2</p>
                         </div>
                     </td>
                     <td class="govuk-table__cell tl-table__cell__list">
                         <div class="tl-employers--table--inline-header"><strong>Frequency</strong></div>
                         <div class="tl-employers--table--inline-cell">
-                            <p>	Daily</p>
+                            <p> Daily</p>
                         </div>
                     </td>
                     <td class="govuk-table__cell">
@@ -56,9 +69,9 @@
                         <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
                     </td>
                 </tr>
-            </tbody>
-        </table>
-
+                </tbody>
+            </table>
+        </form>
         <a asp-page="./AddNotification" class="govuk-button">Add notification for another campus</a>
     </div>
 </div>

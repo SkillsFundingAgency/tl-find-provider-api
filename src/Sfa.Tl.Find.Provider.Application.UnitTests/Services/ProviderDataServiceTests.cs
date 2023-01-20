@@ -205,6 +205,24 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task SaveNotification_Calls_Repository()
+    {
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(notificationRepository: notificationRepository);
+
+        await service.SaveNotification(notification);
+
+        await notificationRepository
+            .Received(1)
+            .Save(notification);
+    }
+
+    [Fact]
     public async Task GetNotification_Returns_Expected_Item()
     {
         const int id = 1;
@@ -275,7 +293,7 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task GetSearchFilters_Calls_Repository()
+    public async Task SaveSearchFilter_Calls_Repository()
     {
         var searchFilter = new SearchFilterBuilder()
             .Build();
@@ -1051,7 +1069,7 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task SendSearchFilters_Calls_Repository()
+    public async Task SearchFilter_SendEmailVerification_Calls_Repository()
     {
         const int notificationId = 1;
 

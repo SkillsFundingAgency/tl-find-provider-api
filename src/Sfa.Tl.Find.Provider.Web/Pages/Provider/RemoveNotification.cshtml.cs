@@ -1,9 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Sfa.Tl.Find.Provider.Web.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
@@ -43,9 +43,9 @@ public class RemoveNotificationModel : PageModel
             return NotFound();
         }
 
-        TempData[nameof(NotificationsModel.DeletedNotificationEmail)] = notification.Email;
-
         await _providerDataService.DeleteNotification(id!.Value);
+
+        TempData[nameof(NotificationsModel.DeletedNotificationEmail)] = notification.Email;
 
         return RedirectToPage("/Provider/Notifications");
     }

@@ -1,8 +1,8 @@
-﻿using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
-using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
 public  class SearchFiltersTests

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
@@ -15,6 +17,8 @@ public class AddNotificationModel : PageModel
     private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddNotificationModel> _logger;
+
+    [BindProperty] public InputModel? Input { get; set; }
 
     public AddNotificationModel(
         IProviderDataService providerDataService,
@@ -32,5 +36,29 @@ public class AddNotificationModel : PageModel
 
     public async Task OnGet()
     {
+    }
+
+    public async Task<IActionResult> OnPost()
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        var notification = new Notification
+        {
+            Email = Input?.Email
+        };
+
+        await _providerDataService.SaveNotification(notification);
+
+        TempData[nameof(NotificationsModel.AddedNotificationEmail)] = notification.Email;
+
+        return RedirectToPage("/Provider/Notifications");
+    }
+
+    public class InputModel
+    {
+        public string? Email { get; set; }
     }
 }
