@@ -47,7 +47,7 @@ public class NotificationsModel : PageModel
     public async Task OnGet()
     {
         var ukPrn = HttpContext.User.GetUkPrn();
-        if (ukPrn is not null && ukPrn > 0)
+        if (ukPrn > 0)
         {
             NotificationList = await _providerDataService.GetNotificationSummaryList(ukPrn.Value);
         }

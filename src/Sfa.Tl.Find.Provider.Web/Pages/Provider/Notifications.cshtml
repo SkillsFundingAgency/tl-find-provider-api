@@ -74,7 +74,7 @@
                         <td class="govuk-table__cell tl-table__cell__list">
                             <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
                             <div class="tl-employers--table--inline-cell">
-                                @if (@notification.Locations is not null && notification.Locations.Any())
+                                @if (notification.Locations is not null && notification.Locations.Any())
                                 {
                                     @foreach (var location in notification.Locations)
                                     {

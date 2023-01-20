@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 
