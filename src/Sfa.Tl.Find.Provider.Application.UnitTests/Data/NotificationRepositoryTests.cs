@@ -20,18 +20,18 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
-    public async Task GetNotifications_Returns_Expected_Results()
+    public async Task GetNotificationSummaryList_Returns_Expected_Results()
     {
         const long ukPrn = 12345678;
         const bool includeAdditionalData = true;
 
-        var notifications = new NotificationBuilder()
+        var notificationSummaries = new NotificationSummaryBuilder()
             .BuildList()
             .ToList();
-        var notificationDtoList = new NotificationDtoBuilder()
+        var notificationSummaryDtoList = new NotificationSummaryDtoBuilder()
             .BuildList()
             .ToList();
-        var routeDtoList = new RouteDtoBuilder()
+        var locationDtoList = new LocationPostcodeBuilder()
             .BuildList()
             .ToList();
 
@@ -39,20 +39,20 @@ public class NotificationRepositoryTests
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .QueryAsync<Notification>(dbConnection, Arg.Any<string>(), Arg.Any<object>())
-            .Returns(notifications);
+            .QueryAsync<NotificationSummary>(dbConnection, Arg.Any<string>(), Arg.Any<object>())
+            .Returns(notificationSummaries);
 
         var callIndex = 0;
 
         await dbContextWrapper
             .QueryAsync(dbConnection,
-                "GetNotifications",
-                Arg.Do<Func<NotificationDto, RouteDto, Notification>>(
+                "GetNotificationSummary",
+                Arg.Do<Func<NotificationSummaryDto, LocationPostcode, NotificationSummary>>(
                     x =>
                     {
-                        var e = notificationDtoList[callIndex];
-                        var r = routeDtoList[callIndex];
-                        x.Invoke(e, r);
+                        var n = notificationSummaryDtoList[callIndex];
+                        var l = locationDtoList[callIndex];
+                        x.Invoke(n, l);
 
                         callIndex++;
                     }),
@@ -63,16 +63,15 @@ public class NotificationRepositoryTests
 
         var repository = new NotificationRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetNotifications(ukPrn, includeAdditionalData))
+        var results = (await repository.GetNotificationSummaryList(ukPrn, includeAdditionalData))
             .ToList();
 
         results.Should().NotBeNullOrEmpty();
         results!.Count.Should().Be(1);
-        results.First().Validate(notificationDtoList.First());
-        results[0].Routes.First().Id.Should().Be(routeDtoList[0].RouteId);
-        results[0].Routes.First().Name.Should().Be(routeDtoList[0].RouteName);
+        results.First().Validate(notificationSummaryDtoList.First());
+        results[0].Locations.First().Name.Should().Be(locationDtoList[0].Name);
+        results[0].Locations.First().Postcode.Should().Be(locationDtoList[0].Postcode);
     }
-
 
     [Fact]
     public async Task GetNotification_Returns_Expected_Results()
@@ -105,9 +104,9 @@ public class NotificationRepositoryTests
                 Arg.Do<Func<NotificationDto, RouteDto, Notification>>(
                     x =>
                     {
-                        var e = notificationDtoList[callIndex];
+                        var n = notificationDtoList[callIndex];
                         var r = routeDtoList[callIndex];
-                        x.Invoke(e, r);
+                        x.Invoke(n, r);
 
                         callIndex++;
                     }),
@@ -167,23 +166,13 @@ public class NotificationRepositoryTests
 
         await repository.Save(notification);
 
-
-
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-        templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-
-        var expectedRouteIds = notification.Routes
-                            .Select(r => r.Id);
 
         templates.GetDynamicTemplatesCount().Should().Be(3);
         templates.ContainsNameAndValue("locationId", notification.LocationId);
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
         var routeIds = templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds");
         routeIds.Should().NotBeNull();
-        var t = routeIds.GetType().Name;
     }
 }

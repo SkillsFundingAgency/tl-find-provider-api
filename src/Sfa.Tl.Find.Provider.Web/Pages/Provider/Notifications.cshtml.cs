@@ -19,7 +19,7 @@ public class NotificationsModel : PageModel
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<NotificationsModel> _logger;
 
-    public IEnumerable<Notification>? NotificationList { get; private set; }
+    public IEnumerable<NotificationSummary>? NotificationList { get; private set; }
 
     [TempData]
     public string? AddedNotificationEmail { get; set; }
@@ -49,7 +49,7 @@ public class NotificationsModel : PageModel
         var ukPrn = HttpContext.User.GetUkPrn();
         if (ukPrn is not null && ukPrn > 0)
         {
-            NotificationList = await _providerDataService.GetNotifications(ukPrn.Value);
+            NotificationList = await _providerDataService.GetNotificationSummaryList(ukPrn.Value);
         }
     }
 }

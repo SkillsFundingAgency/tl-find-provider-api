@@ -33,7 +33,7 @@ public interface IProviderDataService
 
     Task DeleteNotification(int notificationId);
 
-    Task<IEnumerable<Notification>> GetNotifications(long ukPrn);
+    Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn);
     
     Task<Notification> GetNotification(int notificationId);
 

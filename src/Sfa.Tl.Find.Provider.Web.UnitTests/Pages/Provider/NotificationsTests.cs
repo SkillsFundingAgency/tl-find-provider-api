@@ -26,16 +26,16 @@ public  class NotificationsTests
     }
 
     [Fact]
-    public async Task NotificationsModel_OnGet_Populates_EmployerInterest_List_For_Administrator()
+    public async Task NotificationsModel_OnGet_Populates_Notification_List_For_Administrator()
     {
-        var notificationList = new NotificationBuilder()
+        var notificationSummaryList = new NotificationSummaryBuilder()
             .BuildList()
             .ToList();
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetNotifications(PageContextBuilder.DefaultUkPrn)
-            .Returns(notificationList);
+            .GetNotificationSummaryList(PageContextBuilder.DefaultUkPrn)
+            .Returns(notificationSummaryList);
 
         var notificationsModel = new NotificationsModelBuilder()
             .Build(providerDataService);
@@ -50,6 +50,6 @@ public  class NotificationsTests
         notificationsModel
             .NotificationList
             .Should()
-            .BeEquivalentTo(notificationList);
+            .BeEquivalentTo(notificationSummaryList);
     }
 }

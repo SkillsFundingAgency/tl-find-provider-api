@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[GetNotifications]
+﻿CREATE PROCEDURE [dbo].[GetNotificationSummary]
 	@ukPrn BIGINT,
 	@includeAdditionalData BIT
 AS
@@ -14,25 +14,17 @@ AS
 	)
 	 SELECT n.[Id],
 		   n.[Email],
-		   n.[Frequency],
-		   n.[SearchRadius],
 		   l.[Id] AS [LocationId],
 		   l.[Name] AS [LocationName],
-		   l.[Postcode],
-		   r.[Id] AS [RouteId],
-		   r.[Name] AS [RouteName]
+		   l.[Postcode]
 		FROM ProvidersCTE p
-		LEFT JOIN	[dbo].[Location] l
+		INNER JOIN	[dbo].[Location] l
 	  	ON	p.[Id] = l.[ProviderId]
-		LEFT JOIN [dbo].[Notification] n
+		INNER JOIN [dbo].[Notification] n
 		ON n.[LocationId] = l.[Id]
-		INNER JOIN [dbo].[NotificationRoute] nr
-		ON nr.[NotificationId] = n.[Id]
-		LEFT JOIN [Route] r
-		ON r.[Id] = nr.[RouteId]
 		WHERE	l.[IsDeleted] = 0
 		  --Only include the first row to make sure main data set takes priority
 		  AND	p.[ProviderRowNum] = 1
-	ORDER BY	[LocationName],
-				n.[Email],
-				r.[Name]
+	ORDER BY	n.[Email],
+				[LocationId],
+				[LocationName]

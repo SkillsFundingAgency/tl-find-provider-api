@@ -185,23 +185,23 @@ public class ProviderDataServiceTests
     {
         const long ukPrn = 12345678;
 
-        var notifications = new NotificationBuilder()
+        var notificationSummaries = new NotificationSummaryBuilder()
             .BuildList()
             .ToList();
 
         var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotifications(ukPrn, Arg.Any<bool>())
-            .Returns(notifications);
+        notificationRepository.GetNotificationSummaryList(ukPrn, Arg.Any<bool>())
+            .Returns(notificationSummaries);
 
         var service = new ProviderDataServiceBuilder()
             .Build(notificationRepository: notificationRepository);
 
-        var results = (await service.GetNotifications(ukPrn)).ToList();
-        results.Should().BeEquivalentTo(notifications);
+        var results = (await service.GetNotificationSummaryList(ukPrn)).ToList();
+        results.Should().BeEquivalentTo(notificationSummaries);
 
         await notificationRepository
             .Received(1)
-            .GetNotifications(ukPrn, true);
+            .GetNotificationSummaryList(ukPrn, true);
     }
 
     [Fact]

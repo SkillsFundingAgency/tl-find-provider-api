@@ -130,7 +130,7 @@ public class ProviderDataService : IProviderDataService
         await _notificationRepository.Delete(notificationId);
     }
 
-    public async Task<IEnumerable<Notification>> GetNotifications(long ukPrn)
+    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -139,7 +139,7 @@ public class ProviderDataService : IProviderDataService
 
         var notifications = 
             (await _notificationRepository
-            .GetNotifications(ukPrn, _mergeAdditionalProviderData));
+            .GetNotificationSummaryList(ukPrn, _mergeAdditionalProviderData));
 
         return notifications;
     }

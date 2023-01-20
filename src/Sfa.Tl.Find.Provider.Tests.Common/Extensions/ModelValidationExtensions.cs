@@ -365,4 +365,10 @@ public static class ModelValidationExtensions
         notification.Postcode.Should().Be(expected.Postcode);
         notification.SearchRadius.Should().Be(expected.SearchRadius);
     }
+
+    public static void Validate(this NotificationSummary notification, NotificationSummaryDto expected)
+    {
+        notification.Id.Should().Be(expected.Id);
+        notification.Email.Should().Be(expected.Email);
+    }
 }

@@ -7,14 +7,14 @@ public class NotificationDtoBuilder
     public IEnumerable<NotificationDto> BuildList() =>
         new NotificationBuilder()
             .BuildList()
-            .Select(s => new NotificationDto
+            .Select(n => new NotificationDto
             {
-                Id = s.Id,
-                LocationId = s.LocationId,
-                LocationName = s.LocationName,
-                Email = s.Email,
-                Postcode = s.Postcode,
-                SearchRadius = s.SearchRadius
+                Id = n.Id,
+                LocationId = n.LocationId,
+                LocationName = n.LocationName,
+                Email = n.Email,
+                Postcode = n.Postcode,
+                SearchRadius = n.SearchRadius
             })
             .ToList();
 }

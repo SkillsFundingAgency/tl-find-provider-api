@@ -41,7 +41,7 @@ public class NotificationRepository : INotificationRepository
             commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<IEnumerable<Notification>> GetNotifications(long ukPrn, bool includeAdditionalData)
+    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn, bool includeAdditionalData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -51,44 +51,39 @@ public class NotificationRepository : INotificationRepository
             includeAdditionalData
         });
 
-        var notifications = new Dictionary<int, Notification>();
+        var notifications = new Dictionary<int, NotificationSummary>();
 
         await _dbContextWrapper
-            .QueryAsync<NotificationDto, RouteDto, Notification>(
+            .QueryAsync<NotificationSummaryDto, LocationPostcode, NotificationSummary>(
                 connection,
-                "GetNotifications",
-                (e, r) =>
+                "GetNotificationSummary",
+                (n, l) =>
                 {
-                    if (!notifications.TryGetValue(e.Id!.Value, out var notification))
+                    if (!notifications.TryGetValue(n.Id!.Value, out var notification))
                     {
-                        notifications.Add(e.Id.Value,
-                            notification = new Notification
+                        notifications.Add(n.Id.Value,
+                            notification = new NotificationSummary
                             {
-                                Id = e.Id,
-                                Email = e.Email,
-                                Frequency = e.Frequency,
-                                SearchRadius = e.SearchRadius,
-                                LocationId = e.LocationId,
-                                LocationName = e.LocationName,
-                                Postcode = e.Postcode,
-                                Routes = new List<Route>()
+                                Id = n.Id,
+                                Email = n.Email,
+                                Locations = new List<LocationPostcode>()
                             });
                     }
 
-                    if (r is not null)
+                    if (l is not null)
                     {
-                        notification.Routes.Add(
-                            new Route
+                        notification.Locations.Add(
+                            new LocationPostcode
                             {
-                                Id = r.RouteId,
-                                Name = r.RouteName
+                                Name = l.Name,
+                                Postcode = l.Postcode
                             });
                     }
 
                     return notification;
                 },
                 _dynamicParametersWrapper.DynamicParameters,
-                splitOn: "Id, RouteId",
+                splitOn: "Id, LocationId",
                 commandType: CommandType.StoredProcedure);
 
         return notifications.Values;

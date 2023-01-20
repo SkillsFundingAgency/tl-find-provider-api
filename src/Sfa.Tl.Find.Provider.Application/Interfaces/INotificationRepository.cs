@@ -6,7 +6,7 @@ public interface INotificationRepository
 {
     Task Delete(int notificationId);
 
-    Task<IEnumerable<Notification>> GetNotifications(
+    Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(
         long ukPrn, 
         bool includeAdditionalData);
 
