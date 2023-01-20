@@ -200,6 +200,13 @@ public static class ModelValidationExtensions
         locationPostcode.Longitude.Should().Be(expected.Longitude);
     }
 
+    public static void Validate(this LocationPostcode locationPostcode, LocationPostcodeDto expected)
+    {
+        locationPostcode.Id.Should().Be(expected.LocationId);
+        locationPostcode.Name.Should().Be(expected.LocationName);
+        locationPostcode.Postcode.Should().Be(expected.Postcode);
+    }
+
     public static void Validate(this DeliveryYearSearchResult deliveryYear, DeliveryYearSearchResult expected)
     {
         deliveryYear.Year.Should().Be(expected.Year);

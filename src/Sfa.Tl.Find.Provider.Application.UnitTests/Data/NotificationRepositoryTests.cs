@@ -31,7 +31,7 @@ public class NotificationRepositoryTests
         var notificationSummaryDtoList = new NotificationSummaryDtoBuilder()
             .BuildList()
             .ToList();
-        var locationDtoList = new LocationPostcodeBuilder()
+        var locationDtoList = new LocationPostcodeDtoBuilder()
             .BuildList()
             .ToList();
 
@@ -47,7 +47,7 @@ public class NotificationRepositoryTests
         await dbContextWrapper
             .QueryAsync(dbConnection,
                 "GetNotificationSummary",
-                Arg.Do<Func<NotificationSummaryDto, LocationPostcode, NotificationSummary>>(
+                Arg.Do<Func<NotificationSummaryDto, LocationPostcodeDto, NotificationSummary>>(
                     x =>
                     {
                         var n = notificationSummaryDtoList[callIndex];
@@ -69,8 +69,7 @@ public class NotificationRepositoryTests
         results.Should().NotBeNullOrEmpty();
         results!.Count.Should().Be(1);
         results.First().Validate(notificationSummaryDtoList.First());
-        results[0].Locations.First().Name.Should().Be(locationDtoList[0].Name);
-        results[0].Locations.First().Postcode.Should().Be(locationDtoList[0].Postcode);
+        results[0].Locations.First().Validate(locationDtoList.First());
     }
 
     [Fact]

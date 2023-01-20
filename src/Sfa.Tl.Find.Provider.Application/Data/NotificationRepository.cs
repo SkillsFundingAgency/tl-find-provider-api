@@ -54,7 +54,7 @@ public class NotificationRepository : INotificationRepository
         var notifications = new Dictionary<int, NotificationSummary>();
 
         await _dbContextWrapper
-            .QueryAsync<NotificationSummaryDto, LocationPostcode, NotificationSummary>(
+            .QueryAsync<NotificationSummaryDto, LocationPostcodeDto, NotificationSummary>(
                 connection,
                 "GetNotificationSummary",
                 (n, l) =>
@@ -75,7 +75,8 @@ public class NotificationRepository : INotificationRepository
                         notification.Locations.Add(
                             new LocationPostcode
                             {
-                                Name = l.Name,
+                                Id = l.LocationId,
+                                Name = l.LocationName,
                                 Postcode = l.Postcode
                             });
                     }
