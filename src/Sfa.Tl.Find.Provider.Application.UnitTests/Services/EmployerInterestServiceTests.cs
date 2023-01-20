@@ -983,6 +983,8 @@ public class EmployerInterestServiceTests
                     tokens.ValidateTokens(
                         new Dictionary<string, string>
                         {
+                            { "organisation_name", expiredEmployerInterest[0].OrganisationName ?? "" },
+                            { "postcode", expiredEmployerInterest[0].Postcode ?? "" },
                             { "employer_support_site", settings.EmployerSupportSiteUri },
                             { "register_interest_uri", settings.RegisterInterestUri ?? "" }
                         })),

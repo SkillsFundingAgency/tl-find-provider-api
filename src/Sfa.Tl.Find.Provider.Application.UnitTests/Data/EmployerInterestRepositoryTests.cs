@@ -349,7 +349,7 @@ public class EmployerInterestRepositoryTests
         dbContextWrapper
             .QueryAsync<ExpiredEmployerInterestDto>(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("SELECT Id, UniqueId, Email") &&
+                    s.Contains("SELECT Id, UniqueId, OrganisationName, Postcode, Email") &&
                     s.Contains("FROM [dbo].[EmployerInterest]") &&
                     s.Contains("[ExpiryDate] < @date")),
                 Arg.Any<object>(),

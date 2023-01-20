@@ -219,17 +219,19 @@ public class EmployerInterestService : IEmployerInterestService
             employerInterest.UniqueId.ToString());
     }
 
-    private async Task<bool> SendEmployerInterestRemovedEmail(ExpiredEmployerInterestDto item)
+    private async Task<bool> SendEmployerInterestRemovedEmail(ExpiredEmployerInterestDto expiredInterest)
     {
         return await _emailService.SendEmail(
-            item.Email,
+            expiredInterest.Email,
             EmailTemplateNames.EmployerInterestRemoved,
             new Dictionary<string, string>
             {
+                { "organisation_name", expiredInterest.OrganisationName ?? "" },
+                { "postcode", expiredInterest.Postcode ?? "" },
                 { "register_interest_uri", _employerInterestSettings.RegisterInterestUri ?? "" },
                 { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" }
             },
-            item.UniqueId.ToString());
+            expiredInterest.UniqueId.ToString());
     }
 
     private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geoLocation)

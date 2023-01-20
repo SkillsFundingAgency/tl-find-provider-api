@@ -189,7 +189,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             var itemsToDelete = (await 
                 _dbContextWrapper.QueryAsync<ExpiredEmployerInterestDto>(
                     connection,
-                    "SELECT Id, UniqueId, Email " +
+                    "SELECT Id, UniqueId, OrganisationName, Postcode, Email " +
                     "FROM [dbo].[EmployerInterest] " +
                     "WHERE [ExpiryDate] < @date",
                      new { date },
