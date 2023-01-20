@@ -61,65 +61,45 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
+                @foreach (var notification in Model.NotificationList)
+                {
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header tl-wordwrap">
-                            ana.amari@havendalecollege.ac.uk
-                            <strong class="govuk-tag govuk-tag--red">Pending</strong>
+                            @notification.Email
+                            @if (!notification.IsEmailVerified)
+                            {
+                                <strong class="govuk-tag govuk-tag--red">Pending</strong>
+                            }
                         </th>
                         <td class="govuk-table__cell tl-table__cell__list">
                             <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
                             <div class="tl-employers--table--inline-cell">
-                                <p> Alesford Campus</p>
-                            </div>
-                        </td>
-
-                        <td class="govuk-table__cell">
-                            <a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state">Resend verification</a>
-                            <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
-                        </td>
-                    </tr>
-                    @foreach (var notification in Model.NotificationList)
-                    {
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header tl-wordwrap">
-                                @notification.Email
-                                @if (!notification.IsEmailVerified)
+                                @if (@notification.Locations is not null && notification.Locations.Any())
                                 {
-                                    <strong class="govuk-tag govuk-tag--red">Pending</strong>
-                                }
-                            </th>
-                            <td class="govuk-table__cell tl-table__cell__list">
-                                <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
-                                <div class="tl-employers--table--inline-cell">
-                                    @if (@notification.Locations is not null && notification.Locations.Any())
+                                    @foreach (var location in notification.Locations)
                                     {
-                                        @foreach (var location in notification.Locations)
-                                        {
-                                            <p>@($"{location.Name?.ToUpper()} [{location.Postcode}]")</p>
-                                        }
+                                        <p>@($"{location.Name?.ToUpper()} [{location.Postcode}]")</p>
                                     }
-                                    else
-                                    {
-                                            <p>All</p>
-                                    }
-                                </div>
-                            </td>
-
-                            <td class="govuk-table__cell">
-                                @if (notification.IsEmailVerified)
-                                {
-                                    <a asp-page="./EditNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
                                 }
                                 else
                                 {
-                                    <a asp-page="./Notifications" asp-page-handler="ResendEmailVerification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>
+                                    <p>All</p>
                                 }
-                                @*<a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>*@
-                                <a asp-page="./EditNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
-                                <a asp-page="./RemoveNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state">Remove</a>
-                            </td>
-                        </tr>
-                    }
+                            </div>
+                        </td>
+                        <td class="govuk-table__cell">
+                            @if (notification.IsEmailVerified)
+                            {
+                                <a asp-page="./EditNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state">Change</a>
+                            }
+                            else
+                            {
+                                <a asp-page="./Notifications" asp-page-handler="ResendEmailVerification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state">Resend verification</a>
+                            }
+                            <a asp-page="./RemoveNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         }
