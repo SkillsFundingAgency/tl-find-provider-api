@@ -34,16 +34,18 @@ public class RemoveNotificationModel : PageModel
 
     public async Task<IActionResult> OnPost(int? id)
     {
-        if (id == null)
+        var notification = (id is not null)
+            ? await _providerDataService.GetNotification(id.Value)
+            : null;
+
+        if (notification is null)
         {
             return NotFound();
         }
 
-        Notification = await _providerDataService.GetNotification(id.Value);
+        TempData[nameof(NotificationsModel.DeletedNotificationEmail)] = notification.Email;
 
-        TempData["DeletedNotificationEmail"] = Notification?.Email;
-
-        await _providerDataService.DeleteNotification(id.Value);
+        await _providerDataService.DeleteNotification(id!.Value);
 
         return RedirectToPage("/Provider/Notifications");
     }

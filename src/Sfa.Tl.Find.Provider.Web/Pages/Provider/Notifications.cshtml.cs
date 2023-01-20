@@ -52,4 +52,19 @@ public class NotificationsModel : PageModel
             NotificationList = await _providerDataService.GetNotificationSummaryList(ukPrn.Value);
         }
     }
+
+    public async Task<IActionResult> OnGetResendEmailVerification(int id)
+    {
+        var notification = await _providerDataService.GetNotification(id);
+        if (notification is null)
+        {
+            return NotFound();
+        }
+
+        TempData[nameof(VerificationEmail)] = notification.Email;
+
+        await _providerDataService.SendEmailVerification(id);
+
+        return RedirectToPage("/Provider/Notifications");
+    }
 }

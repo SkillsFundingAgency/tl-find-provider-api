@@ -13,6 +13,7 @@ public class ProviderDataServiceBuilder
     public IProviderDataService Build(
         IDateTimeProvider dateTimeProvider = null,
         IPostcodeLookupService postcodeLookupService = null,
+        IEmailService emailService = null,
         IProviderRepository providerRepository = null,
         IQualificationRepository qualificationRepository = null,
         IRouteRepository routeRepository = null,
@@ -26,6 +27,7 @@ public class ProviderDataServiceBuilder
     {
         dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
+        emailService ??= Substitute.For<IEmailService>();
         providerRepository ??= Substitute.For<IProviderRepository>();
         qualificationRepository ??= Substitute.For<IQualificationRepository>();
         routeRepository ??= Substitute.For<IRouteRepository>();
@@ -43,6 +45,7 @@ public class ProviderDataServiceBuilder
         return new ProviderDataService(
             dateTimeProvider,
             postcodeLookupService,
+            emailService,
             providerRepository,
             qualificationRepository,
             routeRepository,

@@ -9,7 +9,7 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        @if (Model.AddedNotificationEmail != null)
+        @if (Model.VerificationEmail != null)
         {
             <div class="tl-notification tl-notification--green">
                 <div>
@@ -33,7 +33,7 @@
         {
             <div class="tl-notification tl-notification--green">
                 <div>
-                    @Model.DeletedNotificationEmail has been added.
+                    @Model.AddedNotificationEmail has been added.
                     <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
                 </div>
             </div>
@@ -83,8 +83,10 @@
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header tl-wordwrap">
                                 @notification.Email
-                                @*TODO: Add Pending flag*@
-                                <strong class="govuk-tag govuk-tag--red">Pending</strong>
+                                @if (!notification.IsEmailVerified)
+                                {
+                                    <strong class="govuk-tag govuk-tag--red">Pending</strong>
+                                }
                             </th>
                             <td class="govuk-table__cell tl-table__cell__list">
                                 <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
@@ -104,7 +106,14 @@
                             </td>
 
                             <td class="govuk-table__cell">
-                                @*TODO: either resend verification or show edit*@
+                                @if (notification.IsEmailVerified)
+                                {
+                                    <a asp-page="./EditNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
+                                }
+                                else
+                                {
+                                    <a asp-page="./Notifications" asp-page-handler="ResendEmailVerification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>
+                                }
                                 @*<a href="EmployerDetails" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Resend verification</a>*@
                                 <a asp-page="./EditNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
                                 <a asp-page="./RemoveNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state">Remove</a>

@@ -275,6 +275,24 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
+    public async Task GetSearchFilters_Calls_Repository()
+    {
+        var searchFilter = new SearchFilterBuilder()
+            .Build();
+
+        var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(searchFilterRepository: searchFilterRepository);
+
+        await service.SaveSearchFilter(searchFilter);
+
+        await searchFilterRepository
+            .Received(1)
+            .Save(searchFilter);
+    }
+
+    [Fact]
     public async Task GetRoutes_Returns_Expected_List_From_Cache()
     {
         var routes = new RouteBuilder().BuildList().ToList();
@@ -1033,20 +1051,33 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task GetSearchFilters_Calls_Repository()
+    public async Task SendSearchFilters_Calls_Repository()
     {
-        var searchFilter = new SearchFilterBuilder()
+        const int notificationId = 1;
+
+        var notification = new NotificationBuilder()
             .Build();
 
-        var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetNotification(notificationId)
+            .Returns(notification);
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>())
+            .Returns(true);
 
         var service = new ProviderDataServiceBuilder()
-            .Build(searchFilterRepository: searchFilterRepository);
+            .Build(
+                emailService: emailService,
+                notificationRepository: notificationRepository);
 
-        await service.SaveSearchFilter(searchFilter);
+        await service.SendEmailVerification(notificationId);
 
-        await searchFilterRepository
-            .Received(1)
-            .Save(searchFilter);
+        //TODO: Fill in tests
     }
+
 }

@@ -18,8 +18,9 @@ namespace Sfa.Tl.Find.Provider.Application.Services;
 public class ProviderDataService : IProviderDataService
 {
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ITownDataService _townDataService;
     private readonly IPostcodeLookupService _postcodeLookupService;
+    private readonly IEmailService _emailService;
+    private readonly ITownDataService _townDataService;
     private readonly IProviderRepository _providerRepository;
     private readonly IQualificationRepository _qualificationRepository;
     private readonly IRouteRepository _routeRepository;
@@ -33,6 +34,7 @@ public class ProviderDataService : IProviderDataService
     public ProviderDataService(
         IDateTimeProvider dateTimeProvider,
         IPostcodeLookupService postcodeLookupService,
+        IEmailService emailService,
         IProviderRepository providerRepository,
         IQualificationRepository qualificationRepository,
         IRouteRepository routeRepository,
@@ -46,6 +48,7 @@ public class ProviderDataService : IProviderDataService
     {
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
+        _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
@@ -367,6 +370,11 @@ public class ProviderDataService : IProviderDataService
     public async Task SaveSearchFilter(SearchFilter searchFilter)
     {
         await _searchFilterRepository.Save(searchFilter);
+    }
+
+    public async Task SendEmailVerification(int notificationId)
+    {
+        //TODO: send email
     }
 
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)

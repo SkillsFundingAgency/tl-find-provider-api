@@ -50,4 +50,6 @@ public interface IProviderDataService
     Task ImportProviderData(Stream stream, bool isAdditionalData);
 
     Task SaveSearchFilter(SearchFilter searchFilter);
+    
+    Task SendEmailVerification(int notificationId);
 }
