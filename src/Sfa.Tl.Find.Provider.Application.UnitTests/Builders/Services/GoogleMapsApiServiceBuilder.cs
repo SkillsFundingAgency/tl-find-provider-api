@@ -23,11 +23,10 @@ public class GoogleMapsApiServiceBuilder
         logger ??= Substitute.For<ILogger<GoogleMapsApiService>>();
 
         googleMapsApiSettings ??= new SettingsBuilder().BuildGoogleMapsApiSettings();
-        var googleMapsApiOptions = googleMapsApiSettings.ToOptions();
 
         return new GoogleMapsApiService(
             httpClient,
-            googleMapsApiOptions,
+            googleMapsApiSettings.ToOptions(),
             logger);
     }
 

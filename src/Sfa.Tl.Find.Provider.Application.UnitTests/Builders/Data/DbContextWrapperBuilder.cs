@@ -19,14 +19,14 @@ public class DbContextWrapperBuilder
             ? new SettingsBuilder().BuildConnectionStringSettings()
             : new SettingsBuilder().BuildConnectionStringSettings(connectionString);
 
-        var connectionStringOptions = connectionStringSettings
-            .ToOptions();
-
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
 
         logger ??= Substitute.For<ILogger<DbContextWrapper>>();
 
-        return new DbContextWrapper(connectionStringOptions, policyRegistry, logger);
+        return new DbContextWrapper(
+            connectionStringSettings.ToOptions(), 
+            policyRegistry, 
+            logger);
     }
 
     public IDbContextWrapper BuildSubstitute()
