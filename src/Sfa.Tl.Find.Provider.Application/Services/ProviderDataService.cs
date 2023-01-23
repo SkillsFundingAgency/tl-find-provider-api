@@ -2,6 +2,7 @@
 using System.Text.Json;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.ClassMaps;
@@ -12,12 +13,14 @@ using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
 public class ProviderDataService : IProviderDataService
 {
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IGuidProvider _guidProvider;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmailService _emailService;
     private readonly ITownDataService _townDataService;
@@ -28,11 +31,13 @@ public class ProviderDataService : IProviderDataService
     private readonly INotificationRepository _notificationRepository;
     private readonly ISearchFilterRepository _searchFilterRepository;
     private readonly ICacheService _cacheService;
+    private readonly ProviderSettings _providerSettings;
     private readonly ILogger<ProviderDataService> _logger;
     private readonly bool _mergeAdditionalProviderData;
 
     public ProviderDataService(
         IDateTimeProvider dateTimeProvider,
+        IGuidProvider guidProvider,
         IPostcodeLookupService postcodeLookupService,
         IEmailService emailService,
         IProviderRepository providerRepository,
@@ -43,10 +48,12 @@ public class ProviderDataService : IProviderDataService
         ISearchFilterRepository searchFilterRepository,
         ITownDataService townDataService,
         ICacheService cacheService,
+        IOptions<ProviderSettings> providerOptions,
         IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
     {
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
@@ -58,6 +65,12 @@ public class ProviderDataService : IProviderDataService
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        if (providerOptions is null) throw new ArgumentNullException(nameof(providerOptions));
+        if (searchOptions is null) throw new ArgumentNullException(nameof(searchOptions));
+
+        _providerSettings = providerOptions?.Value
+                            ?? throw new ArgumentNullException(nameof(providerOptions));
 
         _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
                                        ?? throw new ArgumentNullException(nameof(searchOptions));
@@ -140,7 +153,7 @@ public class ProviderDataService : IProviderDataService
             _logger.LogDebug("Getting notifications");
         }
 
-        var notifications = 
+        var notifications =
             (await _notificationRepository
             .GetNotificationSummaryList(ukPrn, _mergeAdditionalProviderData));
 
@@ -377,9 +390,58 @@ public class ProviderDataService : IProviderDataService
         await _searchFilterRepository.Save(searchFilter);
     }
 
-    public async Task SendEmailVerification(int notificationId)
+    public async Task SendProviderVerificationEmail(int notificationId, string emailAddress)
     {
-        //TODO: send email
+        var uniqueId = _guidProvider.NewGuid();
+
+        var siteUri = new Uri(_providerSettings.ConnectSiteUri);
+        var notificationsUri = new Uri(siteUri, "notifications");
+        var verificationUri = new Uri(QueryHelpers.AddQueryString(
+            notificationsUri.AbsoluteUri.TrimEnd('/'),
+            "token",
+            uniqueId.ToString("D").ToLower()));
+        var verificationUri2 = new Uri(QueryHelpers.AddQueryString(
+            notificationsUri.AbsoluteUri,
+            "token",
+            uniqueId.ToString("D").ToLower()));
+
+        await _emailService.SendEmail(
+            emailAddress,
+            EmailTemplateNames.ProviderVerification,
+            new Dictionary<string, string>
+            {
+                { "email_verification_link", verificationUri.ToString() },
+                { "notifications_uri", notificationsUri.ToString() }
+            },
+            uniqueId.ToString());
+
+        //TODO: save to repository
+        //_notificationRepository.
+    }
+
+    public async Task SendProviderNotificationEmail(int notificationId, string emailAddress)
+    {
+        var siteUri = new Uri(_providerSettings.ConnectSiteUri);
+        var notificationsUri = new Uri(siteUri, "notifications");
+
+        var uniqueId = _guidProvider.NewGuid();
+
+        var employerListUri = new Uri(siteUri, "employer_list");
+        var searchFiltersUri = new Uri(siteUri, "search_filters");
+
+        await _emailService.SendEmail(
+            emailAddress,
+            EmailTemplateNames.ProviderNotification,
+            new Dictionary<string, string>
+            {
+                { "employer_list_uri", employerListUri.ToString() },
+                { "search_filters_uri", searchFiltersUri.ToString() },
+                { "notifications_uri", notificationsUri.ToString() }
+            },
+            uniqueId.ToString());
+
+        //TODO: save to repository?
+        //_notificationRepository.
     }
 
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)

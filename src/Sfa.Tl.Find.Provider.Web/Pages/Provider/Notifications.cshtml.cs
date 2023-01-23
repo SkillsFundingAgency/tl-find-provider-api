@@ -61,9 +61,9 @@ public class NotificationsModel : PageModel
             return NotFound();
         }
 
-        TempData[nameof(VerificationEmail)] = notification.Email;
+        await _providerDataService.SendProviderVerificationEmail(id, notification.Email);
 
-        await _providerDataService.SendEmailVerification(id);
+        TempData[nameof(VerificationEmail)] = notification.Email;
 
         return RedirectToPage("/Provider/Notifications");
     }

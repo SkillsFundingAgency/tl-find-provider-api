@@ -1,4 +1,5 @@
-﻿using Sfa.Tl.Find.Provider.Application.Interfaces;
+﻿using System.Diagnostics;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models.Authentication;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
@@ -94,6 +95,11 @@ public class DfeSignInApiService : IDfeSignInApiService
 
             if (response.IsSuccessStatusCode)
             {
+#if DEBUG
+                var s = await response.Content.ReadAsStringAsync();
+                Debug.WriteLine(s);
+#endif
+
                 userClaims = JsonSerializer
                     .Deserialize<DfeUserInfo>(
                         await response.Content.ReadAsStringAsync(),
@@ -107,6 +113,15 @@ public class DfeSignInApiService : IDfeSignInApiService
                 userClaims.UserId = Guid.Parse(userId);
                 userClaims.Roles = new List<Role>();
             }
+
+#if DEBUG
+            if(userClaims.Roles != null) {
+                foreach (var role in userClaims.Roles)
+                {
+                    Debug.WriteLine($"  role: {role.Name} - {role.Code}");
+                }
+            }
+#endif
         }
         catch (Exception ex)
         {

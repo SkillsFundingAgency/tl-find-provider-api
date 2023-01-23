@@ -171,7 +171,63 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
-    public async Task SaveNotification_Calls_Database()
+    public async Task SaveNotification_Calls_Database_To_Create()
+    {
+        var notification = new NotificationBuilder()
+            .WithNullId()
+            .Build();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.Save(notification);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s => s == "CreateNotification"),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
+    }
+
+    [Fact]
+    public async Task SaveNotification_Sets_Dynamic_Parameters_For_Create()
+    {
+        var notification = new NotificationBuilder()
+            .WithNullId()
+            .Build();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.Save(notification);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(5);
+        templates.ContainsNameAndValue("email", notification.Email);
+        templates.ContainsNameAndValue("frequency", notification.Frequency);
+        templates.ContainsNameAndValue("locationId", notification.LocationId);
+        templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
+        templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
+            .Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task SaveNotification_Calls_Database_To_Update()
     {
         var notification = new NotificationBuilder()
             .Build();
@@ -190,13 +246,13 @@ public class NotificationRepositoryTests
         await dbContextWrapper
             .Received(1)
             .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s => s == "CreateOrUpdateNotification"),
+                Arg.Is<string>(s => s == "UpdateNotification"),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
                 commandType: CommandType.StoredProcedure);
     }
 
     [Fact]
-    public async Task SaveNotification_Sets_Dynamic_Parameters()
+    public async Task SaveNotification_Sets_Dynamic_Parameters_For_Update()
     {
         var notification = new NotificationBuilder()
             .Build();
@@ -215,10 +271,13 @@ public class NotificationRepositoryTests
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
-        templates.GetDynamicTemplatesCount().Should().Be(3);
+        templates.GetDynamicTemplatesCount().Should().Be(6);
+        templates.ContainsNameAndValue("id", notification.Id);
+        templates.ContainsNameAndValue("email", notification.Email);
+        templates.ContainsNameAndValue("frequency", notification.Frequency);
         templates.ContainsNameAndValue("locationId", notification.LocationId);
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
-        var routeIds = templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds");
-        routeIds.Should().NotBeNull();
+        templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
+            .Should().NotBeNull();
     }
 }

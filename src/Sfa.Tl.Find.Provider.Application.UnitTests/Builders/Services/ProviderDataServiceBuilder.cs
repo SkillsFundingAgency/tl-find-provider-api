@@ -5,6 +5,7 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 
@@ -12,6 +13,7 @@ public class ProviderDataServiceBuilder
 {
     public IProviderDataService Build(
         IDateTimeProvider dateTimeProvider = null,
+        IGuidProvider guidProvider = null,
         IPostcodeLookupService postcodeLookupService = null,
         IEmailService emailService = null,
         IProviderRepository providerRepository = null,
@@ -22,10 +24,12 @@ public class ProviderDataServiceBuilder
         ISearchFilterRepository searchFilterRepository = null,
         ITownDataService townDataService = null,
         ICacheService cacheService = null,
+        ProviderSettings? providerSettings = null,
         SearchSettings searchSettings = null,
         ILogger<ProviderDataService> logger = null)
     {
         dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
+        guidProvider ??= Substitute.For<IGuidProvider>();
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
         emailService ??= Substitute.For<IEmailService>();
         providerRepository ??= Substitute.For<IProviderRepository>();
@@ -38,12 +42,12 @@ public class ProviderDataServiceBuilder
         cacheService ??= Substitute.For<ICacheService>();
         logger ??= Substitute.For<ILogger<ProviderDataService>>();
 
+        providerSettings ??= new SettingsBuilder().BuildProviderSettings();
         searchSettings ??= new SettingsBuilder().BuildSearchSettings();
-        var searchOptions = searchSettings
-            .ToOptions();
 
         return new ProviderDataService(
             dateTimeProvider,
+            guidProvider,
             postcodeLookupService,
             emailService,
             providerRepository,
@@ -54,7 +58,8 @@ public class ProviderDataServiceBuilder
             searchFilterRepository,
             townDataService,
             cacheService,
-            searchOptions,
+            providerSettings.ToOptions(),
+            searchSettings.ToOptions(),
             logger);
     }
 }

@@ -53,10 +53,11 @@
                 <label class="govuk-label govuk-!-font-weight-bold" for="frequency">
                     Notification frequency
                 </label>
-                <select class="govuk-select" id="frequency" name="frequency">
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedFrequency" asp-items="Model.FrequencyOptions">
+                    @*<select class="govuk-select" id="frequency" name="frequency">
                     <option value="Immediately">Immediately</option>
                     <option value="Daily">Daily</option>
-                    <option value="Weekly">Weekly</option>
+                    <option value="Weekly">Weekly</option>*@
                 </select>
             </div>
 
@@ -64,13 +65,15 @@
                 <label class="govuk-label govuk-!-font-weight-bold" for="within">
                     Receive notifications for employers within:
                 </label>
-                <select class="govuk-select" id="within" name="within">
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSearchRadius" asp-items="Model.SearchRadiusOptions" >
+                @*<select class="govuk-select" id="within" name="within">
                     <option value="5 miles">5 miles</option>
                     <option value="10 miles">10 miles</option>
                     <option value="20 miles">20 miles</option>
                     <option value="30 miles">30 miles</option>
                     <option value="40 miles">40 miles</option>
                     <option value="50 miles">50 miles</option>
+                    *@
                 </select>
             </div>
 
@@ -85,7 +88,20 @@
                         If nothing is selected, you will receive notifications for all skill areas
                     </div>
                     <div class="govuk-checkboxes govuk-!-margin-top-4" data-module="govuk-checkboxes">
-                        <div class="govuk-checkboxes__item">
+                        @foreach (var skillArea in Model?.Input.SkillAreas.Select((value, i) => (value, i)))
+                        {
+                            var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
+                            var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
+                                    @skillArea.value.Text
+                                </label>
+                                <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
+                                <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Text" />
+                            </div>
+                        }
+@*                        <div class="govuk-checkboxes__item">
                             <input class="govuk-checkboxes__input" id="agriculture" name="agriculture" type="checkbox" value="">
                             <label class="govuk-label govuk-checkboxes__label" for="agriculture">
                                 Agriculture, Environment and Animal Care
@@ -162,7 +178,7 @@
                             <label class="govuk-label govuk-checkboxes__label" for="legal">
                                 Legal, Finance and Accounting
                             </label>
-                        </div>
+                        </div>*@
                     </div>
                 </fieldset>
             </div>

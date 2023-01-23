@@ -16,7 +16,7 @@ public static class Constants
     public const string EmployerInterestSettingsConfigKey = "EmployerInterestSettings";
     public const string GoogleMapsApiSettingsConfigKey = "GoogleMapsApiSettings";
     public const string PostcodeApiSettingsConfigKey = "PostcodeApiSettings";
-    public const string ProviderSettingsConfigKey = "ProviderSettingsConfigKey";
+    public const string ProviderSettingsConfigKey = "ProviderSettings";
     public const string RedisCacheConnectionStringConfigKey = "RedisCacheConnectionString";
     public const string SearchSettingsConfigKey = "SearchSettings";
     public const string SqlConnectionStringConfigKey = "SqlConnectionString";

@@ -8,6 +8,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using System.Security.Claims;
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class NotificationsModelBuilder
@@ -40,13 +41,19 @@ public class NotificationsModelBuilder
             ?? new SettingsBuilder()
                 .BuildProviderSettings());
 
+        var tempDataProvider = Substitute.For<ITempDataProvider>();
+        var tempData = new TempDataDictionary(
+            pageContext.HttpContext,
+            tempDataProvider);
+
         var pageModel = new NotificationsModel(
             providerDataService,
             sessionService,
             providerOptions,
             logger)
         {
-            PageContext = pageContext
+            PageContext = pageContext,
+            TempData = tempData
         };
 
         return pageModel;

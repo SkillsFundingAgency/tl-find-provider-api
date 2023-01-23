@@ -88,22 +88,22 @@ public class SearchFilterDetailsModel : PageModel
         {
         }
 
-        var routes = Input?.SkillAreas != null 
-        ? Input
-            .SkillAreas
-            .Where(s => s.Selected)
-            .Select(s => 
-                new Route
-                {
-                    Id = int.Parse(s.Value)
-                })
-            .ToList()
-        : new List<Route>();
+        var routes = Input?.SkillAreas != null
+            ? Input
+                .SkillAreas
+                .Where(s => s.Selected)
+                .Select(s =>
+                    new Route
+                    {
+                        Id = int.Parse(s.Value)
+                    })
+                .ToList()
+            : new List<Route>();
 
         var searchFilter = new SearchFilter
         {
             LocationId = Input!.LocationId,
-            SearchRadius = Input?.SelectedSearchRadius is not null ? 
+            SearchRadius = Input?.SelectedSearchRadius is not null ?
                 int.Parse(Input!.SelectedSearchRadius)
                 : _providerSettings.DefaultSearchRadius,
             Routes = routes

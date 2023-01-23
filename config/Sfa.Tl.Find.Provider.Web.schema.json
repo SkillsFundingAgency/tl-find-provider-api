@@ -115,6 +115,11 @@
     },
     "ProviderSettings": {
       "properties": {
+        "ConnectSiteUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ProviderSettings_ConnectSiteUri"
+        },
         "DefaultSearchRadius": {
           "minLength": 1,
           "type": "integer",
@@ -123,6 +128,7 @@
       },
       "additionalProperties": false,
       "required": [
+        "ConnectSiteUri",
         "DefaultSearchRadius"
       ],
       "type": "object"

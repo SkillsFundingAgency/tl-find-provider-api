@@ -53,5 +53,7 @@ public interface IProviderDataService
 
     Task SaveSearchFilter(SearchFilter searchFilter);
     
-    Task SendEmailVerification(int notificationId);
+    Task SendProviderVerificationEmail(int notificationId, string emailAddress);
+
+    Task SendProviderNotificationEmail(int notificationId, string emailAddress);
 }

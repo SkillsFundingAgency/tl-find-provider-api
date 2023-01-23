@@ -22,8 +22,6 @@ public class SearchFilterDetailsTests
     public async Task SearchFilterDetailsModel_OnGet_Sets_ExpectedProperties()
     {
         const int id = 999;
-        const int expectedDefaultSearchRadius = 20;
-
         var settings = new SettingsBuilder().BuildProviderSettings();
 
         var searchFilterDetailsModel = new SearchFilterDetailsModelBuilder()
@@ -31,11 +29,11 @@ public class SearchFilterDetailsTests
 
         await searchFilterDetailsModel.OnGet(id);
 
-        searchFilterDetailsModel.DefaultSearchRadius.Should().Be(expectedDefaultSearchRadius);
+        searchFilterDetailsModel.DefaultSearchRadius.Should().Be(settings.DefaultSearchRadius);
     }
 
     [Fact]
-    public async Task SearchFilterDetailsModel_OnGet_Sets_Expected_Results()
+    public async Task SearchFilterDetailsModel_OnGet_Sets_Search_Filter_From_Service()
     {
         var searchFilter = new SearchFilterBuilder()
             .Build();
@@ -140,8 +138,6 @@ public class SearchFilterDetailsTests
     [Fact]
     public async Task SearchFilterDetailsModel_OnGet_Sets_Default_SelectedSearchRadius()
     {
-        const int expectedDefaultSearchRadius = 20;
-
         var settings = new SettingsBuilder().BuildProviderSettings();
 
         var searchFilter = new SearchFilterBuilder()
@@ -160,18 +156,18 @@ public class SearchFilterDetailsTests
         await searchFilterDetailsModel.OnGet(id);
 
         searchFilterDetailsModel.Input.Should().NotBeNull();
-        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(expectedDefaultSearchRadius.ToString());
+        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius.ToString());
     }
 
     [Fact]
     public async Task SearchFilterDetailsModel_OnGet_Sets_Input_SelectedSearchRadius()
     {
-        const int expectedDefaultSearchRadius = 30;
+        const int searchRadius = 30;
 
         var settings = new SettingsBuilder().BuildProviderSettings();
 
         var searchFilter = new SearchFilterBuilder()
-            .WithSearchRadius(expectedDefaultSearchRadius)
+            .WithSearchRadius(searchRadius)
             .Build();
         var id = searchFilter.LocationId;
 
@@ -187,7 +183,7 @@ public class SearchFilterDetailsTests
 
         searchFilterDetailsModel.Input.Should().NotBeNull();
         searchFilterDetailsModel.Input!.LocationId.Should().Be(id);
-        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(expectedDefaultSearchRadius.ToString());
+        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(searchRadius.ToString());
     }
 
     [Fact]

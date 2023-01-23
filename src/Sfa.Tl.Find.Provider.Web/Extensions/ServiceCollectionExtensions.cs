@@ -36,6 +36,10 @@ public static class ServiceCollectionExtensions
             {
                 x.ConfigurePostcodeApiSettings(siteConfiguration);
             })
+            .Configure<ProviderSettings>(x =>
+            {
+                x.ConfigureProviderSettings(siteConfiguration);
+            })
             .Configure<SearchSettings>(x =>
             {
                 x.ConfigureSearchSettings(siteConfiguration);

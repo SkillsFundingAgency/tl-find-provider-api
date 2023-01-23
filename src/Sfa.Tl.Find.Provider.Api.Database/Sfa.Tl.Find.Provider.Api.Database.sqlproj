@@ -143,6 +143,8 @@
     <None Include="Indexes\IX_NotificationRoute_NotificationId.sql" />
     <Build Include="Stored Procedures\CreateOrUpdateNotification.sql" />
     <Build Include="Stored Procedures\GetNotificationSummary.sql" />
+    <Build Include="Stored Procedures\CreateNotification.sql" />
+    <Build Include="Stored Procedures\UpdateNotification.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

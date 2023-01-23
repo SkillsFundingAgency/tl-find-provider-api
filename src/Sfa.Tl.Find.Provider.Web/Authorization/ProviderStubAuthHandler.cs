@@ -10,9 +10,15 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProviderStubAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IHttpContextAccessor httpContextAccessor) : base(options, logger, encoder, clock)
+    public ProviderStubAuthHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        UrlEncoder encoder, 
+        ISystemClock clock, 
+        IHttpContextAccessor httpContextAccessor,
+        ILoggerFactory logger)
+        : base(options, logger, encoder, clock)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor)); ;
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()

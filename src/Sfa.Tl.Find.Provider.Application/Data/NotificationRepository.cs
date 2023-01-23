@@ -150,18 +150,39 @@ public class NotificationRepository : INotificationRepository
         {
             using var connection = _dbContextWrapper.CreateConnection();
 
-            _dynamicParametersWrapper.CreateParameters(new
+            var routeIds = notification.Routes
+                .Select(r => r.Id)
+                .AsTableValuedParameter("dbo.IdListTableType");
+
+            if (notification.Id is > 0)
             {
-                locationId = notification.LocationId,
-                searchRadius = notification.SearchRadius,
-                routeIds = notification.Routes
-                    .Select(r => r.Id)
-                    .AsTableValuedParameter("dbo.IdListTableType")
-            });
+                _dynamicParametersWrapper.CreateParameters(new
+                {
+                    id = notification.Id.Value,
+                    email = notification.Email,
+                    frequency = notification.Frequency,
+                    searchRadius = notification.SearchRadius,
+                    locationId = notification.LocationId,
+                    routeIds
+                });
+            }
+            else
+            {
+                _dynamicParametersWrapper.CreateParameters(new
+                {
+                    email = notification.Email,
+                    frequency = notification.Frequency,
+                    searchRadius = notification.SearchRadius,
+                    locationId = notification.LocationId,
+                    routeIds
+                });
+            }
 
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,
-                "CreateOrUpdateNotification",
+                notification.Id is not > 0
+                    ? "CreateNotification"
+                    : "UpdateNotification",
                 _dynamicParametersWrapper.DynamicParameters,
                 commandType: CommandType.StoredProcedure);
         }
