@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
@@ -24,6 +27,8 @@ public class AddNotificationModel : PageModel
     private readonly ILogger<AddNotificationModel> _logger;
 
     public int DefaultSearchRadius { get; private set; }
+
+    public SelectListItem[]? Locations { get; private set; }
 
     public SelectListItem[]? SearchRadiusOptions { get; private set; }
 
@@ -78,62 +83,94 @@ public class AddNotificationModel : PageModel
             Email = Input.Email,
             LocationId = locationId,
             Frequency = Input.SelectedFrequency,
-            SearchRadius = Input.SelectedSearchRadius is not null ?
-                int.Parse(Input.SelectedSearchRadius)
-                : _providerSettings.DefaultSearchRadius,
+            SearchRadius = Input.SelectedSearchRadius ?? _providerSettings.DefaultSearchRadius,
             Routes = routes
         };
 
         await _providerDataService.SaveNotification(notification);
 
-        TempData[nameof(NotificationsModel.AddedNotificationEmail)] = notification.Email;
+        TempData[nameof(NotificationsModel.VerificationEmail)] = notification.Email;
 
         return RedirectToPage("/Provider/Notifications");
     }
 
     private async Task LoadNotificationView()
     {
+        var ukPrn = HttpContext.User.GetUkPrn();
+
         DefaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
             ? _providerSettings.DefaultSearchRadius
             : Constants.DefaultProviderSearchRadius;
 
-        Input ??= new InputModel();
-        //Input.NotificationId = id;
-        Input.SelectedSearchRadius = DefaultSearchRadius
-            //(Notification.SearchRadius ?? DefaultSearchRadius)
-            .ToString();
+        Input ??= new InputModel()
+        {
+            SelectedSearchRadius = DefaultSearchRadius,
+            SelectedFrequency = NotificationFrequency.Immediately,
+            SelectedLocation = 0
+        };
 
-        Input.SelectedFrequency = NotificationFrequency.Immediately;
+        FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
 
-        //var f = Enum.GetValues<NotificationFrequency>()
-        FrequencyOptions = Enum.GetValues<NotificationFrequency>()
-                .Select(f => new SelectListItem
-                {
-                    Value = ((int)f).ToString(),
-                    Text = f.ToString(),
-                    Selected = f == Input.SelectedFrequency
-                })
-                .ToArray();
+        Locations = await LoadProviderLocationOptions(ukPrn, Input.SelectedLocation);
 
-        SearchRadiusOptions =
-            new List<int> { 5, 10, 20, 30, 40, 50 }
-                .Select(p => new SelectListItem(
-                    $"{p} miles",
-                    p.ToString(),
-                    p.ToString() == Input?.SelectedSearchRadius)
-                )
-                .OrderBy(x => int.Parse(x.Value))
-                .ToArray();
+        SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 
-        Input.SkillAreas = (await _providerDataService
+        var routes = new List<Route>();
+        Input.SkillAreas = await LoadSkillAreaOptions(routes);
+    }
+
+    private SelectListItem[] LoadFrequencyOptions(NotificationFrequency selectedValue)
+    {
+        return Enum.GetValues<NotificationFrequency>()
+            .Select(f => new SelectListItem
+            {
+                Value = ((int)f).ToString(),
+                Text = f.ToString(),
+                Selected = f == selectedValue
+            })
+            .ToArray();
+    }
+
+    private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
+    {
+        return new List<int> { 5, 10, 20, 30, 40, 50 }
+            .Select(p => new SelectListItem(
+                $"{p} miles",
+                p.ToString(),
+                p == selectedValue)
+            )
+            //.OrderBy(x => int.Parse(x.Value))
+            .ToArray();
+    }
+
+    private async Task<SelectListItem[]> LoadSkillAreaOptions(IList<Route> selectedRoutes)
+    {
+        return (await _providerDataService
                 .GetRoutes())
             .Select(r => new SelectListItem(
                 r.Name,
                 r.Id.ToString(),
-                //SearchFilter.Routes.Any(x => r.Id == x.Id))
-                false)
+                selectedRoutes.Any(x => r.Id == x.Id))
             )
             .OrderBy(x => x.Text)
+            .ToArray();
+    }
+
+    private async Task<SelectListItem[]> LoadProviderLocationOptions(long? ukPrn, int? selectedValue)
+    {
+        if (ukPrn is null) return Array.Empty<SelectListItem>();
+
+        var providerLocations = await _providerDataService
+                .GetLocationPostcodes(ukPrn.Value);
+
+        return providerLocations.Select(p
+                => new SelectListItem(
+                    $"{p.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Postcode}]",
+                    p.Id.ToString(),
+                    p.Id == selectedValue)
+            )
+            .OrderBy(x => x.Text)
+            .Prepend(new SelectListItem("All", "0", selectedValue is null or 0 ))
             .ToArray();
     }
 
@@ -144,7 +181,9 @@ public class AddNotificationModel : PageModel
 
         public NotificationFrequency SelectedFrequency { get; set; }
 
-        public string? SelectedSearchRadius { get; set; }
+        public int? SelectedLocation { get; set; }
+
+        public int? SelectedSearchRadius { get; set; }
 
         public SelectListItem[]? SkillAreas { get; set; }
     }

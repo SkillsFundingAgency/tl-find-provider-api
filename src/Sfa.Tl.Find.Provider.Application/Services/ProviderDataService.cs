@@ -388,6 +388,11 @@ public class ProviderDataService : IProviderDataService
         }
 
         await _notificationRepository.Save(notification);
+
+        if (notification.EmailVerificationToken is not null)
+        {
+            await SendProviderVerificationEmail(notification.Email, notification.EmailVerificationToken!.Value);
+        }
     }
 
     public async Task SaveSearchFilter(SearchFilter searchFilter)
@@ -397,31 +402,12 @@ public class ProviderDataService : IProviderDataService
 
     public async Task SendProviderVerificationEmail(int notificationId, string emailAddress)
     {
-        var uniqueId = _guidProvider.NewGuid();
-
-        var siteUri = new Uri(_providerSettings.ConnectSiteUri);
-        var notificationsUri = new Uri(siteUri, "notifications");
-        var verificationUri = new Uri(QueryHelpers.AddQueryString(
-            notificationsUri.AbsoluteUri.TrimEnd('/'),
-            "token",
-            uniqueId.ToString("D").ToLower()));
-        var verificationUri2 = new Uri(QueryHelpers.AddQueryString(
-            notificationsUri.AbsoluteUri,
-            "token",
-            uniqueId.ToString("D").ToLower()));
-
-        await _emailService.SendEmail(
-            emailAddress,
-            EmailTemplateNames.ProviderVerification,
-            new Dictionary<string, string>
-            {
-                { "email_verification_link", verificationUri.ToString() },
-                { "notifications_uri", notificationsUri.ToString() }
-            },
-            uniqueId.ToString());
+        var verificationToken = _guidProvider.NewGuid();
+        await SendProviderVerificationEmail(emailAddress, verificationToken);
 
         //TODO: save to repository
-        //_notificationRepository.
+        _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
+
     }
 
     public async Task SendProviderNotificationEmail(int notificationId, string emailAddress)
@@ -444,9 +430,16 @@ public class ProviderDataService : IProviderDataService
                 { "notifications_uri", notificationsUri.ToString() }
             },
             uniqueId.ToString());
+    }
 
-        //TODO: save to repository?
-        //_notificationRepository.
+    public async Task VerifyNotificationEmail(string token)
+    {
+        if (!Guid.TryParse(token, out var realToken))
+        {
+            _logger.LogError("Invalid token received in VerifyNotificationEmail");
+        }
+
+        await _notificationRepository.RemoveEmailVerificationToken(realToken);
     }
 
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
@@ -559,6 +552,30 @@ public class ProviderDataService : IProviderDataService
             SearchResults = searchResults.ToList(),
             TotalResults = totalSearchResults
         };
+    }
+
+    private async Task SendProviderVerificationEmail(string emailAddress, Guid token)
+    {
+        var siteUri = new Uri(_providerSettings.ConnectSiteUri);
+        var notificationsUri = new Uri(siteUri, "notifications");
+        var verificationUri = new Uri(QueryHelpers.AddQueryString(
+            notificationsUri.AbsoluteUri.TrimEnd('/'),
+            "token",
+            token.ToString("D").ToLower()));
+        var verificationUri2 = new Uri(QueryHelpers.AddQueryString(
+            notificationsUri.AbsoluteUri,
+            "token",
+            token.ToString("D").ToLower()));
+
+        await _emailService.SendEmail(
+            emailAddress,
+            EmailTemplateNames.ProviderVerification,
+            new Dictionary<string, string>
+            {
+                { "email_verification_link", verificationUri.ToString() },
+                { "notifications_uri", notificationsUri.ToString() }
+            },
+            token.ToString());
     }
 
     private async Task ClearCaches()

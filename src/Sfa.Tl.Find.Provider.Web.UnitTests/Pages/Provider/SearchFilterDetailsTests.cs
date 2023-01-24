@@ -156,7 +156,7 @@ public class SearchFilterDetailsTests
         await searchFilterDetailsModel.OnGet(id);
 
         searchFilterDetailsModel.Input.Should().NotBeNull();
-        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius.ToString());
+        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class SearchFilterDetailsTests
 
         searchFilterDetailsModel.Input.Should().NotBeNull();
         searchFilterDetailsModel.Input!.LocationId.Should().Be(id);
-        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(searchRadius.ToString());
+        searchFilterDetailsModel.Input!.SelectedSearchRadius.Should().Be(searchRadius);
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public class SearchFilterDetailsTests
         detailsModel.Input = new SearchFilterDetailsModel.InputModel
         {
             LocationId = id,
-            SelectedSearchRadius = searchRadius.ToString(),
+            SelectedSearchRadius = searchRadius,
             SkillAreas = skillAreas
         };
 
@@ -261,7 +261,7 @@ public class SearchFilterDetailsTests
         detailsModel.Input = new SearchFilterDetailsModel.InputModel
         {
             LocationId = id,
-            SelectedSearchRadius = searchRadius.ToString(),
+            SelectedSearchRadius = searchRadius,
             SkillAreas = Array.Empty<SelectListItem>()
         };
 

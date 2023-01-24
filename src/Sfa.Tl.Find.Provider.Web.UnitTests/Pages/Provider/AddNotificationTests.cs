@@ -9,7 +9,7 @@ using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
-public  class AddNotificationTests
+public class AddNotificationTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
@@ -32,6 +32,38 @@ public  class AddNotificationTests
     }
 
     [Fact]
+    public async Task AddNotificationModel_OnGet_Sets_FrequencyOptions_Select_List()
+    {
+        var settings = new SettingsBuilder().BuildProviderSettings();
+
+        var notification = new NotificationBuilder()
+            .Build();
+        //var id = notification.Id!.Value;
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        //providerDataService
+        //    .GetNotification(id)
+        //    .Returns(notification);
+
+        var addNotificationModel = new AddNotificationModelBuilder()
+            .Build(providerDataService,
+                providerSettings: settings);
+
+        await addNotificationModel.OnGet();
+
+        addNotificationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        var options = addNotificationModel.FrequencyOptions;
+
+        options!.Length.Should().Be(3);
+        options[0].Should().Match<SelectListItem>(x =>
+            x.Text == "Immediately" && x.Value == "1");
+        options[1].Should().Match<SelectListItem>(x =>
+            x.Text == "Daily" && x.Value == "2");
+        options[2].Should().Match<SelectListItem>(x =>
+            x.Text == "Weekly" && x.Value == "3");
+    }
+
+    [Fact]
     public async Task AddNotificationModel_OnGet_Sets_Search_Radius_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
@@ -46,7 +78,7 @@ public  class AddNotificationTests
         //    .Returns(notification);
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService, 
+            .Build(providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -90,15 +122,15 @@ public  class AddNotificationTests
             .GetRoutes()
             .Returns(routes);
 
-        var addNotificationDetailModel = new AddNotificationModelBuilder()
-            .Build(providerDataService, 
+        var addNotificationModel = new AddNotificationModelBuilder()
+            .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationDetailModel.OnGet();
+        await addNotificationModel.OnGet();
 
-        addNotificationDetailModel.Input.Should().NotBeNull();
-        addNotificationDetailModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
-        var skillAreas = addNotificationDetailModel.Input.SkillAreas;
+        addNotificationModel.Input.Should().NotBeNull();
+        addNotificationModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
+        var skillAreas = addNotificationModel.Input.SkillAreas;
 
         skillAreas!.Length.Should().Be(routes.Count);
 
@@ -129,16 +161,18 @@ public  class AddNotificationTests
         //    .GetNotification(id)
         //    .Returns(notification);
 
-        var addNotificationDetailModel = new AddNotificationModelBuilder()
-            .Build(providerDataService, 
+        var addNotificationModel = new AddNotificationModelBuilder()
+            .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationDetailModel.OnGet();
+        await addNotificationModel.OnGet();
 
-        addNotificationDetailModel.Input.Should().NotBeNull();
-        //addNotificationDetailModel.Input!.NotificationId.Should().Be(id);
-        addNotificationDetailModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius.ToString());
-        addNotificationDetailModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
+        addNotificationModel.Input.Should().NotBeNull();
+        //addNotificationModel.Input!.NotificationId.Should().Be(id);
+        addNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        addNotificationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
+        addNotificationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
+        addNotificationModel.Input!.SelectedLocation.Should().Be(0);
     }
 
     [Fact]
@@ -158,16 +192,16 @@ public  class AddNotificationTests
         //    .GetNotification(id)
         //    .Returns(notification);
 
-        var addNotificationDetailModel = new AddNotificationModelBuilder()
+        var addNotificationModel = new AddNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationDetailModel.OnGet();
+        await addNotificationModel.OnGet();
 
-        addNotificationDetailModel.Input.Should().NotBeNull();
-        //addNotificationDetailModel.Input!.NotificationId.Should().Be(id);
-        addNotificationDetailModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius.ToString());
-        addNotificationDetailModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
+        addNotificationModel.Input.Should().NotBeNull();
+        //addNotificationModel.Input!.NotificationId.Should().Be(id);
+        addNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        addNotificationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
     }
 
     [Fact]
@@ -185,13 +219,13 @@ public  class AddNotificationTests
 
         var addNotificationModel = new AddNotificationModelBuilder()
             .Build(providerDataService);
-        
+
         addNotificationModel.Input = new AddNotificationModel.InputModel
         {
             Email = testEmail,
-            SelectedSearchRadius = "30",
+            SelectedSearchRadius = 30,
             SelectedFrequency = NotificationFrequency.Daily,
-            SkillAreas = new []
+            SkillAreas = new[]
             {
                 new SelectListItem("Value 1", "1", true)
             }
@@ -207,7 +241,7 @@ public  class AddNotificationTests
             .Received(1)
             .SaveNotification(Arg.Any<Notification>());
     }
-
+    
     [Fact]
     public async Task AddNotification_OnPost_Sets_TempData()
     {
@@ -235,10 +269,10 @@ public  class AddNotificationTests
         addNotificationModel.TempData
             .Keys
             .Should()
-            .Contain("AddedNotificationEmail");
+            .Contain("VerificationEmail");
 
         addNotificationModel.TempData
-            .Peek("AddedNotificationEmail")
+            .Peek("VerificationEmail")
             .Should()
             .Be(notification.Email);
     }

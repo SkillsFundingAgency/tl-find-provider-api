@@ -43,9 +43,7 @@
                 <div id="campus-hint" class="govuk-hint">
                     Select the campus you want to set up a notification for
                 </div>
-                <select class="govuk-select" id="campus" name="campus" aria-describedby="campus-hint">
-                    <option value="Campus A">Campus A</option>
-                    <option value="Campus B">Campus B</option>
+                <select class="govuk-select" aria-describedby="campus-hint" asp-for="Input!.SelectedLocation" asp-items="Model.Locations">
                 </select>
             </div>
 
@@ -54,10 +52,6 @@
                     Notification frequency
                 </label>
                 <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedFrequency" asp-items="Model.FrequencyOptions">
-                    @*<select class="govuk-select" id="frequency" name="frequency">
-                    <option value="Immediately">Immediately</option>
-                    <option value="Daily">Daily</option>
-                    <option value="Weekly">Weekly</option>*@
                 </select>
             </div>
 
@@ -66,14 +60,6 @@
                     Receive notifications for employers within:
                 </label>
                 <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSearchRadius" asp-items="Model.SearchRadiusOptions" >
-                @*<select class="govuk-select" id="within" name="within">
-                    <option value="5 miles">5 miles</option>
-                    <option value="10 miles">10 miles</option>
-                    <option value="20 miles">20 miles</option>
-                    <option value="30 miles">30 miles</option>
-                    <option value="40 miles">40 miles</option>
-                    <option value="50 miles">50 miles</option>
-                    *@
                 </select>
             </div>
 
@@ -101,84 +87,6 @@
                                 <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Text" />
                             </div>
                         }
-@*                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="agriculture" name="agriculture" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="agriculture">
-                                Agriculture, Environment and Animal Care
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="business" name="business" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="business">
-                                Business and Administration
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="arts" name="arts" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="arts">
-                                Arts, Entertainment, and Recreation
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="catering" name="catering" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="catering">
-                                Catering
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="construction" name="construction" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="construction">
-                                Construction and the Built Environment
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="craft" name="craft" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="craft">
-                                Craft and Design
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="creative" name="creative" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="creative">
-                                Creative and Design
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="digital" name="digital" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="digital">
-                                Digital and IT
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="education" name="education" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="education">
-                                Education and Childcare
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="engineering" name="engineering" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="engineering">
-                                Engineering and Manufacturing
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="hair" name="hair" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="hair">
-                                Hair and Beauty
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="health" name="health" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="health">
-                                Health and Science
-                            </label>
-                        </div>
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="legal" name="legal" type="checkbox" value="">
-                            <label class="govuk-label govuk-checkboxes__label" for="legal">
-                                Legal, Finance and Accounting
-                            </label>
-                        </div>*@
                     </div>
                 </fieldset>
             </div>

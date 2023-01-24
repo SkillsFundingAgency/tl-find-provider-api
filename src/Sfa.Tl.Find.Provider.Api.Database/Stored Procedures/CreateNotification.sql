@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[CreateNotification]
 	@email NVARCHAR(320),
-	@emailVerificationToken UNIQUEIDENTIFIER,
+	@verificationToken UNIQUEIDENTIFIER,
 	@frequency INT,
 	@searchRadius INT,
 	@locationId INT,
@@ -26,7 +26,7 @@ AS
 		VerificationToken)
 	VALUES (@newId,
 		@email,
-		@emailVerificationToken)
+		@verificationToken)
 
 	INSERT INTO [dbo].[NotificationRoute] (
 		NotificationId, 

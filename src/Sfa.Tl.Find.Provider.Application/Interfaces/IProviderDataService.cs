@@ -56,4 +56,6 @@ public interface IProviderDataService
     Task SendProviderVerificationEmail(int notificationId, string emailAddress);
 
     Task SendProviderNotificationEmail(int notificationId, string emailAddress);
+
+    Task VerifyNotificationEmail(string token);
 }

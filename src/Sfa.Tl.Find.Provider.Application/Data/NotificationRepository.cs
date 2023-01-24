@@ -6,6 +6,7 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Data;
+
 public class NotificationRepository : INotificationRepository
 {
     private readonly IDbContextWrapper _dbContextWrapper;
@@ -20,7 +21,8 @@ public class NotificationRepository : INotificationRepository
         ILogger<NotificationRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
-        _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
+        _dynamicParametersWrapper = dynamicParametersWrapper ??
+                                    throw new ArgumentNullException(nameof(dynamicParametersWrapper));
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -41,7 +43,8 @@ public class NotificationRepository : INotificationRepository
             commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn, bool includeAdditionalData)
+    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn,
+        bool includeAdditionalData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -173,7 +176,7 @@ public class NotificationRepository : INotificationRepository
                 _dynamicParametersWrapper.CreateParameters(new
                 {
                     email = notification.Email,
-                    emailVerificationToken = notification.EmailVerificationToken,
+                    verificationToken = notification.EmailVerificationToken,
                     frequency = notification.Frequency,
                     searchRadius = notification.SearchRadius,
                     locationId = notification.LocationId,
@@ -191,7 +194,66 @@ public class NotificationRepository : INotificationRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred when saving employer interest");
+            _logger.LogError(ex, "An error occurred when saving a notification");
+            throw;
+        }
+    }
+
+    public async Task SaveEmailVerificationToken(
+        int notificationId,
+        string emailAddress,
+        Guid? verificationToken)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                notificationId,
+                email = emailAddress,
+                verificationToken,
+            });
+
+            await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "UPDATE dbo.NotificationEmail " +
+                "SET VerificationToken = @verificationToken, " +
+                "    ModifiedOn = GETUTCDATE() " +
+                "WHERE NotificationId = @notificationId " +
+                "  AND Email = @email",
+                _dynamicParametersWrapper.DynamicParameters);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when saving a notification email verification token");
+            throw;
+        }
+    }
+
+    public async Task RemoveEmailVerificationToken(
+        Guid verificationToken)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                verificationToken,
+            });
+
+            await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "UPDATE dbo.NotificationEmail " +
+                "SET VerificationToken = NULL, " +
+                "    ModifiedOn = GETUTCDATE() " +
+                "WHERE VerificationToken = @verificationToken",
+                _dynamicParametersWrapper.DynamicParameters);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when saving a notification email verification token");
             throw;
         }
     }

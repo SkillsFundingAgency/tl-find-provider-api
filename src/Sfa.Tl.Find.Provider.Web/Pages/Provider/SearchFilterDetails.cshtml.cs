@@ -52,29 +52,10 @@ public class SearchFilterDetailsModel : PageModel
         {
             Input ??= new InputModel();
             Input.LocationId = id;
-            Input.SelectedSearchRadius =
-                (SearchFilter.SearchRadius ?? DefaultSearchRadius)
-                .ToString();
+            Input.SelectedSearchRadius = SearchFilter.SearchRadius ?? DefaultSearchRadius;
 
-            SearchRadiusOptions =
-                new List<int> { 5, 10, 20, 30, 40, 50 }
-                    .Select(p => new SelectListItem(
-                        $"{p} miles",
-                        p.ToString(),
-                p.ToString() == Input?.SelectedSearchRadius)
-                )
-                .OrderBy(x => int.Parse(x.Value))
-                .ToArray();
-
-            Input.SkillAreas = (await _providerDataService
-                .GetRoutes())
-                .Select(r => new SelectListItem(
-                    r.Name,
-                    r.Id.ToString(),
-                    SearchFilter.Routes.Any(x => r.Id == x.Id))
-                )
-                .OrderBy(x => x.Text)
-                .ToArray();
+            SearchRadiusOptions = LoadSearchRadiusOptions(Input?.SelectedSearchRadius);
+            Input.SkillAreas = await LoadSkillAreaOptions(SearchFilter.Routes.ToList());
         }
 
         return SearchFilter != null ?
@@ -103,8 +84,8 @@ public class SearchFilterDetailsModel : PageModel
         var searchFilter = new SearchFilter
         {
             LocationId = Input!.LocationId,
-            SearchRadius = Input?.SelectedSearchRadius is not null ?
-                int.Parse(Input!.SelectedSearchRadius)
+            SearchRadius = Input?.SelectedSearchRadius is not null 
+                ? Input!.SelectedSearchRadius
                 : _providerSettings.DefaultSearchRadius,
             Routes = routes
         };
@@ -114,11 +95,36 @@ public class SearchFilterDetailsModel : PageModel
         return RedirectToPage("/Provider/SearchFilters");
     }
 
+    private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
+    {
+        return new List<int> { 5, 10, 20, 30, 40, 50 }
+            .Select(p => new SelectListItem(
+                $"{p} miles",
+                p.ToString(),
+                p == selectedValue)
+            )
+            .OrderBy(x => int.Parse(x.Value))
+            .ToArray();
+    }
+
+    private async Task<SelectListItem[]> LoadSkillAreaOptions(IList<Route> selectedRoutes)
+    {
+        return (await _providerDataService
+                .GetRoutes())
+            .Select(r => new SelectListItem(
+                r.Name,
+                r.Id.ToString(),
+                selectedRoutes.Any(x => r.Id == x.Id))
+            )
+            .OrderBy(x => x.Text)
+            .ToArray();
+    }
+
     public class InputModel
     {
         public int LocationId { get; set; }
 
-        public string? SelectedSearchRadius { get; set; }
+        public int? SelectedSearchRadius { get; set; }
 
         public SelectListItem[]? SkillAreas { get; set; }
     }

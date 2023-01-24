@@ -44,13 +44,23 @@ public class NotificationsModel : PageModel
                             ?? throw new ArgumentNullException(nameof(providerOptions));
     }
 
-    public async Task OnGet()
+    public async Task<IActionResult> OnGet(
+        [FromQuery(Name="token")] string? token = null)
     {
+        if (token is not null)
+        {
+            await _providerDataService
+                .VerifyNotificationEmail(token);
+            return RedirectToPage("/Provider/Notifications");
+        }
+
         var ukPrn = HttpContext.User.GetUkPrn();
         if (ukPrn > 0)
         {
             NotificationList = await _providerDataService.GetNotificationSummaryList(ukPrn.Value);
         }
+
+        return Page();
     }
 
     public async Task<IActionResult> OnGetResendEmailVerification(int id)

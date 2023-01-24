@@ -13,4 +13,8 @@ public interface INotificationRepository
     Task<Notification> GetNotification(int locationId);
 
     Task Save(Notification notification);
+
+    Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? verificationToken);
+
+    Task RemoveEmailVerificationToken(Guid verificationToken);
 }

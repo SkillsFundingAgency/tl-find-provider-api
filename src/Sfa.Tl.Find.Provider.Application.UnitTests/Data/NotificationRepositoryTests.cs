@@ -77,7 +77,7 @@ public class NotificationRepositoryTests
     {
         const long ukPrn = 12345678;
         const bool includeAdditionalData = true;
-        
+
         var dbContextWrapper = new DbContextWrapperBuilder()
             .BuildSubstitute();
 
@@ -219,7 +219,7 @@ public class NotificationRepositoryTests
 
         templates.GetDynamicTemplatesCount().Should().Be(6);
         templates.ContainsNameAndValue("email", notification.Email);
-        templates.ContainsNameAndValue("emailVerificationToken", notification.EmailVerificationToken);
+        templates.ContainsNameAndValue("verificationToken", notification.EmailVerificationToken);
         templates.ContainsNameAndValue("frequency", notification.Frequency);
         templates.ContainsNameAndValue("locationId", notification.LocationId);
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
@@ -280,5 +280,115 @@ public class NotificationRepositoryTests
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
         templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
             .Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task SaveEmailVerificationToken_Calls_Database()
+    {
+        var verificationToken = Guid.Parse("d1cece97-ce55-4c5b-8216-2cd65490d0b2");
+        var notification = new NotificationBuilder()
+            .Build();
+        
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .Build();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper);
+
+        await repository.SaveEmailVerificationToken(notification.Id!.Value, notification.Email, verificationToken);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("UPDATE dbo.NotificationEmail") &&
+                    s.Contains("SET VerificationToken = @verificationToken,") &&
+                    s.Contains("ModifiedOn = GETUTCDATE()") &&
+                    s.Contains("WHERE NotificationId = @notificationId") &&
+                    s.Contains("AND Email = @email")),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+    }
+
+    [Fact]
+    public async Task SaveEmailVerificationToken_Sets_Dynamic_Parameters()
+    {
+        var verificationToken = Guid.Parse("d1cece97-ce55-4c5b-8216-2cd65490d0b2");
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.SaveEmailVerificationToken(notification.Id!.Value, notification.Email, verificationToken);
+        
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(3);
+        templates.ContainsNameAndValue("notificationId", notification.Id);
+        templates.ContainsNameAndValue("email", notification.Email);
+        templates.ContainsNameAndValue("verificationToken", verificationToken);
+    }
+
+
+    [Fact]
+    public async Task RemoveEmailVerificationToken_Calls_Database()
+    {
+        var verificationToken = Guid.Parse("d1cece97-ce55-4c5b-8216-2cd65490d0b2");
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .Build();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper);
+
+        await repository.RemoveEmailVerificationToken(verificationToken);
+        
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("UPDATE dbo.NotificationEmail") &&
+                    s.Contains("SET VerificationToken = NULL") &&
+                    s.Contains("ModifiedOn = GETUTCDATE()") &&
+                    s.Contains("WHERE VerificationToken = @verificationToken")),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+    }
+
+    [Fact]
+    public async Task RemoveEmailVerificationToken_Sets_Dynamic_Parameters()
+    {
+        var verificationToken = Guid.Parse("d1cece97-ce55-4c5b-8216-2cd65490d0b2");
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.RemoveEmailVerificationToken(verificationToken);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("verificationToken", verificationToken);
     }
 }
