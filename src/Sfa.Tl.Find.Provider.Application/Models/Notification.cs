@@ -10,10 +10,14 @@ public class Notification
 
     public string Email { get; init; }
 
+    public bool IsEmailVerified { get; init; }
+
+    public Guid? EmailVerificationToken { get; set; }
+
     public NotificationFrequency Frequency { get; init; }
 
     public int? SearchRadius { get; init; }
-    
+
     public int? LocationId { get; init; }
 
     public string LocationName { get; init; }

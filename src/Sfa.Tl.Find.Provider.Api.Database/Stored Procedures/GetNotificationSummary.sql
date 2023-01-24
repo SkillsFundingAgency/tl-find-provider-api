@@ -13,7 +13,10 @@ AS
 	  AND	(@includeAdditionalData = 1 OR (@includeAdditionalData = 0 AND p.[IsAdditionalData] = 0))
 	)
 	 SELECT n.[Id],
-		   n.[Email],
+		   e.[Email],
+		   CASE	WHEN e.VerificationToken IS NULL THEN 1
+				ELSE 0
+			END AS [IsEmailVerified],
 		   l.[Id] AS [LocationId],
 		   l.[Name] AS [LocationName],
 		   l.[Postcode]
@@ -22,9 +25,11 @@ AS
 	  	ON	p.[Id] = l.[ProviderId]
 		INNER JOIN [dbo].[Notification] n
 		ON n.[LocationId] = l.[Id]
+		INNER JOIN [dbo].[NotificationEmail] e
+		ON e.[NotificationId] = n.[Id]
 		WHERE	l.[IsDeleted] = 0
 		  --Only include the first row to make sure main data set takes priority
 		  AND	p.[ProviderRowNum] = 1
-	ORDER BY	n.[Email],
+	ORDER BY	e.[Email],
 				[LocationId],
 				[LocationName]

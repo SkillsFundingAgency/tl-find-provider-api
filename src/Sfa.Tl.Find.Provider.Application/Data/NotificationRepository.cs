@@ -66,6 +66,7 @@ public class NotificationRepository : INotificationRepository
                             {
                                 Id = n.Id,
                                 Email = n.Email,
+                                IsEmailVerified = n.IsEmailVerified,
                                 Locations = new List<LocationPostcode>()
                             });
                     }
@@ -111,17 +112,18 @@ public class NotificationRepository : INotificationRepository
             .QueryAsync<NotificationDto, RouteDto, Notification>(
                 connection,
                 "GetNotificationDetail",
-                (e, r) =>
+                (n, r) =>
                 {
                     notification ??= new Notification
                     {
-                        Id = e.Id,
-                        Email = e.Email,
-                        Frequency = e.Frequency,
-                        SearchRadius = e.SearchRadius,
-                        LocationId = e.LocationId,
-                        LocationName = e.LocationName,
-                        Postcode = e.Postcode,
+                        Id = n.Id,
+                        Email = n.Email,
+                        IsEmailVerified = n.IsEmailVerified,
+                        Frequency = n.Frequency,
+                        SearchRadius = n.SearchRadius,
+                        LocationId = n.LocationId,
+                        LocationName = n.LocationName,
+                        Postcode = n.Postcode,
                         Routes = new List<Route>()
                     };
 
@@ -171,6 +173,7 @@ public class NotificationRepository : INotificationRepository
                 _dynamicParametersWrapper.CreateParameters(new
                 {
                     email = notification.Email,
+                    emailVerificationToken = notification.EmailVerificationToken,
                     frequency = notification.Frequency,
                     searchRadius = notification.SearchRadius,
                     locationId = notification.LocationId,

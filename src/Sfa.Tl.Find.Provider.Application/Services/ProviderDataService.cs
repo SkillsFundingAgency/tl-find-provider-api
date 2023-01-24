@@ -382,6 +382,11 @@ public class ProviderDataService : IProviderDataService
 
     public async Task SaveNotification(Notification notification)
     {
+        if (notification.Id is null)
+        {
+            notification.EmailVerificationToken = _guidProvider.NewGuid();
+        }
+
         await _notificationRepository.Save(notification);
     }
 

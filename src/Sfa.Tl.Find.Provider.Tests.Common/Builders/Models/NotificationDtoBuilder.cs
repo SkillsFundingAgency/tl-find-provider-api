@@ -10,9 +10,11 @@ public class NotificationDtoBuilder
             .Select(n => new NotificationDto
             {
                 Id = n.Id,
+                Email = n.Email,
+                IsEmailVerified = n.IsEmailVerified,
+                EmailVerificationToken = n.EmailVerificationToken,
                 LocationId = n.LocationId,
                 LocationName = n.LocationName,
-                Email = n.Email,
                 Postcode = n.Postcode,
                 SearchRadius = n.SearchRadius
             })

@@ -16,20 +16,23 @@ public class NotificationBuilder
             new()
             {
                 Id = _useNullId ? null : 1,
+                Email = "test@provider1.co.uk",
+                IsEmailVerified = true,
                 LocationId = 1,
                 LocationName= "Test Location 1",
                 Postcode = "CV1 2WT",
-                Email = "test@provider1.co.uk",
                 SearchRadius = _searchRadius,
                 Frequency = _frequency
             },
             new()
             {
                 Id = _useNullId ? null : 2,
+                Email = "test@provider2.co.uk",
+                IsEmailVerified = false,
+                EmailVerificationToken = Guid.Parse("b61cd465-1836-4a44-bf60-51a1f7254285"),
                 LocationId = 1,
                 LocationName= "Test Location 2",
                 Postcode = "CV1 2WT",
-                Email = "test@provider2.co.uk",
                 SearchRadius = _searchRadius,
                 Frequency = _frequency,
                 Routes = new List<Route>

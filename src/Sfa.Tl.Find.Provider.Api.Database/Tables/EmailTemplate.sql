@@ -5,4 +5,4 @@
 	[TemplateId] NVARCHAR(50) NOT NULL, 
 	[CreatedOn] DATETIME2 NOT NULL DEFAULT GETUTCDATE(), 
 	[ModifiedOn] DATETIME2 NULL, 
-    CONSTRAINT [PK_EmailTemplates] PRIMARY KEY ([Id]))
+    CONSTRAINT [PK_EmailTemplate] PRIMARY KEY ([Id]))

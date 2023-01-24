@@ -145,6 +145,9 @@
     <Build Include="Stored Procedures\GetNotificationSummary.sql" />
     <Build Include="Stored Procedures\CreateNotification.sql" />
     <Build Include="Stored Procedures\UpdateNotification.sql" />
+    <Build Include="Tables\NotificationEmail.sql" />
+    <Build Include="Stored Procedures\DeleteSearchFilter.sql" />
+    <None Include="Indexes\IX_NotificationEmail_NotificationId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

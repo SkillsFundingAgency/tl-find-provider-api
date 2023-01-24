@@ -4,6 +4,9 @@ AS
 
 	SET NOCOUNT ON;
 	
+	DELETE FROM [dbo].[NotificationEmail]
+	WHERE [NotificationId] = @notificationId;
+
 	DELETE FROM [dbo].[NotificationRoute]
 	WHERE [NotificationId] = @notificationId;
 	

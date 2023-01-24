@@ -366,6 +366,8 @@ public static class ModelValidationExtensions
     {
         notification.Id.Should().Be(expected.Id);
         notification.Email.Should().Be(expected.Email);
+        notification.IsEmailVerified.Should().Be(expected.IsEmailVerified);
+        notification.EmailVerificationToken.Should().Be(expected.EmailVerificationToken);
         notification.Frequency.Should().Be(expected.Frequency);
         notification.LocationId.Should().Be(expected.LocationId);
         notification.LocationName.Should().Be(expected.LocationName);
@@ -373,9 +375,10 @@ public static class ModelValidationExtensions
         notification.SearchRadius.Should().Be(expected.SearchRadius);
     }
 
-    public static void Validate(this NotificationSummary notification, NotificationSummaryDto expected)
+    public static void Validate(this NotificationSummary notificationSummary, NotificationSummaryDto expected)
     {
-        notification.Id.Should().Be(expected.Id);
-        notification.Email.Should().Be(expected.Email);
+        notificationSummary.Id.Should().Be(expected.Id);
+        notificationSummary.Email.Should().Be(expected.Email);
+        notificationSummary.IsEmailVerified.Should().Be(expected.IsEmailVerified);
     }
 }

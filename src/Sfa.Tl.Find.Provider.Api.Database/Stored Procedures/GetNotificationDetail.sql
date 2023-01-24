@@ -2,7 +2,10 @@
 	@notificationId INT
 AS
 	SELECT n.[Id],
-		   n.[Email],
+		   e.[Email],
+		   CASE	WHEN e.VerificationToken IS NULL THEN 1
+				ELSE 0
+			END AS [IsEmailVerified],
 		   n.[Frequency],
 		   n.[SearchRadius],
 		   l.[Id] AS [LocationId],
@@ -13,11 +16,13 @@ AS
 	FROM [Notification] n
 	LEFT JOIN	[dbo].[Location] l
 	ON	l.[Id] = n.[LocationId]
+	INNER JOIN [dbo].[NotificationEmail] e
+	ON e.[NotificationId] = n.[Id]
 	LEFT JOIN [dbo].[NotificationRoute] nr
 	ON nr.[NotificationId] = n.[Id]
 	LEFT JOIN [Route] r
 	ON r.[Id] = nr.[RouteId]
 	WHERE n.[Id] = @notificationId
 	ORDER BY	[LocationName],
-				n.[Email],
+				e.[Email],
 				r.[Name]

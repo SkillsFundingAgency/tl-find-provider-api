@@ -217,8 +217,9 @@ public class NotificationRepositoryTests
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
-        templates.GetDynamicTemplatesCount().Should().Be(5);
+        templates.GetDynamicTemplatesCount().Should().Be(6);
         templates.ContainsNameAndValue("email", notification.Email);
+        templates.ContainsNameAndValue("emailVerificationToken", notification.EmailVerificationToken);
         templates.ContainsNameAndValue("frequency", notification.Frequency);
         templates.ContainsNameAndValue("locationId", notification.LocationId);
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
