@@ -141,7 +141,6 @@
     <Build Include="Tables\NotificationRoute.sql" />
     <None Include="Indexes\IX_NotificationRoute_RouteId.sql" />
     <None Include="Indexes\IX_NotificationRoute_NotificationId.sql" />
-    <Build Include="Stored Procedures\CreateOrUpdateNotification.sql" />
     <Build Include="Stored Procedures\GetNotificationSummary.sql" />
     <Build Include="Stored Procedures\CreateNotification.sql" />
     <Build Include="Stored Procedures\UpdateNotification.sql" />
@@ -150,7 +149,7 @@
     <None Include="Indexes\IX_NotificationEmail_NotificationId.sql" />
     <Build Include="Tables\ProviderNotification.sql" />
     <None Include="Indexes\IX_ProviderNotification_NotificationId.sql" />
-    <None Include="Indexes\Copy of IX_ProviderNotification_NotificationId.sql" />
+    <None Include="Indexes\IX_ProviderNotification_ProviderId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />
