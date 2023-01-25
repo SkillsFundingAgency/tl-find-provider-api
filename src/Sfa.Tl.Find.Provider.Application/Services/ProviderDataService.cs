@@ -2,7 +2,6 @@
 using System.Text.Json;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.ClassMaps;
@@ -405,9 +404,7 @@ public class ProviderDataService : IProviderDataService
         var verificationToken = _guidProvider.NewGuid();
         await SendProviderVerificationEmail(emailAddress, verificationToken);
 
-        //TODO: save to repository
-        _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
-
+        await _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
     }
 
     public async Task SendProviderNotificationEmail(int notificationId, string emailAddress)
@@ -559,10 +556,6 @@ public class ProviderDataService : IProviderDataService
         var siteUri = new Uri(_providerSettings.ConnectSiteUri);
         var notificationsUri = new Uri(siteUri, "notifications");
         var verificationUri = new Uri(QueryHelpers.AddQueryString(
-            notificationsUri.AbsoluteUri.TrimEnd('/'),
-            "token",
-            token.ToString("D").ToLower()));
-        var verificationUri2 = new Uri(QueryHelpers.AddQueryString(
             notificationsUri.AbsoluteUri,
             "token",
             token.ToString("D").ToLower()));

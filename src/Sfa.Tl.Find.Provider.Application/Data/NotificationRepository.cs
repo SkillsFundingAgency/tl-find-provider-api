@@ -159,12 +159,12 @@ public class NotificationRepository : INotificationRepository
                 .Select(r => r.Id)
                 .AsTableValuedParameter("dbo.IdListTableType");
 
-            if (notification.Id is > 0)
+            if (notification.Id is null or 0)
             {
                 _dynamicParametersWrapper.CreateParameters(new
                 {
-                    id = notification.Id.Value,
                     email = notification.Email,
+                    verificationToken = notification.EmailVerificationToken,
                     frequency = notification.Frequency,
                     searchRadius = notification.SearchRadius,
                     locationId = notification.LocationId,
@@ -175,8 +175,8 @@ public class NotificationRepository : INotificationRepository
             {
                 _dynamicParametersWrapper.CreateParameters(new
                 {
+                    id = notification.Id.Value,
                     email = notification.Email,
-                    verificationToken = notification.EmailVerificationToken,
                     frequency = notification.Frequency,
                     searchRadius = notification.SearchRadius,
                     locationId = notification.LocationId,

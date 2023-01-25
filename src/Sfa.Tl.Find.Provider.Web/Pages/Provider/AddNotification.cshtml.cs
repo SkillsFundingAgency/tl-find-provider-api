@@ -75,13 +75,10 @@ public class AddNotificationModel : PageModel
                 .ToList()
             : new List<Route>();
 
-        //TODO: Campus dropdown
-        var locationId = 2;
-
         var notification = new Notification
         {
             Email = Input.Email,
-            LocationId = locationId,
+            LocationId = Input.SelectedLocation is not null && Input.SelectedLocation > 0 ? Input.SelectedLocation : null,
             Frequency = Input.SelectedFrequency,
             SearchRadius = Input.SelectedSearchRadius ?? _providerSettings.DefaultSearchRadius,
             Routes = routes
