@@ -239,8 +239,8 @@ public class AddNotificationTests
 
         await providerDataService
             .Received(1)
-            .SaveNotification(Arg.Any<Notification>(), 
-                Arg.Any<long>());
+            .SaveNotification(Arg.Any<Notification>(),
+                PageContextBuilder.DefaultUkPrn);
     }
     
     [Fact]
@@ -276,5 +276,38 @@ public class AddNotificationTests
             .Peek("VerificationEmail")
             .Should()
             .Be(notification.Email);
+    }
+
+    [Fact]
+    public async Task AddNotification_OnPostAddLocation_Saves_To_Repository_And_Redirects()
+    {
+        const string testEmail = "test@test.com";
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+
+        var addNotificationModel = new AddNotificationModelBuilder()
+            .Build(providerDataService);
+
+        addNotificationModel.Input = new AddNotificationModel.InputModel
+        {
+            Email = testEmail,
+            SelectedSearchRadius = 30,
+            SelectedFrequency = NotificationFrequency.Daily,
+            SkillAreas = new[]
+            {
+                new SelectListItem("Value 1", "1", true)
+            }
+        };
+
+        var result = await addNotificationModel.OnPostAddLocation();
+
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Provider/Notifications");
+        
+        await providerDataService
+            .Received(1)
+            .SaveNotification(Arg.Any<Notification>(),
+                PageContextBuilder.DefaultUkPrn);
     }
 }

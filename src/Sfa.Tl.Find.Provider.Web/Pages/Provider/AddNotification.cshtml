@@ -59,7 +59,7 @@
                 <label class="govuk-label govuk-!-font-weight-bold" for="within">
                     Receive notifications for employers within:
                 </label>
-                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSearchRadius" asp-items="Model.SearchRadiusOptions" >
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSearchRadius" asp-items="Model.SearchRadiusOptions">
                 </select>
             </div>
 
@@ -79,8 +79,8 @@
                             var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
                             var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
-                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
+                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
                                     @skillArea.value.Text
                                 </label>
                                 <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
@@ -91,9 +91,8 @@
                 </fieldset>
             </div>
             <button type="submit" class="govuk-button govuk-!-margin-right-2">Save and finish</button>
-            <button class="govuk-button govuk-button--secondary">Add another notification for this email</button>
+            <button type="submit" asp-page-handler="AddLocation" class="govuk-button govuk-button--secondary">Add another notification for this email</button>
             <a asp-page="./Notifications" class="govuk-link govuk-!-padding-2 tl-display--inline-block">Cancel</a>
         </form>
-
     </div>
 </div>

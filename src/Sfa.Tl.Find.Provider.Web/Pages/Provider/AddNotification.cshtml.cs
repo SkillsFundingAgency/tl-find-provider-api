@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -63,20 +62,31 @@ public class AddNotificationModel : PageModel
             return Page();
         }
 
+        await Save();
+
+        TempData[nameof(NotificationsModel.VerificationEmail)] = Input!.Email;
+
+        return RedirectToPage("/Provider/Notifications");
+    }
+
+    public async Task<IActionResult> OnPostAddLocation()
+    {
+        if (!ModelState.IsValid)
+        {
+            await LoadNotificationView();
+            return Page();
+        }
+
+        await Save();
+
+        return RedirectToPage("/Provider/Notifications");
+    }
+
+    private async Task Save()
+    {
         var ukPrn = HttpContext.User.GetUkPrn().Value;
 
         var routes = GetSelectedSkillAreas(Input!.SkillAreas);
-            //Input!.SkillAreas != null
-            //? Input
-            //    .SkillAreas
-            //    .Where(s => s.Selected)
-            //    .Select(s =>
-            //        new Route
-            //        {
-            //            Id = int.Parse(s.Value)
-            //        })
-            //    .ToList()
-            //: new List<Route>();
 
         var notification = new Notification
         {
@@ -88,10 +98,6 @@ public class AddNotificationModel : PageModel
         };
 
         await _providerDataService.SaveNotification(notification, ukPrn);
-
-        TempData[nameof(NotificationsModel.VerificationEmail)] = notification.Email;
-
-        return RedirectToPage("/Provider/Notifications");
     }
 
     private async Task LoadNotificationView()
