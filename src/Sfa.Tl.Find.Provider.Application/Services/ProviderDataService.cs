@@ -379,14 +379,14 @@ public class ProviderDataService : IProviderDataService
         _logger.LogInformation("Loaded {count} providers from stream.", count);
     }
 
-    public async Task SaveNotification(Notification notification)
+    public async Task SaveNotification(Notification notification, long ukPrn)
     {
         if (notification.Id is null)
         {
             notification.EmailVerificationToken = _guidProvider.NewGuid();
         }
 
-        await _notificationRepository.Save(notification);
+        await _notificationRepository.Save(notification, ukPrn);
 
         if (notification.EmailVerificationToken is not null)
         {

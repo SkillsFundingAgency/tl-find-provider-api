@@ -63,17 +63,20 @@ public class AddNotificationModel : PageModel
             return Page();
         }
 
-        var routes = Input!.SkillAreas != null
-            ? Input
-                .SkillAreas
-                .Where(s => s.Selected)
-                .Select(s =>
-                    new Route
-                    {
-                        Id = int.Parse(s.Value)
-                    })
-                .ToList()
-            : new List<Route>();
+        var ukPrn = HttpContext.User.GetUkPrn().Value;
+
+        var routes = GetSelectedSkillAreas(Input!.SkillAreas);
+            //Input!.SkillAreas != null
+            //? Input
+            //    .SkillAreas
+            //    .Where(s => s.Selected)
+            //    .Select(s =>
+            //        new Route
+            //        {
+            //            Id = int.Parse(s.Value)
+            //        })
+            //    .ToList()
+            //: new List<Route>();
 
         var notification = new Notification
         {
@@ -84,7 +87,7 @@ public class AddNotificationModel : PageModel
             Routes = routes
         };
 
-        await _providerDataService.SaveNotification(notification);
+        await _providerDataService.SaveNotification(notification, ukPrn);
 
         TempData[nameof(NotificationsModel.VerificationEmail)] = notification.Email;
 
@@ -169,6 +172,20 @@ public class AddNotificationModel : PageModel
             .OrderBy(x => x.Text)
             .Prepend(new SelectListItem("All", "0", selectedValue is null or 0 ))
             .ToArray();
+    }
+
+    private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)
+    {
+        return selectList != null
+            ? selectList
+                .Where(s => s.Selected)
+                .Select(s =>
+                    new Route
+                    {
+                        Id = int.Parse(s.Value)
+                    })
+                .ToList()
+            : new List<Route>();
     }
 
     public class InputModel

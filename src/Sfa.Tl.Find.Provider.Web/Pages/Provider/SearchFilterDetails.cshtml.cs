@@ -69,17 +69,7 @@ public class SearchFilterDetailsModel : PageModel
         {
         }
 
-        var routes = Input?.SkillAreas != null
-            ? Input
-                .SkillAreas
-                .Where(s => s.Selected)
-                .Select(s =>
-                    new Route
-                    {
-                        Id = int.Parse(s.Value)
-                    })
-                .ToList()
-            : new List<Route>();
+        var routes = GetSelectedSkillAreas(Input?.SkillAreas);
 
         var searchFilter = new SearchFilter
         {
@@ -118,6 +108,20 @@ public class SearchFilterDetailsModel : PageModel
             )
             .OrderBy(x => x.Text)
             .ToArray();
+    }
+
+    private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)
+    {
+        return selectList != null
+            ? selectList
+                .Where(s => s.Selected)
+                .Select(s =>
+                    new Route
+                    {
+                        Id = int.Parse(s.Value)
+                    })
+                .ToList()
+            : new List<Route>();
     }
 
     public class InputModel

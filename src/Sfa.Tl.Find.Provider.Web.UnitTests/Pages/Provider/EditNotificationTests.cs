@@ -234,6 +234,7 @@ public  class EditNotificationTests
 
         await providerDataService
             .Received(1)
-            .SaveNotification(Arg.Any<Notification>());
+            .SaveNotification(Arg.Any<Notification>(),
+                Arg.Any<long>());
     }
 }

@@ -49,7 +49,7 @@ public interface IProviderDataService
 
     Task ImportProviderData(Stream stream, bool isAdditionalData);
 
-    Task SaveNotification(Notification notification);
+    Task SaveNotification(Notification notification, long ukPrn);
 
     Task SaveSearchFilter(SearchFilter searchFilter);
     

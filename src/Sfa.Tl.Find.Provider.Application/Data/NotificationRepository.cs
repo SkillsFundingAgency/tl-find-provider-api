@@ -149,7 +149,7 @@ public class NotificationRepository : INotificationRepository
         return notification;
     }
 
-    public async Task Save(Notification notification)
+    public async Task Save(Notification notification, long ukPrn)
     {
         try
         {
@@ -163,6 +163,7 @@ public class NotificationRepository : INotificationRepository
             {
                 _dynamicParametersWrapper.CreateParameters(new
                 {
+                    ukPrn,
                     email = notification.Email,
                     verificationToken = notification.EmailVerificationToken,
                     frequency = notification.Frequency,

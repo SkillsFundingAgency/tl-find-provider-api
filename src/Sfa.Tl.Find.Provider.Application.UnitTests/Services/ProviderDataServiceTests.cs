@@ -215,11 +215,11 @@ public class ProviderDataServiceTests
         var service = new ProviderDataServiceBuilder()
             .Build(notificationRepository: notificationRepository);
 
-        await service.SaveNotification(notification);
+        await service.SaveNotification(notification, TestUkPrn);
 
         await notificationRepository
             .Received(1)
-            .Save(notification);
+            .Save(notification, TestUkPrn);
     }
 
 
@@ -261,7 +261,7 @@ public class ProviderDataServiceTests
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
 
-        await service.SaveNotification(notification);
+        await service.SaveNotification(notification, TestUkPrn);
 
         await emailService
             .Received(1)
@@ -313,7 +313,7 @@ public class ProviderDataServiceTests
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
 
-        await service.SaveNotification(notification);
+        await service.SaveNotification(notification, 0);
 
         await emailService
             .DidNotReceiveWithAnyArgs()

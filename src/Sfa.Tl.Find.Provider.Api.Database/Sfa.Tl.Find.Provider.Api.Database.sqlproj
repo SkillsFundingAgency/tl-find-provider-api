@@ -148,6 +148,9 @@
     <Build Include="Tables\NotificationEmail.sql" />
     <Build Include="Stored Procedures\DeleteSearchFilter.sql" />
     <None Include="Indexes\IX_NotificationEmail_NotificationId.sql" />
+    <Build Include="Tables\ProviderNotification.sql" />
+    <None Include="Indexes\IX_ProviderNotification_NotificationId.sql" />
+    <None Include="Indexes\Copy of IX_ProviderNotification_NotificationId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

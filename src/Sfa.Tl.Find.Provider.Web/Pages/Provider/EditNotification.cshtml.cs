@@ -80,7 +80,7 @@ public class EditNotificationModel : PageModel
 
         //TODO: Copy details to a new notification
 
-        await _providerDataService.SaveNotification(notification);
+        await _providerDataService.SaveNotification(notification, 0);
 
         return RedirectToPage("/Provider/Notifications");
     }

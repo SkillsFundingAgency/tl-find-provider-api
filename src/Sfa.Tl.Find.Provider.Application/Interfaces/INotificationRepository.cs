@@ -12,7 +12,7 @@ public interface INotificationRepository
 
     Task<Notification> GetNotification(int locationId);
 
-    Task Save(Notification notification);
+    Task Save(Notification notification, long ukPrn);
 
     Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? verificationToken);
 

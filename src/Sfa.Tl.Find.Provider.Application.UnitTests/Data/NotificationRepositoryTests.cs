@@ -12,6 +12,8 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Data;
 
 public class NotificationRepositoryTests
 {
+    private const int TestUkPrn = 10099099;
+
     [Fact]
     public void Constructor_Guards_Against_Null_Parameters()
     {
@@ -22,7 +24,6 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task GetNotificationSummaryList_Returns_Expected_Results()
     {
-        const long ukPrn = 12345678;
         const bool includeAdditionalData = true;
 
         var notificationSummaries = new NotificationSummaryBuilder()
@@ -63,7 +64,7 @@ public class NotificationRepositoryTests
 
         var repository = new NotificationRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetNotificationSummaryList(ukPrn, includeAdditionalData))
+        var results = (await repository.GetNotificationSummaryList(TestUkPrn, includeAdditionalData))
             .ToList();
 
         results.Should().NotBeNullOrEmpty();
@@ -75,7 +76,6 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task GetNotificationSummaryList_Sets_Dynamic_Parameters()
     {
-        const long ukPrn = 12345678;
         const bool includeAdditionalData = true;
 
         var dbContextWrapper = new DbContextWrapperBuilder()
@@ -87,13 +87,13 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.GetNotificationSummaryList(ukPrn, includeAdditionalData);
+        await repository.GetNotificationSummaryList(TestUkPrn, includeAdditionalData);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
         templates.GetDynamicTemplatesCount().Should().Be(2);
-        templates.ContainsNameAndValue("ukPrn", ukPrn);
+        templates.ContainsNameAndValue("ukPrn", TestUkPrn);
         templates.ContainsNameAndValue("includeAdditionalData", includeAdditionalData);
     }
 
@@ -186,7 +186,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification);
+        await repository.Save(notification, TestUkPrn);
 
         await dbContextWrapper
             .Received(1)
@@ -212,12 +212,13 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification);
+        await repository.Save(notification, TestUkPrn);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
-        templates.GetDynamicTemplatesCount().Should().Be(6);
+        templates.GetDynamicTemplatesCount().Should().Be(7);
+        templates.ContainsNameAndValue("ukPrn", TestUkPrn);
         templates.ContainsNameAndValue("email", notification.Email);
         templates.ContainsNameAndValue("verificationToken", notification.EmailVerificationToken);
         templates.ContainsNameAndValue("frequency", notification.Frequency);
@@ -242,7 +243,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification);
+        await repository.Save(notification, 0);
 
         await dbContextWrapper
             .Received(1)
@@ -267,7 +268,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification);
+        await repository.Save(notification, 0);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();

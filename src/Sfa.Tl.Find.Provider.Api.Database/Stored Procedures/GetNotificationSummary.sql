@@ -21,15 +21,16 @@ AS
 		   l.[Name] AS [LocationName],
 		   l.[Postcode]
 		FROM ProvidersCTE p
-		INNER JOIN	[dbo].[Location] l
-	  	ON	p.[Id] = l.[ProviderId]
+		INNER JOIN	[dbo].[ProviderNotification] pn
+	  	ON	pn.[ProviderId] = p.[Id]
 		INNER JOIN [dbo].[Notification] n
-		ON n.[LocationId] = l.[Id]
+		ON n.[Id] = pn.[NotificationId]
 		INNER JOIN [dbo].[NotificationEmail] e
 		ON e.[NotificationId] = n.[Id]
-		WHERE	l.[IsDeleted] = 0
+		LEFT JOIN	[dbo].[Location] l
+	  	ON	l.[Id] = n.[LocationId]
+		WHERE	ISNULL(l.[IsDeleted], 0) = 0
 		  --Only include the first row to make sure main data set takes priority
 		  AND	p.[ProviderRowNum] = 1
 	ORDER BY	e.[Email],
-				[LocationId],
 				[LocationName]
