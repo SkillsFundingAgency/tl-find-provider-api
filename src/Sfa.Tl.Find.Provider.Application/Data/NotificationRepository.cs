@@ -149,7 +149,7 @@ public class NotificationRepository : INotificationRepository
         return notification;
     }
 
-    public async Task Save(Notification notification, long ukPrn)
+    public async Task Create(Notification notification, long ukPrn)
     {
         try
         {
@@ -159,43 +159,60 @@ public class NotificationRepository : INotificationRepository
                 .Select(r => r.Id)
                 .AsTableValuedParameter("dbo.IdListTableType");
 
-            if (notification.Id is null or 0)
+            _dynamicParametersWrapper.CreateParameters(new
             {
-                _dynamicParametersWrapper.CreateParameters(new
-                {
-                    ukPrn,
-                    email = notification.Email,
-                    verificationToken = notification.EmailVerificationToken,
-                    frequency = notification.Frequency,
-                    searchRadius = notification.SearchRadius,
-                    locationId = notification.LocationId,
-                    routeIds
-                });
-            }
-            else
-            {
-                _dynamicParametersWrapper.CreateParameters(new
-                {
-                    id = notification.Id.Value,
-                    email = notification.Email,
-                    frequency = notification.Frequency,
-                    searchRadius = notification.SearchRadius,
-                    locationId = notification.LocationId,
-                    routeIds
-                });
-            }
+                ukPrn,
+                email = notification.Email,
+                verificationToken = notification.EmailVerificationToken,
+                frequency = notification.Frequency,
+                searchRadius = notification.SearchRadius,
+                locationId = notification.LocationId,
+                routeIds
+            });
+
 
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,
-                notification.Id is not > 0
-                    ? "CreateNotification"
-                    : "UpdateNotification",
+                "CreateNotification",
                 _dynamicParametersWrapper.DynamicParameters,
                 commandType: CommandType.StoredProcedure);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred when saving a notification");
+            _logger.LogError(ex, "An error occurred when creating a notification");
+            throw;
+        }
+    }
+
+    public async Task Update(Notification notification)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var routeIds = notification.Routes
+                .Select(r => r.Id)
+                .AsTableValuedParameter("dbo.IdListTableType");
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                id = notification.Id.Value,
+                email = notification.Email,
+                frequency = notification.Frequency,
+                searchRadius = notification.SearchRadius,
+                locationId = notification.LocationId,
+                routeIds
+            });
+
+            var result = await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "UpdateNotification",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when updating a notification");
             throw;
         }
     }

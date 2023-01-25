@@ -205,7 +205,40 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task SaveNotification_Calls_Repository()
+    public async Task SaveNotification_Calls_Repository_For_Create_When_Id_Is_Null()
+    {
+        var notification = new NotificationBuilder()
+            .WithNullId()
+            .Build();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+
+        var uniqueId = Guid.Parse("b4fd2a81-dcc9-43b9-9f4e-be76d1faa801");
+        var guidProvider = Substitute.For<IGuidProvider>();
+        guidProvider
+            .NewGuid()
+            .Returns(uniqueId);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(guidProvider: guidProvider,
+                notificationRepository: notificationRepository);
+
+        await service.SaveNotification(notification, TestUkPrn);
+
+        await notificationRepository
+            .Received(1)
+            .Create(notification, TestUkPrn);
+
+        await notificationRepository
+            .Received(1)
+            .Create(Arg.Is<Notification>(n => 
+                    ReferenceEquals(n, notification) &&
+                    n.EmailVerificationToken == uniqueId), 
+                TestUkPrn);
+    }
+
+    [Fact]
+    public async Task SaveNotification_Calls_Repository_For_Update()
     {
         var notification = new NotificationBuilder()
             .Build();
@@ -219,7 +252,7 @@ public class ProviderDataServiceTests
 
         await notificationRepository
             .Received(1)
-            .Save(notification, TestUkPrn);
+            .Update(notification);
     }
 
 
@@ -287,7 +320,7 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task SaveNotification_Sends_Email_Verification_Email_For_Update()
+    public async Task SaveNotification_Does_Not_Send_Email_Verification_Email_For_Update()
     {
         var uniqueId = Guid.Parse("f0f7d306-f114-42c5-adeb-87b67e580f1a");
 

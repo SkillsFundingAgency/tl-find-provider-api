@@ -171,7 +171,7 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
-    public async Task SaveNotification_Calls_Database_To_Create()
+    public async Task CreateNotification_Calls_Database()
     {
         var notification = new NotificationBuilder()
             .WithNullId()
@@ -186,7 +186,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification, TestUkPrn);
+        await repository.Create(notification, TestUkPrn);
 
         await dbContextWrapper
             .Received(1)
@@ -197,7 +197,7 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
-    public async Task SaveNotification_Sets_Dynamic_Parameters_For_Create()
+    public async Task CreateNotification_Sets_Dynamic_Parameters()
     {
         var notification = new NotificationBuilder()
             .WithNullId()
@@ -212,7 +212,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification, TestUkPrn);
+        await repository.Create(notification, TestUkPrn);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
@@ -229,7 +229,7 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
-    public async Task SaveNotification_Calls_Database_To_Update()
+    public async Task UpdateNotification_Calls_Database()
     {
         var notification = new NotificationBuilder()
             .Build();
@@ -243,7 +243,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification, 0);
+        await repository.Update(notification);
 
         await dbContextWrapper
             .Received(1)
@@ -254,7 +254,7 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
-    public async Task SaveNotification_Sets_Dynamic_Parameters_For_Update()
+    public async Task UpdateNotification_Sets_Dynamic_Parameters()
     {
         var notification = new NotificationBuilder()
             .Build();
@@ -268,7 +268,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Save(notification, 0);
+        await repository.Update(notification);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();

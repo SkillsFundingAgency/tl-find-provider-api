@@ -384,9 +384,12 @@ public class ProviderDataService : IProviderDataService
         if (notification.Id is null)
         {
             notification.EmailVerificationToken = _guidProvider.NewGuid();
+            await _notificationRepository.Create(notification, ukPrn);
         }
-
-        await _notificationRepository.Save(notification, ukPrn);
+        else
+        {
+            await _notificationRepository.Update(notification);
+        }
 
         if (notification.EmailVerificationToken is not null)
         {
