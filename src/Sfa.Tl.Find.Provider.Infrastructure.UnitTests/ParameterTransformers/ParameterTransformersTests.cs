@@ -3,7 +3,7 @@
 namespace Sfa.Tl.Find.Provider.Infrastructure.UnitTests.ParameterTransformers;
 public class ParameterTransformersTests
 {
-    [Theory(DisplayName = "SlugifyParameterTransformer Data Tests")]
+    [Theory(DisplayName = $"{nameof(SlugifyParameterTransformer)} Data Tests")]
     [InlineData(null, null)]
     [InlineData("Index", "index")]
     [InlineData("EmployerList", "employer-list")]

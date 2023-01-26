@@ -1,5 +1,4 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Sfa.Tl.Find.Provider.Application.Extensions;
@@ -33,16 +32,25 @@ public static class FormattingExtensions
             return $"{town.Name}, {town.LocalAuthority}";
         return $"{town.Name}";
     }
-
-    public static string GetContactPreferenceDisplayName(
-        this ContactPreference? contactPreference,
-        string defaultDisplayName = "Unknown")
+    
+    public static string GetEnumDisplayName<T>(
+        this T? value,
+        string defaultDisplayName = "Unknown") where T: struct, Enum
     {
-        if (contactPreference is null) return string.Empty;
+        if (value is null) return string.Empty;
         
-        var displayAttribute = contactPreference.Value.GetCustomAttribute<DisplayAttribute>();
+        var displayAttribute = value.GetCustomAttribute<DisplayAttribute>();
         return displayAttribute != null && !string.IsNullOrWhiteSpace(displayAttribute.Name)
             ? displayAttribute.Name
             : defaultDisplayName;
+    }
+
+    public static string GetEnumDisplayName<T>(
+        this T value) where T : struct, Enum
+    {
+        var displayAttribute = value.GetCustomAttribute<DisplayAttribute>();
+        return displayAttribute != null && !string.IsNullOrWhiteSpace(displayAttribute.Name)
+            ? displayAttribute.Name
+            : value.ToString();
     }
 }

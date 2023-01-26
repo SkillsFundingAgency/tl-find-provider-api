@@ -21,7 +21,7 @@ public class JsonExtensionsTests
         "}" +
         "}");
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetBoolean) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetBoolean)} Data Tests")]
     [InlineData("myInt32", false)]
     [InlineData("myPositiveDouble", false)]
     [InlineData("myString", false)]
@@ -37,7 +37,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetInt32) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetInt32)} Data Tests")]
     [InlineData("myInt32", 123)]
     [InlineData("myPositiveDouble", 0)]
     [InlineData("myString", 0)]
@@ -54,7 +54,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetInt32) + " with Default Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetInt32)} Data Tests")]
     [InlineData("myInt32", 1, 123)]
     [InlineData("notANumber", 10, 10)]
     [InlineData("myNull", 5, 5)]
@@ -66,7 +66,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetInt64) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetInt64)} Data Tests")]
     [InlineData("myInt32", 123)]
     [InlineData("myInt64", 1000000000)]
     [InlineData("myPositiveDouble", 0)]
@@ -84,7 +84,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetInt64) + " with Default Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetInt64)} Data Tests")]
     [InlineData("myInt64", 1, 1000000000)]
     [InlineData("notANumber", 10, 10)]
     [InlineData("myNull", 5, 5)]
@@ -97,7 +97,7 @@ public class JsonExtensionsTests
     }
 
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetDecimal) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetDecimal)} Data Tests")]
     [InlineData("myPositiveDecimal", 99.999)]
     [InlineData("myNegativeDecimal", -99.999)]
     [InlineData("myInt64", 1000000000)]
@@ -113,7 +113,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetDecimal) + " with Default Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetDecimal)} Data Tests")]
     [InlineData("myPositiveDecimal", 1, 99.999)]
     [InlineData("myNegativeDecimal", -1, -99.999)]
     [InlineData("notANumber", 10, 10)]
@@ -126,7 +126,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetDouble) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetDouble)} Data Tests")]
     [InlineData("myPositiveDouble", 100.999)]
     [InlineData("myNegativeDouble", -100.999)]
     [InlineData("myInt64", 1000000000)]
@@ -142,7 +142,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetDouble) + " with Default Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetDouble)} Data Tests")]
     [InlineData("myPositiveDouble", 1, 100.999)]
     [InlineData("myNegativeDouble", -1, -100.999)]
     [InlineData("notANumber", 10, 10)]
@@ -155,7 +155,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetString) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetString)} Data Tests")]
     [InlineData("myString", "my value")]
     [InlineData("myInt32", null)]
     [InlineData("myInt64", null)]
@@ -172,7 +172,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetString) + " with maxLength Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetString)} Data Tests")]
     [InlineData("myString", "my value", 10)]
     [InlineData("myString", "my value", 8)]
     [InlineData("myString", "my val", 6)]
@@ -191,7 +191,7 @@ public class JsonExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JsonExtensions.SafeGetString) + " with Default Data Tests")]
+    [Theory(DisplayName = $"{nameof(JsonExtensions.SafeGetString)} Data Tests")]
     [InlineData("myString", "default value", "my value")]
     [InlineData("notAString", "default value", "default value")]
     [InlineData("myNull", "default value", "default value")]
