@@ -21,6 +21,8 @@ public class EditNotificationModel : PageModel
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<EditNotificationModel> _logger;
 
+    public IEnumerable<NotificationLocationSummary>? NotificationLocationList { get; private set; }
+
     public Notification? Notification { get; private set; }
 
     public int DefaultSearchRadius { get; private set; }
@@ -47,6 +49,8 @@ public class EditNotificationModel : PageModel
 
     public async Task<IActionResult> OnGet(int id)
     {
+        NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(id);
+        
         Notification = await _providerDataService.GetNotification(id);
 
         if (Notification is null)

@@ -41,6 +41,32 @@ public  class EditNotificationTests
 
         editNotificationModel.Notification.Should().Be(notification);
     }
+
+    [Fact]
+    public async Task EditNotificationsModel_OnGet_Populates_Notification_List()
+    {
+        const int notificationId = 1;
+
+        var notificationLocationSummaryList = new NotificationLocationSummaryBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotificationLocationSummaryList(notificationId)
+            .Returns(notificationLocationSummaryList);
+
+        var editNotificationsModel = new EditNotificationModelBuilder()
+            .Build(providerDataService);
+
+        await editNotificationsModel.OnGet(notificationId);
+
+        editNotificationsModel
+            .NotificationLocationList 
+            .Should()
+            .BeEquivalentTo(notificationLocationSummaryList);
+    }
+
     [Fact]
     public async Task EditNotificationModel_OnGet_Sets_Search_Radius_Select_List()
     {

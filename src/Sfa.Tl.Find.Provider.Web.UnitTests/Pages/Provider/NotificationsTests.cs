@@ -92,11 +92,6 @@ public class NotificationsTests
         notificationsModel
             .NotificationList
             .Should()
-            .NotBeNullOrEmpty();
-
-        notificationsModel
-            .NotificationList
-            .Should()
             .BeEquivalentTo(notificationSummaryList);
     }
 

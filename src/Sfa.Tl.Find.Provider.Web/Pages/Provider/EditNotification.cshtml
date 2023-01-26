@@ -32,44 +32,70 @@
             <input asp-for="Input!.Id" type="hidden" />
             <table class="govuk-table tl-employers--table">
                 <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header">Campus</th>
-                    <th scope="col" class="govuk-table__header">Radius</th>
-                    <th scope="col" class="govuk-table__header">T Levels</th>
-                    <th scope="col" class="govuk-table__header">Frequency</th>
-                    <th scope="col" class="govuk-table__header"></th>
-                </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Campus</th>
+                        <th scope="col" class="govuk-table__header">Radius</th>
+                        <th scope="col" class="govuk-table__header">T Levels</th>
+                        <th scope="col" class="govuk-table__header">Frequency</th>
+                        <th scope="col" class="govuk-table__header"></th>
+                    </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header tl-wordwrap">
-                        Alesford Campus
-                    </th>
-                    <td class="govuk-table__cell tl-table__cell__list">
-                        <div class="tl-employers--table--inline-header"><strong>Radius</strong></div>
-                        <div class="tl-employers--table--inline-cell">
-                            <p> 20 miles</p>
-                        </div>
-                    </td>
-                    <td class="govuk-table__cell tl-table__cell__list">
-                        <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
-                        <div class="tl-employers--table--inline-cell">
-                            <p>Test</p>
-                            <p>Test 2</p>
-                        </div>
-                    </td>
-                    <td class="govuk-table__cell tl-table__cell__list">
-                        <div class="tl-employers--table--inline-header"><strong>Frequency</strong></div>
-                        <div class="tl-employers--table--inline-cell">
-                            <p> Daily</p>
-                        </div>
-                    </td>
-                    <td class="govuk-table__cell">
-                        <a asp-page="./AddNotification" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-5">Change</a>
-                        <a asp-page="./RemoveNotification" class="govuk-link govuk-link--no-visited-state">Remove</a>
-                    </td>
-                </tr>
-                </tbody>
+                    @if (Model.NotificationLocationList != null && Model.NotificationLocationList.Any())
+                    {
+                        foreach (var notificationLocation in Model.NotificationLocationList)
+                        {
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header tl-wordwrap">
+                                    @if (notificationLocation.Locations is not null && notificationLocation.Locations.Any())
+                                    {
+                                        @foreach (var location in notificationLocation.Locations)
+                                        {
+                                            <p>@($"{location.Name?.ToUpper()} [{location.Postcode}]")</p>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>All</p>
+                                    }
+                                </th>
+                                <td class="govuk-table__cell tl-table__cell__list">
+                                    <div class="tl-employers--table--inline-header"><strong>Radius</strong></div>
+                                    <div class="tl-employers--table--inline-cell">
+                                        <p>@notificationLocation.SearchRadius miles</p>
+                                    </div>
+                                </td>
+                                <td class="govuk-table__cell tl-table__cell__list">
+                                    <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
+                                    <div class="tl-employers--table--inline-cell">
+                                        @if (notificationLocation.Routes is not { Count: > 0 })
+                                        {
+                                            <p>All</p>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var route in notificationLocation.Routes)
+                                            {
+                                                <p>@route.Name</p>
+                                            }
+                                        }
+                                    </div>
+                                </td>
+                                <td class="govuk-table__cell tl-table__cell__list">
+                                    <div class="tl-employers--table--inline-header"><strong>Frequency</strong></div>
+                                    <div class="tl-employers--table--inline-cell">
+                                        <p>@notificationLocation.Frequency</p>
+                                        @*Look at GetContactPreferenceDisplayName - add one for frequency or generic*@
+                                    </div>
+                                </td>
+                                <td class="govuk-table__cell">
+                                    <a asp-page="./AddNotification" asp-route-id="@notificationLocation.Id" class="govuk-link govuk-link--no-visited-state">Change</a>
+                                    <a asp-page="./RemoveNotification" asp-route-id="@notificationLocation.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
             </table>
         </form>
         <a asp-page="./AddNotification" class="govuk-button">Add notification for another campus</a>
