@@ -8,7 +8,6 @@
 	@includeAdditionalData BIT,
 	@totalLocationsCount INT OUTPUT
 AS
-
 	SET NOCOUNT ON;
 
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326);

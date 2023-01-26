@@ -1,6 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[GetNotificationDetail]
 	@notificationId INT
 AS
+	SET NOCOUNT ON;
+
 	SELECT n.[Id],
 		   e.[Email],
 		   CASE	WHEN e.VerificationToken IS NULL THEN 1

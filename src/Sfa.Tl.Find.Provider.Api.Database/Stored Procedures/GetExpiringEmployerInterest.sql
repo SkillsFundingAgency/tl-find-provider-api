@@ -1,6 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[GetExpiringEmployerInterest]
 	@daysToExpiry [INT]
 AS
+	SET NOCOUNT ON;
 
 	DECLARE @expiryDate [DATETIME2] = 
 			DATEADD(day, 

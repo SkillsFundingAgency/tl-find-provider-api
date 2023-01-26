@@ -2,7 +2,6 @@
 	@employerInterestIds [dbo].[IdListTableType] READONLY,
 	@employerInterestsDeleted INT OUTPUT
 AS
-
 	SET NOCOUNT ON;
 	
 	DELETE FROM [dbo].[EmployerInterestLocation]
