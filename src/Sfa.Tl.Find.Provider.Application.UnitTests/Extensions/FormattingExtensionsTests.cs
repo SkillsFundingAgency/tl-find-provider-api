@@ -1,12 +1,11 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;
 
 public class FormattingExtensionsTests
 {
-    [Theory(DisplayName = nameof(FormattingExtensions.FormatDistance) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(FormattingExtensions.FormatDistance)} Data Tests")]
     [InlineData(0D, "0 miles")]
     [InlineData(1.2D, "1 mile")]
     [InlineData(5.4D, "5 miles")]
@@ -17,7 +16,7 @@ public class FormattingExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(FormattingExtensions.FormatDistance) + "Nullable Data Tests")]
+    [Theory(DisplayName = $"{nameof(FormattingExtensions.FormatDistance)} Nullable Data Tests")]
     [InlineData(null, "")]
     [InlineData(0.0, "0 miles")]
     [InlineData(1.2D, "1 mile")]
@@ -28,7 +27,7 @@ public class FormattingExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(FormattingExtensions.FormatPostcodeForUri) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(FormattingExtensions.FormatPostcodeForUri)} Data Tests")]
     [InlineData("CV1 2WT", "CV1%202WT")]
     [InlineData("cv1 2wt", "CV1%202WT")]
     [InlineData(" CV1 2WT ", "CV1%202WT")]
@@ -38,7 +37,7 @@ public class FormattingExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(FormattingExtensions.FormatTownName) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(FormattingExtensions.FormatTownName)} Data Tests")]
     [InlineData("Oxford", "Oxfordshire", "Oxfordshire", "Oxford, Oxfordshire")]
     [InlineData("Bristol", null, "Gloucestershire", "Bristol, Gloucestershire")]
     [InlineData("Coventry", "West Midlands", "West Midlands", "Coventry, West Midlands")]
@@ -54,22 +53,6 @@ public class FormattingExtensionsTests
         };
 
         var result = town.FormatTownName();
-        result.Should().Be(expectedResult);
-    }
-
-    [Theory(DisplayName = nameof(FormattingExtensions.GetContactPreferenceDisplayName) + " Data Tests")]
-    [InlineData(null, "")]
-    [InlineData(ContactPreference.Email, "Email")]
-    [InlineData(ContactPreference.Telephone, "Telephone")]
-    [InlineData(ContactPreference.NoPreference, "No preference")]
-    [InlineData((ContactPreference)4, "Unknown")]
-    [InlineData((ContactPreference)5, "No idea", "No idea")]
-    public void GetContactPreferenceDisplayName_Data_Tests(ContactPreference? contactPreference, string expectedResult, string defaultValue = null)
-    {
-        var result = defaultValue is null 
-            ? contactPreference.GetContactPreferenceDisplayName()
-            : contactPreference.GetContactPreferenceDisplayName(defaultValue);
-
         result.Should().Be(expectedResult);
     }
 }
