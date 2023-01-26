@@ -207,6 +207,12 @@ public static class ModelValidationExtensions
         locationPostcode.Postcode.Should().Be(expected.Postcode);
     }
 
+    public static void Validate(this Route route, RouteDto expected)
+    {
+        route.Id.Should().Be(expected.RouteId);
+        route.Name.Should().Be(expected.RouteName);
+    }
+
     public static void Validate(this DeliveryYearSearchResult deliveryYear, DeliveryYearSearchResult expected)
     {
         deliveryYear.Year.Should().Be(expected.Year);
@@ -380,5 +386,12 @@ public static class ModelValidationExtensions
         notificationSummary.Id.Should().Be(expected.Id);
         notificationSummary.Email.Should().Be(expected.Email);
         notificationSummary.IsEmailVerified.Should().Be(expected.IsEmailVerified);
+    }
+
+    public static void Validate(this NotificationLocationSummary notificationLocationSummary, NotificationLocationSummaryDto expected)
+    {
+        notificationLocationSummary.Id.Should().Be(expected.Id);
+        notificationLocationSummary.Frequency.Should().Be(expected.Frequency);
+        notificationLocationSummary.SearchRadius.Should().Be(expected.SearchRadius);
     }
 }

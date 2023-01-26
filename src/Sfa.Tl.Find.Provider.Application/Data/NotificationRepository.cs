@@ -43,57 +43,6 @@ public class NotificationRepository : INotificationRepository
             commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn,
-        bool includeAdditionalData)
-    {
-        using var connection = _dbContextWrapper.CreateConnection();
-
-        _dynamicParametersWrapper.CreateParameters(new
-        {
-            ukPrn,
-            includeAdditionalData
-        });
-
-        var notifications = new Dictionary<int, NotificationSummary>();
-
-        await _dbContextWrapper
-            .QueryAsync<NotificationSummaryDto, LocationPostcodeDto, NotificationSummary>(
-                connection,
-                "GetNotificationSummary",
-                (n, l) =>
-                {
-                    if (!notifications.TryGetValue(n.Id!.Value, out var notification))
-                    {
-                        notifications.Add(n.Id.Value,
-                            notification = new NotificationSummary
-                            {
-                                Id = n.Id,
-                                Email = n.Email,
-                                IsEmailVerified = n.IsEmailVerified,
-                                Locations = new List<LocationPostcode>()
-                            });
-                    }
-
-                    if (l is not null)
-                    {
-                        notification.Locations.Add(
-                            new LocationPostcode
-                            {
-                                Id = l.LocationId,
-                                Name = l.LocationName,
-                                Postcode = l.Postcode
-                            });
-                    }
-
-                    return notification;
-                },
-                _dynamicParametersWrapper.DynamicParameters,
-                splitOn: "Id, LocationId",
-                commandType: CommandType.StoredProcedure);
-
-        return notifications.Values;
-    }
-
     public async Task<Notification> GetNotification(
         int notificationId)
     {
@@ -149,6 +98,119 @@ public class NotificationRepository : INotificationRepository
         return notification;
     }
 
+    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn,
+        bool includeAdditionalData)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            ukPrn,
+            includeAdditionalData
+        });
+
+        var notifications = new Dictionary<int, NotificationSummary>();
+
+        await _dbContextWrapper
+            .QueryAsync<NotificationSummaryDto, LocationPostcodeDto, NotificationSummary>(
+                connection,
+                "GetNotificationSummary",
+                (n, l) =>
+                {
+                    if (!notifications.TryGetValue(n.Id!.Value, out var notification))
+                    {
+                        notifications.Add(n.Id.Value,
+                            notification = new NotificationSummary
+                            {
+                                Id = n.Id,
+                                Email = n.Email,
+                                IsEmailVerified = n.IsEmailVerified,
+                                Locations = new List<LocationPostcode>()
+                            });
+                    }
+
+                    if (l is not null)
+                    {
+                        notification.Locations.Add(
+                            new LocationPostcode
+                            {
+                                Id = l.LocationId,
+                                Name = l.LocationName,
+                                Postcode = l.Postcode
+                            });
+                    }
+
+                    return notification;
+                },
+                _dynamicParametersWrapper.DynamicParameters,
+                splitOn: "Id, LocationId",
+                commandType: CommandType.StoredProcedure);
+
+        return notifications.Values;
+    }
+
+    public async Task<IEnumerable<NotificationLocationSummary>> GetNotificationLocationSummaryList(
+        int notificationId)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+           notificationId
+        });
+
+        var notifications = new Dictionary<int, NotificationLocationSummary>();
+        
+        await _dbContextWrapper
+            .QueryAsync<NotificationLocationSummaryDto, LocationPostcodeDto, RouteDto, NotificationLocationSummary>(
+                connection,
+                "GetNotificationLocationSummary",
+                (n, l, r) =>
+                {
+                    if (!notifications.TryGetValue(n.Id!.Value, out var notification))
+                    {
+                        notifications.Add(n.Id.Value,
+                            notification = new NotificationLocationSummary
+                            {
+                                Id = n.Id,
+                                SearchRadius = n.SearchRadius,
+                                Frequency = n.Frequency,
+                                Locations = new List<LocationPostcode>(),
+                                Routes = new List<Route>()
+                            });
+                    }
+
+                    if (l is not null && notification.Locations.All(x => x.Id != l.LocationId))
+                    {
+                        notification.Locations.Add(
+                            new LocationPostcode
+                            {
+                                Id = l.LocationId,
+                                Name = l.LocationName,
+                                Postcode = l.Postcode
+                            });
+                    }
+
+                    if (r is not null && notification.Routes.All(x => x.Id != r.RouteId))
+                    {
+                        notification.Routes.Add(
+                            new Route
+                            {
+                                Id = r.RouteId,
+                                Name = r.RouteName
+                            });
+                    }
+
+                    return notification;
+                },
+                _dynamicParametersWrapper.DynamicParameters,
+                splitOn: "Id, LocationId, RouteId",
+                commandType: CommandType.StoredProcedure);
+
+        return notifications.Values;
+    }
+
+
     public async Task Create(Notification notification, long ukPrn)
     {
         try
@@ -169,7 +231,6 @@ public class NotificationRepository : INotificationRepository
                 locationId = notification.LocationId,
                 routeIds
             });
-
 
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,

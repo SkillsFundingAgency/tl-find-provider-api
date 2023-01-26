@@ -6,11 +6,14 @@ public interface INotificationRepository
 {
     Task Delete(int notificationId);
 
+    Task<Notification> GetNotification(int notificationId);
+
     Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(
         long ukPrn, 
         bool includeAdditionalData);
 
-    Task<Notification> GetNotification(int locationId);
+    Task<IEnumerable<NotificationLocationSummary>> GetNotificationLocationSummaryList(
+        int notificationId);
 
     Task Create(Notification notification, long ukPrn);
 

@@ -181,7 +181,7 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task GetNotifications_Returns_Expected_List()
+    public async Task GetNotificationSummaryList_Returns_Expected_List()
     {
         const long ukPrn = 12345678;
 
@@ -202,6 +202,30 @@ public class ProviderDataServiceTests
         await notificationRepository
             .Received(1)
             .GetNotificationSummaryList(ukPrn, true);
+    }
+
+    [Fact]
+    public async Task GetNotificationLocationSummaryList_Returns_Expected_List()
+    {
+        const int notificationId = 1;
+        
+        var notificationLocationSummaries = new NotificationLocationSummaryBuilder()
+            .BuildList()
+            .ToList();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetNotificationLocationSummaryList(notificationId)
+            .Returns(notificationLocationSummaries);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(notificationRepository: notificationRepository);
+
+        var results = (await service.GetNotificationLocationSummaryList(notificationId)).ToList();
+        results.Should().BeEquivalentTo(notificationLocationSummaries);
+
+        await notificationRepository
+        .Received(1)
+            .GetNotificationLocationSummaryList(notificationId);
     }
 
     [Fact]

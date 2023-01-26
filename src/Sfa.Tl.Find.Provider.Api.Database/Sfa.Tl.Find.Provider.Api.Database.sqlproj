@@ -150,6 +150,7 @@
     <Build Include="Tables\ProviderNotification.sql" />
     <None Include="Indexes\IX_ProviderNotification_NotificationId.sql" />
     <None Include="Indexes\IX_ProviderNotification_ProviderId.sql" />
+    <Build Include="Stored Procedures\GetNotificationLocationSummary.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

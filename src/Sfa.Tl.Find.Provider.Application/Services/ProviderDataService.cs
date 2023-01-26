@@ -159,6 +159,20 @@ public class ProviderDataService : IProviderDataService
         return notifications;
     }
 
+    public async Task<IEnumerable<NotificationLocationSummary>> GetNotificationLocationSummaryList(int notificationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notification locations");
+        }
+
+        var notificationLocations =
+            (await _notificationRepository
+                .GetNotificationLocationSummaryList(notificationId));
+
+        return notificationLocations;
+    }
+
     public async Task<Notification> GetNotification(int notificationId)
     {
         if (_logger.IsEnabled(LogLevel.Debug))

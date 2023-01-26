@@ -98,6 +98,90 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
+    public async Task GetNotificationLocationSummaryList_Returns_Expected_Results()
+    {
+        const int notificationId = 1;
+
+        var notificationSummaries = new NotificationLocationSummaryBuilder()
+            .BuildList()
+            .ToList();
+        var notificationLocationSummaryDtoList = new NotificationLocationSummaryDtoBuilder()
+            .BuildList()
+            .ToList();
+        var locationDtoList = new LocationPostcodeDtoBuilder()
+            .BuildList()
+            .ToList();
+        var routeDtoList = new RouteDtoBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<NotificationLocationSummary>(dbConnection, Arg.Any<string>(), Arg.Any<object>())
+            .Returns(notificationSummaries);
+
+        var callIndex = 0;
+
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
+                "GetNotificationLocationSummary",
+                Arg.Do<Func<NotificationLocationSummaryDto, LocationPostcodeDto, RouteDto, NotificationLocationSummary>>(
+                    x =>
+                    {
+                        var n = notificationLocationSummaryDtoList[callIndex];
+                        var l = locationDtoList[callIndex];
+                        var r = routeDtoList[callIndex];
+                        x.Invoke(n, l, r);
+
+                        callIndex++;
+                    }),
+                Arg.Any<object>(),
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
+
+        var repository = new NotificationRepositoryBuilder().Build(dbContextWrapper);
+
+        var results = (await repository.GetNotificationLocationSummaryList(notificationId))
+            .ToList();
+
+        results.Should().NotBeNullOrEmpty();
+        results!.Count.Should().Be(1);
+        results.First().Validate(notificationLocationSummaryDtoList.First());
+       
+        results[0].Locations.Should().NotBeNullOrEmpty();
+        results[0].Locations.First().Validate(locationDtoList.First());
+
+        results[0].Routes.Should().NotBeNullOrEmpty();
+        results[0].Routes.First().Validate(routeDtoList[0]);
+    }
+
+    [Fact]
+    public async Task GetNotificationLocationSummaryList_Sets_Dynamic_Parameters()
+    {
+        const int notificationId = 1;
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetNotificationLocationSummaryList(notificationId);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("notificationId", notificationId);
+    }
+
+    [Fact]
     public async Task GetNotification_Returns_Expected_Results()
     {
         const int id = 1;

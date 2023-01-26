@@ -145,8 +145,8 @@ public class SearchFilterRepositoryTests
         var result = await repository.GetSearchFilter(id);
 
         result.Validate(searchFilterDtoList.First());
-        result.Routes.First().Id.Should().Be(routeDtoList[0].RouteId);
-        result.Routes.First().Name.Should().Be(routeDtoList[0].RouteName);
+        result.Routes.Should().NotBeNullOrEmpty();
+        result.Routes.First().Validate(routeDtoList[0]);
     }
     [Fact]
     public async Task GetSearchFilter_Sets_Dynamic_Parameters()
