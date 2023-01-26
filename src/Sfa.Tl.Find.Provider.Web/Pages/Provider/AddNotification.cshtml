@@ -8,24 +8,26 @@
     <a asp-page="./Notifications" class="govuk-back-link" id="tl-back">Return to notifications</a>
 }
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
-        <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
-        <div class="govuk-error-summary__body">
-            <ul class="govuk-list govuk-error-summary__list">
-                <li><a sfa-validation-for="Input!.Email" href="#Input_Email"></a></li>
-            </ul>
-        </div>
-    </div>
-}
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-two-thirds">
+
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a sfa-validation-for="Input!.Email" href="#Input_Email"></a></li>
+                    </ul>
+                </div>
+            </div>
+        }
         <h1 class="govuk-heading-xl">Add a new notification</h1>
 
         <form method="post">
-            <div class="govuk-form-group">
+            <div class="govuk-form-group" sfa-validation-for="Input!.Email" sfa-validationerror-class="govuk-form-group--error">
                 <label class="govuk-label govuk-!-font-weight-bold" asp-for="Input!.Email">
                     Email address
                 </label>
