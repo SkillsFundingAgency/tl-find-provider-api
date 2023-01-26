@@ -28,7 +28,7 @@ public class NotificationSummaryBuilder
                     new()
                     {
                         Id = 2,
-                         Name = "Headquarters",
+                        Name = "Headquarters",
                         Postcode = "SW1A 2AA"
                     }
                 }

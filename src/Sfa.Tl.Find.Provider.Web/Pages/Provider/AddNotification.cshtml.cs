@@ -108,7 +108,7 @@ public class AddNotificationModel : PageModel
             ? _providerSettings.DefaultSearchRadius
             : Constants.DefaultProviderSearchRadius;
 
-        Input ??= new InputModel()
+        Input ??= new InputModel
         {
             SelectedSearchRadius = DefaultSearchRadius,
             SelectedFrequency = NotificationFrequency.Immediately,

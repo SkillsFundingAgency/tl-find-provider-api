@@ -13,7 +13,7 @@ public static class TestHttpRequestFactory
     {
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(payload));
 
-        var httpContext = new DefaultHttpContext()
+        var httpContext = new DefaultHttpContext
         {
             Request =
             {
