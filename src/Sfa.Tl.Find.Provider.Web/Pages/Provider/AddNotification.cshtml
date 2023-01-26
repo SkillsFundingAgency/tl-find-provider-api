@@ -8,11 +8,8 @@
     <a asp-page="./Notifications" class="govuk-back-link" id="tl-back">Return to notifications</a>
 }
 
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-
-
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
@@ -34,6 +31,7 @@
                 <div id="email-hint" class="govuk-hint">
                     This is the email address that will receive notifications
                 </div>
+                <span class="govuk-error-message" asp-validation-for="Input!.Email"></span>
                 <input class="govuk-input govuk-input--width-20" asp-for="Input!.Email" type="email" spellcheck="false" aria-describedby="email-hint" autocomplete="email"
                        sfa-validation-for="Input!.Email" sfa-validationerror-class="govuk-input--error">
             </div>
