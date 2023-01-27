@@ -10,6 +10,20 @@
 }
 
 <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @if (Model.RemovedLocation != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    Notifications for @Model.RemovedLocation have been removed.
+                    <br/><br/><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Edit notifications for @Model.Notification?.Email</h1>
     </div>
@@ -82,7 +96,6 @@
                     </tbody>
             </table>
         </form>
-        <a asp-page="./AddNotification" asp-route-id="@Model.Notification?.Id" class=" govuk-button">Add notification for another campus</a>
+        <a asp-page="./AddNotification" asp-route-id="@Model.Notification?.Id" class="govuk-button">Add notification for another campus</a>
     </div>
 </div>
-

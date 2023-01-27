@@ -20,6 +20,9 @@ public class EditNotificationModel : PageModel
 
     public IEnumerable<NotificationLocationSummary>? NotificationLocationList { get; private set; }
 
+    [TempData]
+    public string? RemovedLocation { get; set; }
+
     public Notification? Notification { get; private set; }
 
     public EditNotificationModel(
