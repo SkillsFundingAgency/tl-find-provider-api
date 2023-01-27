@@ -18,6 +18,8 @@ public class EditNotificationModel : PageModel
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<EditNotificationModel> _logger;
 
+    public int ProviderNotificationId { get; private set; }
+
     public IEnumerable<NotificationLocationSummary>? NotificationLocationList { get; private set; }
 
     [TempData]
@@ -41,6 +43,7 @@ public class EditNotificationModel : PageModel
 
     public async Task<IActionResult> OnGet(int id)
     {
+        ProviderNotificationId = id;
         Notification = await _providerDataService.GetNotification(id);
         if (Notification is null)
         {
@@ -50,5 +53,15 @@ public class EditNotificationModel : PageModel
         NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(id);
         
         return Page();
+    }
+
+    public async Task<IActionResult> OnGetRemoveLocation(int id, int providerNotificationId)
+    {
+        Notification = await _providerDataService.GetNotification(providerNotificationId);
+
+        //Need to get NotificationLocation, or pass name/postcode via link
+        
+        TempData[nameof(RemovedLocation)] = "Test";
+        return RedirectToPage("/Provider/EditNotification", new { id = providerNotificationId });
     }
 }
