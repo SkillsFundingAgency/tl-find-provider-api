@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
+using Sfa.Tl.Find.Provider.Web.Pages.Employer;
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
 public class AddNotificationTests
 {
+    private const string EmailFieldKey = "Input.Email";
+
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
     {

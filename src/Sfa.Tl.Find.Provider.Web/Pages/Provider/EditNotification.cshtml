@@ -35,12 +35,9 @@
                         {
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header tl-wordwrap">
-                                    @if (notificationLocation.Locations is not null && notificationLocation.Locations.Any())
+                                    @if (notificationLocation.Location is not null)
                                     {
-                                        @foreach (var location in notificationLocation.Locations)
-                                        {
-                                            <p>@($"{location.Name?.ToUpper()} [{location.Postcode}]")</p>
-                                        }
+                                        <p>@($"{notificationLocation.Location.Name?.ToUpper()} [{notificationLocation.Location.Postcode}]")</p>
                                     }
                                     else
                                     {

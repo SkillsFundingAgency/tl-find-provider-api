@@ -13,20 +13,11 @@ public class NotificationLocationSummaryBuilder
                 Id = 1,
                 SearchRadius = 20,
                 Frequency = NotificationFrequency.Daily,
-                Locations = new List<LocationPostcode>
+                Location = new LocationPostcode
                 {
-                    new()
-                    {
-                        Id = 1,
-                        Name = "The Palace",
-                        Postcode = "SW1A 1AA"
-                    },
-                    new()
-                    {
-                        Id = 2,
-                        Name = "Headquarters",
-                        Postcode = "SW1A 2AA"
-                    }
+                    Id = 1,
+                    Name = "The Palace",
+                    Postcode = "SW1A 1AA"
                 },
                 Routes = new List<Route>
                 {
@@ -47,7 +38,7 @@ public class NotificationLocationSummaryBuilder
                 Id = 2,
                 SearchRadius = 20,
                 Frequency = NotificationFrequency.Weekly,
-                Locations = new List<LocationPostcode>(),
+                Location = null,
                 Routes = new List<Route>()
             }
         };

@@ -3,26 +3,23 @@
 AS
 	SET NOCOUNT ON;
 
-	SELECT n.[Id],
-		   --e.[Id] AS [EmailId],
-		   --e.[Email],
-		   n.[Frequency],
-		   n.[SearchRadius],
+	SELECT nl.[Id],
+		   nl.[Frequency],
+		   nl.[SearchRadius],
 		   l.[Id] AS [LocationId],
 		   l.[Name] AS [LocationName],
 		   l.[Postcode],
 		   r.[Id] AS [RouteId],
 		   r.[Name] AS [RouteName]
-	FROM [Notification] n
-	INNER JOIN [dbo].[NotificationEmail] e
-	ON e.[NotificationId] = n.[Id]
+	FROM [ProviderNotification] n
+	INNER JOIN [dbo].[NotificationLocation] nl
+ 	ON	nl.[ProviderNotificationId] = n.[Id]
 	LEFT JOIN	[dbo].[Location] l
-	ON	l.[Id] = n.[LocationId]
-	LEFT JOIN [dbo].[NotificationRoute] nr
-	ON nr.[NotificationId] = n.[Id]
+	ON	l.[Id] = nl.[LocationId]
+	LEFT JOIN [dbo].[NotificationLocationRoute] nlr
+	ON	nlr.[NotificationLocationId] = nl.[Id]
 	LEFT JOIN [Route] r
-	ON r.[Id] = nr.[RouteId]
+	ON r.[Id] = nlr.[RouteId]
 	WHERE n.[Id] = @notificationId
-	ORDER BY	--e.[Email],
-				[LocationName],
+	ORDER BY	[LocationName],
 				r.[Name]

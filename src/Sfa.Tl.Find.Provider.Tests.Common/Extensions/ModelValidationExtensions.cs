@@ -393,5 +393,9 @@ public static class ModelValidationExtensions
         notificationLocationSummary.Id.Should().Be(expected.Id);
         notificationLocationSummary.Frequency.Should().Be(expected.Frequency);
         notificationLocationSummary.SearchRadius.Should().Be(expected.SearchRadius);
+
+        notificationLocationSummary.Location?.Id.Should().Be(expected.LocationId);
+        notificationLocationSummary.Location?.Name.Should().Be(expected.LocationName);
+        notificationLocationSummary.Location?.Postcode.Should().Be(expected.Postcode);
     }
 }

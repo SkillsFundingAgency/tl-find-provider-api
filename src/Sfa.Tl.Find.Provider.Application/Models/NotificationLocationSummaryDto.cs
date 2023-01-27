@@ -8,4 +8,11 @@ public class NotificationLocationSummaryDto
     public NotificationFrequency Frequency { get; init; }
 
     public int? SearchRadius { get; init; }
+
+    public int? LocationId { get; init; }
+    
+    public string? LocationName { get; init; }
+
+    public string? Postcode { get; init; }
+
 }

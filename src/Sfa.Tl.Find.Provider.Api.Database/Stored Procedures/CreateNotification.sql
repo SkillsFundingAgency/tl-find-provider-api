@@ -1,7 +1,7 @@
-﻿CREATE PROCEDURE [dbo].[CreateNotification]
+﻿CREATE PROCEDURE [dbo].[CreateProviderNotification]
 	@ukPrn BIGINT,
 	@email NVARCHAR(320),
-	@verificationToken UNIQUEIDENTIFIER,
+	@emailVerificationToken UNIQUEIDENTIFIER,
 	@frequency INT,
 	@searchRadius INT,
 	@locationId INT,
@@ -9,23 +9,17 @@
 AS
 	SET NOCOUNT ON;
 
-    DECLARE @newId INT
-
-	INSERT INTO [dbo].[Notification] (
-		Frequency,
-		SearchRadius,
-		LocationId)
-	VALUES (@frequency,
-		@searchRadius,
-		@locationId)
-	
-    SELECT @newId = SCOPE_IDENTITY();
+    DECLARE @notificationLocationId INT
+	DECLARE @providerNotificationId INT
 
 	INSERT INTO [dbo].[ProviderNotification] (
 		[ProviderId],
-		[NotificationId])
+		[Email],
+		[EmailVerificationToken]
+		)
 	SELECT p.[Id],
-		@newId
+		@email,
+		@emailVerificationToken
 	FROM 	(SELECT	p.[Id],
 				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
 			 FROM	[Provider] p
@@ -33,19 +27,25 @@ AS
 			   AND	p.[IsDeleted] = 0) p
 	  WHERE ProviderRowNum = 1
 
-	INSERT INTO [dbo].[NotificationEmail] (
-		NotificationId, 
-		Email,
-		VerificationToken)
-	VALUES (@newId,
-		@email,
-		@verificationToken)
+    SELECT @providerNotificationId = SCOPE_IDENTITY();
 
-	INSERT INTO [dbo].[NotificationRoute] (
-		NotificationId, 
-		RouteId)
-	SELECT @newId,
+	INSERT INTO [dbo].[NotificationLocation] (
+		[ProviderNotificationId], 
+		[LocationId],
+		[Frequency],
+		[SearchRadius])
+	VALUES (@providerNotificationId,
+		@locationId,
+		@frequency,
+		@searchRadius)
+
+	SELECT @notificationLocationId = SCOPE_IDENTITY();
+
+	INSERT INTO [dbo].[NotificationLocationRoute] (
+		[NotificationLocationId] ,
+		[RouteId])
+	SELECT @notificationLocationId,
 		[Id]
 		FROM @routeIds
 
-    RETURN @newId
+    RETURN @providerNotificationId

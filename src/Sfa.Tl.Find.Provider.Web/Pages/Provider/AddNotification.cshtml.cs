@@ -197,6 +197,7 @@ public class AddNotificationModel : PageModel
     public class InputModel
     {
         [Required(ErrorMessage = "Enter an email")]
+        [EmailAddress(ErrorMessage = "Enter a valid email")]
         public string? Email { get; set; }
 
         public NotificationFrequency SelectedFrequency { get; set; }

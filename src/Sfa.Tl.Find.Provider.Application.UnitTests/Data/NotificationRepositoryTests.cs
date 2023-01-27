@@ -108,9 +108,6 @@ public class NotificationRepositoryTests
         var notificationLocationSummaryDtoList = new NotificationLocationSummaryDtoBuilder()
             .BuildList()
             .ToList();
-        var locationDtoList = new LocationPostcodeDtoBuilder()
-            .BuildList()
-            .ToList();
         var routeDtoList = new RouteDtoBuilder()
             .BuildList()
             .ToList();
@@ -127,13 +124,12 @@ public class NotificationRepositoryTests
         await dbContextWrapper
             .QueryAsync(dbConnection,
                 "GetNotificationLocationSummary",
-                Arg.Do<Func<NotificationLocationSummaryDto, LocationPostcodeDto, RouteDto, NotificationLocationSummary>>(
+                Arg.Do<Func<NotificationLocationSummaryDto, RouteDto, NotificationLocationSummary>>(
                     x =>
                     {
                         var n = notificationLocationSummaryDtoList[callIndex];
-                        var l = locationDtoList[callIndex];
                         var r = routeDtoList[callIndex];
-                        x.Invoke(n, l, r);
+                        x.Invoke(n, r);
 
                         callIndex++;
                     }),
@@ -151,9 +147,6 @@ public class NotificationRepositoryTests
         results!.Count.Should().Be(1);
         results.First().Validate(notificationLocationSummaryDtoList.First());
        
-        results[0].Locations.Should().NotBeNullOrEmpty();
-        results[0].Locations.First().Validate(locationDtoList.First());
-
         results[0].Routes.Should().NotBeNullOrEmpty();
         results[0].Routes.First().Validate(routeDtoList[0]);
     }
@@ -275,7 +268,7 @@ public class NotificationRepositoryTests
         await dbContextWrapper
             .Received(1)
             .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s => s == "CreateNotification"),
+                Arg.Is<string>(s => s == "CreateProviderNotification"),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
                 commandType: CommandType.StoredProcedure);
     }
@@ -304,7 +297,7 @@ public class NotificationRepositoryTests
         templates.GetDynamicTemplatesCount().Should().Be(7);
         templates.ContainsNameAndValue("ukPrn", TestUkPrn);
         templates.ContainsNameAndValue("email", notification.Email);
-        templates.ContainsNameAndValue("verificationToken", notification.EmailVerificationToken);
+        templates.ContainsNameAndValue("emailVerificationToken", notification.EmailVerificationToken);
         templates.ContainsNameAndValue("frequency", notification.Frequency);
         templates.ContainsNameAndValue("locationId", notification.LocationId);
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
@@ -390,10 +383,10 @@ public class NotificationRepositoryTests
             .Received(1)
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("UPDATE dbo.NotificationEmail") &&
-                    s.Contains("SET VerificationToken = @verificationToken,") &&
+                    s.Contains("UPDATE dbo.ProviderNotification") &&
+                    s.Contains("SET EmailVerificationToken = @emailVerificationToken,") &&
                     s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE NotificationId = @notificationId") &&
+                    s.Contains("WHERE Id = @providerNotificationId") &&
                     s.Contains("AND Email = @email")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
@@ -420,9 +413,9 @@ public class NotificationRepositoryTests
         templates.Should().NotBeNullOrEmpty();
 
         templates.GetDynamicTemplatesCount().Should().Be(3);
-        templates.ContainsNameAndValue("notificationId", notification.Id);
+        templates.ContainsNameAndValue("providerNotificationId", notification.Id);
         templates.ContainsNameAndValue("email", notification.Email);
-        templates.ContainsNameAndValue("verificationToken", verificationToken);
+        templates.ContainsNameAndValue("emailVerificationToken", verificationToken);
     }
 
 
@@ -447,10 +440,10 @@ public class NotificationRepositoryTests
             .Received(1)
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("UPDATE dbo.NotificationEmail") &&
-                    s.Contains("SET VerificationToken = NULL") &&
+                    s.Contains("UPDATE dbo.ProviderNotification") &&
+                    s.Contains("SET EmailVerificationToken = NULL") &&
                     s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE VerificationToken = @verificationToken")),
+                    s.Contains("WHERE EmailVerificationToken = @emailVerificationToken")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
@@ -474,6 +467,6 @@ public class NotificationRepositoryTests
         templates.Should().NotBeNullOrEmpty();
 
         templates.GetDynamicTemplatesCount().Should().Be(1);
-        templates.ContainsNameAndValue("verificationToken", verificationToken);
+        templates.ContainsNameAndValue("emailVerificationToken", verificationToken);
     }
 }

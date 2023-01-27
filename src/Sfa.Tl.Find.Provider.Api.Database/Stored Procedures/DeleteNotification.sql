@@ -3,17 +3,14 @@
 AS
 	SET NOCOUNT ON;
 	
-	DELETE FROM [dbo].[NotificationEmail]
-	WHERE [NotificationId] = @notificationId;
-
-	DELETE FROM [dbo].[NotificationRoute]
-	WHERE [NotificationId] = @notificationId;
-
-	--DELETE FROM [dbo].[NotificationLocation]
-	--WHERE [NotificationId] = @notificationId;
+	DELETE FROM [dbo].[NotificationLocationRoute]
+	WHERE [NotificationLocationId] IN (SELECT [Id] 
+										FROM [dbo].[NotificationLocation]
+									WHERE [ProviderNotificationId] = @notificationId);
 	
+	DELETE FROM [dbo].[NotificationLocation]
+	WHERE [ProviderNotificationId] = @notificationId;
+		
 	DELETE FROM [dbo].[ProviderNotification]
-	WHERE [NotificationId] = @notificationId;
-	
-	DELETE FROM [dbo].[Notification]
 	WHERE [Id] = @notificationId;
+

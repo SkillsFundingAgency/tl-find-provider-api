@@ -19,7 +19,7 @@ public interface INotificationRepository
 
     Task Update(Notification notification);
 
-    Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? verificationToken);
+    Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? emailVerificationToken);
 
-    Task RemoveEmailVerificationToken(Guid verificationToken);
+    Task RemoveEmailVerificationToken(Guid emailVerificationToken);
 }

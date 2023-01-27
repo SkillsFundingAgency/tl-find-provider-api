@@ -11,7 +11,10 @@ public class NotificationLocationSummaryDtoBuilder
             {
                 Id = n.Id,
                 SearchRadius = n.SearchRadius,
-                Frequency = n.Frequency
+                Frequency = n.Frequency,
+                LocationId = 1,
+                LocationName = "Location 1",
+                Postcode = "CV1 2WT",
             })
             .ToList();
 }

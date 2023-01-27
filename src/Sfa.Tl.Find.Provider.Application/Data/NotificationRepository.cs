@@ -162,10 +162,10 @@ public class NotificationRepository : INotificationRepository
         var notifications = new Dictionary<int, NotificationLocationSummary>();
         
         await _dbContextWrapper
-            .QueryAsync<NotificationLocationSummaryDto, LocationPostcodeDto, RouteDto, NotificationLocationSummary>(
+            .QueryAsync<NotificationLocationSummaryDto, RouteDto, NotificationLocationSummary>(
                 connection,
                 "GetNotificationLocationSummary",
-                (n, l, r) =>
+                (n, r) =>
                 {
                     if (!notifications.TryGetValue(n.Id!.Value, out var notification))
                     {
@@ -175,19 +175,15 @@ public class NotificationRepository : INotificationRepository
                                 Id = n.Id,
                                 SearchRadius = n.SearchRadius,
                                 Frequency = n.Frequency,
-                                Locations = new List<LocationPostcode>(),
+                                Location = n.LocationId is not null ? 
+                                    new LocationPostcode
+                                    {
+                                        Id = n.LocationId,
+                                        Name = n.LocationName,
+                                        Postcode = n.Postcode,
+                                    }
+                                : null,
                                 Routes = new List<Route>()
-                            });
-                    }
-
-                    if (l is not null && notification.Locations.All(x => x.Id != l.LocationId))
-                    {
-                        notification.Locations.Add(
-                            new LocationPostcode
-                            {
-                                Id = l.LocationId,
-                                Name = l.LocationName,
-                                Postcode = l.Postcode
                             });
                     }
 
@@ -204,7 +200,7 @@ public class NotificationRepository : INotificationRepository
                     return notification;
                 },
                 _dynamicParametersWrapper.DynamicParameters,
-                splitOn: "Id, LocationId, RouteId",
+                splitOn: "Id, RouteId",
                 commandType: CommandType.StoredProcedure);
 
         return notifications.Values;
@@ -225,7 +221,7 @@ public class NotificationRepository : INotificationRepository
             {
                 ukPrn,
                 email = notification.Email,
-                verificationToken = notification.EmailVerificationToken,
+                emailVerificationToken = notification.EmailVerificationToken,
                 frequency = notification.Frequency,
                 searchRadius = notification.SearchRadius,
                 locationId = notification.LocationId,
@@ -234,7 +230,7 @@ public class NotificationRepository : INotificationRepository
 
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,
-                "CreateNotification",
+                "CreateProviderNotification",
                 _dynamicParametersWrapper.DynamicParameters,
                 commandType: CommandType.StoredProcedure);
         }
@@ -279,9 +275,9 @@ public class NotificationRepository : INotificationRepository
     }
 
     public async Task SaveEmailVerificationToken(
-        int notificationId,
+        int providerNotificationId,
         string emailAddress,
-        Guid? verificationToken)
+        Guid? emailVerificationToken)
     {
         try
         {
@@ -289,17 +285,17 @@ public class NotificationRepository : INotificationRepository
 
             _dynamicParametersWrapper.CreateParameters(new
             {
-                notificationId,
+                providerNotificationId,
                 email = emailAddress,
-                verificationToken,
+                emailVerificationToken
             });
 
             await _dbContextWrapper.ExecuteAsync(
                 connection,
-                "UPDATE dbo.NotificationEmail " +
-                "SET VerificationToken = @verificationToken, " +
+                "UPDATE dbo.ProviderNotification " +
+                "SET EmailVerificationToken = @emailVerificationToken, " +
                 "    ModifiedOn = GETUTCDATE() " +
-                "WHERE NotificationId = @notificationId " +
+                "WHERE Id = @providerNotificationId " +
                 "  AND Email = @email",
                 _dynamicParametersWrapper.DynamicParameters);
         }
@@ -311,7 +307,7 @@ public class NotificationRepository : INotificationRepository
     }
 
     public async Task RemoveEmailVerificationToken(
-        Guid verificationToken)
+        Guid emailVerificationToken)
     {
         try
         {
@@ -319,15 +315,15 @@ public class NotificationRepository : INotificationRepository
 
             _dynamicParametersWrapper.CreateParameters(new
             {
-                verificationToken,
+                emailVerificationToken
             });
 
             await _dbContextWrapper.ExecuteAsync(
                 connection,
-                "UPDATE dbo.NotificationEmail " +
-                "SET VerificationToken = NULL, " +
+                "UPDATE dbo.ProviderNotification " +
+                "SET EmailVerificationToken = NULL, " +
                 "    ModifiedOn = GETUTCDATE() " +
-                "WHERE VerificationToken = @verificationToken",
+                "WHERE EmailVerificationToken = @emailVerificationToken",
                 _dynamicParametersWrapper.DynamicParameters);
         }
         catch (Exception ex)
