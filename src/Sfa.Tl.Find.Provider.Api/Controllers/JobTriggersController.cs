@@ -2,6 +2,7 @@
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Models;
+// ReSharper disable StringLiteralTypo
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -24,25 +25,26 @@ public class JobTriggersController : ControllerBase
     }
 
     [HttpPost]
-    // ReSharper disable once StringLiteralTypo
     [Route("importcoursedirectory")]
     public async Task TriggerCourseDirectoryImportJob() =>
         await TriggerJob(JobKeys.CourseDirectoryImport);
 
     [HttpPost]
-    // ReSharper disable once StringLiteralTypo
     [Route("employerinterestcleanup")]
     public async Task TriggerEmployerInterestCleanupJob() =>
         await TriggerJob(JobKeys.EmployerInterestCleanup);
 
     [HttpPost]
-    // ReSharper disable once StringLiteralTypo
+    [Route("employerinterestcleanup")]
+    public async Task TriggerProviderNotificationEmailJob() =>
+        await TriggerJob(JobKeys.ProviderNotificationEmail);
+
+    [HttpPost]
     [Route("startuptasks")]
     public async Task TriggerStartupTasksJob() =>
         await TriggerJob(JobKeys.StartupTasks);
 
     [HttpPost]
-    // ReSharper disable once StringLiteralTypo
     [Route("importtowns")]
     public async Task TriggerImportTownDataJob() => 
         await TriggerJob(JobKeys.ImportTownData);

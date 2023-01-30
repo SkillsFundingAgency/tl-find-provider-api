@@ -5,6 +5,7 @@ public class EmployerInterestSettings
     public string? CleanupJobSchedule { get; set; }
     public string? EmployerSupportSiteUri { get; set; }
     public int ExpiryNotificationDays { get; set; }
+    public int MaximumExtensions { get; set; }
     public int RetentionDays { get; set; }
     public int SearchRadius { get; set; }
     public string? ExtendEmployerUri { get; set; }

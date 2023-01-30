@@ -67,6 +67,7 @@ public static class SettingsExtensions
         settings.CleanupJobSchedule = configuration.EmployerInterestSettings?.CleanupJobSchedule;
         settings.ExtendEmployerUri = configuration.EmployerInterestSettings?.ExtendEmployerUri;
         settings.ExpiryNotificationDays = configuration.EmployerInterestSettings?.ExpiryNotificationDays ?? 0;
+        settings.MaximumExtensions = configuration.EmployerInterestSettings?.MaximumExtensions ?? 0;
         settings.RetentionDays = configuration.EmployerInterestSettings?.RetentionDays ?? 0;
         settings.UnsubscribeEmployerUri = configuration.EmployerInterestSettings?.UnsubscribeEmployerUri;
         settings.RegisterInterestUri = configuration.EmployerInterestSettings?.RegisterInterestUri;
@@ -97,6 +98,8 @@ public static class SettingsExtensions
 
         settings.ConnectSiteUri = configuration.ProviderSettings?.ConnectSiteUri;
         settings.DefaultSearchRadius = configuration.ProviderSettings?.DefaultSearchRadius ?? 0;
+        settings.NotificationEmailJobSchedule = configuration.ProviderSettings?.NotificationEmailJobSchedule;
+        settings.NotificationEmailDayOfWeek = configuration.ProviderSettings?.NotificationEmailDayOfWeek ?? 0;
     }
 
     public static void ConfigureSearchSettings(this SearchSettings settings, SiteConfiguration configuration)

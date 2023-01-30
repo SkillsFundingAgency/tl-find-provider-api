@@ -91,6 +91,10 @@
           "type": "integer",
           "environmentVariable": "EmployerInterestSettings_ExpiryNotificationDays"
         },
+        "MaximumExtensions": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_MaximumExtensions"
+        },
         "RegisterInterestUri": {
           "type": "string",
           "environmentVariable": "EmployerInterestSettings_RegisterInterestUri"
@@ -141,6 +145,14 @@
           "minLength": 1,
           "type": "string",
           "environmentVariable": "ProviderSettings_ConnectSiteUri"
+        },
+        "NotificationEmailJobSchedule": {
+          "type": "string",
+          "environmentVariable": "ProviderSettings_NotificationEmailJobSchedule"
+        },
+        "NotificationEmailDayOfWeek": {
+          "type": "integer",
+          "environmentVariable": "ProviderSettings_NotificationEmailDayOfWeek"
         }
       },
       "additionalProperties": false,

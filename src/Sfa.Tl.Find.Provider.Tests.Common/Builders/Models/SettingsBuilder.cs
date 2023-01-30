@@ -30,9 +30,13 @@ public class SettingsBuilder
     private const string ConnectSiteUri = "https://test.connect.tlevels.gov.uk/";
     private const int DefaultSearchRadius = 20;
 
+    private const string ProviderNotificationEmailJobSchedule = "0 0 8 * * MON-FRI";
+    private const int ProviderNotificationEmailDayOfWeek = 1;
+
     private const string EmployerSupportCleanupJobSchedule = "0 0 3 ? * MON-FRI";
     private const int EmployerInterestExpiryNotificationDays = 7;
     private const int EmployerInterestRetentionDays = 10;
+    private const int EmployerInterestMaximumExtensions = 20;
     private const int EmployerInterestSearchRadius = 30;
     private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
     private const string RegisterInterestUri = "https://test.employerssupportgov.uk/registerinterest";
@@ -120,12 +124,14 @@ public class SettingsBuilder
         string unsubscribeEmployerUri = UnsubscribeEmployerUri,
         int expiryNotificationDays = EmployerInterestExpiryNotificationDays,
         int retentionDays = EmployerInterestRetentionDays,
+        int maximumExtensions = EmployerInterestMaximumExtensions,
         int searchRadius = EmployerInterestSearchRadius) => new()
         {
             CleanupJobSchedule = cleanupJobSchedule,
             EmployerSupportSiteUri = employerSupportSiteUri,
             ExpiryNotificationDays = expiryNotificationDays,
             ExtendEmployerUri = extendEmployerUri,
+            MaximumExtensions = maximumExtensions,
             RetentionDays = retentionDays,
             SearchRadius = searchRadius,
             RegisterInterestUri = registerInterestUri,
@@ -148,10 +154,14 @@ public class SettingsBuilder
 
     public ProviderSettings BuildProviderSettings(
         string connectSiteUri = ConnectSiteUri,
-        int defaultSearchRadius = DefaultSearchRadius) => new()
+        int defaultSearchRadius = DefaultSearchRadius,
+        string notificationEmailJobSchedule = ProviderNotificationEmailJobSchedule,
+        int notificationEmailDayOfWeek = ProviderNotificationEmailDayOfWeek) => new()
         {
             ConnectSiteUri = connectSiteUri,
-            DefaultSearchRadius = defaultSearchRadius
+            DefaultSearchRadius = defaultSearchRadius,
+            NotificationEmailJobSchedule = notificationEmailJobSchedule,
+            NotificationEmailDayOfWeek = notificationEmailDayOfWeek
         };
 
     public SearchSettings BuildSearchSettings(

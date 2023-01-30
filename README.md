@@ -65,11 +65,15 @@ Add a new row to the table with:
         "ExtendEmployerUri": "https://test.employers.tlevels.gov.uk/hc/en-gb/articles/8050093018258?step=extend",
         "RegisterInterestUri": "https://test.employers.tlevels.gov.uk/hc/en-gb/articles/8050093018258",
         "ExpiryNotificationDays": 7,
+        "MaximumExtensions": 20,
         "RetentionDays": 84,
         "SearchRadius": 30
       },
     "ProviderSettings": {
-        "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/"
+        "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
+        "DefaultSearchRadius": 20,
+        "NotificationEmailJobSchedule": "0 0 8 * * MON-FRI",
+        "NotificationEmailDayOfWeek": 1
     },
     "GoogleMapsApiSettings": {
         "ApiKey": "<API key>",
