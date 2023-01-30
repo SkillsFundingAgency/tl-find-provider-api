@@ -5,7 +5,7 @@
 }
 
 @section breadcrumbs {
-            <a asp-page="./SearchFilters" class="govuk-back-link" id="tl-back">Return to search filters</a>
+    <a asp-page="./SearchFilters" class="govuk-back-link" id="tl-back">Return to search filters</a>
 }
 
 <div class="govuk-grid-row">
@@ -40,12 +40,11 @@
                             var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
                             var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
-                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected" >
-                                        @skillArea.value.Text
-                                    </label>
-                                    <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
-                                    @*<input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Text" />*@
+                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                    @skillArea.value.Text
+                                </label>
+                                <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
                             </div>
                         }
                     </div>
@@ -54,7 +53,7 @@
 
             <button type="submit" class="govuk-button govuk-!-margin-right-2">Save changes</button>
             <a asp-page="./SearchFilters" class="govuk-link govuk-!-padding-2 tl-display--inline-block">Cancel</a>
-            
+
             <input type="hidden" asp-for="@Model.Input.LocationId" />
 
         </form>
