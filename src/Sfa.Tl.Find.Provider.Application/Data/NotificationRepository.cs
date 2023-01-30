@@ -27,18 +27,34 @@ public class NotificationRepository : INotificationRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task Delete(int notificationId)
+    public async Task Delete(int providerNotificationId)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            notificationId
+            providerNotificationId
         });
 
         await _dbContextWrapper.ExecuteAsync(
             connection,
-            "DeleteNotification",
+            "DeleteProviderNotification",
+            _dynamicParametersWrapper.DynamicParameters,
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public async Task DeleteLocation(int notificationLocationId)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            notificationLocationId
+        });
+
+        await _dbContextWrapper.ExecuteAsync(
+            connection,
+            "DeleteNotificationLocation",
             _dynamicParametersWrapper.DynamicParameters,
             commandType: CommandType.StoredProcedure);
     }
@@ -64,6 +80,61 @@ public class NotificationRepository : INotificationRepository
             .QueryAsync<NotificationDto, RouteDto, Notification>(
                 connection,
                 "GetNotificationDetail",
+                (n, r) =>
+                {
+                    notification ??= new Notification
+                    {
+                        Id = n.Id,
+                        Email = n.Email,
+                        IsEmailVerified = n.IsEmailVerified,
+                        Frequency = n.Frequency,
+                        SearchRadius = n.SearchRadius,
+                        LocationId = n.LocationId,
+                        LocationName = n.LocationName,
+                        Postcode = n.Postcode,
+                        Routes = new List<Route>()
+                    };
+
+                    if (r is not null)
+                    {
+                        notification.Routes.Add(
+                            new Route
+                            {
+                                Id = r.RouteId,
+                                Name = r.RouteName
+                            });
+                    }
+
+                    return notification;
+                },
+                _dynamicParametersWrapper.DynamicParameters,
+                splitOn: "Id, RouteId",
+                commandType: CommandType.StoredProcedure);
+
+        return notification;
+    }
+
+    public async Task<Notification> GetNotificationLocation(
+        int notificationLocationId)
+    {
+        if (notificationLocationId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(notificationLocationId));
+        }
+
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            notificationLocationId = notificationLocationId
+        });
+
+        Notification notification = null;
+
+        await _dbContextWrapper
+            .QueryAsync<NotificationDto, RouteDto, Notification>(
+                connection,
+                "GetNotificationLocationDetail",
                 (n, r) =>
                 {
                     notification ??= new Notification

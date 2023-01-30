@@ -22,6 +22,98 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
+    public async Task Delete_Calls_Database()
+    {
+        const int providerNotificationId = 1;
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .Build();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper, dynamicParametersWrapper);
+
+        await repository.Delete(providerNotificationId);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s => s == "DeleteProviderNotification"),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
+    }
+
+    [Fact]
+    public async Task Delete_Sets_Dynamic_Parameters()
+    {
+        const int providerNotificationId = 1;
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.Delete(providerNotificationId);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("providerNotificationId", providerNotificationId);
+    }
+
+    [Fact]
+    public async Task DeleteLocation_Calls_Database()
+    {
+        const int notificationLocationId = 1;
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .Build();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper, dynamicParametersWrapper);
+
+        await repository.DeleteLocation(notificationLocationId);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s => s == "DeleteNotificationLocation"),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
+    }
+
+    [Fact]
+    public async Task DeleteLocation_Sets_Dynamic_Parameters()
+    {
+        const int notificationLocationId = 1;
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.DeleteLocation(notificationLocationId);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("notificationLocationId", notificationLocationId);
+    }
+
+    [Fact]
     public async Task GetNotificationSummaryList_Returns_Expected_Results()
     {
         const bool includeAdditionalData = true;
@@ -146,7 +238,7 @@ public class NotificationRepositoryTests
         results.Should().NotBeNullOrEmpty();
         results!.Count.Should().Be(1);
         results.First().Validate(notificationLocationSummaryDtoList.First());
-       
+
         results[0].Routes.Should().NotBeNullOrEmpty();
         results[0].Routes.First().Validate(routeDtoList[0]);
     }
@@ -245,6 +337,79 @@ public class NotificationRepositoryTests
 
         templates.GetDynamicTemplatesCount().Should().Be(1);
         templates.ContainsNameAndValue("notificationId", notificationId);
+    }
+
+    [Fact]
+    public async Task GetNotificationLocation_Returns_Expected_Results()
+    {
+        const int id = 1;
+
+        var notifications = new NotificationBuilder()
+            .BuildList()
+            .ToList();
+        var notificationDtoList = new NotificationDtoBuilder()
+            .BuildList()
+            .Take(1)
+            .ToList();
+        var routeDtoList = new RouteDtoBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<Notification>(dbConnection, Arg.Any<string>(), Arg.Any<object>())
+            .Returns(notifications);
+
+        var callIndex = 0;
+
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
+                "GetNotificationLocationDetail",
+                Arg.Do<Func<NotificationDto, RouteDto, Notification>>(
+                    x =>
+                    {
+                        var n = notificationDtoList[callIndex];
+                        var r = routeDtoList[callIndex];
+                        x.Invoke(n, r);
+
+                        callIndex++;
+                    }),
+                Arg.Any<object>(),
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
+
+        var repository = new NotificationRepositoryBuilder().Build(dbContextWrapper);
+
+        var result = await repository.GetNotificationLocation(id);
+
+        result.Validate(notificationDtoList.First());
+        result.Routes.First().Id.Should().Be(routeDtoList[0].RouteId);
+        result.Routes.First().Name.Should().Be(routeDtoList[0].RouteName);
+    }
+
+    [Fact]
+    public async Task GetNotificationLocation_Sets_Dynamic_Parameters()
+    {
+        const int notificationLocationId = 1;
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetNotificationLocation(notificationLocationId);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("notificationLocationId", notificationLocationId);
     }
 
     [Fact]
@@ -366,7 +531,7 @@ public class NotificationRepositoryTests
         var verificationToken = Guid.Parse("d1cece97-ce55-4c5b-8216-2cd65490d0b2");
         var notification = new NotificationBuilder()
             .Build();
-        
+
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
@@ -408,7 +573,7 @@ public class NotificationRepositoryTests
                 dynamicParametersWrapper.DapperParameterFactory);
 
         await repository.SaveEmailVerificationToken(notification.Id!.Value, notification.Email, verificationToken);
-        
+
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
@@ -435,7 +600,7 @@ public class NotificationRepositoryTests
                 dynamicParametersWrapper);
 
         await repository.RemoveEmailVerificationToken(verificationToken);
-        
+
         await dbContextWrapper
             .Received(1)
             .ExecuteAsync(dbConnection,

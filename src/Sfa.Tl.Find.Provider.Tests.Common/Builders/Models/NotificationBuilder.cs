@@ -6,6 +6,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 public class NotificationBuilder
 {
     private bool _useNullId;
+    private bool _useNullLocation;
     private int? _searchRadius = 20;
     private NotificationFrequency _frequency = NotificationFrequency.Immediately;
         
@@ -18,9 +19,9 @@ public class NotificationBuilder
                 Id = _useNullId ? null : 1,
                 Email = "test@provider1.co.uk",
                 IsEmailVerified = true,
-                LocationId = 1,
-                LocationName= "Test Location 1",
-                Postcode = "CV1 2WT",
+                LocationId = _useNullLocation ? null : 1,
+                LocationName= _useNullLocation ? null : "Test Location 1",
+                Postcode = _useNullLocation ? null : "CV1 2WT",
                 SearchRadius = _searchRadius,
                 Frequency = _frequency
             },
@@ -30,9 +31,9 @@ public class NotificationBuilder
                 Email = "test@provider2.co.uk",
                 IsEmailVerified = false,
                 EmailVerificationToken = Guid.Parse("b61cd465-1836-4a44-bf60-51a1f7254285"),
-                LocationId = 1,
-                LocationName= "Test Location 2",
-                Postcode = "CV1 2WT",
+                LocationId = _useNullLocation ? null : 2,
+                LocationName= _useNullLocation ? null : "Test Location 2",
+                Postcode = _useNullLocation ? null : "CV2 3WT",
                 SearchRadius = _searchRadius,
                 Frequency = _frequency,
                 Routes = new List<Route>
@@ -67,9 +68,15 @@ public class NotificationBuilder
         return this;
     }
 
-    public NotificationBuilder WithNullId(bool useNullId = true)
+    public NotificationBuilder WithNullId()
     {
-        _useNullId = useNullId;
+        _useNullId = true;
+        return this;
+    }
+
+    public NotificationBuilder WithNullLocation()
+    {
+        _useNullLocation = true;
         return this;
     }
 }

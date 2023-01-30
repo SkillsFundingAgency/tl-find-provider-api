@@ -29,12 +29,12 @@ public  class RemoveNotificationTests
             .GetNotification(notificationId)
             .Returns(notification);
 
-        var removeNotificationsModel = new RemoveNotificationModelBuilder()
+        var removeNotificationModel = new RemoveNotificationModelBuilder()
             .Build(providerDataService);
 
-        await removeNotificationsModel.OnGet(notificationId);
+        await removeNotificationModel.OnGet(notificationId);
 
-        removeNotificationsModel.Notification
+        removeNotificationModel.Notification
             .Should()
             .BeEquivalentTo(notification);
     }
@@ -49,10 +49,10 @@ public  class RemoveNotificationTests
             .GetNotification(id)
             .Returns(null as Notification);
 
-        var removeNotificationsModel = new RemoveNotificationModelBuilder()
+        var removeNotificationModel = new RemoveNotificationModelBuilder()
             .Build(providerDataService);
 
-        var result = await removeNotificationsModel.OnGet(id);
+        var result = await removeNotificationModel.OnGet(id);
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
@@ -60,7 +60,7 @@ public  class RemoveNotificationTests
     }
 
     [Fact]
-    public async Task RemoveNotification_OnPost_Deletes_From_Repository_And_Redirects()
+    public async Task RemoveNotificationModel_OnPost_Deletes_From_Repository_And_Redirects()
     {
         const int id = 999;
 
@@ -72,10 +72,10 @@ public  class RemoveNotificationTests
             .GetNotification(id)
             .Returns(notification);
 
-        var removeNotificationsModel = new RemoveNotificationModelBuilder()
+        var removeNotificationModel = new RemoveNotificationModelBuilder()
             .Build(providerDataService);
 
-        var result = await removeNotificationsModel.OnPost(id);
+        var result = await removeNotificationModel.OnPost(id);
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
@@ -87,7 +87,7 @@ public  class RemoveNotificationTests
     }
 
     [Fact]
-    public async Task RemoveNotification_OnPost_Sets_TempData()
+    public async Task RemoveNotificationModel_OnPost_Sets_TempData()
     {
         const int id = 999;
 
@@ -99,18 +99,18 @@ public  class RemoveNotificationTests
             .GetNotification(id)
             .Returns(notification);
 
-        var removeNotificationsModel = new RemoveNotificationModelBuilder()
+        var removeNotificationModel = new RemoveNotificationModelBuilder()
             .Build(providerDataService);
 
-        await removeNotificationsModel.OnPost(id);
+        await removeNotificationModel.OnPost(id);
 
-        removeNotificationsModel.TempData.Should().NotBeNull();
-        removeNotificationsModel.TempData
+        removeNotificationModel.TempData.Should().NotBeNull();
+        removeNotificationModel.TempData
             .Keys
             .Should()
             .Contain("DeletedNotificationEmail");
 
-        removeNotificationsModel.TempData
+        removeNotificationModel.TempData
             .Peek("DeletedNotificationEmail")
             .Should()
             .Be(notification.Email);

@@ -7,7 +7,7 @@ using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
-public  class EditNotificationTests
+public class EditNotificationTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
@@ -32,7 +32,7 @@ public  class EditNotificationTests
         var settings = new SettingsBuilder().BuildProviderSettings();
 
         var editNotificationModel = new EditNotificationModelBuilder()
-            .Build(providerDataService, 
+            .Build(providerDataService,
                 providerSettings: settings);
 
         await editNotificationModel.OnGet(notificationId);
@@ -41,7 +41,7 @@ public  class EditNotificationTests
     }
 
     [Fact]
-    public async Task EditNotificationsModel_OnGet_Populates_Notification_List()
+    public async Task EditNotificationModel_OnGet_Populates_Notification_List()
     {
         const int notificationId = 1;
 
@@ -58,17 +58,17 @@ public  class EditNotificationTests
             .GetNotificationLocationSummaryList(notificationId)
             .Returns(notificationLocationSummaryList);
 
-        var editNotificationsModel = new EditNotificationModelBuilder()
+        var editNotificationModel = new EditNotificationModelBuilder()
             .Build(providerDataService);
 
-        await editNotificationsModel.OnGet(notificationId);
+        await editNotificationModel.OnGet(notificationId);
 
-        editNotificationsModel
-            .NotificationLocationList 
+        editNotificationModel
+            .NotificationLocationList
             .Should()
             .BeEquivalentTo(notificationLocationSummaryList);
     }
-    
+
     [Fact]
     public async Task EditNotificationModel_OnGet_Sets_Initial_Input_Values_With_Default_Search_Radius()
     {
@@ -139,5 +139,103 @@ public  class EditNotificationTests
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Error/404");
+    }
+
+    [Fact]
+    public async Task EditNotificationModel_OnGetRemoveLocation_Deletes_From_Repository_And_Redirects()
+    {
+        const int notificationLocationId = 999;
+        const int providerNotificationId = 1;
+
+        var notificationLocation = new NotificationBuilder()
+                .Build();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotificationLocation(notificationLocationId)
+            .Returns(notificationLocation);
+
+        var editNotificationModel = new EditNotificationModelBuilder()
+            .Build(providerDataService);
+
+        var result = await editNotificationModel.OnGetRemoveLocation(notificationLocationId, providerNotificationId);
+
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Provider/EditNotification");
+        redirectResult.RouteValues.Should().Contain(x => 
+            x.Key == "id" &&
+            x.Value != null &&
+            x.Value.ToString() == "1");
+
+        await providerDataService
+                .Received(1)
+                .DeleteNotificationLocation(notificationLocationId);
+    }
+
+    [Fact]
+    public async Task EditNotificationModel_OnGetRemoveLocation_Sets_TempData()
+    {
+        const int id = 999;
+        const int providerNotificationId = 1;
+        const string expectedLocation = "TEST LOCATION 1 [CV1 2WT]";
+
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotificationLocation(id)
+            .Returns(notification);
+
+        var editNotificationModel = new EditNotificationModelBuilder()
+            .Build(providerDataService);
+
+        await editNotificationModel.OnGetRemoveLocation(id, providerNotificationId);
+
+        editNotificationModel.TempData.Should().NotBeNull();
+        editNotificationModel.TempData
+            .Keys
+            .Should()
+            .Contain("RemovedLocation");
+
+        editNotificationModel.TempData
+            .Peek("RemovedLocation")
+            .Should()
+            .Be(expectedLocation);
+    }
+
+    [Fact]
+    public async Task EditNotificationModel_OnGetRemoveLocation_Sets_TempData_For_Null_Location()
+    {
+        const int id = 999;
+        const int providerNotificationId = 1;
+
+        const string expectedLocation = "All";
+
+        var notification = new NotificationBuilder()
+            .WithNullLocation()
+            .Build();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotificationLocation(id)
+            .Returns(notification);
+
+        var editNotificationModel = new EditNotificationModelBuilder()
+            .Build(providerDataService);
+
+        await editNotificationModel.OnGetRemoveLocation(id, providerNotificationId);
+
+        editNotificationModel.TempData.Should().NotBeNull();
+        editNotificationModel.TempData
+            .Keys
+            .Should()
+            .Contain("RemovedLocation");
+
+        editNotificationModel.TempData
+            .Peek("RemovedLocation")
+            .Should()
+            .Be(expectedLocation);
     }
 }

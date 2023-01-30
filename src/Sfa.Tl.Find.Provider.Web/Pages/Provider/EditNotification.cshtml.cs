@@ -57,11 +57,18 @@ public class EditNotificationModel : PageModel
 
     public async Task<IActionResult> OnGetRemoveLocation(int id, int providerNotificationId)
     {
-        Notification = await _providerDataService.GetNotification(providerNotificationId);
+        var notificationLocation = await _providerDataService.GetNotificationLocation(id);
 
-        //Need to get NotificationLocation, or pass name/postcode via link
-        
-        TempData[nameof(RemovedLocation)] = "Test";
+        if (notificationLocation is not null)
+        {
+            await _providerDataService.DeleteNotificationLocation(id);
+
+            TempData[nameof(RemovedLocation)] = 
+                notificationLocation.LocationName is not null
+                ? $"{notificationLocation.LocationName?.ToUpper()} [{notificationLocation.Postcode}]"
+                : "All";
+        }
+
         return RedirectToPage("/Provider/EditNotification", new { id = providerNotificationId });
     }
 }

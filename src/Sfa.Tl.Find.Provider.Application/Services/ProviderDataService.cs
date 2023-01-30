@@ -144,6 +144,16 @@ public class ProviderDataService : IProviderDataService
 
         await _notificationRepository.Delete(notificationId);
     }
+    
+    public async Task DeleteNotificationLocation(int notificationLocationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Deleting notification location {notificationLocationId}", notificationLocationId);
+        }
+
+        await _notificationRepository.DeleteLocation(notificationLocationId);
+    }
 
     public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn)
     {
@@ -182,6 +192,17 @@ public class ProviderDataService : IProviderDataService
 
         return await _notificationRepository
             .GetNotification(notificationId);
+    }
+
+    public async Task<Notification> GetNotificationLocation(int notificationLocationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notification location {notificationLocationId}", notificationLocationId);
+        }
+
+        return await _notificationRepository
+            .GetNotificationLocation(notificationLocationId);
     }
 
     public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)
