@@ -122,7 +122,7 @@ public class EditNotificationTests
     }
 
     [Fact]
-    public async Task EditNotificationModel_OnGet_Redirects_To_404_If_Employer_Not_Found()
+    public async Task EditNotificationModel_OnGet_Redirects_To_Notifications_If_Notification_Location_Not_Found()
     {
         const int notificationId = 999;
 
@@ -138,7 +138,7 @@ public class EditNotificationTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/Error/404");
+        redirectResult!.PageName.Should().Be("/Provider/Notifications");
     }
 
     [Fact]

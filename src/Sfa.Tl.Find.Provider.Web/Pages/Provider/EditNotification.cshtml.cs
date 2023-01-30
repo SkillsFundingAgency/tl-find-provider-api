@@ -47,7 +47,7 @@ public class EditNotificationModel : PageModel
         Notification = await _providerDataService.GetNotification(id);
         if (Notification is null)
         {
-            return RedirectToPage("/Error/404");
+            return RedirectToPage("/Provider/Notifications");
         }
 
         NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(id);
