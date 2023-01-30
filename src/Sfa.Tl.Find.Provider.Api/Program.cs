@@ -102,7 +102,8 @@ try
     builder.Services.AddQuartzServices(
         siteConfiguration.CourseDirectoryImportSchedule,
         siteConfiguration.TownDataImportSchedule,
-        siteConfiguration.EmployerInterestSettings?.CleanupJobSchedule);
+        siteConfiguration.EmployerInterestSettings?.CleanupJobSchedule,
+        siteConfiguration.ProviderSettings?.NotificationEmailJobSchedule);
 
     builder.Services
         .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()

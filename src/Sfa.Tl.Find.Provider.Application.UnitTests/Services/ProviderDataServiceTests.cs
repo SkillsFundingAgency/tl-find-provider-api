@@ -1267,29 +1267,14 @@ public class ProviderDataServiceTests
     }
 
     [Fact]
-    public async Task SendProviderVerificationEmail_Calls_EmailService_And_Repository()
+    public async Task SendProviderNotifications_Calls_EmailService()
     {
-        const int notificationId = 1;
-        var uniqueId = Guid.Parse("f0f7d306-f114-42c5-adeb-87b67e580f1a");
-
         var providerSettings = new SettingsBuilder()
             .BuildProviderSettings();
 
-        var baseUri = providerSettings.ConnectSiteUri?.TrimEnd('/');
-        var expectedNotificationsUri = $"{baseUri}/notifications";
-        var expectedVerificationUri = $"{baseUri}/notifications?token={uniqueId:D}";
-
-        var guidProvider = Substitute.For<IGuidProvider>();
-        guidProvider
-            .NewGuid()
-        .Returns(uniqueId);
-
-        var notification = new NotificationBuilder()
-            .Build();
-
         var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotification(notificationId)
-            .Returns(notification);
+        //notificationRepository.GetNotification(notificationId)
+        //    .Returns(notification);
 
         var emailService = Substitute.For<IEmailService>();
         emailService.SendEmail(
@@ -1301,30 +1286,25 @@ public class ProviderDataServiceTests
 
         var service = new ProviderDataServiceBuilder()
             .Build(
-                guidProvider: guidProvider,
                 emailService: emailService,
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
 
-        await service.SendProviderVerificationEmail(notificationId, notification.Email);
+        //TODO: Remove act when method is implemented - just keep "await service.SendProviderNotifications();"
 
-        await emailService
-            .Received(1)
-            .SendEmail(
-                notification.Email,
-                EmailTemplateNames.ProviderVerification,
-                Arg.Is<IDictionary<string, string>>(tokens =>
-                    tokens.ValidateTokens(
-                        new Dictionary<string, string>
-                        {
-                            { "email_verification_link", expectedVerificationUri },
-                            { "notifications_uri", expectedNotificationsUri }
-                        })),
-                Arg.Any<string>());
+        var f = async () =>
+        {
+            await service.SendProviderNotifications();
+        };
+        await f.Should().ThrowAsync<NotImplementedException>();
+        //await emailService
+        //    .Received(1)
+        //    .SendEmail(
+        //        notification.Email,
+        //        EmailTemplateNames.ProviderNotification,
+        //        Arg.Any<IDictionary<string, string>>(),
+        //        Arg.Any<string>());
 
-        await notificationRepository
-            .Received(1)
-            .SaveEmailVerificationToken(notificationId, notification.Email, uniqueId);
     }
 
     [Fact]
@@ -1392,10 +1372,67 @@ public class ProviderDataServiceTests
                             { "notifications_uri", expectedNotificationsUri }
                         })),
                 Arg.Any<string>());
+    }
+    
+    [Fact]
+    public async Task SendProviderVerificationEmail_Calls_EmailService_And_Repository()
+    {
+        const int notificationId = 1;
+        var uniqueId = Guid.Parse("f0f7d306-f114-42c5-adeb-87b67e580f1a");
 
-        //notificationRepository
-        //    .Received(1)
-        //    .SaveEmailVerification(notificationId);
+        var providerSettings = new SettingsBuilder()
+            .BuildProviderSettings();
+
+        var baseUri = providerSettings.ConnectSiteUri?.TrimEnd('/');
+        var expectedNotificationsUri = $"{baseUri}/notifications";
+        var expectedVerificationUri = $"{baseUri}/notifications?token={uniqueId:D}";
+
+        var guidProvider = Substitute.For<IGuidProvider>();
+        guidProvider
+            .NewGuid()
+        .Returns(uniqueId);
+
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetNotification(notificationId)
+            .Returns(notification);
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(
+                guidProvider: guidProvider,
+                emailService: emailService,
+                notificationRepository: notificationRepository,
+                providerSettings: providerSettings);
+
+        await service.SendProviderVerificationEmail(notificationId, notification.Email);
+
+        await emailService
+            .Received(1)
+            .SendEmail(
+                notification.Email,
+                EmailTemplateNames.ProviderVerification,
+                Arg.Is<IDictionary<string, string>>(tokens =>
+                    tokens.ValidateTokens(
+                        new Dictionary<string, string>
+                        {
+                            { "email_verification_link", expectedVerificationUri },
+                            { "notifications_uri", expectedNotificationsUri }
+                        })),
+                Arg.Any<string>());
+
+        await notificationRepository
+            .Received(1)
+            .SaveEmailVerificationToken(notificationId, notification.Email, uniqueId);
     }
 
     [Fact]

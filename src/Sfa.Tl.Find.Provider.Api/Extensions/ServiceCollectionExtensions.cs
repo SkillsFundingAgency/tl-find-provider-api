@@ -204,7 +204,8 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string courseDirectoryImportCronSchedule = null,
         string townDataImportCronSchedule = null,
-        string employerInterestCleanupCronSchedule = null)
+        string employerInterestCleanupCronSchedule = null,
+        string providerNotificationEmailCronSchedule = null)
     {
         services.AddQuartz(q =>
         {
@@ -255,6 +256,19 @@ public static class ServiceCollectionExtensions
                             CronScheduleBuilder
                                 .CronSchedule(employerInterestCleanupCronSchedule)));
             }
+
+            if (!string.IsNullOrEmpty(providerNotificationEmailCronSchedule))
+            {
+                var providerNotificationEmailJobKey = new JobKey(JobKeys.ProviderNotificationEmail);
+                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                        opts.WithIdentity(providerNotificationEmailJobKey))
+                    .AddTrigger(opts => opts
+                        .ForJob(providerNotificationEmailJobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(providerNotificationEmailCronSchedule)));
+            }
+
         });
 
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

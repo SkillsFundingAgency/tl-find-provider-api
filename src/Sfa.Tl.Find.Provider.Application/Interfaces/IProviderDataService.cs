@@ -58,10 +58,12 @@ public interface IProviderDataService
     Task SaveNotification(Notification notification, long ukPrn);
 
     Task SaveSearchFilter(SearchFilter searchFilter);
-    
-    Task SendProviderVerificationEmail(int notificationId, string emailAddress);
 
+    Task SendProviderNotifications();
+    
     Task SendProviderNotificationEmail(int notificationId, string emailAddress);
+
+    Task SendProviderVerificationEmail(int notificationId, string emailAddress);
 
     Task VerifyNotificationEmail(string token);
 }

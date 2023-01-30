@@ -437,14 +437,12 @@ public class ProviderDataService : IProviderDataService
         await _searchFilterRepository.Save(searchFilter);
     }
 
-    public async Task SendProviderVerificationEmail(int notificationId, string emailAddress)
+    public Task SendProviderNotifications()
     {
-        var verificationToken = _guidProvider.NewGuid();
-        await SendProviderVerificationEmail(emailAddress, verificationToken);
-
-        await _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
+        //TODO: Send daily then weekly emails? or all at once?
+        throw new NotImplementedException();
     }
-
+    
     public async Task SendProviderNotificationEmail(int notificationId, string emailAddress)
     {
         var siteUri = new Uri(_providerSettings.ConnectSiteUri);
@@ -465,6 +463,14 @@ public class ProviderDataService : IProviderDataService
                 { "notifications_uri", notificationsUri.ToString() }
             },
             uniqueId.ToString());
+    }
+
+    public async Task SendProviderVerificationEmail(int notificationId, string emailAddress)
+    {
+        var verificationToken = _guidProvider.NewGuid();
+        await SendProviderVerificationEmail(emailAddress, verificationToken);
+
+        await _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
     }
 
     public async Task VerifyNotificationEmail(string token)
