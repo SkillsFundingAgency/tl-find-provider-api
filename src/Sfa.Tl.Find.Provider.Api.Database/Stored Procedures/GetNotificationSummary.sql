@@ -17,6 +17,7 @@ AS
 		   CASE	WHEN n.EmailVerificationToken IS NULL THEN 1
 				ELSE 0
 			END AS [IsEmailVerified],
+		   nl.[Id] AS [NotificationLocationId],
 		   l.[Id] AS [LocationId],
 		   l.[Name] AS [LocationName],
 		   l.[Postcode]
