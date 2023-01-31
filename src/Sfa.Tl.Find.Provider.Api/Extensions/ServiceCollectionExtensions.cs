@@ -205,8 +205,9 @@ public static class ServiceCollectionExtensions
         string courseDirectoryImportCronSchedule = null,
         string townDataImportCronSchedule = null,
         string employerInterestCleanupCronSchedule = null,
-        string providerNotificationEmailCronSchedule = null)
-    {
+        string providerNotificationEmailCronSchedule = null,
+        string providerNotificationEmailImmediateCronSchedule = null)
+        {
         services.AddQuartz(q =>
         {
             q.SchedulerName = "Find a Provider Quartz Scheduler";
@@ -269,6 +270,11 @@ public static class ServiceCollectionExtensions
                                 .CronSchedule(providerNotificationEmailCronSchedule)));
             }
 
+            if (!string.IsNullOrEmpty(providerNotificationEmailImmediateCronSchedule))
+            {
+                var providerNotificationImmediateEmailJobKey = new JobKey(JobKeys.ProviderNotificationEmail);
+                //TODO: Add job
+            }
         });
 
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

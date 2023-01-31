@@ -36,7 +36,7 @@ public static class SettingsExtensions
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-        settings.Administrators= configuration.DfeSignInSettings?.Administrators;
+        settings.Administrators = configuration.DfeSignInSettings?.Administrators;
         settings.ApiUri = configuration.DfeSignInSettings?.ApiUri;
         settings.ApiSecret = configuration.DfeSignInSettings?.ApiSecret;
         settings.Audience = configuration.DfeSignInSettings?.Audience;
@@ -99,7 +99,8 @@ public static class SettingsExtensions
         settings.ConnectSiteUri = configuration.ProviderSettings?.ConnectSiteUri;
         settings.DefaultSearchRadius = configuration.ProviderSettings?.DefaultSearchRadius ?? 0;
         settings.NotificationEmailJobSchedule = configuration.ProviderSettings?.NotificationEmailJobSchedule;
-        settings.NotificationEmailDayOfWeek = configuration.ProviderSettings?.NotificationEmailDayOfWeek ?? 0;
+        settings.NotificationEmailImmediateJobSchedule = configuration.ProviderSettings?.NotificationEmailImmediateJobSchedule;
+        settings.NotificationEmailWeeklyDay = configuration.ProviderSettings?.NotificationEmailWeeklyDay ?? 0;
     }
 
     public static void ConfigureSearchSettings(this SearchSettings settings, SiteConfiguration configuration)

@@ -80,6 +80,25 @@ public class JobTriggersControllerTests
     }
 
     [Fact]
+    public async Task TriggerProviderNotificationEmailJobImmediate_Runs_Job()
+    {
+        var scheduler = Substitute.For<IScheduler>();
+        var schedulerFactory = Substitute.For<ISchedulerFactory>();
+        schedulerFactory.GetScheduler()
+            .Returns(Task.FromResult(scheduler));
+
+        var controller = new JobTriggersControllerBuilder()
+            .Build(schedulerFactory);
+
+        await controller.TriggerProviderNotificationEmailImmediateJob();
+
+        await scheduler
+            .Received(1)
+            .TriggerJob(Arg.Is<JobKey>(k =>
+                k.Name == JobKeys.ProviderNotificationEmailImmediate));
+    }
+
+    [Fact]
     public async Task TriggerStartupTasksJob_Runs_Job()
     {
         var scheduler = Substitute.For<IScheduler>();

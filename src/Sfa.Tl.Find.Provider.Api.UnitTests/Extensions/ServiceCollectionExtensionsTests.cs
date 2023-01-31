@@ -161,7 +161,8 @@ public class ServiceCollectionExtensionsTests
             "0 0 9 ? * MON-FRI",
             "0 0 10 ? * *",
             "0 0 11 ? * *",
-            "0 0 12 ? * *");
+            "0 0 6 ? * *",
+            "0 */ 15 * ***");
 
         services.Should().Contain(t =>
             t.ImplementationType != null &&

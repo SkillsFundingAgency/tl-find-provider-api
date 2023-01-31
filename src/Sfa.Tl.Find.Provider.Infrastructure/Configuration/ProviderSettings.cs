@@ -8,5 +8,7 @@ public class ProviderSettings
 
     public string? NotificationEmailJobSchedule { get; set;}
 
-    public int NotificationEmailDayOfWeek { get; set; }
+    public string? NotificationEmailImmediateJobSchedule { get; set;}
+
+    public int NotificationEmailWeeklyDay { get; set; }
 }

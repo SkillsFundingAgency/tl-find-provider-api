@@ -150,9 +150,13 @@
           "type": "string",
           "environmentVariable": "ProviderSettings_NotificationEmailJobSchedule"
         },
-        "NotificationEmailDayOfWeek": {
+        "NotificationEmailImmediateJobSchedule": {
+          "type": "string",
+          "environmentVariable": "ProviderSettings_NotificationEmailImmediateJobSchedule"
+        },
+        "NotificationEmailWeeklyDay": {
           "type": "integer",
-          "environmentVariable": "ProviderSettings_NotificationEmailDayOfWeek"
+          "environmentVariable": "ProviderSettings_NotificationEmailWeeklyDay"
         }
       },
       "additionalProperties": false,

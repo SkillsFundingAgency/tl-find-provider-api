@@ -73,7 +73,8 @@ Add a new row to the table with:
         "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
         "DefaultSearchRadius": 20,
         "NotificationEmailJobSchedule": "0 0 8 * * MON-FRI",
-        "NotificationEmailDayOfWeek": 1
+        "NotificationEmailImmediateJobSchedule": "0 */15 * * * *"
+        "NotificationEmailWeeklyDay": 5
     },
     "GoogleMapsApiSettings": {
         "ApiKey": "<API key>",

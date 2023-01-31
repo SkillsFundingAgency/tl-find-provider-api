@@ -35,9 +35,14 @@ public class JobTriggersController : ControllerBase
         await TriggerJob(JobKeys.EmployerInterestCleanup);
 
     [HttpPost]
-    [Route("employerinterestcleanup")]
+    [Route("providernotificationemail")]
     public async Task TriggerProviderNotificationEmailJob() =>
         await TriggerJob(JobKeys.ProviderNotificationEmail);
+
+    [HttpPost]
+    [Route("providernotificationemailimmediate")]
+    public async Task TriggerProviderNotificationEmailImmediateJob() =>
+        await TriggerJob(JobKeys.ProviderNotificationEmailImmediate);
 
     [HttpPost]
     [Route("startuptasks")]

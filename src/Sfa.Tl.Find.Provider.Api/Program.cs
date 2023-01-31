@@ -103,7 +103,8 @@ try
         siteConfiguration.CourseDirectoryImportSchedule,
         siteConfiguration.TownDataImportSchedule,
         siteConfiguration.EmployerInterestSettings?.CleanupJobSchedule,
-        siteConfiguration.ProviderSettings?.NotificationEmailJobSchedule);
+        siteConfiguration.ProviderSettings?.NotificationEmailJobSchedule,
+        siteConfiguration.ProviderSettings?.NotificationEmailImmediateJobSchedule);
 
     builder.Services
         .AddSingleton<IHttpContextAccessor, HttpContextAccessor>()

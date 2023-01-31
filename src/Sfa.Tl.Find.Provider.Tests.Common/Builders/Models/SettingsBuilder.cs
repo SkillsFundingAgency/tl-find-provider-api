@@ -30,8 +30,9 @@ public class SettingsBuilder
     private const string ConnectSiteUri = "https://test.connect.tlevels.gov.uk/";
     private const int DefaultSearchRadius = 20;
 
-    private const string ProviderNotificationEmailJobSchedule = "0 0 8 * * MON-FRI";
-    private const int ProviderNotificationEmailDayOfWeek = 1;
+    private const string ProviderNotificationEmailJobSchedule = "0 */15 * * * *";
+    private const string NotificationEmailImmediateJobSchedule = "0 0 6 * * *";
+    private const int ProviderNotificationEmailWeeklyDay = 5;
 
     private const string EmployerSupportCleanupJobSchedule = "0 0 3 ? * MON-FRI";
     private const int EmployerInterestExpiryNotificationDays = 7;
@@ -156,12 +157,14 @@ public class SettingsBuilder
         string connectSiteUri = ConnectSiteUri,
         int defaultSearchRadius = DefaultSearchRadius,
         string notificationEmailJobSchedule = ProviderNotificationEmailJobSchedule,
-        int notificationEmailDayOfWeek = ProviderNotificationEmailDayOfWeek) => new()
+        string notificationEmailImmediateJobSchedule = NotificationEmailImmediateJobSchedule,
+        int notificationEmailWeeklyDay = ProviderNotificationEmailWeeklyDay) => new()
         {
             ConnectSiteUri = connectSiteUri,
             DefaultSearchRadius = defaultSearchRadius,
             NotificationEmailJobSchedule = notificationEmailJobSchedule,
-            NotificationEmailDayOfWeek = notificationEmailDayOfWeek
+            NotificationEmailImmediateJobSchedule = notificationEmailImmediateJobSchedule,
+            NotificationEmailWeeklyDay = notificationEmailWeeklyDay
         };
 
     public SearchSettings BuildSearchSettings(
