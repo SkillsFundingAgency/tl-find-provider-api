@@ -96,6 +96,15 @@
                     </tbody>
             </table>
         </form>
+        
+        <div class="tl-notification-box tl-notification-box--red">
+            <div>
+                <strong>Do you want to remove notifications for Warrick Green?</strong>
+                <br /><br />
+                <a class="govuk-button govuk-button--warning govuk-!-margin-right-3 govuk-!-margin-bottom-0" data-module="govuk-button">Remove</a>
+                <a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+            </div>
+        </div>
         <a asp-page="./AddNotification" asp-route-id="@Model.Notification?.Id" class="govuk-button">Add notification for another campus</a>
     </div>
 </div>
