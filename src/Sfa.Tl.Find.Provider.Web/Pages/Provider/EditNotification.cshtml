@@ -97,8 +97,7 @@
             </table>
         </form>
         
-        @*<div id="tl-notification-box" class="tl-notification-box tl-notification-box--red tl-hidden">*@
-        <div id="tl-notification-box" class="tl-hidden">
+        <div id="tl-notification-box" class="tl-notification-box tl-notification-box--red tl-hidden">
             <div>
                 <strong>Do you want to remove notifications for <span id="tl-confirm-location-name"></span>?</strong>
                 <br /><br />
@@ -118,15 +117,15 @@
             var campus = $(this).closest('tr').find('th').text().trim();
             $("#tl-confirm-location-name").text(campus);
             $("#tl-notification-box").removeClass("tl-hidden");
-            $("#tl-notification-box").addClass("tl-notification-box");
-            $("#tl-notification-box").addClass("tl-notification-box--red");
+            //$("#tl-notification-box").addClass("tl-notification-box");
+            //$("#tl-notification-box").addClass("tl-notification-box--red");
 
             $("#tl-add-notification").addClass("tl-hidden");
         });
 
         $("a.notification-close").click(function () {
-            $("#tl-notification-box").removeClass("tl-notification-box");
-            $("#tl-notification-box").removeClass("tl-notification-box--red");
+            //$("#tl-notification-box").removeClass("tl-notification-box");
+            //$("#tl-notification-box").removeClass("tl-notification-box--red");
             $("#tl-notification-box").addClass("tl-hidden");
 
             $("#tl-add-notification").removeClass("tl-hidden");
