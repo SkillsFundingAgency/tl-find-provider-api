@@ -88,7 +88,7 @@
                                 </td>
                                 <td class="govuk-table__cell">
                                     <a asp-page="./AddNotification" asp-route-id="@notificationLocation.Id" class="govuk-link govuk-link--no-visited-state">Change</a>
-                                    <a asp-page="./EditNotification" asp-page-handler="RemoveLocation" asp-route-id="@notificationLocation.Id" asp-route-providernotificationid="@Model.ProviderNotificationId" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
+                                    <a asp-page="./EditNotification" asp-page-handler="RemoveLocation" asp-route-id="@notificationLocation.Id" asp-route-providernotificationid="@Model.ProviderNotificationId" class="tl-remove-notification govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
                                 </td>
                             </tr>
                         }
@@ -97,14 +97,41 @@
             </table>
         </form>
         
-        <div class="tl-notification-box tl-notification-box--red">
+        @*<div id="tl-notification-box" class="tl-notification-box tl-notification-box--red tl-hidden">*@
+        <div id="tl-notification-box" class="tl-hidden">
             <div>
-                <strong>Do you want to remove notifications for Warrick Green?</strong>
+                <strong>Do you want to remove notifications for <span id="tl-confirm-location-name"></span>?</strong>
                 <br /><br />
-                <a class="govuk-button govuk-button--warning govuk-!-margin-right-3 govuk-!-margin-bottom-0" data-module="govuk-button">Remove</a>
+                <a class="govuk-button govuk-button--warning govuk-!-margin-right-3 govuk-!-margin-bottom-0" id="tl-confirm-remove" data-module="govuk-button">Remove</a>
                 <a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
             </div>
         </div>
-        <a asp-page="./AddNotification" asp-route-id="@Model.Notification?.Id" class="govuk-button">Add notification for another campus</a>
+        <a asp-page="./AddNotification" asp-route-id="@Model.Notification?.Id" id="tl-add-notification" class="govuk-button">Add notification for another campus</a>
     </div>
 </div>
+
+@section scripts {
+    <script>
+        $("a.tl-remove-notification").click(function (e) {
+            e.preventDefault();
+            $("#tl-confirm-remove").attr('href', $(this).attr('href'));
+            var campus = $(this).closest('tr').find('th').text().trim();
+            $("#tl-confirm-location-name").text(campus);
+            $("#tl-notification-box").removeClass("tl-hidden");
+            $("#tl-notification-box").addClass("tl-notification-box");
+            $("#tl-notification-box").addClass("tl-notification-box--red");
+
+            $("#tl-add-notification").addClass("tl-hidden");
+        });
+
+        $("a.notification-close").click(function () {
+            $("#tl-notification-box").removeClass("tl-notification-box");
+            $("#tl-notification-box").removeClass("tl-notification-box--red");
+            $("#tl-notification-box").addClass("tl-hidden");
+
+            $("#tl-add-notification").removeClass("tl-hidden");
+            $("#tl-confirm-remove").attr('href', "#");
+            $("#tl-confirm-location-name").text("");
+        });
+    </script>
+}
