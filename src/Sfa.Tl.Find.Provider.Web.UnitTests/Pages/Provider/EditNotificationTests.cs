@@ -89,36 +89,6 @@ public class EditNotificationTests
                 providerSettings: settings);
 
         await editNotificationDetailModel.OnGet(id);
-
-        //editNotificationDetailModel.Input.Should().NotBeNull();
-        //editNotificationDetailModel.Input!.NotificationId.Should().Be(id);
-    }
-
-    [Fact]
-    public async Task EditNotificationModel_OnGet_Sets_Input_Selected_Values()
-    {
-        const int searchRadius = 30;
-
-        var settings = new SettingsBuilder().BuildProviderSettings();
-
-        var notification = new NotificationBuilder()
-            .WithSearchRadius(searchRadius)
-            .Build();
-        var id = notification.Id!.Value;
-
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
-            .GetNotification(id)
-            .Returns(notification);
-
-        var editNotificationDetailModel = new EditNotificationModelBuilder()
-            .Build(providerDataService,
-                providerSettings: settings);
-
-        await editNotificationDetailModel.OnGet(id);
-
-        //editNotificationDetailModel.Input.Should().NotBeNull();
-        //editNotificationDetailModel.Input!.NotificationId.Should().Be(id);
     }
 
     [Fact]
