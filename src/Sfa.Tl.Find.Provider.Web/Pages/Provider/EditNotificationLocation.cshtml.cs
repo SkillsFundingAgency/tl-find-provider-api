@@ -15,12 +15,12 @@ using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
-public class EditNotificationCampusModel : PageModel
+public class EditNotificationLocationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
     private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
-    private readonly ILogger<EditNotificationCampusModel> _logger;
+    private readonly ILogger<EditNotificationLocationModel> _logger;
 
     public int DefaultSearchRadius { get; private set; }
 
@@ -32,11 +32,11 @@ public class EditNotificationCampusModel : PageModel
 
     [BindProperty] public InputModel? Input { get; set; }
 
-    public EditNotificationCampusModel(
+    public EditNotificationLocationModel(
         IProviderDataService providerDataService,
         ISessionService? sessionService,
         IOptions<ProviderSettings> providerOptions,
-        ILogger<EditNotificationCampusModel> logger)
+        ILogger<EditNotificationLocationModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));

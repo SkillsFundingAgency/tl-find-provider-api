@@ -71,8 +71,8 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddPageRoute("/Provider/AddNotification", "/add-notification");
     options.Conventions.AddPageRoute("/Provider/EditNotification", "/edit-notification");
     options.Conventions.AddPageRoute("/Provider/RemoveNotification", "/remove-notification");
-    //options.Conventions.AddPageRoute("/Provider/AddNotificationCampus", "/notification-add-email-campus");
-    options.Conventions.AddPageRoute("/Provider/EditNotificationCampus", "/notification-edit-email-campus");
+    //options.Conventions.AddPageRoute("/Provider/AddNotificationLocation", "/notification-add-email-campus");
+    options.Conventions.AddPageRoute("/Provider/EditNotificationLocation", "/notification-edit-email-campus");
     
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");

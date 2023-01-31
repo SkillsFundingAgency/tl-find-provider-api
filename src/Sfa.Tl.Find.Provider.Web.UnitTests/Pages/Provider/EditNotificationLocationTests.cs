@@ -9,32 +9,30 @@ using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
-public class EditNotificationCampusTests
+public class EditNotificationLocationTests
 {
-    private const string EmailFieldKey = "Input.Email";
-
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
     {
-        typeof(EditNotificationCampusModel)
+        typeof(EditNotificationLocationModel)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public async Task EditNotificationCampusModel_OnGet_Sets_ExpectedProperties()
+    public async Task EditNotificationLocationModel_OnGet_Sets_ExpectedProperties()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerSettings: settings);
 
-        await editNotificationCampusModel.OnGet();
+        await editNotificationLocationModel.OnGet();
 
-        editNotificationCampusModel.DefaultSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        editNotificationLocationModel.DefaultSearchRadius.Should().Be(settings.DefaultSearchRadius);
     }
 
     [Fact]
-    public async Task EditNotificationCampusModel_OnGet_Sets_FrequencyOptions_Select_List()
+    public async Task EditNotificationLocationModel_OnGet_Sets_FrequencyOptions_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -47,14 +45,14 @@ public class EditNotificationCampusTests
         //    .GetNotification(id)
         //    .Returns(notification);
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationCampusModel.OnGet();
+        await editNotificationLocationModel.OnGet();
 
-        editNotificationCampusModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
-        var options = editNotificationCampusModel.FrequencyOptions;
+        editNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        var options = editNotificationLocationModel.FrequencyOptions;
 
         options!.Length.Should().Be(3);
         options[0].Should().Match<SelectListItem>(x =>
@@ -66,7 +64,7 @@ public class EditNotificationCampusTests
     }
 
     [Fact]
-    public async Task EditNotificationCampusModel_OnGet_Sets_Search_Radius_Select_List()
+    public async Task EditNotificationLocationModel_OnGet_Sets_Search_Radius_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -79,14 +77,14 @@ public class EditNotificationCampusTests
         //    .GetNotification(id)
         //    .Returns(notification);
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationCampusModel.OnGet();
+        await editNotificationLocationModel.OnGet();
 
-        editNotificationCampusModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
-        var options = editNotificationCampusModel.SearchRadiusOptions;
+        editNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        var options = editNotificationLocationModel.SearchRadiusOptions;
 
         options!.Length.Should().Be(6);
         options[0].Should().Match<SelectListItem>(x =>
@@ -104,7 +102,7 @@ public class EditNotificationCampusTests
     }
 
     [Fact]
-    public async Task EditNotificationCampusModel_OnGet_Sets_Skill_Area_Select_List()
+    public async Task EditNotificationLocationModel_OnGet_Sets_Skill_Area_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -124,15 +122,15 @@ public class EditNotificationCampusTests
             .GetRoutes()
             .Returns(routes);
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationCampusModel.OnGet();
+        await editNotificationLocationModel.OnGet();
 
-        editNotificationCampusModel.Input.Should().NotBeNull();
-        editNotificationCampusModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
-        var skillAreas = editNotificationCampusModel.Input.SkillAreas;
+        editNotificationLocationModel.Input.Should().NotBeNull();
+        editNotificationLocationModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
+        var skillAreas = editNotificationLocationModel.Input.SkillAreas;
 
         skillAreas!.Length.Should().Be(routes.Count);
 
@@ -149,7 +147,7 @@ public class EditNotificationCampusTests
     }
 
     [Fact]
-    public async Task EditNotificationCampusModel_OnGet_Sets_Initial_Input_Values_With_Default_Search_Radius()
+    public async Task EditNotificationLocationModel_OnGet_Sets_Initial_Input_Values_With_Default_Search_Radius()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -163,22 +161,22 @@ public class EditNotificationCampusTests
         //    .GetNotification(id)
         //    .Returns(notification);
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationCampusModel.OnGet();
+        await editNotificationLocationModel.OnGet();
 
-        editNotificationCampusModel.Input.Should().NotBeNull();
-        //editNotificationCampusModel.Input!.NotificationId.Should().Be(id);
-        editNotificationCampusModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
-        editNotificationCampusModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
-        editNotificationCampusModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
-        editNotificationCampusModel.Input!.SelectedLocation.Should().Be(0);
+        editNotificationLocationModel.Input.Should().NotBeNull();
+        //editNotificationLocationModel.Input!.NotificationId.Should().Be(id);
+        editNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        editNotificationLocationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
+        editNotificationLocationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
+        editNotificationLocationModel.Input!.SelectedLocation.Should().Be(0);
     }
 
     [Fact]
-    public async Task EditNotificationCampusModel_OnGet_Sets_Input_Selected_Values()
+    public async Task EditNotificationLocationModel_OnGet_Sets_Input_Selected_Values()
     {
         //const int searchRadius = 30;
 
@@ -194,20 +192,20 @@ public class EditNotificationCampusTests
         //    .GetNotification(id)
         //    .Returns(notification);
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationCampusModel.OnGet();
+        await editNotificationLocationModel.OnGet();
 
-        editNotificationCampusModel.Input.Should().NotBeNull();
-        //editNotificationCampusModel.Input!.NotificationId.Should().Be(id);
-        editNotificationCampusModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
-        editNotificationCampusModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
+        editNotificationLocationModel.Input.Should().NotBeNull();
+        //editNotificationLocationModel.Input!.NotificationId.Should().Be(id);
+        editNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        editNotificationLocationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
     }
 
     [Fact]
-    public async Task EditNotificationCampus_OnPost_Saves_To_Repository_And_Redirects()
+    public async Task EditNotificationLocation_OnPost_Saves_To_Repository_And_Redirects()
     {
         const string testEmail = "test@test.com";
         //var notification = new NotificationBuilder()
@@ -219,10 +217,10 @@ public class EditNotificationCampusTests
         //    .GetNotification(notificationId)
         //    .Returns(notification);
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService);
 
-        editNotificationCampusModel.Input = new EditNotificationCampusModel.InputModel
+        editNotificationLocationModel.Input = new EditNotificationLocationModel.InputModel
         {
             Email = testEmail,
             SelectedSearchRadius = 30,
@@ -233,7 +231,7 @@ public class EditNotificationCampusTests
             }
         };
 
-        var result = await editNotificationCampusModel.OnPost();
+        var result = await editNotificationLocationModel.OnPost();
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
@@ -246,7 +244,7 @@ public class EditNotificationCampusTests
     }
     
     [Fact]
-    public async Task EditNotificationCampus_OnPost_Sets_TempData()
+    public async Task EditNotificationLocation_OnPost_Sets_TempData()
     {
         var notification = new NotificationBuilder()
             .Build();
@@ -258,39 +256,39 @@ public class EditNotificationCampusTests
         //    .GetNotification(notificationId)
         //    .Returns(notification);
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService);
 
-        editNotificationCampusModel.Input = new EditNotificationCampusModel.InputModel
+        editNotificationLocationModel.Input = new EditNotificationLocationModel.InputModel
         {
             Email = notification.Email
         };
 
-        await editNotificationCampusModel.OnPost();
+        await editNotificationLocationModel.OnPost();
 
-        editNotificationCampusModel.TempData.Should().NotBeNull();
-        editNotificationCampusModel.TempData
+        editNotificationLocationModel.TempData.Should().NotBeNull();
+        editNotificationLocationModel.TempData
             .Keys
             .Should()
             .Contain("VerificationEmail");
 
-        editNotificationCampusModel.TempData
+        editNotificationLocationModel.TempData
             .Peek("VerificationEmail")
             .Should()
             .Be(notification.Email);
     }
 
     [Fact]
-    public async Task EditNotificationCampus_OnPostAddLocation_Saves_To_Repository_And_Redirects()
+    public async Task EditNotificationLocation_OnPostAddLocation_Saves_To_Repository_And_Redirects()
     {
         const string testEmail = "test@test.com";
 
         var providerDataService = Substitute.For<IProviderDataService>();
 
-        var editNotificationCampusModel = new EditNotificationCampusModelBuilder()
+        var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
             .Build(providerDataService);
 
-        editNotificationCampusModel.Input = new EditNotificationCampusModel.InputModel
+        editNotificationLocationModel.Input = new EditNotificationLocationModel.InputModel
         {
             Email = testEmail,
             SelectedSearchRadius = 30,
@@ -301,7 +299,7 @@ public class EditNotificationCampusTests
             }
         };
 
-        var result = await editNotificationCampusModel.OnPostAddLocation();
+        var result = await editNotificationLocationModel.OnPostAddLocation();
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();

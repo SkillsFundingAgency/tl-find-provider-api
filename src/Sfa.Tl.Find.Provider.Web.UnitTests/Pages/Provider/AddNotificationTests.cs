@@ -11,8 +11,6 @@ using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
 public class AddNotificationTests
 {
-    private const string EmailFieldKey = "Input.Email";
-
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
     {

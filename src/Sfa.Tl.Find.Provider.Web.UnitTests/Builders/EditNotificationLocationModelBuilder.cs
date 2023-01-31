@@ -11,13 +11,13 @@ using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
-public class EditNotificationCampusModelBuilder
+public class EditNotificationLocationModelBuilder
 {
-    public EditNotificationCampusModel Build(
+    public EditNotificationLocationModel Build(
         IProviderDataService? providerDataService = null,
         ISessionService? sessionService = null,
         ProviderSettings? providerSettings = null,
-        ILogger<EditNotificationCampusModel>? logger = null,
+        ILogger<EditNotificationLocationModel>? logger = null,
         PageContext? pageContext = null,
         bool userIsAuthenticated = true,
         bool isAdministrator = false)
@@ -34,7 +34,7 @@ public class EditNotificationCampusModelBuilder
 
         providerDataService ??= Substitute.For<IProviderDataService>();
         sessionService ??= Substitute.For<ISessionService>();
-        logger ??= Substitute.For<ILogger<EditNotificationCampusModel>>();
+        logger ??= Substitute.For<ILogger<EditNotificationLocationModel>>();
 
         var providerOptions = Options.Create(
             providerSettings
@@ -46,7 +46,7 @@ public class EditNotificationCampusModelBuilder
             pageContext.HttpContext,
             tempDataProvider);
         
-        var pageModel = new EditNotificationCampusModel(
+        var pageModel = new EditNotificationLocationModel(
             providerDataService,
             sessionService,
             providerOptions,
