@@ -703,7 +703,9 @@ public class EmployerInterestRepositoryTests
             .ExecuteAsync(dbConnection, 
                 Arg.Is<string>(s => 
                     s.Contains("UPDATE dbo.EmployerInterest") &&
-                    s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate)") &&
+                    s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate),") &&
+                    s.Contains("ExtensionCount = ExtensionCount + 1,") &&
+                    s.Contains("ModifiedOn = GETUTCDATE()") &&
                     s.Contains("WHERE UniqueId = @uniqueId") &&
                     s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));

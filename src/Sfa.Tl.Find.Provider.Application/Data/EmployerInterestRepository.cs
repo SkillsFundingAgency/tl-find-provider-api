@@ -533,6 +533,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             connection,
             "UPDATE dbo.EmployerInterest " +
             "SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate), " +
+            "    ExtensionCount = ExtensionCount + 1, " +
             "    ModifiedOn = GETUTCDATE() " +
             "WHERE UniqueId = @uniqueId " +
             "AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())",
