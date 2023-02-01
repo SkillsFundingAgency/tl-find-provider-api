@@ -25,8 +25,6 @@ public class AddNotificationModel : PageModel
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddNotificationModel> _logger;
 
-    public int DefaultSearchRadius { get; private set; }
-
     public SelectListItem[]? Locations { get; private set; }
 
     public SelectListItem[]? SearchRadiusOptions { get; private set; }
@@ -104,13 +102,13 @@ public class AddNotificationModel : PageModel
     {
         var ukPrn = HttpContext.User.GetUkPrn();
 
-        DefaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
+        var defaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
             ? _providerSettings.DefaultSearchRadius
             : Constants.DefaultProviderSearchRadius;
 
         Input ??= new InputModel
         {
-            SelectedSearchRadius = DefaultSearchRadius,
+            SelectedSearchRadius = defaultSearchRadius,
             SelectedFrequency = NotificationFrequency.Immediately,
             SelectedLocation = 0
         };
@@ -121,8 +119,7 @@ public class AddNotificationModel : PageModel
 
         SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 
-        var routes = new List<Route>();
-        Input.SkillAreas = await LoadSkillAreaOptions(routes);
+        Input.SkillAreas = await LoadSkillAreaOptions(new List<Route>());
     }
 
     private SelectListItem[] LoadFrequencyOptions(NotificationFrequency selectedValue)
@@ -149,7 +146,7 @@ public class AddNotificationModel : PageModel
             .ToArray();
     }
 
-    private async Task<SelectListItem[]> LoadSkillAreaOptions(IList<Route> selectedRoutes)
+    private async Task<SelectListItem[]> LoadSkillAreaOptions(IEnumerable<Route> selectedRoutes)
     {
         return (await _providerDataService
                 .GetRoutes())

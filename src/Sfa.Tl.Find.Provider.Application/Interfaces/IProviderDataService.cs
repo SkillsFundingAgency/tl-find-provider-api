@@ -57,6 +57,8 @@ public interface IProviderDataService
 
     Task SaveNotification(Notification notification, long ukPrn);
 
+    Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null);
+
     Task SaveSearchFilter(SearchFilter searchFilter);
 
     Task SendProviderNotifications();

@@ -2,7 +2,7 @@
 @using Sfa.Tl.Find.Provider.Application.Extensions
 @model Sfa.Tl.Find.Provider.Web.Pages.Provider.EditNotificationModel
 @{
-    ViewData["Title"] = $"Edit notification for {Model.Notification?.LocationName?.ToUpper()} [{Model.Notification?.Postcode}]";
+    ViewData["Title"] = $"Edit notifications for {Model.Notification?.Email}";
 }
 
 @section breadcrumbs {
@@ -16,7 +16,7 @@
             <div class="tl-notification tl-notification--green">
                 <div>
                     Notifications for @Model.RemovedLocation have been removed.
-                    <br/><br/><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
                 </div>
             </div>
         }
@@ -31,72 +31,70 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form method="post">
-            <table class="govuk-table tl-employers--table">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header">Campus</th>
-                        <th scope="col" class="govuk-table__header">Radius</th>
-                        <th scope="col" class="govuk-table__header">T Levels</th>
-                        <th scope="col" class="govuk-table__header">Frequency</th>
-                        <th scope="col" class="govuk-table__header"></th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @if (Model.NotificationLocationList != null && Model.NotificationLocationList.Any())
+        <table class="govuk-table tl-employers--table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Campus</th>
+                    <th scope="col" class="govuk-table__header">Radius</th>
+                    <th scope="col" class="govuk-table__header">T Levels</th>
+                    <th scope="col" class="govuk-table__header">Frequency</th>
+                    <th scope="col" class="govuk-table__header"></th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if (Model.NotificationLocationList != null && Model.NotificationLocationList.Any())
+                {
+                    foreach (var notificationLocation in Model.NotificationLocationList)
                     {
-                        foreach (var notificationLocation in Model.NotificationLocationList)
-                        {
-                            <tr class="govuk-table__row">
-                                <th scope="row" class="govuk-table__header tl-wordwrap">
-                                    @if (notificationLocation.Location is not null)
-                                    {
-                                        <p>@($"{notificationLocation.Location.Name?.ToUpper()} [{notificationLocation.Location.Postcode}]")</p>
-                                    }
-                                    else
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header tl-wordwrap">
+                                @if (notificationLocation.Location is not null)
+                                {
+                                    <p>@($"{notificationLocation.Location.Name?.ToUpper()} [{notificationLocation.Location.Postcode}]")</p>
+                                }
+                                else
+                                {
+                                    <p>All</p>
+                                }
+                            </th>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>Radius</strong></div>
+                                <div class="tl-employers--table--inline-cell">
+                                    <p>@notificationLocation.SearchRadius miles</p>
+                                </div>
+                            </td>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
+                                <div class="tl-employers--table--inline-cell">
+                                    @if (notificationLocation.Routes is not { Count: > 0 })
                                     {
                                         <p>All</p>
                                     }
-                                </th>
-                                <td class="govuk-table__cell tl-table__cell__list">
-                                    <div class="tl-employers--table--inline-header"><strong>Radius</strong></div>
-                                    <div class="tl-employers--table--inline-cell">
-                                        <p>@notificationLocation.SearchRadius miles</p>
-                                    </div>
-                                </td>
-                                <td class="govuk-table__cell tl-table__cell__list">
-                                    <div class="tl-employers--table--inline-header"><strong>T Levels</strong></div>
-                                    <div class="tl-employers--table--inline-cell">
-                                        @if (notificationLocation.Routes is not { Count: > 0 })
+                                    else
+                                    {
+                                        @foreach (var route in notificationLocation.Routes)
                                         {
-                                            <p>All</p>
+                                            <p>@route.Name</p>
                                         }
-                                        else
-                                        {
-                                            @foreach (var route in notificationLocation.Routes)
-                                            {
-                                                <p>@route.Name</p>
-                                            }
-                                        }
-                                    </div>
-                                </td>
-                                <td class="govuk-table__cell tl-table__cell__list">
-                                    <div class="tl-employers--table--inline-header"><strong>Frequency</strong></div>
-                                    <div class="tl-employers--table--inline-cell">
-                                        <p>@notificationLocation.Frequency.GetEnumDisplayName()</p>
-                                    </div>
-                                </td>
-                                <td class="govuk-table__cell">
-                                    <a asp-page="./AddNotification" asp-route-id="@notificationLocation.Id" class="govuk-link govuk-link--no-visited-state">Change</a>
-                                    <a asp-page="./EditNotification" asp-page-handler="RemoveLocation" asp-route-id="@notificationLocation.Id" asp-route-providernotificationid="@Model.ProviderNotificationId" class="tl-remove-notification govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
-                                </td>
-                            </tr>
-                        }
+                                    }
+                                </div>
+                            </td>
+                            <td class="govuk-table__cell tl-table__cell__list">
+                                <div class="tl-employers--table--inline-header"><strong>Frequency</strong></div>
+                                <div class="tl-employers--table--inline-cell">
+                                    <p>@notificationLocation.Frequency.GetEnumDisplayName()</p>
+                                </div>
+                            </td>
+                            <td class="govuk-table__cell">
+                                <a asp-page="./EditNotificationLocation" asp-route-id="@notificationLocation.Id" asp-route-providernotificationid="@Model.ProviderNotificationId" class="govuk-link govuk-link--no-visited-state">Change</a>
+                                <a asp-page="./EditNotification" asp-page-handler="RemoveLocation" asp-route-id="@notificationLocation.Id" asp-route-providernotificationid="@Model.ProviderNotificationId" class="tl-remove-notification govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
+                            </td>
+                        </tr>
                     }
-                    </tbody>
-            </table>
-        </form>
-        
+                }
+            </tbody>
+        </table>
+
         <div id="tl-notification-box" class="tl-notification-box tl-notification-box--red tl-hidden">
             <div>
                 <strong>Do you want to remove notifications for <span id="tl-confirm-location-name"></span>?</strong>
@@ -122,7 +120,6 @@
 
         $("a.notification-close").click(function () {
             $("#tl-notification-box").addClass("tl-hidden");
-
             $("#tl-add-notification").removeClass("tl-hidden");
             $("#tl-confirm-remove").attr('href', "#");
             $("#tl-confirm-location-name").text("");

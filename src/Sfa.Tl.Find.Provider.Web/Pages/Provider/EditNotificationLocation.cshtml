@@ -1,10 +1,92 @@
 ﻿@page
 @model Sfa.Tl.Find.Provider.Web.Pages.Provider.EditNotificationLocationModel
 @{
-    //ViewData["Title"] = $"Edit notification for {Model.Notification?.LocationName?.ToUpper()} [{Model.Notification?.Postcode}]";
+    var formattedLocationName = Model.NotificationDetail?.LocationId is not null
+        ? $"{Model.NotificationDetail?.LocationName?.ToUpper()} [{Model.NotificationDetail?.Postcode}]"
+        : "All";
+    ViewData["Title"] = $"Edit notification for {formattedLocationName}";
 }
 
 @section breadcrumbs {
-    @*TODO - set providernotificationid here*@
-    <a asp-page="./EditNotifications" class="govuk-back-link" id="tl-back">Return to notifications</a>
+    <a asp-page="./EditNotification" asp-route-id="@Model.Input!.ProviderNotificationId" class="govuk-back-link" id="tl-back">Return to edit notifications</a>
 }
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Notifications for @formattedLocationName</h1>
+
+        <form method="post">
+            @*            <div class="govuk-form-group" sfa-validation-for="Input!.Email" sfa-validationerror-class="govuk-form-group--error">
+            <label class="govuk-label govuk-!-font-weight-bold" asp-for="Input!.Email">
+            Email address
+            </label>
+            <div id="email-hint" class="govuk-hint">
+            This is the email address that will receive notifications
+            </div>
+            <span class="govuk-error-message" id="email-error" asp-validation-for="Input!.Email"></span>
+            <input class="govuk-input govuk-input--width-20" asp-for="Input!.Email" type="email" spellcheck="false" aria-describedby="email-hint email-error" autocomplete="email"
+            sfa-validation-for="Input!.Email" sfa-validationerror-class="govuk-input--error">
+            </div>
+
+            <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="campus">
+            Campus
+            </label>
+            <div id="campus-hint" class="govuk-hint">
+            Select the campus you want to set up a notification for
+            </div>
+            <select class="govuk-select" aria-describedby="campus-hint" asp-for="Input!.SelectedLocation" asp-items="Model.Locations">
+            </select>
+            </div>
+            *@
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="frequency">
+                    Notification frequency
+                </label>
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedFrequency" asp-items="Model.FrequencyOptions">
+                </select>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="within">
+                    Receive notifications for employers within:
+                </label>
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSearchRadius" asp-items="Model.SearchRadiusOptions">
+                </select>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="skillarea-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h3 class="govuk-fieldset__heading govuk-!-margin-top-3">
+                            Receive notifications for employers interested in the following skill areas:
+                        </h3>
+                    </legend>
+                    <div id="skillarea-hint" class="govuk-hint">
+                        If nothing is selected, you will receive notifications for all skill areas
+                    </div>
+                    <div class="govuk-checkboxes govuk-!-margin-top-4" data-module="govuk-checkboxes">
+                        @foreach (var skillArea in Model?.Input.SkillAreas.Select((value, i) => (value, i)))
+                        {
+                            var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
+                            var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                    @skillArea.value.Text
+                                </label>
+                                <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            </div>
+            <button type="submit" class="govuk-button govuk-!-margin-right-2">Save and finish</button>
+            <button type="submit" asp-page-handler="AddLocation" class="govuk-button govuk-button--secondary">Add another notification for this email</button>
+            <a asp-page="./EditNotification" asp-route-id="@Model.Input!.ProviderNotificationId" class="govuk-link govuk-!-padding-2 tl-display--inline-block">Cancel</a>
+
+            <input type="hidden" asp-for="Input!.Id" />
+            <input type="hidden" asp-for="Input!.ProviderNotificationId" />
+        </form>
+    </div>
+</div>

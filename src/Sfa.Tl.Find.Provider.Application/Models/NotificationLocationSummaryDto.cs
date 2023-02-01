@@ -14,5 +14,4 @@ public class NotificationLocationSummaryDto
     public string? LocationName { get; init; }
 
     public string? Postcode { get; init; }
-
 }

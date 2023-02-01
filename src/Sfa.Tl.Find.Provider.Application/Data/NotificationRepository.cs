@@ -247,9 +247,9 @@ public class NotificationRepository : INotificationRepository
                                 SearchRadius = n.SearchRadius,
                                 Frequency = n.Frequency,
                                 Location = n.LocationId is not null ?
-                                    new LocationPostcode
+                                    new NotificationLocationName
                                     {
-                                        Id = n.LocationId,
+                                        Id = n.Id,
                                         Name = n.LocationName,
                                         Postcode = n.Postcode,
                                     }

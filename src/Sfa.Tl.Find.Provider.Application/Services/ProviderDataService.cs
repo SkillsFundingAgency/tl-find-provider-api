@@ -432,6 +432,11 @@ public class ProviderDataService : IProviderDataService
         }
     }
 
+    public async Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null)
+    {
+        //await _notificationRepository.;
+    }
+
     public async Task SaveSearchFilter(SearchFilter searchFilter)
     {
         await _searchFilterRepository.Save(searchFilter);

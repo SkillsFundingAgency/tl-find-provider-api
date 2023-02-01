@@ -9,7 +9,7 @@ public class NotificationLocationSummary
 
     public int? SearchRadius { get; init; }
 
-    public LocationPostcode? Location { get; init; }
+    public NotificationLocationName? Location { get; init; }
 
     public ICollection<Route> Routes { get; init; }
 }

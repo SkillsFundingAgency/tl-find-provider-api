@@ -13,7 +13,7 @@ public class NotificationLocationSummaryBuilder
                 Id = 1,
                 SearchRadius = 20,
                 Frequency = NotificationFrequency.Daily,
-                Location = new LocationPostcode
+                Location = new NotificationLocationName
                 {
                     Id = 1,
                     Name = "The Palace",

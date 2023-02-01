@@ -41,16 +41,18 @@ public class EditNotificationModel : PageModel
                             ?? throw new ArgumentNullException(nameof(providerOptions));
     }
 
-    public async Task<IActionResult> OnGet(int id)
+    public async Task<IActionResult> OnGet(
+        [FromQuery(Name = "id")]
+        int providerNotificationId)
     {
-        ProviderNotificationId = id;
-        Notification = await _providerDataService.GetNotification(id);
+        ProviderNotificationId = providerNotificationId;
+        Notification = await _providerDataService.GetNotification(providerNotificationId);
         if (Notification is null)
         {
             return RedirectToPage("/Provider/Notifications");
         }
 
-        NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(id);
+        NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(providerNotificationId);
         
         return Page();
     }

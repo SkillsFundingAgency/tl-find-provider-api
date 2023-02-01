@@ -28,7 +28,7 @@ public class AddNotificationTests
 
         await addNotificationModel.OnGet();
 
-        addNotificationModel.DefaultSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        //addNotificationModel.DefaultSearchRadius.Should().Be(settings.DefaultSearchRadius);
     }
 
     [Fact]
@@ -146,7 +146,6 @@ public class AddNotificationTests
 
         addNotificationModel.Input.Should().NotBeNull();
         addNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
-        addNotificationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
         addNotificationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
         addNotificationModel.Input!.SelectedLocation.Should().Be(0);
     }

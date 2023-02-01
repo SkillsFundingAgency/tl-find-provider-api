@@ -55,7 +55,7 @@ public class SearchFilterDetailsModel : PageModel
             Input.SelectedSearchRadius = SearchFilter.SearchRadius ?? DefaultSearchRadius;
 
             SearchRadiusOptions = LoadSearchRadiusOptions(Input?.SelectedSearchRadius);
-            Input.SkillAreas = await LoadSkillAreaOptions(SearchFilter.Routes.ToList());
+            Input.SkillAreas = await LoadSkillAreaOptions(SearchFilter.Routes);
         }
 
         return SearchFilter != null ?
@@ -97,7 +97,7 @@ public class SearchFilterDetailsModel : PageModel
             .ToArray();
     }
 
-    private async Task<SelectListItem[]> LoadSkillAreaOptions(IList<Route> selectedRoutes)
+    private async Task<SelectListItem[]> LoadSkillAreaOptions(IEnumerable<Route> selectedRoutes)
     {
         return (await _providerDataService
                 .GetRoutes())
