@@ -92,7 +92,8 @@ public class EmployerInterestService : IEmployerInterestService
         return await _employerInterestRepository
             .ExtendExpiry(id,
                 _employerInterestSettings.RetentionDays,
-                _employerInterestSettings.ExpiryNotificationDays);
+                _employerInterestSettings.ExpiryNotificationDays,
+                _employerInterestSettings.MaximumExtensions);
     }
 
     public async Task<int> NotifyExpiringEmployerInterest()

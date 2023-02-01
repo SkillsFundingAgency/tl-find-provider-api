@@ -539,6 +539,7 @@ public class EmployerInterestServiceTests
         employerInterestRepository.ExtendExpiry(
                 uniqueId, 
                 Arg.Any<int>(),
+                Arg.Any<int>(),
                 Arg.Any<int>())
             .Returns(true);
 
@@ -555,7 +556,8 @@ public class EmployerInterestServiceTests
             .ExtendExpiry(
                 uniqueId, 
                 settings.RetentionDays, 
-                settings.ExpiryNotificationDays);
+                settings.ExpiryNotificationDays,
+                settings.MaximumExtensions);
     }
 
     [Fact]
