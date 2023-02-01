@@ -126,7 +126,7 @@ public class NotificationRepository : INotificationRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            notificationLocationId = notificationLocationId
+            notificationLocationId
         });
 
         Notification notification = null;
@@ -183,7 +183,7 @@ public class NotificationRepository : INotificationRepository
         var notifications = new Dictionary<int, NotificationSummary>();
 
         await _dbContextWrapper
-            .QueryAsync<NotificationSummaryDto, LocationPostcodeDto, NotificationSummary>(
+            .QueryAsync<NotificationSummaryDto, NotificationLocationNameDto, NotificationSummary>(
                 connection,
                 "GetNotificationSummary",
                 (n, l) =>
@@ -196,14 +196,14 @@ public class NotificationRepository : INotificationRepository
                                 Id = n.Id,
                                 Email = n.Email,
                                 IsEmailVerified = n.IsEmailVerified,
-                                Locations = new List<LocationPostcode>()
+                                Locations = new List<NotificationLocationName>()
                             });
                     }
 
-                    if (l is not null)
+                    if (l is not null && l.NotificationLocationId is not null)
                     {
                         notification.Locations.Add(
-                            new LocationPostcode
+                            new NotificationLocationName
                             {
                                 Id = l.LocationId,
                                 Name = l.LocationName,
@@ -214,7 +214,7 @@ public class NotificationRepository : INotificationRepository
                     return notification;
                 },
                 _dynamicParametersWrapper.DynamicParameters,
-                splitOn: "Id, LocationId",
+                splitOn: "Id, NotificationLocationId",
                 commandType: CommandType.StoredProcedure);
 
         return notifications.Values;
@@ -227,11 +227,11 @@ public class NotificationRepository : INotificationRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-           notificationId
+            notificationId
         });
 
         var notifications = new Dictionary<int, NotificationLocationSummary>();
-        
+
         await _dbContextWrapper
             .QueryAsync<NotificationLocationSummaryDto, RouteDto, NotificationLocationSummary>(
                 connection,
@@ -246,7 +246,7 @@ public class NotificationRepository : INotificationRepository
                                 Id = n.Id,
                                 SearchRadius = n.SearchRadius,
                                 Frequency = n.Frequency,
-                                Location = n.LocationId is not null ? 
+                                Location = n.LocationId is not null ?
                                     new LocationPostcode
                                     {
                                         Id = n.LocationId,

@@ -398,4 +398,11 @@ public static class ModelValidationExtensions
         notificationLocationSummary.Location?.Name.Should().Be(expected.LocationName);
         notificationLocationSummary.Location?.Postcode.Should().Be(expected.Postcode);
     }
+
+    public static void Validate(this NotificationLocationName locationPostcode, NotificationLocationNameDto expected)
+    {
+        locationPostcode.Id.Should().Be(expected.LocationId);
+        locationPostcode.Postcode.Should().Be(expected.Postcode);
+        locationPostcode.Name.Should().Be(expected.LocationName);
+    }
 }

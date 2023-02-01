@@ -9,7 +9,7 @@ public class NotificationBuilder
     private bool _useNullLocation;
     private int? _searchRadius = 20;
     private NotificationFrequency _frequency = NotificationFrequency.Immediately;
-        
+
 
     public IEnumerable<Notification> BuildList() =>
         new List<Notification>
@@ -20,7 +20,7 @@ public class NotificationBuilder
                 Email = "test@provider1.co.uk",
                 IsEmailVerified = true,
                 LocationId = _useNullLocation ? null : 1,
-                LocationName= _useNullLocation ? null : "Test Location 1",
+                LocationName = _useNullLocation ? null : "Test Location 1",
                 Postcode = _useNullLocation ? null : "CV1 2WT",
                 SearchRadius = _searchRadius,
                 Frequency = _frequency
@@ -32,7 +32,7 @@ public class NotificationBuilder
                 IsEmailVerified = false,
                 EmailVerificationToken = Guid.Parse("b61cd465-1836-4a44-bf60-51a1f7254285"),
                 LocationId = _useNullLocation ? null : 2,
-                LocationName= _useNullLocation ? null : "Test Location 2",
+                LocationName = _useNullLocation ? null : "Test Location 2",
                 Postcode = _useNullLocation ? null : "CV2 3WT",
                 SearchRadius = _searchRadius,
                 Frequency = _frequency,

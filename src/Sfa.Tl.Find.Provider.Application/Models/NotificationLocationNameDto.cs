@@ -1,7 +1,7 @@
 ﻿namespace Sfa.Tl.Find.Provider.Application.Models;
 public class NotificationLocationNameDto
 {
-    public int NotificationLocationId { get; init; }
+    public int? NotificationLocationId { get; init; }
 
     public int? LocationId { get; init; }
     

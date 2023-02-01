@@ -124,7 +124,7 @@ public class NotificationRepositoryTests
         var notificationSummaryDtoList = new NotificationSummaryDtoBuilder()
             .BuildList()
             .ToList();
-        var locationDtoList = new LocationPostcodeDtoBuilder()
+        var locationNameDtoList = new NotificationLocationNameDtoBuilder()
             .BuildList()
             .ToList();
 
@@ -140,17 +140,17 @@ public class NotificationRepositoryTests
         await dbContextWrapper
             .QueryAsync(dbConnection,
                 "GetNotificationSummary",
-                Arg.Do<Func<NotificationSummaryDto, LocationPostcodeDto, NotificationSummary>>(
+                Arg.Do<Func<NotificationSummaryDto, NotificationLocationNameDto, NotificationSummary>>(
                     x =>
                     {
                         var n = notificationSummaryDtoList[callIndex];
-                        var l = locationDtoList[callIndex];
+                        var l = locationNameDtoList[callIndex];
                         x.Invoke(n, l);
 
                         callIndex++;
                     }),
                 Arg.Any<object>(),
-                splitOn: Arg.Any<string>(),
+                splitOn: "Id, NotificationLocationId",
                 commandType: CommandType.StoredProcedure
             );
 
@@ -162,7 +162,8 @@ public class NotificationRepositoryTests
         results.Should().NotBeNullOrEmpty();
         results!.Count.Should().Be(1);
         results.First().Validate(notificationSummaryDtoList.First());
-        results[0].Locations.First().Validate(locationDtoList.First());
+        results[0].Locations.Should().NotBeNullOrEmpty();
+        results[0].Locations.First().Validate(locationNameDtoList.First());
     }
 
     [Fact]
@@ -226,7 +227,7 @@ public class NotificationRepositoryTests
                         callIndex++;
                     }),
                 Arg.Any<object>(),
-                splitOn: Arg.Any<string>(),
+                splitOn: "Id, RouteId",
                 commandType: CommandType.StoredProcedure
             );
 
@@ -304,7 +305,7 @@ public class NotificationRepositoryTests
                         callIndex++;
                     }),
                 Arg.Any<object>(),
-                splitOn: Arg.Any<string>(),
+                splitOn: "Id, RouteId",
                 commandType: CommandType.StoredProcedure
             );
 
@@ -377,7 +378,7 @@ public class NotificationRepositoryTests
                         callIndex++;
                     }),
                 Arg.Any<object>(),
-                splitOn: Arg.Any<string>(),
+                splitOn: "Id, RouteId",
                 commandType: CommandType.StoredProcedure
             );
 

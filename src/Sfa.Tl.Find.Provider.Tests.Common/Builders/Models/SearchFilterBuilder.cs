@@ -13,7 +13,7 @@ public class SearchFilterBuilder
             {
                 Id = 1,
                 LocationId = 1,
-                LocationName= "Test Location",
+                LocationName = "Test Location",
                 Postcode = "CV1 2WT",
                 SearchRadius = _searchRadius,
                 Routes = new List<Route>

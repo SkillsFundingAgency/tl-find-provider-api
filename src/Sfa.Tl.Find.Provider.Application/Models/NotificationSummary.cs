@@ -11,7 +11,7 @@ public class NotificationSummary
 
     public bool IsEmailVerified { get; init; }
 
-    public ICollection<LocationPostcode> Locations { get; init; }
+    public ICollection<NotificationLocationName> Locations { get; init; }
 
     private string DebuggerDisplay()
         => $"Id {Id}, " +

@@ -77,12 +77,15 @@
                                 {
                                     @foreach (var location in notification.Locations)
                                     {
-                                        <p>@($"{location.Name?.ToUpper()} [{location.Postcode}]")</p>
+                                        if (location.Id is not null)
+                                        {
+                                            <p>@($"{location.Name?.ToUpper()} [{location.Postcode}]")</p>
+                                        }
+                                        else
+                                        {
+                                            <p>All</p>
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    <p>All</p>
                                 }
                             </div>
                         </td> 
