@@ -149,28 +149,6 @@ public class TownDataService : ITownDataService
 
     private async Task SaveTowns(IEnumerable<OnsLocationApiItem> rawData)
     {
-        var t1 = rawData
-            .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
-                           !string.IsNullOrEmpty(item.LocalAuthorityName) &&
-                           !string.IsNullOrEmpty(item.LocationAuthorityDistrict) &&
-                           item.PlaceName != PlaceNameDescription.None)
-            .ToList();
-
-        var t2 = rawData
-            .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
-                           !string.IsNullOrEmpty(item.LocalAuthorityName) &&
-                           !string.IsNullOrEmpty(item.LocationAuthorityDistrict) &&
-                           item.PlaceName != PlaceNameDescription.None)
-            .GroupBy(c => new
-            {
-                c.LocalAuthorityName,
-                Name = c.LocationName,
-                c.LocationAuthorityDistrict
-            })
-            .Select(item => item.First())
-            .ToList();
-
-
         var towns = rawData
             .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
                            !string.IsNullOrEmpty(item.LocalAuthorityName) &&
