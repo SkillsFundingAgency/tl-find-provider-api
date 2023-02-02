@@ -160,7 +160,7 @@ public class TownDataServiceTests
                 -1.984158M);
         // ReSharper restore StringLiteralTypo
     }
-
+    
     [Fact]
     public async Task ImportTowns_Filters_Out_Civil_Parishes()
     {
@@ -317,7 +317,7 @@ public class TownDataServiceTests
         await service.ImportTowns(stream);
 
         receivedTowns.Should().NotBeNull();
-        receivedTowns.Count.Should().Be(5);
+        receivedTowns.Count.Should().Be(6);
 
         // ReSharper disable StringLiteralTypo
         receivedTowns
@@ -372,6 +372,38 @@ public class TownDataServiceTests
                 "West Midlands",
                 52.520416M,
                 -1.984158M);
+        // ReSharper restore StringLiteralTypo
+    }
+
+    [Fact]
+    public async Task ImportTowns_From_Csv_Stream_Creates_Expected_Town_With_Null_County()
+    {
+        IList<Town> receivedTowns = null;
+
+        var townRepository = Substitute.For<ITownRepository>();
+        await townRepository
+            .Save(Arg.Do<IEnumerable<Town>>(
+                x => receivedTowns = x?.ToList()));
+
+        var stream = IndexOfPlaceNamesCsvBuilder.BuildIndexOfPlaceNamesCsvAsStream();
+        
+        var service = new TownDataServiceBuilder()
+            .Build(townRepository: townRepository);
+
+        await service.ImportTowns(stream);
+
+        receivedTowns.Should().NotBeNullOrEmpty();
+
+        // ReSharper disable StringLiteralTypo
+        receivedTowns
+            .SingleOrDefault(t =>
+                t.Id == 10214)
+            .Validate(10214,
+                "Bude",
+                null,
+                "Cornwall",
+                50.825207M,
+                -4.538982M);
         // ReSharper restore StringLiteralTypo
     }
 

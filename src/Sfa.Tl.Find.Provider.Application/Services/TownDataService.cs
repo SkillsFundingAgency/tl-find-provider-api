@@ -58,7 +58,7 @@ public class TownDataService : ITownDataService
             .Where(item => string.Compare(item.Country, "England", StringComparison.InvariantCultureIgnoreCase) == 0
                            && item.PopulationCount is >= 500 and <= 10000000)
             .ToList();
-        
+
         await SaveTowns(items);
     }
 
@@ -149,6 +149,7 @@ public class TownDataService : ITownDataService
 
     private async Task SaveTowns(IEnumerable<OnsLocationApiItem> rawData)
     {
+
         var towns = rawData
             .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
                            !string.IsNullOrEmpty(item.LocalAuthorityName) &&
