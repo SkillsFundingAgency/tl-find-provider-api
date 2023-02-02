@@ -312,6 +312,38 @@ public class NotificationRepository : INotificationRepository
         }
     }
 
+    public async Task CreateLocation(Notification notification, int providerNotificationId)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var routeIds = notification.Routes
+                .Select(r => r.Id)
+                .AsTableValuedParameter("dbo.IdListTableType");
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                providerNotificationId,
+                frequency = notification.Frequency,
+                searchRadius = notification.SearchRadius,
+                locationId = notification.LocationId,
+                routeIds
+            });
+
+            var result = await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "CreateNotificationLocation",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when updating a notification");
+            throw;
+        }
+    }
+    
     public async Task Update(Notification notification)
     {
         try
@@ -335,6 +367,37 @@ public class NotificationRepository : INotificationRepository
             var result = await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "UpdateNotification",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when updating a notification");
+            throw;
+        }
+    }
+
+    public async Task UpdateLocation(Notification notification)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var routeIds = notification.Routes
+                .Select(r => r.Id)
+                .AsTableValuedParameter("dbo.IdListTableType");
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                @notificationLocationId = notification.Id.Value,
+                frequency = notification.Frequency,
+                searchRadius = notification.SearchRadius,
+                routeIds
+            });
+
+            var result = await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "UpdateNotificationLocation",
                 _dynamicParametersWrapper.DynamicParameters,
                 commandType: CommandType.StoredProcedure);
         }

@@ -21,7 +21,11 @@ public interface INotificationRepository
 
     Task Create(Notification notification, long ukPrn);
 
+    Task CreateLocation(Notification notification, int providerNotificationId);
+
     Task Update(Notification notification);
+
+    Task UpdateLocation(Notification notification);
 
     Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? emailVerificationToken);
 

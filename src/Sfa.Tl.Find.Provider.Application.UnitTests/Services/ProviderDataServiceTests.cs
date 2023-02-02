@@ -295,7 +295,6 @@ public class ProviderDataServiceTests
             .Update(notification);
     }
 
-
     [Fact]
     public async Task SaveNotification_Sends_Email_Verification_Email_For_Create()
     {
@@ -397,6 +396,50 @@ public class ProviderDataServiceTests
                 Arg.Any<string>());
     }
 
+    [Fact]
+    public async Task SaveNotificationLocation_Calls_Repository_For_Create()
+    {
+        const int providerNotificationId = 10;
+        var notification = new NotificationBuilder()
+            .WithNullId()
+            .Build();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+
+        var uniqueId = Guid.Parse("b4fd2a81-dcc9-43b9-9f4e-be76d1faa801");
+        var guidProvider = Substitute.For<IGuidProvider>();
+        guidProvider
+            .NewGuid()
+            .Returns(uniqueId);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(notificationRepository: notificationRepository);
+
+        await service.SaveNotificationLocation(notification, providerNotificationId);
+
+        await notificationRepository
+            .Received(1)
+            .CreateLocation(notification, providerNotificationId);
+    }
+
+    [Fact]
+    public async Task SaveNotificationLocation_Calls_Repository_For_Update()
+    {
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(notificationRepository: notificationRepository);
+
+        await service.SaveNotificationLocation(notification);
+
+        await notificationRepository
+            .Received(1)
+            .UpdateLocation(notification);
+    }
+    
     [Fact]
     public async Task GetNotification_Returns_Expected_Item()
     {

@@ -472,6 +472,66 @@ public class NotificationRepositoryTests
     }
 
     [Fact]
+    public async Task CreateNotificationLocation_Calls_Database()
+    {
+        const int providerNotificationId = 10;
+
+        var notification = new NotificationBuilder()
+            .WithNullId()
+            .Build();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.CreateLocation(notification, providerNotificationId);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s => s == "CreateNotificationLocation"),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
+    }
+
+    [Fact]
+    public async Task CreateNotificationLocation_Sets_Dynamic_Parameters()
+    {
+        const int providerNotificationId = 10;
+
+        var notification = new NotificationBuilder()
+            .WithNullId()
+            .Build();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.CreateLocation(notification, providerNotificationId);
+        
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(5);
+        templates.ContainsNameAndValue("providerNotificationId", providerNotificationId);
+        templates.ContainsNameAndValue("frequency", notification.Frequency);
+        templates.ContainsNameAndValue("locationId", notification.LocationId);
+        templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
+        templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
+            .Should().NotBeNull();
+    }
+
+    [Fact]
     public async Task UpdateNotification_Calls_Database()
     {
         var notification = new NotificationBuilder()
@@ -521,6 +581,59 @@ public class NotificationRepositoryTests
         templates.ContainsNameAndValue("email", notification.Email);
         templates.ContainsNameAndValue("frequency", notification.Frequency);
         templates.ContainsNameAndValue("locationId", notification.LocationId);
+        templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
+        templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
+            .Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task UpdateNotificationLocation_Calls_Database()
+    {
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.UpdateLocation(notification);
+
+        await dbContextWrapper
+            .Received(1)
+            .ExecuteAsync(dbConnection,
+                Arg.Is<string>(s => s == "UpdateNotificationLocation"),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
+    }
+
+    [Fact]
+    public async Task UpdateNotificationLocation_Sets_Dynamic_Parameters()
+    {
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.UpdateLocation(notification);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(4);
+        templates.ContainsNameAndValue("notificationLocationId", notification.Id);
+        templates.ContainsNameAndValue("frequency", notification.Frequency);
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
         templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
             .Should().NotBeNull();

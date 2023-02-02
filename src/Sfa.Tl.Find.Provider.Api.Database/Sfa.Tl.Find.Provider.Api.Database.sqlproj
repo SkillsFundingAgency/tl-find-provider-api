@@ -139,7 +139,7 @@
     <None Include="Indexes\IX_NotificationLocationRoute_RouteId.sql" />
     <None Include="Indexes\IX_NotificationLocationRoute_LocationId.sql" />
     <Build Include="Stored Procedures\GetNotificationSummary.sql" />
-    <Build Include="Stored Procedures\CreateNotification.sql" />
+    <Build Include="Stored Procedures\CreateProviderNotification.sql" />
     <Build Include="Stored Procedures\UpdateNotification.sql" />
     <Build Include="Stored Procedures\DeleteSearchFilter.sql" />
     <Build Include="Tables\ProviderNotification.sql" />
@@ -151,6 +151,8 @@
     <Build Include="Stored Procedures\DeleteProviderNotification.sql" />
     <None Include="Indexes\IX_NotificationLocation_LocationI.sql" />
     <Build Include="Stored Procedures\GetNotificationLocationDetail.sql" />
+    <Build Include="Stored Procedures\CreateNotificationLocation.sql" />
+    <Build Include="Stored Procedures\UpdateNotificationLocation.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

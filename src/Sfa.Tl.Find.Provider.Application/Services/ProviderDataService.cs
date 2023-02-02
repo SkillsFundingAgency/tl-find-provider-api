@@ -144,7 +144,7 @@ public class ProviderDataService : IProviderDataService
 
         await _notificationRepository.Delete(notificationId);
     }
-    
+
     public async Task DeleteNotificationLocation(int notificationLocationId)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -420,21 +420,24 @@ public class ProviderDataService : IProviderDataService
         {
             notification.EmailVerificationToken = _guidProvider.NewGuid();
             await _notificationRepository.Create(notification, ukPrn);
+            await SendProviderVerificationEmail(notification.Email, notification.EmailVerificationToken!.Value);
         }
         else
         {
             await _notificationRepository.Update(notification);
         }
-
-        if (notification.EmailVerificationToken is not null)
-        {
-            await SendProviderVerificationEmail(notification.Email, notification.EmailVerificationToken!.Value);
-        }
     }
 
     public async Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null)
     {
-        //await _notificationRepository.;
+        if (notification.Id is null && providerNotificationId is not null)
+        {
+            await _notificationRepository.CreateLocation(notification, providerNotificationId.Value);
+        }
+        else
+        {
+            await _notificationRepository.UpdateLocation(notification);
+        }
     }
 
     public async Task SaveSearchFilter(SearchFilter searchFilter)
@@ -447,7 +450,7 @@ public class ProviderDataService : IProviderDataService
         //TODO: Send daily then weekly emails? or all at once?
         throw new NotImplementedException();
     }
-    
+
     public async Task SendProviderNotificationEmail(int notificationId, string emailAddress)
     {
         var siteUri = new Uri(_providerSettings.ConnectSiteUri);
