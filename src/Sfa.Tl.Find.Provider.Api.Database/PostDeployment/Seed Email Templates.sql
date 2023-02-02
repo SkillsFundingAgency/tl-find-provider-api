@@ -20,7 +20,7 @@ THEN
 UPDATE SET 
 	[Name] = Source.[Name],
 	[TemplateId] = Source.[TemplateId],
-	[ModifiedOn] = GETDATE()
+	[ModifiedOn] = GETUTCDATE()
 WHEN NOT MATCHED BY TARGET THEN 
 	INSERT ([Name], [TemplateId]) 
 	VALUES ([Name], [TemplateId]) 

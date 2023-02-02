@@ -26,14 +26,14 @@ WHEN MATCHED
 THEN 
 UPDATE SET 
 	[Name] = Source.[Name],
-	[ModifiedOn] = GETDATE(),
+	[ModifiedOn] = GETUTCDATE(),
     [IsDeleted] = Source.[IsDeleted]
 WHEN NOT MATCHED BY TARGET THEN 
 	INSERT ([Id], [Name], [IsDeleted]) 
 	VALUES ([Id], [Name], [IsDeleted]) 
 WHEN NOT MATCHED BY SOURCE THEN 
 UPDATE SET 
-	[ModifiedOn] = GETDATE(),
+	[ModifiedOn] = GETUTCDATE(),
     [IsDeleted] = 1
 ;
 
