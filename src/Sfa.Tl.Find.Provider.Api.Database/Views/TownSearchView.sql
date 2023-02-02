@@ -7,16 +7,15 @@ SELECT  [Id],
 		[LocalAuthority],
 		[Latitude],
 		[Longitude],
-		--Replace known special characters, 
-		-- and replace ampersand with and
+		--Replace known special characters, and replace ampersand with and
 		LOWER(CONCAT(
 			dbo.ReplaceAllFunction(
 				dbo.ReplaceAllFunction(
-					CASE WHEN County IS NULL THEN
+					CASE WHEN County IS NULL  OR County = '' THEN
 						CONCAT([Name], ' ',  [LocalAuthority])
 					ELSE
 						CONCAT([Name], ' ',  [County])
-					END, 
+					END,
 					'%[ ,.''()/!-]%', 1, ''), 
 				'%[&]%', 1, 'and'),
 			--Performance trick - append id so clustered index will work
