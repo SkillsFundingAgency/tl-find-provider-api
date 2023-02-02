@@ -1,0 +1,18 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.Provider.AddNotificationLocationModel
+@{
+    ViewData["Title"] = $"Add new notification for {Model.ProviderNotification?.Email}";
+}
+
+@section breadcrumbs {
+    <a asp-page="./EditNotification" asp-route-id="@Model.Input!.ProviderNotificationId" class="govuk-back-link" id="tl-back">Return to edit notifications</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Add a new notifications for @Model.ProviderNotification?.Email</h1>
+
+        <form method="post">
+        </form>
+    </div>
+</div>

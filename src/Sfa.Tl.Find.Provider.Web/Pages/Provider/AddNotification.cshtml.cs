@@ -142,7 +142,6 @@ public class AddNotificationModel : PageModel
                 p.ToString(),
                 p == selectedValue)
             )
-            //.OrderBy(x => int.Parse(x.Value))
             .ToArray();
     }
 
