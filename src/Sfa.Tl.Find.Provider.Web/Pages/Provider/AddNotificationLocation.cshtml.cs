@@ -76,6 +76,19 @@ public class AddNotificationLocationModel : PageModel
         return RedirectToPage("/Provider/EditNotification", new { id = Input?.ProviderNotificationId });
     }
 
+    public async Task<IActionResult> OnPostAddLocation()
+    {
+        if (!ModelState.IsValid)
+        {
+            await LoadNotificationView(Input!.ProviderNotificationId);
+            return Page();
+        }
+
+        await Save();
+
+        return RedirectToPage("/Provider/AddNotificationLocation", new { id = Input?.ProviderNotificationId });
+    }
+
     private async Task Save()
     {
         var routes = GetSelectedSkillAreas(Input!.SkillAreas);

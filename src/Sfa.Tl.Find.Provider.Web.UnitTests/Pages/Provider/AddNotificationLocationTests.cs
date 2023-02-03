@@ -263,14 +263,8 @@ public class AddNotificationLocationTests
     public async Task AddNotificationLocationModel_OnPost_Saves_To_Repository_And_Redirects()
     {
         const int providerNotificationId = 1;
-        const string testEmail = "test@test.com";
-        var notification = new NotificationBuilder()
-            .Build();
 
         var providerDataService = Substitute.For<IProviderDataService>();
-        //providerDataService
-        //    .GetNotification(notification.Id!.Value)
-        //    .Returns(notification);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
             .Build(providerDataService);
@@ -298,7 +292,42 @@ public class AddNotificationLocationTests
 
         await providerDataService
             .Received(1)
-            .SaveNotificationLocation(Arg.Any<Notification>(), notification.Id!.Value);
+            .SaveNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
+    }
+
+    [Fact]
+    public async Task AddNotificationLocation_OnPostAddLocation_Saves_To_Repository_And_Redirects()
+    {
+        const int providerNotificationId = 1;
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+
+        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+            .Build(providerDataService);
+        addNotificationLocationModel.Input = new AddNotificationLocationModel.InputModel
+        {
+            ProviderNotificationId = providerNotificationId,
+            SelectedSearchRadius = 30,
+            SelectedFrequency = NotificationFrequency.Daily,
+            SkillAreas = new[]
+            {
+                new SelectListItem("Value 1", "1", true)
+            }
+        };
+
+        var result = await addNotificationLocationModel.OnPostAddLocation();
+
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Provider/AddNotificationLocation");
+        redirectResult.RouteValues.Should().Contain(x =>
+            x.Key == "id" &&
+            x.Value != null &&
+            x.Value.ToString() == $"{providerNotificationId}");
+
+        await providerDataService
+            .Received(1)
+            .SaveNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
     }
 
     //[Fact]
