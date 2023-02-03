@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
@@ -32,12 +33,49 @@ public class AddNotificationTests
     }
 
     [Fact]
-    public async Task AddNotificationModel_OnGet_Sets_FrequencyOptions_Select_List()
+    public async Task AddNotificationModel_OnGet_Sets_Provider_Locations_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
-        var notification = new NotificationBuilder()
-            .Build();
+        var locations = new LocationPostcodeBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetLocationPostcodes(PageContextBuilder.DefaultUkPrn)
+            .Returns(locations);
+
+        var addNotificationModel = new AddNotificationModelBuilder()
+            .Build(providerDataService,
+                providerSettings: settings);
+
+        await addNotificationModel.OnGet();
+
+        addNotificationModel.Locations.Should().NotBeNullOrEmpty();
+        var options = addNotificationModel.Locations;
+
+        options!.Length.Should().Be(locations.Count + 1);
+
+        options[0].Should().Match<SelectListItem>(x =>
+            x.Text == "All" && x.Value == "0");
+
+        var orderedLocations = locations
+            .OrderBy(r => r.Name)
+            .ToArray();
+
+        for (var i = 1; i < options.Length; i++)
+        {
+            options[i].Should().Match<SelectListItem>(x =>
+                x.Text == $"{orderedLocations[i -1].Name.TruncateWithEllipsis(15).ToUpper()} [{orderedLocations[i - 1].Postcode}]" &&
+                x.Value == orderedLocations[i - 1].Id.ToString());
+        }
+    }
+
+    [Fact]
+    public async Task AddNotificationModel_OnGet_Sets_FrequencyOptions_Select_List()
+    {
+        var settings = new SettingsBuilder().BuildProviderSettings();
 
         var providerDataService = Substitute.For<IProviderDataService>();
 
@@ -63,9 +101,6 @@ public class AddNotificationTests
     public async Task AddNotificationModel_OnGet_Sets_Search_Radius_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
-
-        var notification = new NotificationBuilder()
-            .Build();
 
         var providerDataService = Substitute.For<IProviderDataService>();
 

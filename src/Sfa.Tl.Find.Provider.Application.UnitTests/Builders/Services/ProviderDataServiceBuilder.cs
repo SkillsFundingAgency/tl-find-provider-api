@@ -5,7 +5,6 @@ using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 

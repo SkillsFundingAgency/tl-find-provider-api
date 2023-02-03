@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,7 +7,6 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
-using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
@@ -180,12 +178,12 @@ public class AddNotificationLocationModel : PageModel
             )
             .OrderBy(x => x.Text)
             .ToList();
-
-        return providerLocations.Any(p => p.Id is null && p.LocationId is not null)
-            ? selectList.ToArray()
-            : selectList
+        
+        return !providerLocations.Any(p => p.Id != null && p.LocationId == null)
+            ? selectList
                 .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
-                .ToArray();
+                .ToArray()
+            : selectList.ToArray();
     }
 
     private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)

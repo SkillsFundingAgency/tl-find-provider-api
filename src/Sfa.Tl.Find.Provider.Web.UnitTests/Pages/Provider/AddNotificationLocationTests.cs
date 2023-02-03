@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
@@ -30,6 +31,53 @@ public class AddNotificationLocationTests
 
         await addNotificationLocationModel.OnGet(providerNotificationId);
 
+    }
+
+    [Fact]
+    public async Task AddNotificationLocationModel_OnGet_Sets_Provider_Locations_Select_List()
+    {
+        var settings = new SettingsBuilder().BuildProviderSettings();
+
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var locations = new NotificationLocationNameBuilder()
+            .BuildList()
+            .ToList();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotification(notification.Id!.Value)
+            .Returns(notification);
+        providerDataService
+            .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
+            .Returns(locations);
+
+        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+            .Build(providerDataService,
+                providerSettings: settings);
+
+        await addNotificationLocationModel.OnGet(notification.Id.Value);
+
+        addNotificationLocationModel.Locations.Should().NotBeNullOrEmpty();
+        var options = addNotificationLocationModel.Locations;
+
+        options[0].Should().Match<SelectListItem>(x =>
+            x.Text == "All" && x.Value == "0");
+
+        var orderedAvailableLocations = locations
+            .Where(x => x.Id is null)
+            .OrderBy(r => r.Name)
+            .ToList();
+
+        options!.Length.Should().Be(orderedAvailableLocations.Count + 1);
+
+        for (var i = 1; i < options.Length; i++)
+        {
+            options[i].Should().Match<SelectListItem>(x =>
+                x.Text == $"{orderedAvailableLocations[i - 1].Name.TruncateWithEllipsis(15).ToUpper()} [{orderedAvailableLocations[i - 1].Postcode}]" &&
+                x.Value == orderedAvailableLocations[i - 1].LocationId.ToString());
+        }
     }
 
     [Fact]

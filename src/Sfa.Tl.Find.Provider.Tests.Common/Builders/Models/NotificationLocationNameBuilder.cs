@@ -22,6 +22,13 @@ public class NotificationLocationNameBuilder
                 LocationId = 2,
                 Name= "Test Location 2",
                 Postcode = "CV2 3WT"
+            },
+            new()
+            {
+                Id = null,
+                LocationId = 3,
+                Name= "Test Location 3",
+                Postcode = "CV2 4WT"
             }
         };
 
