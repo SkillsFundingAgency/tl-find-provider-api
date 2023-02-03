@@ -184,8 +184,6 @@ public class AddNotificationLocationModel : PageModel
 
     public class InputModel
     {
-        public int Id { get; set; }
-
         public int ProviderNotificationId { get; set; }
 
         public NotificationFrequency SelectedFrequency { get; set; }

@@ -30,8 +30,6 @@ public class EditNotificationLocationTests
             .Build(providerSettings: settings);
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, NotificationLocationId);
-
-        //editNotificationLocationModel.DefaultSearchRadius.Should().Be(settings.DefaultSearchRadius);
     }
 
     [Fact]
@@ -51,7 +49,7 @@ public class EditNotificationLocationTests
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id!.Value);
+        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
 
         editNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
         var options = editNotificationLocationModel.FrequencyOptions;
@@ -82,7 +80,7 @@ public class EditNotificationLocationTests
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id!.Value);
+        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
 
         editNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
         var options = editNotificationLocationModel.SearchRadiusOptions;
@@ -126,7 +124,7 @@ public class EditNotificationLocationTests
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id!.Value);
+        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
 
         editNotificationLocationModel.Input.Should().NotBeNull();
         editNotificationLocationModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
@@ -170,7 +168,7 @@ public class EditNotificationLocationTests
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id!.Value);
+        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
 
         var skillAreas = editNotificationLocationModel.Input?.SkillAreas;
         skillAreas.Should().NotBeNull();
@@ -201,7 +199,7 @@ public class EditNotificationLocationTests
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id!.Value);
+        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
 
         editNotificationLocationModel.Input.Should().NotBeNull();
         editNotificationLocationModel.Input!.Id.Should().Be(notification.Id!.Value);
@@ -231,7 +229,7 @@ public class EditNotificationLocationTests
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id!.Value);
+        await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
 
         editNotificationLocationModel.Input.Should().NotBeNull();
         editNotificationLocationModel.Input!.Id.Should().Be(notification.Id!.Value);
@@ -265,7 +263,6 @@ public class EditNotificationLocationTests
     [Fact]
     public async Task EditNotificationLocationModel_OnPost_Saves_To_Repository_And_Redirects()
     {
-        const string testEmail = "test@test.com";
         var notification = new NotificationBuilder()
             .Build();
 
@@ -280,7 +277,7 @@ public class EditNotificationLocationTests
         editNotificationLocationModel.Input = new EditNotificationLocationModel.InputModel
         {
             Id = notification.Id!.Value,
-            //Email = testEmail,
+            ProviderNotificationId = ProviderNotificationId,
             SelectedSearchRadius = 30,
             SelectedFrequency = NotificationFrequency.Daily,
             SkillAreas = new[]
@@ -294,44 +291,13 @@ public class EditNotificationLocationTests
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Provider/EditNotification");
+        redirectResult.RouteValues.Should().Contain(x =>
+            x.Key == "id" &&
+            x.Value != null &&
+            x.Value.ToString() == $"{ProviderNotificationId}");
 
         await providerDataService
             .Received(1)
             .SaveNotificationLocation(Arg.Any<Notification>());
     }
-
-    //[Fact]
-    //public async Task EditNotificationLocationModel_OnPost_Sets_TempData()
-    //{
-    //    var notification = new NotificationBuilder()
-    //        .Build();
-
-    //    //var notificationId = notification.Id!.Value;
-
-    //    var providerDataService = Substitute.For<IProviderDataService>();
-    //    //providerDataService
-    //    //    .GetNotificationLocation(notificationId)
-    //    //    .Returns(notification);
-
-    //    var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-    //        .Build(providerDataService);
-
-    //    editNotificationLocationModel.Input = new EditNotificationLocationModel.InputModel
-    //    {
-    //        Email = notification.Email
-    //    };
-
-    //    await editNotificationLocationModel.OnPost();
-
-    //    editNotificationLocationModel.TempData.Should().NotBeNull();
-    //    editNotificationLocationModel.TempData
-    //        .Keys
-    //        .Should()
-    //        .Contain("VerificationEmail");
-
-    //    editNotificationLocationModel.TempData
-    //        .Peek("VerificationEmail")
-    //        .Should()
-    //        .Be(notification.Email);
-    //}
 }
