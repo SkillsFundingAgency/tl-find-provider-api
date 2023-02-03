@@ -49,6 +49,7 @@ public class NotificationRepositoryTests
     public async Task Delete_Sets_Dynamic_Parameters()
     {
         const int providerNotificationId = 1;
+
         var dbContextWrapper = new DbContextWrapperBuilder()
             .BuildSubstitute();
 
@@ -111,6 +112,61 @@ public class NotificationRepositoryTests
 
         templates.GetDynamicTemplatesCount().Should().Be(1);
         templates.ContainsNameAndValue("notificationLocationId", notificationLocationId);
+    }
+
+    [Fact]
+    public async Task GetAvailableLocationPostcodes_Returns_Expected_List_For_Single_Result_Row()
+    {
+        const int providerNotificationId = 1;
+
+        var locationNames = new NotificationLocationNameBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .QueryAsync<NotificationLocationName>(dbConnection,
+                "GetProviderNotificationLocations",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
+            .Returns(locationNames);
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper);
+
+        var results = (await repository
+                .GetProviderNotificationLocations(providerNotificationId))
+            .ToList();
+
+        results.Should().NotBeNull();
+        results!.Count.Should().Be(locationNames.Count);
+
+        results.Should().BeEquivalentTo(locationNames);
+    }
+
+    [Fact]
+    public async Task GetAvailableLocationPostcodes_Sets_Dynamic_Parameters()
+    {
+        const int providerNotificationId = 1;
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .BuildSubstitute();
+
+        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetProviderNotificationLocations(providerNotificationId);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("providerNotificationId", providerNotificationId);
     }
 
     [Fact]

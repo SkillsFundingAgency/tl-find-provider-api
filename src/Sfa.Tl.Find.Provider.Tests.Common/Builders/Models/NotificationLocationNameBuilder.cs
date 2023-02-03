@@ -11,13 +11,15 @@ public class NotificationLocationNameBuilder
         {
             new()
             {
-                Id = _withNullFirstLocation ? null : 1,
+                Id = 1,
+                LocationId = _withNullFirstLocation ? null : 1,
                 Name= _withNullFirstLocation ? null : "Test Location 1",
                 Postcode = _withNullFirstLocation ? null : "CV1 2WT"
             },
             new()
             {
                 Id = 2,
+                LocationId = 2,
                 Name= "Test Location 2",
                 Postcode = "CV2 3WT"
             }

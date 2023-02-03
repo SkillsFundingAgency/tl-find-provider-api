@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -83,7 +84,7 @@ public class AddNotificationLocationModel : PageModel
         {
             LocationId = Input.SelectedLocation is not null && Input.SelectedLocation > 0 ? Input.SelectedLocation : null,
             Frequency = Input.SelectedFrequency,
-            SearchRadius = Input.SelectedSearchRadius ?? _providerSettings.DefaultSearchRadius,
+            SearchRadius = Input.SelectedSearchRadius, //?? _providerSettings.DefaultSearchRadius,
             Routes = routes
         };
 
@@ -105,7 +106,7 @@ public class AddNotificationLocationModel : PageModel
         };
 
         FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
-        
+
         Locations = await LoadProviderLocationOptions(providerNotificationId, Input.SelectedLocation);
 
         SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
@@ -152,20 +153,26 @@ public class AddNotificationLocationModel : PageModel
 
     private async Task<SelectListItem[]> LoadProviderLocationOptions(int providerNotificationId, int? selectedValue)
     {
-        var providerLocations = await _providerDataService
-                .GetLocationPostcodes(HttpContext.User.GetUkPrn().Value);
-            //TODO: Just get:
-                //.GetUnusedLocationPostcodes(providerNotificationId);
+        var providerLocations = (await _providerDataService
+            .GetAvailableNotificationLocationPostcodes(providerNotificationId))
+            .ToList();
 
-        return providerLocations.Select(p
+        var selectList = providerLocations
+            .Where(p => p.Id is null && p.LocationId is not null)
+            .Select(p
                 => new SelectListItem(
                     $"{p.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Postcode}]",
-                    p.Id.ToString(),
-                    p.Id == selectedValue)
+                    p.LocationId.ToString(),
+                    p.LocationId == selectedValue)
             )
             .OrderBy(x => x.Text)
-            .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
-            .ToArray();
+            .ToList();
+
+        return providerLocations.Any(p => p.Id is null && p.LocationId is not null)
+            ? selectList.ToArray()
+            : selectList
+                .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
+                .ToArray();
     }
 
     private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)

@@ -205,6 +205,12 @@ public class ProviderDataService : IProviderDataService
             .GetNotificationLocation(notificationLocationId);
     }
 
+    public async Task<IEnumerable<NotificationLocationName>> GetAvailableNotificationLocationPostcodes(int providerNotificationId)
+    {
+        return await _notificationRepository
+            .GetProviderNotificationLocations(providerNotificationId);
+    }
+
     public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)
     {
         if (_logger.IsEnabled(LogLevel.Debug))

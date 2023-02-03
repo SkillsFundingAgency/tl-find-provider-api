@@ -59,6 +59,29 @@ public class NotificationRepository : INotificationRepository
             commandType: CommandType.StoredProcedure);
     }
 
+    
+    public async Task<IEnumerable<NotificationLocationName>> GetProviderNotificationLocations(int providerNotificationId)
+    {
+        if (providerNotificationId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(providerNotificationId));
+        }
+
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            providerNotificationId
+        });
+
+        return await _dbContextWrapper
+            .QueryAsync<NotificationLocationName>(
+                connection,
+                "GetProviderNotificationLocations",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+    }
+
     public async Task<Notification> GetNotification(
         int notificationId)
     {
@@ -205,7 +228,8 @@ public class NotificationRepository : INotificationRepository
                         notification.Locations.Add(
                             new NotificationLocationName
                             {
-                                Id = l.LocationId,
+                                Id = l.NotificationLocationId,
+                                LocationId = l.LocationId,
                                 Name = l.LocationName,
                                 Postcode = l.Postcode
                             });

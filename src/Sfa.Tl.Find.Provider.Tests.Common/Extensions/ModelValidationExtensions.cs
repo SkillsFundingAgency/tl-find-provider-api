@@ -401,7 +401,8 @@ public static class ModelValidationExtensions
 
     public static void Validate(this NotificationLocationName locationPostcode, NotificationLocationNameDto expected)
     {
-        locationPostcode.Id.Should().Be(expected.LocationId);
+        locationPostcode.Id.Should().Be(expected.NotificationLocationId);
+        locationPostcode.LocationId.Should().Be(expected.LocationId);
         locationPostcode.Postcode.Should().Be(expected.Postcode);
         locationPostcode.Name.Should().Be(expected.LocationName);
     }

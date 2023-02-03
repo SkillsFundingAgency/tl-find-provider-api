@@ -43,6 +43,8 @@ public interface IProviderDataService
 
     Task<Notification> GetNotificationLocation(int notificationLocationId);
 
+    Task<IEnumerable<NotificationLocationName>> GetAvailableNotificationLocationPostcodes(int providerNotificationId);
+
     Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn);
     
     Task<SearchFilter> GetSearchFilter(int locationId);

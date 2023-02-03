@@ -153,6 +153,7 @@
     <Build Include="Stored Procedures\GetNotificationLocationDetail.sql" />
     <Build Include="Stored Procedures\CreateNotificationLocation.sql" />
     <Build Include="Stored Procedures\UpdateNotificationLocation.sql" />
+    <Build Include="Stored Procedures\GetProviderNotificationLocations.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

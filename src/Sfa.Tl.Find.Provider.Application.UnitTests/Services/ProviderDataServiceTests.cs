@@ -244,6 +244,32 @@ public class ProviderDataServiceTests
             .GetNotificationLocationSummaryList(notificationId);
     }
 
+
+
+    [Fact]
+    public async Task GetAvailableNotificationLocationPostcodes_Returns_Expected_List()
+    {
+        const int providerNotificationId = 1;
+
+        var locationNames = new NotificationLocationNameBuilder()
+            .BuildList()
+            .ToList();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetProviderNotificationLocations(providerNotificationId)
+            .Returns(locationNames);
+
+        var service = new ProviderDataServiceBuilder().Build(
+            notificationRepository: notificationRepository);
+
+        var response = (await service
+                .GetAvailableNotificationLocationPostcodes(providerNotificationId))
+            ?.ToList();
+
+        response.Should().NotBeNull();
+        response.Should().BeEquivalentTo(locationNames);
+    }
+
     [Fact]
     public async Task SaveNotification_Calls_Repository_For_Create_When_Id_Is_Null()
     {
