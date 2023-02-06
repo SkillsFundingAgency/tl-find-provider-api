@@ -65,14 +65,14 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
     options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
     options.Conventions.AddPageRoute("/Help/TermsAndConditions", "/terms-and-conditions");
-    options.Conventions.AddPageRoute("/Provider/SearchFilters", "/search-filters");
-    options.Conventions.AddPageRoute("/Provider/SearchFilterDetails", "/search-filter-details");
+    options.Conventions.AddPageRoute("/Provider/SearchFilters", "/filters");
+    options.Conventions.AddPageRoute("/Provider/SearchFilterDetails", "/filters-edit");
     options.Conventions.AddPageRoute("/Provider/Notifications", "/notifications");
-    options.Conventions.AddPageRoute("/Provider/AddNotification", "/add-notification");
-    options.Conventions.AddPageRoute("/Provider/EditNotification", "/edit-notification");
-    options.Conventions.AddPageRoute("/Provider/RemoveNotification", "/remove-notification");
-    options.Conventions.AddPageRoute("/Provider/AddNotificationLocation", "/notification-add-email-campus");
-    options.Conventions.AddPageRoute("/Provider/EditNotificationLocation", "/notification-edit-email-campus");
+    options.Conventions.AddPageRoute("/Provider/AddNotification", "/notifications-add");
+    options.Conventions.AddPageRoute("/Provider/EditNotification", "/notifications-edit");
+    options.Conventions.AddPageRoute("/Provider/RemoveNotification", "/notifications-remove");
+    options.Conventions.AddPageRoute("/Provider/AddNotificationLocation", "/notifications-edit-campus-add");
+    options.Conventions.AddPageRoute("/Provider/EditNotificationLocation", "/notifications-edit-campus");
     
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
