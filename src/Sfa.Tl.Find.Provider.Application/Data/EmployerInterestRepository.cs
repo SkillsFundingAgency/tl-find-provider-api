@@ -542,7 +542,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             "    ModifiedOn = GETUTCDATE() " +
             "WHERE UniqueId = @uniqueId " +
             "  AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())" +
-            "  AND ExtensionCount < @maxExtensions",
+            "  AND ExtensionCount < @maximumExtensions",
             _dynamicParametersWrapper.DynamicParameters);
 
         return rowsAffected > 0;

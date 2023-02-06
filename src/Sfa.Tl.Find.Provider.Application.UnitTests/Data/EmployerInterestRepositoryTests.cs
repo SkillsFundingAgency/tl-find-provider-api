@@ -754,7 +754,7 @@ public class EmployerInterestRepositoryTests
                     s.Contains("ModifiedOn = GETUTCDATE()") &&
                     s.Contains("WHERE UniqueId = @uniqueId") &&
                     s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())") &&
-                    s.Contains("AND ExtensionCount < @maxExtensions")),
+                    s.Contains("AND ExtensionCount < @maximumExtensions")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
