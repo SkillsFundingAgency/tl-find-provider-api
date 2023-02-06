@@ -13,6 +13,7 @@ using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
@@ -451,10 +452,22 @@ public class ProviderDataService : IProviderDataService
         await _searchFilterRepository.Save(searchFilter);
     }
 
-    public Task SendProviderNotifications()
+    public async Task SendProviderNotifications()
     {
-        //TODO: Send daily then weekly emails? or all at once?
-        throw new NotImplementedException();
+        await SendProviderNotifications(NotificationFrequency.Daily);
+    }
+
+    public async Task SendProviderNotifications(NotificationFrequency frequency)
+    {
+        var pendingNotificationEmails = await _notificationRepository.GetPendingNotificationEmails(frequency);
+        foreach (var notificationEmail in pendingNotificationEmails)
+        {
+            await SendProviderNotificationEmail(
+                notificationEmail.NotificationLocationId, 
+                notificationEmail.Email);
+
+            await _notificationRepository.UpdateNotificationSentDate(notificationEmail.NotificationLocationId);
+        }
     }
 
     public async Task SendProviderNotificationEmail(int notificationId, string emailAddress)

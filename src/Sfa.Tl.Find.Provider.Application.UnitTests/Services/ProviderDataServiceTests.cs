@@ -2,6 +2,7 @@
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -47,7 +48,7 @@ public class ProviderDataServiceTests
             .Returns(industries);
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.Get<IList<Industry>?>(CacheKeys.IndustriesKey)
+        cacheService.Get<IList<Industry>>(CacheKeys.IndustriesKey)
             .Returns(default(IList<Industry>));
 
         var service = new ProviderDataServiceBuilder()
@@ -70,7 +71,7 @@ public class ProviderDataServiceTests
         var industryRepository = Substitute.For<IIndustryRepository>();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.Get<IList<Industry>?>(CacheKeys.IndustriesKey)
+        cacheService.Get<IList<Industry>>(CacheKeys.IndustriesKey)
             .Returns(industries);
 
         var service = new ProviderDataServiceBuilder()
@@ -97,7 +98,7 @@ public class ProviderDataServiceTests
             .Returns(qualifications);
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.Get<IList<Qualification>?>(CacheKeys.QualificationsKey)
+        cacheService.Get<IList<Qualification>>(CacheKeys.QualificationsKey)
             .Returns(default(IList<Qualification>));
 
         var service = new ProviderDataServiceBuilder()
@@ -120,7 +121,7 @@ public class ProviderDataServiceTests
         var qualificationRepository = Substitute.For<IQualificationRepository>();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.Get<IList<Qualification>?>(CacheKeys.QualificationsKey)
+        cacheService.Get<IList<Qualification>>(CacheKeys.QualificationsKey)
             .Returns(qualifications);
 
         var service = new ProviderDataServiceBuilder()
@@ -147,7 +148,7 @@ public class ProviderDataServiceTests
             .Returns(routes);
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.Get<IList<Route>?>(CacheKeys.RoutesKey)
+        cacheService.Get<IList<Route>>(CacheKeys.RoutesKey)
             .Returns(default(IList<Route>));
 
         var service = new ProviderDataServiceBuilder()
@@ -161,7 +162,7 @@ public class ProviderDataServiceTests
             .Received(1)
             .GetAll(true);
     }
-    
+
     [Fact]
     public async Task DeleteNotification_Calls_Repository()
     {
@@ -224,7 +225,7 @@ public class ProviderDataServiceTests
     public async Task GetNotificationLocationSummaryList_Returns_Expected_List()
     {
         const int notificationId = 1;
-        
+
         var notificationLocationSummaries = new NotificationLocationSummaryBuilder()
             .BuildList()
             .ToList();
@@ -297,9 +298,9 @@ public class ProviderDataServiceTests
 
         await notificationRepository
             .Received(1)
-            .Create(Arg.Is<Notification>(n => 
+            .Create(Arg.Is<Notification>(n =>
                     ReferenceEquals(n, notification) &&
-                    n.EmailVerificationToken == uniqueId), 
+                    n.EmailVerificationToken == uniqueId),
                 TestUkPrn);
     }
 
@@ -465,7 +466,7 @@ public class ProviderDataServiceTests
             .Received(1)
             .UpdateLocation(notification);
     }
-    
+
     [Fact]
     public async Task GetNotification_Returns_Expected_Item()
     {
@@ -585,7 +586,7 @@ public class ProviderDataServiceTests
         var routeRepository = Substitute.For<IRouteRepository>();
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.Get<IList<Route>?>(CacheKeys.RoutesKey)
+        cacheService.Get<IList<Route>>(CacheKeys.RoutesKey)
             .Returns(routes);
 
         var service = new ProviderDataServiceBuilder()
@@ -1338,12 +1339,18 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task SendProviderNotifications_Calls_EmailService()
     {
+        const NotificationFrequency frequency = NotificationFrequency.Daily;
+
         var providerSettings = new SettingsBuilder()
             .BuildProviderSettings();
 
+        var notificationEmails = new NotificationEmailBuilder()
+            .BuildList()
+            .ToList();
+
         var notificationRepository = Substitute.For<INotificationRepository>();
-        //notificationRepository.GetNotification(notificationId)
-        //    .Returns(notification);
+        notificationRepository.GetPendingNotificationEmails(frequency)
+            .Returns(notificationEmails);
 
         var emailService = Substitute.For<IEmailService>();
         emailService.SendEmail(
@@ -1359,21 +1366,67 @@ public class ProviderDataServiceTests
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
 
-        //TODO: Remove act when method is implemented - just keep "await service.SendProviderNotifications();"
+        await service.SendProviderNotifications();
 
-        var f = async () =>
-        {
-            await service.SendProviderNotifications();
-        };
-        await f.Should().ThrowAsync<NotImplementedException>();
-        //await emailService
-        //    .Received(1)
-        //    .SendEmail(
-        //        notification.Email,
-        //        EmailTemplateNames.ProviderNotification,
-        //        Arg.Any<IDictionary<string, string>>(),
-        //        Arg.Any<string>());
+        await emailService
+            .Received(notificationEmails.Count)
+            .SendEmail(
+                Arg.Any<string>(),
+                EmailTemplateNames.ProviderNotification,
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>());
 
+        await emailService
+            .Received(1)
+            .SendEmail(
+                notificationEmails.First().Email,
+                EmailTemplateNames.ProviderNotification,
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task SendProviderNotifications_Calls_UpdateNotificationSentDate()
+    {
+        const NotificationFrequency frequency = NotificationFrequency.Daily;
+
+        var providerSettings = new SettingsBuilder()
+            .BuildProviderSettings();
+
+        var notificationEmails = new NotificationEmailBuilder()
+            .BuildList()
+            .Take(1)  
+            .ToList();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetPendingNotificationEmails(frequency)
+            .Returns(notificationEmails);
+
+        var emailService = Substitute.For<IEmailService>();
+        emailService.SendEmail(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>())
+            .Returns(true);
+
+        var service = new ProviderDataServiceBuilder()
+            .Build(
+                emailService: emailService,
+                notificationRepository: notificationRepository,
+                providerSettings: providerSettings);
+
+        await service.SendProviderNotifications();
+
+        await notificationRepository
+            .Received(notificationEmails.Count)
+            .UpdateNotificationSentDate(
+                Arg.Any<int>());
+
+        await notificationRepository
+            .Received(1)
+            .UpdateNotificationSentDate(
+                notificationEmails.First().NotificationLocationId);
     }
 
     [Fact]
@@ -1442,7 +1495,7 @@ public class ProviderDataServiceTests
                         })),
                 Arg.Any<string>());
     }
-    
+
     [Fact]
     public async Task SendProviderVerificationEmail_Calls_EmailService_And_Repository()
     {
