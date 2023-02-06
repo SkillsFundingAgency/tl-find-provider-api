@@ -66,8 +66,7 @@
                     </div>
                 </fieldset>
             </div>
-            <button type="submit" class="govuk-button govuk-!-margin-right-2">Save and finish</button>
-            <button type="submit" asp-page-handler="AddLocation" class="govuk-button govuk-button--secondary">Add another notification for this email</button>
+            <button type="submit" class="govuk-button govuk-!-margin-right-2">Save changes</button>
             <a asp-page="./EditNotification" asp-route-id="@Model.Input!.ProviderNotificationId" class="govuk-link govuk-!-padding-2 tl-display--inline-block">Cancel</a>
 
             <input type="hidden" asp-for="Input!.ProviderNotificationId" />
