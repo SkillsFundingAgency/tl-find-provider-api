@@ -35,7 +35,7 @@ public class EmailTemplateRepositoryTests
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -60,7 +60,7 @@ public class EmailTemplateRepositoryTests
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -93,7 +93,7 @@ public class EmailTemplateRepositoryTests
                 )
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -119,7 +119,7 @@ public class EmailTemplateRepositoryTests
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -144,7 +144,7 @@ public class EmailTemplateRepositoryTests
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -177,7 +177,7 @@ public class EmailTemplateRepositoryTests
                 )
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,

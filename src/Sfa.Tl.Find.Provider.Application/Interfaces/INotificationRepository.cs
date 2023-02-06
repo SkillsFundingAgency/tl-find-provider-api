@@ -1,4 +1,5 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
@@ -11,6 +12,8 @@ public interface INotificationRepository
     Task<IEnumerable<NotificationLocationName>> GetProviderNotificationLocations(int providerNotificationId);
 
     Task<Notification> GetNotification(int notificationId);
+
+    Task<IEnumerable<NotificationEmail>> GetPendingNotificationEmails(NotificationFrequency frequency);
 
     Task<Notification> GetNotificationLocation(int notificationLocationId);
 
@@ -28,6 +31,8 @@ public interface INotificationRepository
     Task Update(Notification notification);
 
     Task UpdateLocation(Notification notification);
+
+    Task UpdateNotificationSentDate(int notificationLocationId);
 
     Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? emailVerificationToken);
 

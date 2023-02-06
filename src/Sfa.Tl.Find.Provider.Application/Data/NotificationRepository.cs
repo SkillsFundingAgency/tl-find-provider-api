@@ -4,6 +4,7 @@ using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Data;
 
@@ -135,6 +136,23 @@ public class NotificationRepository : INotificationRepository
                 commandType: CommandType.StoredProcedure);
 
         return notification;
+    }
+
+    public async Task<IEnumerable<NotificationEmail>> GetPendingNotificationEmails(NotificationFrequency frequency)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            frequency
+        });
+
+        return await _dbContextWrapper
+            .QueryAsync<NotificationEmail>(
+                connection,
+                "GetPendingNotifications",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
     }
 
     public async Task<Notification> GetNotificationLocation(
@@ -428,6 +446,32 @@ public class NotificationRepository : INotificationRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred when updating a notification");
+            throw;
+        }
+    }
+
+    public async Task UpdateNotificationSentDate(int notificationLocationId)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                notificationLocationId
+            });
+
+            await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "UPDATE dbo.NotificationLocation " +
+                "SET LastNotificationDate = GETUTCDATE(), " +
+                "    ModifiedOn = GETUTCDATE() " +
+                "WHERE Id = @notificationLocationId ",
+                _dynamicParametersWrapper.DynamicParameters);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when saving a notification last sent date");
             throw;
         }
     }

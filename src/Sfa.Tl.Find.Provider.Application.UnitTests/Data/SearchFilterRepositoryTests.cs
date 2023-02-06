@@ -82,7 +82,7 @@ public class SearchFilterRepositoryTests
         var dbContextWrapper = new DbContextWrapperBuilder()
             .BuildSubstitute();
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -155,7 +155,7 @@ public class SearchFilterRepositoryTests
         var dbContextWrapper = new DbContextWrapperBuilder()
             .BuildSubstitute();
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -179,7 +179,7 @@ public class SearchFilterRepositoryTests
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -204,7 +204,7 @@ public class SearchFilterRepositoryTests
         var dbContextWrapper = new DbContextWrapperBuilder()
             .BuildSubstitute();
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,

@@ -798,7 +798,7 @@ public class EmployerInterestRepositoryTests
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -825,7 +825,7 @@ public class EmployerInterestRepositoryTests
         var dbContextWrapper = new DbContextWrapperBuilder()
             .BuildSubstitute();
 
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,

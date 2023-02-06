@@ -70,7 +70,7 @@ public class TownRepositoryTests
             
         var receivedSqlArgs = new List<string>();
 
-        var dapperParameterWrapper = new SubstituteDynamicParameterWrapper();
+        var dapperParameterWrapper = new SubstituteDynamicParametersWrapper();
         
         var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnectionWithTransaction();

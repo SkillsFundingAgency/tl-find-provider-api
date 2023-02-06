@@ -3,7 +3,7 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 
-internal class SubstituteDynamicParameterWrapper
+public class SubstituteDynamicParametersWrapper
 {
     public IDynamicParametersWrapper DapperParameterFactory
     {
@@ -16,7 +16,7 @@ internal class SubstituteDynamicParameterWrapper
         private set;
     }
 
-    public SubstituteDynamicParameterWrapper()
+    public SubstituteDynamicParametersWrapper()
     {
         var parameters = Substitute.For<IDynamicParametersWrapper>();
         parameters

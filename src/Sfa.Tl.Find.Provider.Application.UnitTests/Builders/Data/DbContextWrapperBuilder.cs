@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -51,6 +52,20 @@ public class DbContextWrapperBuilder
             .Returns(dbConnection);
 
         return (dbContextWrapper, dbConnection);
+    }
+
+    public (IDbContextWrapper, IDbConnection, SubstituteDynamicParametersWrapper) BuildSubstituteWrapperAndConnectionWithDynamicParameters()
+    {
+        var dbConnection = Substitute.For<IDbConnection>();
+
+        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+        dbContextWrapper
+            .CreateConnection()
+            .Returns(dbConnection);
+
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+
+        return (dbContextWrapper, dbConnection, dynamicParametersWrapper);
     }
 
     public (IDbContextWrapper, IDbConnection, IDbTransaction) BuildSubstituteWrapperAndConnectionWithTransaction()
