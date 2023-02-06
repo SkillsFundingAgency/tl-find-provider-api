@@ -37,7 +37,7 @@
                 <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" asp-for="Input!.SelectedPostcode" asp-items="Model.Postcodes">
                     <option value="">Select campus</option>
                 </select>
-                <div class="tl-employers--search tl-hidden @(Model.Input?.SelectedPostcode == "Enter postcode" ? "active" : string.Empty)">
+                <div class="tl-employers--search @(Model.Input?.SelectedPostcode == "Enter postcode" ? "active" : string.Empty)">
                     <label class="govuk-label govuk-visually-hidden" for="Input!.CustomPostcode">Enter postcode</label>
                     <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" asp-for="Input!.CustomPostcode" type="text"
                            sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-input--error">
