@@ -4,7 +4,6 @@ using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
-using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -79,10 +78,9 @@ public class SearchFilterRepositoryTests
         const long ukPrn = 12345678;
         const bool includeAdditionalData = true;
 
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .BuildSubstitute();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -148,15 +146,15 @@ public class SearchFilterRepositoryTests
         result.Routes.Should().NotBeNullOrEmpty();
         result.Routes.First().Validate(routeDtoList[0]);
     }
+
     [Fact]
     public async Task GetSearchFilter_Sets_Dynamic_Parameters()
     {
         const int locationId = 1;
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .BuildSubstitute();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
-
+        
+        var (dbContextWrapper, _, dynamicParametersWrapper) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+        
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
@@ -176,10 +174,8 @@ public class SearchFilterRepositoryTests
         var searchFilter = new SearchFilterBuilder()
             .Build();
 
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -201,10 +197,9 @@ public class SearchFilterRepositoryTests
         var searchFilter = new SearchFilterBuilder()
             .Build();
 
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .BuildSubstitute();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new SearchFilterRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -214,19 +209,11 @@ public class SearchFilterRepositoryTests
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-        templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-
-        var expectedRouteIds = searchFilter.Routes
-                            .Select(r => r.Id);
 
         templates.GetDynamicTemplatesCount().Should().Be(3);
         templates.ContainsNameAndValue("locationId", searchFilter.LocationId);
         templates.ContainsNameAndValue("searchRadius", searchFilter.SearchRadius);
         var routeIds = templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds");
         routeIds.Should().NotBeNull();
-        var t = routeIds.GetType().Name;
     }
 }

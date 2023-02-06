@@ -3,7 +3,6 @@ using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
-using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -26,16 +25,15 @@ public class EmailTemplateRepositoryTests
     [Fact]
     public async Task GetEmailTemplate_By_Id_Returns_Expected_Result()
     {
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         dbContextWrapper
             .QueryAsync<EmailTemplate>(dbConnection,
                 Arg.Any<string>(),
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -51,8 +49,10 @@ public class EmailTemplateRepositoryTests
     [Fact]
     public async Task GetEmailTemplate_By_Id_Calls_Query()
     {
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+
 
         dbContextWrapper
             .QueryAsync<EmailTemplate>(dbConnection,
@@ -60,9 +60,7 @@ public class EmailTemplateRepositoryTests
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
 
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
-
-        var repository = new EmailTemplateRepositoryBuilder()
+       var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
@@ -83,17 +81,9 @@ public class EmailTemplateRepositoryTests
     [Fact]
     public async Task GetEmailTemplate_By_Id_Sets_Dynamic_Parameter()
     {
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
-
-        dbContextWrapper
-            .QueryAsync<EmailTemplate>(dbConnection,
-                Arg.Any<string>(),
-                Arg.Any<DynamicParameters>()
-                )
-            .Returns(new List<EmailTemplate> { _testEmailTemplate });
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -110,16 +100,15 @@ public class EmailTemplateRepositoryTests
     [Fact]
     public async Task GetEmailTemplate_By_Name_Returns_Expected_Result()
     {
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         dbContextWrapper
             .QueryAsync<EmailTemplate>(dbConnection,
                 Arg.Any<string>(),
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -135,16 +124,15 @@ public class EmailTemplateRepositoryTests
     [Fact]
     public async Task GetEmailTemplate_By_Name_Calls_Query()
     {
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
+       var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         dbContextWrapper
             .QueryAsync<EmailTemplate>(dbConnection,
                 Arg.Any<string>(),
                 Arg.Any<DynamicParameters>())
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -167,8 +155,9 @@ public class EmailTemplateRepositoryTests
     [Fact]
     public async Task GetEmailTemplate_By_Name_Sets_Dynamic_Parameter()
     {
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         dbContextWrapper
             .QueryAsync<EmailTemplate>(dbConnection,
@@ -176,8 +165,6 @@ public class EmailTemplateRepositoryTests
                 Arg.Any<DynamicParameters>()
                 )
             .Returns(new List<EmailTemplate> { _testEmailTemplate });
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
 
         var repository = new EmailTemplateRepositoryBuilder()
             .Build(dbContextWrapper,

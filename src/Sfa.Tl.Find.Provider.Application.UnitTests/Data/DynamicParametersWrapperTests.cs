@@ -13,8 +13,7 @@ public class DynamicParametersWrapperTests
         typeof(DynamicParametersWrapper)
             .ShouldNotAcceptNullConstructorArguments();
     }
-
-
+    
     [Fact]
     public void Constructor_Sets_Dynamic_Parameters_Property()
     {

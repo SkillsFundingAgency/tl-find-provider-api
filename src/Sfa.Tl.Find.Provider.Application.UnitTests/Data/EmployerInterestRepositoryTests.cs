@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
-using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -766,15 +765,13 @@ public class EmployerInterestRepositoryTests
         const int maximumExtensions = 10;
         var uniqueId = new Guid();
 
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .BuildSubstitute();
-
-        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
-            .Build();
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
-                dynamicParametersWrapper);
+                dynamicParametersWrapper.DapperParameterFactory);
 
         await repository.ExtendExpiry(uniqueId, 
             numberOfDaysToExtend,
@@ -795,10 +792,9 @@ public class EmployerInterestRepositoryTests
     {
         const int id = 10;
 
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -822,10 +818,9 @@ public class EmployerInterestRepositoryTests
     {
         const int id = 10;
 
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .BuildSubstitute();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,

@@ -290,6 +290,12 @@ public static class ModelValidationExtensions
         qualification.Name.Should().Be(expected.Name);
     }
 
+    public static void Validate(this Qualification qualification, QualificationDto expected)
+    {
+        qualification.Id.Should().Be(expected.QualificationId);
+        qualification.Name.Should().Be(expected.QualificationName);
+    }
+
     public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected, bool validateId = false, bool validateUniqueId = false, bool validatePostcode = true, bool validateLatLong = true)
     {
         if(validateId) employerInterest.Id.Should().Be(expected.Id);

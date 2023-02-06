@@ -80,4 +80,19 @@ public class DbContextWrapperBuilder
 
         return (dbContextWrapper, dbConnection, transaction);
     }
+
+    public (IDbContextWrapper, IDbConnection, IDbTransaction, SubstituteDynamicParametersWrapper) BuildSubstituteWrapperAndConnectionWithTransactionWithDynamicParameters()
+    {
+        var transaction = Substitute.For<IDbTransaction>();
+
+        var (dbContextWrapper, dbConnection) = BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .BeginTransaction(dbConnection)
+            .Returns(transaction);
+
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+
+        return (dbContextWrapper, dbConnection, transaction, dynamicParametersWrapper);
+    }
 }
