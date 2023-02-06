@@ -73,7 +73,7 @@ public class AddNotificationLocationModel : PageModel
 
         return RedirectToPage("/Provider/EditNotification", new { id = Input?.ProviderNotificationId });
     }
-    
+        
     private async Task Save()
     {
         var routes = GetSelectedSkillAreas(Input!.SkillAreas);
@@ -161,16 +161,15 @@ public class AddNotificationLocationModel : PageModel
                 => new SelectListItem(
                     $"{p.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Postcode}]",
                     p.LocationId.ToString(),
-                    p.LocationId == selectedValue)
-            )
+                    p.LocationId == selectedValue))
             .OrderBy(x => x.Text)
             .ToList();
         
-        return !providerLocations.Any(p => p.Id != null && p.LocationId == null)
-            ? selectList
+        return providerLocations.Any(p => p.Id is not null && p.LocationId is null)
+            ? selectList.ToArray()
+            : selectList
                 .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
-                .ToArray()
-            : selectList.ToArray();
+                .ToArray();
     }
 
     private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)

@@ -15,10 +15,11 @@ public class EditNotificationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
     private readonly ISessionService _sessionService;
-    private readonly ProviderSettings _providerSettings;
     private readonly ILogger<EditNotificationModel> _logger;
 
     public int ProviderNotificationId { get; private set; }
+
+    public bool HasAvailableLocations { get; private set; }
 
     public IEnumerable<NotificationLocationSummary>? NotificationLocationList { get; private set; }
 
@@ -30,15 +31,11 @@ public class EditNotificationModel : PageModel
     public EditNotificationModel(
         IProviderDataService providerDataService,
         ISessionService? sessionService,
-        IOptions<ProviderSettings> providerOptions,
         ILogger<EditNotificationModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-        _providerSettings = providerOptions?.Value
-                            ?? throw new ArgumentNullException(nameof(providerOptions));
     }
 
     public async Task<IActionResult> OnGet(
@@ -53,7 +50,14 @@ public class EditNotificationModel : PageModel
         }
 
         NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(providerNotificationId);
-        
+
+        var allLocations = (await _providerDataService
+                .GetAvailableNotificationLocationPostcodes(providerNotificationId))
+                .ToList();
+        HasAvailableLocations = 
+            allLocations.Any(p => (p.Id is null && p.LocationId is not null) //unused location
+            || !allLocations.Any(p => p.Id is not null && p.LocationId is null));
+
         return Page();
     }
 
@@ -65,7 +69,7 @@ public class EditNotificationModel : PageModel
         {
             await _providerDataService.DeleteNotificationLocation(id);
 
-            TempData[nameof(RemovedLocation)] = 
+            TempData[nameof(RemovedLocation)] =
                 notificationLocation.LocationName is not null
                 ? $"{notificationLocation.LocationName?.ToUpper()} [{notificationLocation.Postcode}]"
                 : "All";

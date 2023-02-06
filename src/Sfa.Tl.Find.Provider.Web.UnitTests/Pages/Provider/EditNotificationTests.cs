@@ -24,20 +24,25 @@ public class EditNotificationTests
 
         var notificationId = notification.Id!.Value;
 
+        var availableLocations = new NotificationLocationNameBuilder()
+            .BuildList()
+            .ToList();
+
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
             .GetNotification(notificationId)
             .Returns(notification);
-
-        var settings = new SettingsBuilder().BuildProviderSettings();
+        providerDataService
+            .GetAvailableNotificationLocationPostcodes(notificationId)
+            .Returns(availableLocations);
 
         var editNotificationModel = new EditNotificationModelBuilder()
-            .Build(providerDataService,
-                providerSettings: settings);
+            .Build(providerDataService);
 
         await editNotificationModel.OnGet(notificationId);
 
         editNotificationModel.Notification.Should().Be(notification);
+        editNotificationModel.HasAvailableLocations.Should().BeTrue();
     }
 
     [Fact]
@@ -50,6 +55,10 @@ public class EditNotificationTests
             .BuildList()
             .ToList();
 
+        var availableLocations = new NotificationLocationNameBuilder()
+            .BuildList()
+            .ToList();
+
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
             .GetNotification(notificationId)
@@ -57,6 +66,9 @@ public class EditNotificationTests
         providerDataService
             .GetNotificationLocationSummaryList(notificationId)
             .Returns(notificationLocationSummaryList);
+        providerDataService
+            .GetAvailableNotificationLocationPostcodes(notificationId)
+            .Returns(availableLocations);
 
         var editNotificationModel = new EditNotificationModelBuilder()
             .Build(providerDataService);
@@ -70,25 +82,27 @@ public class EditNotificationTests
     }
 
     [Fact]
-    public async Task EditNotificationModel_OnGet_Sets_Initial_Input_Values_With_Default_Search_Radius()
+    public async Task EditNotificationModel_OnGet_Sets_HasAvailableLocations_To_False_When_No_Available_Locations()
     {
-        var settings = new SettingsBuilder().BuildProviderSettings();
-
         var notification = new NotificationBuilder()
             .WithSearchRadius(null)
             .Build();
-        var id = notification.Id!.Value;
+        var notificationId = notification.Id!.Value;
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetNotification(id)
+            .GetNotification(notificationId)
             .Returns(notification);
+        providerDataService
+            .GetAvailableNotificationLocationPostcodes(notificationId)
+            .Returns(Enumerable.Empty<NotificationLocationName>());
 
-        var editNotificationDetailModel = new EditNotificationModelBuilder()
-            .Build(providerDataService,
-                providerSettings: settings);
+        var editNotificationModel = new EditNotificationModelBuilder()
+            .Build(providerDataService);
 
-        await editNotificationDetailModel.OnGet(id);
+        await editNotificationModel.OnGet(notificationId);
+
+        editNotificationModel.HasAvailableLocations.Should().BeFalse();
     }
 
     [Fact]

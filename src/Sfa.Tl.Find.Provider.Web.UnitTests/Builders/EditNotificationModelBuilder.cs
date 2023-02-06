@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
-using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using System.Security.Claims;
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -16,7 +13,6 @@ public class EditNotificationModelBuilder
     public EditNotificationModel Build(
         IProviderDataService? providerDataService = null,
         ISessionService? sessionService = null,
-        ProviderSettings? providerSettings = null,
         ILogger<EditNotificationModel>? logger = null,
         PageContext? pageContext = null,
         bool userIsAuthenticated = true,
@@ -36,11 +32,6 @@ public class EditNotificationModelBuilder
         sessionService ??= Substitute.For<ISessionService>();
         logger ??= Substitute.For<ILogger<EditNotificationModel>>();
 
-        var providerOptions = Options.Create(
-            providerSettings
-            ?? new SettingsBuilder()
-                .BuildProviderSettings());
-
         var tempDataProvider = Substitute.For<ITempDataProvider>();
         var tempData = new TempDataDictionary(
             pageContext.HttpContext,
@@ -49,7 +40,6 @@ public class EditNotificationModelBuilder
         var pageModel = new EditNotificationModel(
             providerDataService,
             sessionService,
-            providerOptions,
             logger)
         {
             PageContext = pageContext,

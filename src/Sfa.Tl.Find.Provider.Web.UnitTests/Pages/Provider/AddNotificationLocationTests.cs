@@ -41,7 +41,7 @@ public class AddNotificationLocationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var locations = new NotificationLocationNameBuilder()
+        var availableLocations = new NotificationLocationNameBuilder()
             .BuildList()
             .ToList();
 
@@ -51,7 +51,7 @@ public class AddNotificationLocationTests
             .Returns(notification);
         providerDataService
             .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
-            .Returns(locations);
+            .Returns(availableLocations);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
             .Build(providerDataService,
@@ -65,7 +65,7 @@ public class AddNotificationLocationTests
         options[0].Should().Match<SelectListItem>(x =>
             x.Text == "All" && x.Value == "0");
 
-        var orderedAvailableLocations = locations
+        var orderedAvailableLocations = availableLocations
             .Where(x => x.Id is null)
             .OrderBy(r => r.Name)
             .ToList();

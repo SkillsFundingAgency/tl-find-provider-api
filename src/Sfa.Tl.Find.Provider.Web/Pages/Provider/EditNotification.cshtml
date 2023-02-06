@@ -103,7 +103,10 @@
                 <a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
             </div>
         </div>
-        <a asp-page="./AddNotificationLocation" asp-route-id="@Model.Notification?.Id" id="tl-add-notification" class="govuk-button">Add notification for another campus</a>
+        @if(Model.HasAvailableLocations)
+        {
+            <a asp-page="./AddNotificationLocation" asp-route-id="@Model.Notification?.Id" id="tl-add-notification" class="govuk-button">Add notification for another campus</a>
+        }
     </div>
 </div>
 
