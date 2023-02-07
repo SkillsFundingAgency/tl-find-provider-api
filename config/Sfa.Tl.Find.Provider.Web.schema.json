@@ -124,6 +124,11 @@
           "minLength": 1,
           "type": "integer",
           "environmentVariable": "ProviderSettings_DefaultSearchRadius"
+        },
+        "SupportSiteAccessConnectHelpUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ProviderSettings_SupportSiteAccessConnectHelpUri"
         }
       },
       "additionalProperties": false,

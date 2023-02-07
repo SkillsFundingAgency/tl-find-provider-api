@@ -128,6 +128,12 @@ Add a new row to the table with:
         "Timeout": 30,
         "Administrators": "<list of administrator email addresses>"
     },
+    "ProviderSettings": {
+        "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
+        "DefaultSearchRadius": 20,
+        "SupportSiteAccessConnectHelpUri": "https://support.tlevels.gov.uk/hc/en-gb/articles/9753415632914"
+    },
+
     "PostcodeApiSettings": {
         "BaseUri": "https://api.postcodes.io/"
     }

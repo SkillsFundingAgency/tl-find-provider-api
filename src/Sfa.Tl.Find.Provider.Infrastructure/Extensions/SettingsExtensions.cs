@@ -101,6 +101,7 @@ public static class SettingsExtensions
         settings.NotificationEmailJobSchedule = configuration.ProviderSettings?.NotificationEmailJobSchedule;
         settings.NotificationEmailImmediateJobSchedule = configuration.ProviderSettings?.NotificationEmailImmediateJobSchedule;
         settings.NotificationEmailWeeklyDay = configuration.ProviderSettings?.NotificationEmailWeeklyDay ?? 0;
+        settings.SupportSiteAccessConnectHelpUri = configuration.ProviderSettings?.SupportSiteAccessConnectHelpUri;
     }
 
     public static void ConfigureSearchSettings(this SearchSettings settings, SiteConfiguration configuration)

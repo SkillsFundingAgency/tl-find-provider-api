@@ -11,4 +11,6 @@ public class ProviderSettings
     public string? NotificationEmailImmediateJobSchedule { get; set;}
 
     public int NotificationEmailWeeklyDay { get; set; }
+
+    public string? SupportSiteAccessConnectHelpUri { get; set; }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Web.Pages;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
+using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages;
 public class StartTests
@@ -13,6 +14,7 @@ public class StartTests
         typeof(StartModel)
             .ShouldNotAcceptNullConstructorArguments();
     }
+
 
     [Fact]
     public void StartModel_OnGet_Returns_PageResult_When_User_Is_Not_Authenticated()
@@ -27,6 +29,19 @@ public class StartTests
         var pageResult = result as PageResult;
         pageResult.Should().NotBeNull();
         startModel.HttpContext.User.Identity!.IsAuthenticated.Should().BeFalse();
+    }
+
+    [Fact]
+    public void StartModel_OnGet_Sets_Expected_Properties_PageResult_When_User_Is_Not_Authenticated()
+    {
+        var settings = new SettingsBuilder().BuildProviderSettings();
+
+        var startModel = new StartModelBuilder()
+            .Build(settings, userIsAuthenticated: false);
+
+        startModel.OnGet();
+
+        startModel.SupportSiteAccessConnectHelpUri.Should().Be(settings.SupportSiteAccessConnectHelpUri);
     }
 
     [Fact]
