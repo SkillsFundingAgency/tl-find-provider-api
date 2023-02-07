@@ -114,10 +114,20 @@ else if (Model.ZeroResultsFound == true)
                 Please search another postcode or check back soon to see employers in your area.
             </p>
         }
-        else
+        else if (@Model.SelectedPostcodeHasFilters)
         {
             <p class="govuk-body" govuk-!-margin-bottom-0>
-                <strong>There are currently no employers within your search area who have expressed interest in T Levels.</strong><br>
+                <strong>There are currently no employers within your search filters who have expressed interest in T Levels.</strong><br>
+                You can search another postcode,
+                <a asp-page="/Provider/SearchFilterDetails" asp-route-id="@Model.SelectedLocationId" class="govuk-link govuk-link--no-visited-state">change your search filters</a>
+                or <a asp-page="/Provider/Notifications" class="govuk-link govuk-link--no-visited-state">switch on notifications</a>
+                to be alerted when there are new employers in your area.
+            </p>
+        }
+        else 
+        {
+            <p class="govuk-body" govuk-!-margin-bottom-0>
+                <strong>There are currently no employers within @Model.SearchRadius miles who have expressed interest in T Levels.</strong><br>
                 You can search another postcode,
                 <a asp-page="/Provider/SearchFilterDetails" asp-route-id="@Model.SelectedLocationId" class="govuk-link govuk-link--no-visited-state">change your search area</a>
                 or <a asp-page="/Provider/Notifications" class="govuk-link govuk-link--no-visited-state">switch on notifications</a>

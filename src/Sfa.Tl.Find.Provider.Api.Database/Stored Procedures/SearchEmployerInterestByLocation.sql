@@ -10,15 +10,11 @@ AS
 	DECLARE @searchRadius DECIMAL =  @defaultSearchRadius;
 	DECLARE @searchRadiusInMeters DECIMAL;
 
-	DECLARE @routeIds [dbo].[IdListTableType];
-
 	DECLARE @searchFilterId INT;
 	DECLARE @fromLocation GEOGRAPHY;
 
 	SELECT @totalEmployerInterestsCount = COUNT(1) 
 	FROM [dbo].[EmployerInterest];
-
-	SET @searchFiltersApplied = 0;
 
 	IF (@locationId IS NULL)
 		RAISERROR ('Either @locationId or both @latitude and @longitude required' ,1 ,1)
@@ -34,17 +30,12 @@ AS
 	ON sf.[LocationId] = l.[Id] 
 	WHERE l.[Id] = @locationId
 
-	IF(@searchFilterId IS NOT NULL)
-	BEGIN
-		SET @searchFiltersApplied = 1
-
-		INSERT INTO @routeIds 
-		SELECT [RouteId]
-		FROM [dbo].[SearchFilterRoute]
-	END
-
 	SET @searchRadiusInMeters = @searchRadius * @metersPerMile;
-
+	SET @searchFiltersApplied = CASE WHEN (@searchFilterId IS NOT NULL) 
+									 THEN 1 
+									 ELSE 0 
+								END;
+	
 	WITH EmployerInterest_CTE AS (
 		SELECT ei.[Id],
 			ei.[OrganisationName],
@@ -66,15 +57,24 @@ AS
 		FROM [dbo].[EmployerInterestIndustry] eii
 		INNER JOIN [dbo].[Industry] i
 		ON eii.[IndustryId] = i.[Id]
-	),
+		),
+
+	SearchFilterRoute_CTE AS (
+		SELECT [RouteId]
+		FROM [dbo].[SearchFilterRoute] sfr
+		WHERE @searchFilterId IS NOT NULL
+		  AND sfr.[SearchFilterId] = @searchFilterId
+		),
 
 	Route_CTE AS (
 		SELECT r.[Id], 
 			r.[Name]
 		FROM [dbo].[Route] r
-		WHERE (SELECT COUNT(*) FROM @routeIds) = 0
-		   OR r.[Id] IN (SELECT [Id] FROM @routeIds)
-	)
+		LEFT JOIN SearchFilterRoute_CTE sfr
+		ON r.[Id] = sfr.[RouteId]
+		WHERE sfr.[RouteId] IS NOT NULL
+		OR (SELECT COUNT(*) FROM SearchFilterRoute_CTE) = 0
+		)
 
 	SELECT	ei.[Id],
 			ei.[OrganisationName],
