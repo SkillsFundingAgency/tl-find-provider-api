@@ -9,10 +9,8 @@ AS
 				 l.[Name],
 				 l.[Postcode]
 		FROM [ProviderNotification] pn
-		INNER JOIN [dbo].[Provider] p
-  		ON	p.[Id] = pn.[ProviderId]
 		INNER JOIN	[dbo].[Location] l
-		ON		p.[Id] = l.[ProviderId]
+		ON		pn.[ProviderId] = l.[ProviderId]
 		WHERE	pn.[Id] = @providerNotificationId
 		  AND	l.[IsDeleted] = 0),
 
