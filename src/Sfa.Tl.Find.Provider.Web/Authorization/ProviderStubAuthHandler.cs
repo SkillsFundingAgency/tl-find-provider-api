@@ -12,13 +12,13 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
 
     public ProviderStubAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
-        UrlEncoder encoder, 
-        ISystemClock clock, 
+        UrlEncoder encoder,
+        ISystemClock clock,
         IHttpContextAccessor httpContextAccessor,
         ILoggerFactory logger)
         : base(options, logger, encoder, clock)
     {
-        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor)); ;
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()

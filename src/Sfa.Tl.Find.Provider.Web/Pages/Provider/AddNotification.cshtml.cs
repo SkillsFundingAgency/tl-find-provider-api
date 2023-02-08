@@ -101,7 +101,7 @@ public class AddNotificationModel : PageModel
 
     private async Task LoadNotificationView()
     {
-        var defaultSearchRadius = _providerSettings.DefaultNotificationSearchRadius > 0
+        var defaultNotificationSearchRadius = _providerSettings.DefaultNotificationSearchRadius > 0
             ? _providerSettings.DefaultNotificationSearchRadius
             : Constants.DefaultProviderNotificationFilterRadius;
 
@@ -113,7 +113,7 @@ public class AddNotificationModel : PageModel
 
         Input ??= new InputModel
         {
-            SelectedSearchRadius = defaultSearchRadius,
+            SelectedSearchRadius = defaultNotificationSearchRadius,
             SelectedFrequency = NotificationFrequency.Immediately,
             SelectedLocation = 0
         };

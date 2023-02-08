@@ -89,11 +89,15 @@ public class EditNotificationLocationModel : PageModel
 
     private async Task LoadNotificationView(int providerNotificationId, int id)
     {
+        var defaultNotificationSearchRadius = _providerSettings.DefaultNotificationSearchRadius > 0
+            ? _providerSettings.DefaultNotificationSearchRadius
+            : Constants.DefaultProviderNotificationFilterRadius;
+
         Input ??= new InputModel
         {
             Id = id,
             ProviderNotificationId = providerNotificationId,
-            SelectedSearchRadius = NotificationDetail?.SearchRadius ?? Constants.DefaultProviderNotificationFilterRadius,
+            SelectedSearchRadius = NotificationDetail?.SearchRadius ?? defaultNotificationSearchRadius,
             SelectedFrequency = NotificationDetail?.Frequency ?? NotificationFrequency.Immediately
         };
 

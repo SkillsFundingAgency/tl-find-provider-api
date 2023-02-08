@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Dapper;
 using Sfa.Tl.Find.Provider.Application.Data;
-using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
