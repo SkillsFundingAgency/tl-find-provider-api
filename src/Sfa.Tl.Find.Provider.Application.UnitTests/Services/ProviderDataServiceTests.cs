@@ -274,11 +274,16 @@ public class ProviderDataServiceTests
     [Fact]
     public async Task SaveNotification_Calls_Repository_For_Create_When_Id_Is_Null()
     {
+        const int newId = 1;
+
         var notification = new NotificationBuilder()
             .WithNullId()
             .Build();
 
         var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository
+            .Create(notification, TestUkPrn)
+            .Returns(newId);
 
         var uniqueId = Guid.Parse("b4fd2a81-dcc9-43b9-9f4e-be76d1faa801");
         var guidProvider = Substitute.For<IGuidProvider>();
@@ -290,11 +295,9 @@ public class ProviderDataServiceTests
             .Build(guidProvider: guidProvider,
                 notificationRepository: notificationRepository);
 
-        await service.SaveNotification(notification, TestUkPrn);
+        var result = await service.SaveNotification(notification, TestUkPrn);
 
-        await notificationRepository
-            .Received(1)
-            .Create(notification, TestUkPrn);
+        result.Should().Be(newId);
 
         await notificationRepository
             .Received(1)
@@ -1573,6 +1576,6 @@ public class ProviderDataServiceTests
 
         await notificationRepository
             .Received(1)
-            .RemoveEmailVerificationToken(uniqueId);
+            .VerifyEmailToken(uniqueId);
     }
 }

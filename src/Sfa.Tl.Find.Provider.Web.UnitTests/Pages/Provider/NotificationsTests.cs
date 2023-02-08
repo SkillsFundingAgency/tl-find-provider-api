@@ -33,16 +33,33 @@ public class NotificationsTests
     public async Task NotificationsModel_OnGet_With_Token_Returns_Redirect_Result()
     {
         const string token = "611c0ffc-8144-4ca5-9428-b2a555729947";
+        const string email = "test@test.com";
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .VerifyNotificationEmail(token)
+            .Returns((Success: true, Email: email));
 
         var notificationsModel = new NotificationsModelBuilder()
-            .Build();
+            .Build(providerDataService);
 
         var result = await notificationsModel.OnGet(token);
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Provider/Notifications");
+
+        notificationsModel.TempData.Should().NotBeNull();
+        notificationsModel.TempData
+            .Keys
+            .Should()
+            .Contain("VerifiedEmail");
+
+        notificationsModel.TempData
+            .Peek("VerifiedEmail")
+            .Should()
+            .Be(email);
     }
-    
+
     [Fact]
     public async Task NotificationsModel_OnGet_With_Token_Calls_Service()
     {

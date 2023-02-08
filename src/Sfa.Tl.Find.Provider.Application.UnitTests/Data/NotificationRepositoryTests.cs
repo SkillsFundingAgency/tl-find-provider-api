@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Dapper;
 using Sfa.Tl.Find.Provider.Application.Data;
+using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
@@ -485,19 +486,30 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task CreateNotification_Calls_Database()
     {
+        const int newId = 2;
+
         var notification = new NotificationBuilder()
             .WithNullId()
             .Build();
 
+        //var (dbContextWrapper, dbConnection) =
+        //    new DbContextWrapperBuilder()
+        //        .BuildSubstituteWrapperAndConnection();
+
+        //var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
+        //var parameters = new DynamicParameters();
+        //parameters.Add("returnValue", newId, DbType.Int32, ParameterDirection.ReturnValue);
+        //dynamicParametersWrapper.DynamicParameters.Returns(parameters);
         var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
                 .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+        dynamicParametersWrapper.ReturnValue = newId;
 
         var repository = new NotificationRepositoryBuilder()
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.Create(notification, TestUkPrn);
+        var result = await repository.Create(notification, TestUkPrn);
 
         await dbContextWrapper
             .Received(1)
@@ -510,17 +522,29 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task CreateNotification_Sets_Dynamic_Parameters()
     {
+        const int newId = 2;
+
         var notification = new NotificationBuilder()
             .WithNullId()
             .Build();
 
-        var (dbContextWrapper, _, dynamicParametersWrapper) =
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
                 .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+        dynamicParametersWrapper.ReturnValue = newId;
+
+        dbContextWrapper
+            .ExecuteAsync(dbConnection,
+                "CreateProviderNotification",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
+            .Returns(newId);
 
         var repository = new NotificationRepositoryBuilder()
             .Build(dbContextWrapper,
-                dynamicParametersWrapper.DapperParameterFactory);
+                dynamicParametersWrapper.DapperParameterFactory
+                //dynamicParametersWrapper
+                );
 
         await repository.Create(notification, TestUkPrn);
 
@@ -536,6 +560,35 @@ public class NotificationRepositoryTests
         templates.ContainsNameAndValue("searchRadius", notification.SearchRadius);
         templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
             .Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task CreateNotification_Returns_Expected_Result()
+    {
+        const int newId = 1;
+        var notification = new NotificationBuilder()
+            .WithNullId()
+            .Build();
+
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+        dynamicParametersWrapper.ReturnValue = newId;
+        
+        dbContextWrapper
+            .ExecuteAsync(dbConnection,
+                "CreateProviderNotification",
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
+            .Returns(newId);
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        var result = await repository.Create(notification, TestUkPrn);
+
+        result.Should().Be(newId);
     }
 
     [Fact]
@@ -803,7 +856,7 @@ public class NotificationRepositoryTests
     }
     
     [Fact]
-    public async Task RemoveEmailVerificationToken_Calls_Database()
+    public async Task VerifyEmailToken_Calls_Database()
     {
         var verificationToken = Guid.Parse("d1cece97-ce55-4c5b-8216-2cd65490d0b2");
 
@@ -817,21 +870,18 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper);
 
-        await repository.RemoveEmailVerificationToken(verificationToken);
+        await repository.VerifyEmailToken(verificationToken);
 
         await dbContextWrapper
             .Received(1)
-            .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s =>
-                    s.Contains("UPDATE dbo.ProviderNotification") &&
-                    s.Contains("SET EmailVerificationToken = NULL") &&
-                    s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE EmailVerificationToken = @emailVerificationToken")),
-                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+            .ExecuteScalarAsync<string>(dbConnection,
+                Arg.Is<string>(s => s == "VerifyNotificationEmailToken"),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
     }
 
     [Fact]
-    public async Task RemoveEmailVerificationToken_Sets_Dynamic_Parameters()
+    public async Task VerifyEmailToken_Sets_Dynamic_Parameters()
     {
         var verificationToken = Guid.Parse("d1cece97-ce55-4c5b-8216-2cd65490d0b2");
 
@@ -843,7 +893,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.RemoveEmailVerificationToken(verificationToken);
+        await repository.VerifyEmailToken(verificationToken);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();

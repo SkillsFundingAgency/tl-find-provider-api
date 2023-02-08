@@ -125,6 +125,11 @@
           "type": "integer",
           "environmentVariable": "ProviderSettings_DefaultSearchRadius"
         },
+        "DefaultNotificationSearchRadius": {
+          "minLength": 1,
+          "type": "integer",
+          "environmentVariable": "ProviderSettings_DefaultNotificationSearchRadius"
+        },
         "SupportSiteAccessConnectHelpUri": {
           "minLength": 1,
           "type": "string",

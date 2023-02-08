@@ -27,6 +27,80 @@ public class NotificationRepository : INotificationRepository
         _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
+    
+    public async Task<int> Create(Notification notification, long ukPrn)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var routeIds = notification.Routes
+                .Select(r => r.Id)
+                .AsTableValuedParameter("dbo.IdListTableType");
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                ukPrn,
+                email = notification.Email,
+                emailVerificationToken = notification.EmailVerificationToken,
+                frequency = notification.Frequency,
+                searchRadius = notification.SearchRadius,
+                locationId = notification.LocationId,
+                routeIds
+            });
+            _dynamicParametersWrapper
+                .AddReturnValueParameter("returnValue", DbType.Int32);
+
+            await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "CreateProviderNotification",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+
+            var providerNotificationId = _dynamicParametersWrapper
+                .DynamicParameters
+                .Get<int>("returnValue");
+
+            return providerNotificationId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when creating a notification");
+            throw;
+        }
+    }
+
+    public async Task CreateLocation(Notification notification, int providerNotificationId)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            var routeIds = notification.Routes
+                .Select(r => r.Id)
+                .AsTableValuedParameter("dbo.IdListTableType");
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                providerNotificationId,
+                frequency = notification.Frequency,
+                searchRadius = notification.SearchRadius,
+                locationId = notification.LocationId,
+                routeIds
+            });
+
+            var result = await _dbContextWrapper.ExecuteAsync(
+                connection,
+                "CreateNotificationLocation",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when updating a notification");
+            throw;
+        }
+    }
 
     public async Task Delete(int providerNotificationId)
     {
@@ -59,7 +133,6 @@ public class NotificationRepository : INotificationRepository
             _dynamicParametersWrapper.DynamicParameters,
             commandType: CommandType.StoredProcedure);
     }
-
     
     public async Task<IEnumerable<NotificationLocationName>> GetProviderNotificationLocations(int providerNotificationId)
     {
@@ -319,73 +392,6 @@ public class NotificationRepository : INotificationRepository
         return notifications.Values;
     }
 
-
-    public async Task Create(Notification notification, long ukPrn)
-    {
-        try
-        {
-            using var connection = _dbContextWrapper.CreateConnection();
-
-            var routeIds = notification.Routes
-                .Select(r => r.Id)
-                .AsTableValuedParameter("dbo.IdListTableType");
-
-            _dynamicParametersWrapper.CreateParameters(new
-            {
-                ukPrn,
-                email = notification.Email,
-                emailVerificationToken = notification.EmailVerificationToken,
-                frequency = notification.Frequency,
-                searchRadius = notification.SearchRadius,
-                locationId = notification.LocationId,
-                routeIds
-            });
-
-            var result = await _dbContextWrapper.ExecuteAsync(
-                connection,
-                "CreateProviderNotification",
-                _dynamicParametersWrapper.DynamicParameters,
-                commandType: CommandType.StoredProcedure);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred when creating a notification");
-            throw;
-        }
-    }
-
-    public async Task CreateLocation(Notification notification, int providerNotificationId)
-    {
-        try
-        {
-            using var connection = _dbContextWrapper.CreateConnection();
-
-            var routeIds = notification.Routes
-                .Select(r => r.Id)
-                .AsTableValuedParameter("dbo.IdListTableType");
-
-            _dynamicParametersWrapper.CreateParameters(new
-            {
-                providerNotificationId,
-                frequency = notification.Frequency,
-                searchRadius = notification.SearchRadius,
-                locationId = notification.LocationId,
-                routeIds
-            });
-
-            var result = await _dbContextWrapper.ExecuteAsync(
-                connection,
-                "CreateNotificationLocation",
-                _dynamicParametersWrapper.DynamicParameters,
-                commandType: CommandType.StoredProcedure);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred when updating a notification");
-            throw;
-        }
-    }
-    
     public async Task Update(Notification notification)
     {
         try
@@ -507,9 +513,8 @@ public class NotificationRepository : INotificationRepository
             throw;
         }
     }
-
-    public async Task RemoveEmailVerificationToken(
-        Guid emailVerificationToken)
+    
+    public async Task<(bool Success, string Email)> VerifyEmailToken(Guid emailVerificationToken)
     {
         try
         {
@@ -520,13 +525,13 @@ public class NotificationRepository : INotificationRepository
                 emailVerificationToken
             });
 
-            await _dbContextWrapper.ExecuteAsync(
+            var email = await _dbContextWrapper.ExecuteScalarAsync<string>(
                 connection,
-                "UPDATE dbo.ProviderNotification " +
-                "SET EmailVerificationToken = NULL, " +
-                "    ModifiedOn = GETUTCDATE() " +
-                "WHERE EmailVerificationToken = @emailVerificationToken",
-                _dynamicParametersWrapper.DynamicParameters);
+                "VerifyNotificationEmailToken",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure);
+            
+            return (email is not null, email);
         }
         catch (Exception ex)
         {

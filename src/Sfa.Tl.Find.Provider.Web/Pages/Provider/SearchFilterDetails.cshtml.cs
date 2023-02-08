@@ -39,7 +39,7 @@ public class SearchFilterDetailsModel : PageModel
     {
         DefaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
             ? _providerSettings.DefaultSearchRadius
-            : Constants.DefaultProviderSearchRadius;
+            : Constants.DefaultProviderSearchFilterRadius;
 
         SearchFilter = await _providerDataService.GetSearchFilter(id);
 

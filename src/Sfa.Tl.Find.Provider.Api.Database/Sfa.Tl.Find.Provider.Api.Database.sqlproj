@@ -155,6 +155,7 @@
     <Build Include="Stored Procedures\UpdateNotificationLocation.sql" />
     <Build Include="Stored Procedures\GetProviderNotificationLocations.sql" />
     <Build Include="Stored Procedures\GetPendingNotifications.sql" />
+    <Build Include="Stored Procedures\VerifyNotificationEmailToken.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

@@ -204,7 +204,7 @@ public class EditNotificationLocationTests
         editNotificationLocationModel.Input.Should().NotBeNull();
         editNotificationLocationModel.Input!.Id.Should().Be(notification.Id!.Value);
         editNotificationLocationModel.Input!.ProviderNotificationId.Should().Be(ProviderNotificationId);
-        editNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        editNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
         editNotificationLocationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
         //editNotificationLocationModel.Input!.SelectedLocation.Should().Be(0);
     }
@@ -257,7 +257,7 @@ public class EditNotificationLocationTests
         redirectResult.RouteValues.Should().Contain(x =>
             x.Key == "id" &&
             x.Value != null &&
-            x.Value.ToString() == "1");
+            x.Value.ToString() == ProviderNotificationId.ToString());
     }
 
     [Fact]

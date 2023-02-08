@@ -10,10 +10,7 @@ public static class DynamicParameterValidationExtensions
             .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
             .SingleOrDefault(p => p.Name == "templates");
 
-        //fieldInfo.Should().NotBeNull();
         var templates = fieldInfo?.GetValue(dynamicParameters) as IList<object>;
-        //templates.Should().NotBeNullOrEmpty();
-
         return templates;
     }
 
@@ -21,7 +18,6 @@ public static class DynamicParameterValidationExtensions
     {
         var item = dynamicTemplates.First();
         var pi = item.GetType().GetProperties();
-        //pi.Length.Should().Be(3)
         return pi.Length;
     }
 

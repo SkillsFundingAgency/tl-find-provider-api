@@ -72,6 +72,18 @@ public class DynamicParametersWrapperTests
     }
 
     [Fact]
+    public void AddReturnValueParameter_Creates_Expected_Parameters()
+    {
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();
+
+        dynamicParametersWrapper.AddReturnValueParameter("bob", DbType.String);
+
+        dynamicParametersWrapper.DynamicParameters.ParameterNames.Should().NotBeNullOrEmpty();
+        dynamicParametersWrapper.DynamicParameters.ParameterNames
+            .Should().Contain(s => s == "bob");
+    }
+
+    [Fact]
     public void AddParameter_Creates_Expected_Parameters()
     {
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder().Build();

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
+using Notify.Models;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
@@ -30,6 +31,9 @@ public class NotificationsModel : PageModel
     [TempData]
     public string? VerificationEmail { get; set; }
 
+    [TempData]
+    public string? VerifiedEmail { get; set; }
+
     public NotificationsModel(
         IProviderDataService providerDataService,
         ISessionService? sessionService,
@@ -49,8 +53,14 @@ public class NotificationsModel : PageModel
     {
         if (token is not null)
         {
-            await _providerDataService
+            var verificationResult = await _providerDataService
                 .VerifyNotificationEmail(token);
+
+            if (verificationResult.Success)
+            {
+                TempData[nameof(VerifiedEmail)] = verificationResult.Email;
+            }
+
             return RedirectToPage("/Provider/Notifications");
         }
 

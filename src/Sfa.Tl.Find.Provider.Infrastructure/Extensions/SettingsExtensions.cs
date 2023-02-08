@@ -98,6 +98,7 @@ public static class SettingsExtensions
 
         settings.ConnectSiteUri = configuration.ProviderSettings?.ConnectSiteUri;
         settings.DefaultSearchRadius = configuration.ProviderSettings?.DefaultSearchRadius ?? 0;
+        settings.DefaultNotificationSearchRadius = configuration.ProviderSettings?.DefaultNotificationSearchRadius ?? 0;
         settings.NotificationEmailJobSchedule = configuration.ProviderSettings?.NotificationEmailJobSchedule;
         settings.NotificationEmailImmediateJobSchedule = configuration.ProviderSettings?.NotificationEmailImmediateJobSchedule;
         settings.NotificationEmailWeeklyDay = configuration.ProviderSettings?.NotificationEmailWeeklyDay ?? 0;

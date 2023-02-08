@@ -5,6 +5,10 @@ namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
 public interface INotificationRepository
 {
+    Task<int> Create(Notification notification, long ukPrn);
+
+    Task CreateLocation(Notification notification, int providerNotificationId);
+
     Task Delete(int providerNotificationId);
 
     Task DeleteLocation(int notificationLocationId);
@@ -24,10 +28,6 @@ public interface INotificationRepository
     Task<IEnumerable<NotificationLocationSummary>> GetNotificationLocationSummaryList(
         int notificationId);
 
-    Task Create(Notification notification, long ukPrn);
-
-    Task CreateLocation(Notification notification, int providerNotificationId);
-
     Task Update(Notification notification);
 
     Task UpdateLocation(Notification notification);
@@ -36,5 +36,5 @@ public interface INotificationRepository
 
     Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? emailVerificationToken);
 
-    Task RemoveEmailVerificationToken(Guid emailVerificationToken);
+    Task<(bool Success, string Email)> VerifyEmailToken(Guid emailVerificationToken);
 }

@@ -177,7 +177,7 @@ public class DbContextWrapper : IDbContextWrapper
                         commandType),
                 context);
     }
-
+    
     public async Task<T> ExecuteScalarAsync<T>(
         IDbConnection connection,
         string sql,

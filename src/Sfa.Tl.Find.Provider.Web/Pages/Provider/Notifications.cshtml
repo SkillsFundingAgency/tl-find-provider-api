@@ -19,6 +19,16 @@
             </div>
         }
 
+        @if (Model.VerifiedEmail != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    @Model.VerifiedEmail has been verified
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
+
         @if (Model.DeletedNotificationEmail != null)
         {
             <div class="tl-notification tl-notification--green">

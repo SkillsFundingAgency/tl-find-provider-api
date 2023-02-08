@@ -1,20 +1,19 @@
-﻿using Dapper;
+﻿using System;
+using System.Data;
+using System.Drawing;
+using Dapper;
+using NSubstitute.Core;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 
 public class SubstituteDynamicParametersWrapper
 {
-    public IDynamicParametersWrapper DapperParameterFactory
-    {
-        get;
-    }
+    public IDynamicParametersWrapper DapperParameterFactory { get; }
 
-    public DynamicParameters DynamicParameters
-    {
-        get; 
-        private set;
-    }
+    public DynamicParameters DynamicParameters { get; set; }
+    
+    public object? ReturnValue { get; set; }
 
     public SubstituteDynamicParametersWrapper()
     {
@@ -24,10 +23,20 @@ public class SubstituteDynamicParametersWrapper
                 x.CreateParameters(Arg.Any<object>()))
             .Do(x =>
             {
-                var p = x.Arg<object>();
-                DynamicParameters = new DynamicParameters(p);
-            });
+                //var p = x.Arg<object>();
+                DynamicParameters = new DynamicParameters(x.Arg<object>());
+            })
+            ;
 
+        parameters
+            .When(x =>
+                x.AddReturnValueParameter(Arg.Any<string>(), Arg.Any<DbType?>(), Arg.Any<int?>()))
+            .Do(x =>
+            {
+                DynamicParameters ??= new DynamicParameters();
+                DynamicParameters.Add(x.Arg<string>(), ReturnValue, dbType: x.Arg<DbType?>(), size: x.Arg<int?>());
+            })
+        ;
         parameters.DynamicParameters
             .Returns(_ => DynamicParameters);
 

@@ -41,6 +41,6 @@ public class SearchFiltersModel : PageModel
 
         DefaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
             ? _providerSettings.DefaultSearchRadius
-            : Constants.DefaultProviderSearchRadius;
+            : Constants.DefaultProviderSearchFilterRadius;
     }
 }

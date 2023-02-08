@@ -41,4 +41,14 @@ public class DynamicParametersWrapper : IDynamicParametersWrapper
         
         return this;
     }
+
+    public IDynamicParametersWrapper AddReturnValueParameter(
+        string name, 
+        DbType? dbType = default, 
+        int? size = default)
+    {
+        DynamicParameters.Add(name, dbType: dbType, direction: ParameterDirection.ReturnValue, size: size);
+
+        return this;
+    }
 }

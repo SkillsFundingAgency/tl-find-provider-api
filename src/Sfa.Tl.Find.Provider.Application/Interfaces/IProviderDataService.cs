@@ -57,7 +57,7 @@ public interface IProviderDataService
 
     Task ImportProviderData(Stream stream, bool isAdditionalData);
 
-    Task SaveNotification(Notification notification, long ukPrn);
+    Task<int> SaveNotification(Notification notification, long ukPrn);
 
     Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null);
 
@@ -69,5 +69,5 @@ public interface IProviderDataService
 
     Task SendProviderVerificationEmail(int notificationId, string emailAddress);
 
-    Task VerifyNotificationEmail(string token);
+    Task<(bool Success, string Email)> VerifyNotificationEmail(string token);
 }

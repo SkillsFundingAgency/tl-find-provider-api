@@ -89,22 +89,15 @@ public class EditNotificationLocationModel : PageModel
 
     private async Task LoadNotificationView(int providerNotificationId, int id)
     {
-        var defaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
-            ? _providerSettings.DefaultSearchRadius
-            : Constants.DefaultProviderSearchRadius;
-
         Input ??= new InputModel
         {
             Id = id,
             ProviderNotificationId = providerNotificationId,
-            SelectedSearchRadius = NotificationDetail?.SearchRadius ?? defaultSearchRadius,
+            SelectedSearchRadius = NotificationDetail?.SearchRadius ?? Constants.DefaultProviderNotificationFilterRadius,
             SelectedFrequency = NotificationDetail?.Frequency ?? NotificationFrequency.Immediately
         };
 
         FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
-
-        //TODO: Only load unused locations
-        //Locations = await LoadProviderLocationOptions(ukPrn, Input.SelectedLocation);
 
         SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 

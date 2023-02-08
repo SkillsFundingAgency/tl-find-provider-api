@@ -251,7 +251,7 @@ public class AddNotificationLocationTests
 
         addNotificationLocationModel.Input.Should().NotBeNull();
         addNotificationLocationModel.Input!.ProviderNotificationId.Should().Be(notification.Id.Value);
-        addNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        addNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
         addNotificationLocationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
         addNotificationLocationModel.Input!.SelectedLocation.Should().Be(0);
     }
@@ -280,7 +280,7 @@ public class AddNotificationLocationTests
 
         addNotificationLocationModel.Input.Should().NotBeNull();
         addNotificationLocationModel.Input!.ProviderNotificationId.Should().Be(notification.Id!.Value);
-        addNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        addNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
         addNotificationLocationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
     }
 

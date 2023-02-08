@@ -82,7 +82,7 @@ public class AddNotificationLocationModel : PageModel
         {
             LocationId = Input.SelectedLocation is not null && Input.SelectedLocation > 0 ? Input.SelectedLocation : null,
             Frequency = Input.SelectedFrequency,
-            SearchRadius = Input.SelectedSearchRadius, //?? _providerSettings.DefaultSearchRadius,
+            SearchRadius = Input.SelectedSearchRadius,
             Routes = routes
         };
 
@@ -91,9 +91,9 @@ public class AddNotificationLocationModel : PageModel
 
     private async Task LoadNotificationView(int providerNotificationId)
     {
-        var defaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
-            ? _providerSettings.DefaultSearchRadius
-            : Constants.DefaultProviderSearchRadius;
+        var defaultSearchRadius = _providerSettings.DefaultNotificationSearchRadius > 0
+            ? _providerSettings.DefaultNotificationSearchRadius
+            : Constants.DefaultProviderNotificationFilterRadius;
 
         Input ??= new InputModel
         {

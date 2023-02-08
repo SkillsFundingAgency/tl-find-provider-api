@@ -6,6 +6,8 @@ public class ProviderSettings
 
     public int DefaultSearchRadius { get; set; }
 
+    public int DefaultNotificationSearchRadius { get; set; }
+
     public string? NotificationEmailJobSchedule { get; set;}
 
     public string? NotificationEmailImmediateJobSchedule { get; set;}

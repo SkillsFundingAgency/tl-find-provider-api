@@ -180,7 +180,7 @@ public class AddNotificationTests
         await addNotificationModel.OnGet();
 
         addNotificationModel.Input.Should().NotBeNull();
-        addNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        addNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
         addNotificationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
         addNotificationModel.Input!.SelectedLocation.Should().Be(0);
     }
@@ -199,7 +199,7 @@ public class AddNotificationTests
         await addNotificationModel.OnGet();
 
         addNotificationModel.Input.Should().NotBeNull();
-        addNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultSearchRadius);
+        addNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
         addNotificationModel.Input!.SelectedFrequency.Should().Be(NotificationFrequency.Immediately);
     }
 
@@ -269,9 +269,14 @@ public class AddNotificationTests
     [Fact]
     public async Task AddNotification_OnPostAddLocation_Saves_To_Repository_And_Redirects()
     {
+        const int newId = 1;
         const string testEmail = "test@test.com";
 
         var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .SaveNotification(Arg.Any<Notification>(),
+                PageContextBuilder.DefaultUkPrn)
+            .Returns(newId);
 
         var addNotificationModel = new AddNotificationModelBuilder()
             .Build(providerDataService);
@@ -291,8 +296,12 @@ public class AddNotificationTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/Provider/Notifications");
-        
+        redirectResult!.PageName.Should().Be("/Provider/AddNotificationLocation");
+        redirectResult.RouteValues.Should().Contain(x =>
+            x.Key == "id" &&
+            x.Value != null &&
+            x.Value.ToString() == newId.ToString());
+
         await providerDataService
             .Received(1)
             .SaveNotification(Arg.Any<Notification>(),

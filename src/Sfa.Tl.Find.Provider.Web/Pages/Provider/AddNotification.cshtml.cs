@@ -24,7 +24,7 @@ public class AddNotificationModel : PageModel
     private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddNotificationModel> _logger;
-
+    
     public SelectListItem[]? Locations { get; private set; }
 
     public SelectListItem[]? SearchRadiusOptions { get; private set; }
@@ -75,12 +75,13 @@ public class AddNotificationModel : PageModel
             return Page();
         }
 
-        await Save();
+        var providerNotificationId = await Save();
 
-        return RedirectToPage("/Provider/Notifications");
+        return RedirectToPage("/Provider/AddNotificationLocation", 
+            new { id = providerNotificationId });
     }
 
-    private async Task Save()
+    private async Task<int> Save()
     {
         var ukPrn = HttpContext.User.GetUkPrn().Value;
 
@@ -91,20 +92,20 @@ public class AddNotificationModel : PageModel
             Email = Input.Email,
             LocationId = Input.SelectedLocation is not null && Input.SelectedLocation > 0 ? Input.SelectedLocation : null,
             Frequency = Input.SelectedFrequency,
-            SearchRadius = Input.SelectedSearchRadius ?? _providerSettings.DefaultSearchRadius,
+            SearchRadius = Input.SelectedSearchRadius,
             Routes = routes
         };
 
-        await _providerDataService.SaveNotification(notification, ukPrn);
+        return await _providerDataService.SaveNotification(notification, ukPrn);
     }
 
     private async Task LoadNotificationView()
     {
         var ukPrn = HttpContext.User.GetUkPrn();
 
-        var defaultSearchRadius = _providerSettings.DefaultSearchRadius > 0
-            ? _providerSettings.DefaultSearchRadius
-            : Constants.DefaultProviderSearchRadius;
+        var defaultSearchRadius = _providerSettings.DefaultNotificationSearchRadius > 0
+            ? _providerSettings.DefaultNotificationSearchRadius
+            : Constants.DefaultProviderNotificationFilterRadius;
 
         Input ??= new InputModel
         {
@@ -136,11 +137,12 @@ public class AddNotificationModel : PageModel
 
     private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
     {
-        return new List<int> { 5, 10, 20, 30, 40, 50 }
+        var values = new List<int> {5, 10, 20, 30, 40, 50};
+        return values
             .Select(p => new SelectListItem(
                 $"{p} miles",
                 p.ToString(),
-                p == selectedValue)
+                p == (selectedValue ?? values[0]))
             )
             .ToArray();
     }

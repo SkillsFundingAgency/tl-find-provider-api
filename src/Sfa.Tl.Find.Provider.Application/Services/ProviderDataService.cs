@@ -421,17 +421,21 @@ public class ProviderDataService : IProviderDataService
         _logger.LogInformation("Loaded {count} providers from stream.", count);
     }
 
-    public async Task SaveNotification(Notification notification, long ukPrn)
+    public async Task<int> SaveNotification(Notification notification, long ukPrn)
     {
         if (notification.Id is null)
         {
             notification.EmailVerificationToken = _guidProvider.NewGuid();
-            await _notificationRepository.Create(notification, ukPrn);
+            var id = await _notificationRepository.Create(notification, ukPrn);
             await SendProviderVerificationEmail(notification.Email, notification.EmailVerificationToken!.Value);
+            return id;
         }
+
+        //TODO: Separate into Create and Update methods - Update doesn't need to return uid;
         else
         {
             await _notificationRepository.Update(notification);
+            return notification.Id.Value;
         }
     }
 
@@ -500,14 +504,15 @@ public class ProviderDataService : IProviderDataService
         await _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
     }
 
-    public async Task VerifyNotificationEmail(string token)
+    public async Task<(bool Success, string Email)> VerifyNotificationEmail(string token)
     {
         if (!Guid.TryParse(token, out var realToken))
         {
             _logger.LogError("Invalid token received in VerifyNotificationEmail");
         }
 
-        await _notificationRepository.RemoveEmailVerificationToken(realToken);
+        //await _notificationRepository.RemoveEmailVerificationToken(realToken);
+        return await _notificationRepository.VerifyEmailToken(realToken);
     }
 
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
