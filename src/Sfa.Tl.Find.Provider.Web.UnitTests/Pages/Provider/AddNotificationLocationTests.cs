@@ -63,7 +63,7 @@ public class AddNotificationLocationTests
         var options = addNotificationLocationModel.Locations;
 
         options[0].Should().Match<SelectListItem>(x =>
-            x.Text == "All" && x.Value == "0");
+            x.Text == "All" && x.Value == "0" && x.Selected);
 
         var orderedAvailableLocations = availableLocations
             .Where(x => x.Id is null)

@@ -35,17 +35,24 @@
                 <input class="govuk-input govuk-input--width-20" asp-for="Input!.Email" type="email" spellcheck="false" aria-describedby="email-hint email-error" autocomplete="email"
                        sfa-validation-for="Input!.Email" sfa-validationerror-class="govuk-input--error">
             </div>
-
-            <div class="govuk-form-group">
-                <label class="govuk-label govuk-!-font-weight-bold" for="campus">
-                    Campus
-                </label>
-                <div id="campus-hint" class="govuk-hint">
-                    Select the campus you want to set up a notification for
+            
+            @if (Model.Locations is not null && Model.Locations.Length > 0)
+            {
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-!-font-weight-bold" for="campus">
+                        Campus
+                    </label>
+                    <div id="campus-hint" class="govuk-hint">
+                        Select the campus you want to set up a notification for
+                    </div>
+                    <select class="govuk-select" aria-describedby="campus-hint" asp-for="Input!.SelectedLocation" asp-items="Model.Locations">
+                    </select>
                 </div>
-                <select class="govuk-select" aria-describedby="campus-hint" asp-for="Input!.SelectedLocation" asp-items="Model.Locations">
-                </select>
-            </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="@Model.Input!.SelectedLocation" />
+            }
 
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-!-font-weight-bold" for="frequency">

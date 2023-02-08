@@ -24,7 +24,7 @@ public class AddNotificationModel : PageModel
     private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddNotificationModel> _logger;
-    
+
     public SelectListItem[]? Locations { get; private set; }
 
     public SelectListItem[]? SearchRadiusOptions { get; private set; }
@@ -77,7 +77,7 @@ public class AddNotificationModel : PageModel
 
         var providerNotificationId = await Save();
 
-        return RedirectToPage("/Provider/AddNotificationLocation", 
+        return RedirectToPage("/Provider/AddNotificationLocation",
             new { id = providerNotificationId });
     }
 
@@ -101,11 +101,15 @@ public class AddNotificationModel : PageModel
 
     private async Task LoadNotificationView()
     {
-        var ukPrn = HttpContext.User.GetUkPrn();
-
         var defaultSearchRadius = _providerSettings.DefaultNotificationSearchRadius > 0
             ? _providerSettings.DefaultNotificationSearchRadius
             : Constants.DefaultProviderNotificationFilterRadius;
+
+        var ukPrn = HttpContext.User.GetUkPrn();
+
+        var providerLocations =
+            (await GetProviderLocations(ukPrn))
+            .ToList();
 
         Input ??= new InputModel
         {
@@ -116,7 +120,14 @@ public class AddNotificationModel : PageModel
 
         FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
 
-        Locations = await LoadProviderLocationOptions(ukPrn, Input.SelectedLocation);
+        if (providerLocations.Count == 1)
+        {
+            Input.SelectedLocation = providerLocations.Single().Id;
+        }
+        else
+        {
+            Locations = LoadProviderLocationOptions(providerLocations, Input.SelectedLocation);
+        }
 
         SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 
@@ -137,7 +148,7 @@ public class AddNotificationModel : PageModel
 
     private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
     {
-        var values = new List<int> {5, 10, 20, 30, 40, 50};
+        var values = new List<int> { 5, 10, 20, 30, 40, 50 };
         return values
             .Select(p => new SelectListItem(
                 $"{p} miles",
@@ -160,13 +171,16 @@ public class AddNotificationModel : PageModel
             .ToArray();
     }
 
-    private async Task<SelectListItem[]> LoadProviderLocationOptions(long? ukPrn, int? selectedValue)
+    private async Task<IEnumerable<LocationPostcode>> GetProviderLocations(long? ukPrn)
     {
-        if (ukPrn is null) return Array.Empty<SelectListItem>();
+        if (ukPrn is null) return Array.Empty<LocationPostcode>();
 
-        var providerLocations = await _providerDataService
-                .GetLocationPostcodes(ukPrn.Value);
+        return await _providerDataService
+            .GetLocationPostcodes(ukPrn.Value);
+    }
 
+    private SelectListItem[] LoadProviderLocationOptions(IEnumerable<LocationPostcode> providerLocations, int? selectedValue)
+    {
         return providerLocations.Select(p
                 => new SelectListItem(
                     $"{p.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Postcode}]",
@@ -174,7 +188,7 @@ public class AddNotificationModel : PageModel
                     p.Id == selectedValue)
             )
             .OrderBy(x => x.Text)
-            .Prepend(new SelectListItem("All", "0", selectedValue is null or 0 ))
+            .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
             .ToArray();
     }
 
