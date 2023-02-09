@@ -1,4 +1,5 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
@@ -63,7 +64,7 @@ public interface IProviderDataService
 
     Task SaveSearchFilter(SearchFilter searchFilter);
 
-    Task SendProviderNotifications();
+    Task SendProviderNotifications(NotificationFrequency frequency);
     
     Task SendProviderNotificationEmail(int notificationId, string emailAddress);
 

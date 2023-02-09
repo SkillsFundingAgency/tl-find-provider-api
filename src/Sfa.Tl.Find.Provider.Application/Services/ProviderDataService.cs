@@ -456,11 +456,6 @@ public class ProviderDataService : IProviderDataService
         await _searchFilterRepository.Save(searchFilter);
     }
 
-    public async Task SendProviderNotifications()
-    {
-        await SendProviderNotifications(NotificationFrequency.Daily);
-    }
-
     public async Task SendProviderNotifications(NotificationFrequency frequency)
     {
         var pendingNotificationEmails = await _notificationRepository.GetPendingNotificationEmails(frequency);
@@ -478,11 +473,10 @@ public class ProviderDataService : IProviderDataService
     {
         var siteUri = new Uri(_providerSettings.ConnectSiteUri);
         var notificationsUri = new Uri(siteUri, "notifications");
+        var employerListUri = new Uri(siteUri, "employer-list");
+        var searchFiltersUri = new Uri(siteUri, "filters");
 
         var uniqueId = _guidProvider.NewGuid();
-
-        var employerListUri = new Uri(siteUri, "employer_list");
-        var searchFiltersUri = new Uri(siteUri, "search_filters");
 
         await _emailService.SendEmail(
             emailAddress,

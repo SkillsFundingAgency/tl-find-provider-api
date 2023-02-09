@@ -1369,7 +1369,7 @@ public class ProviderDataServiceTests
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
 
-        await service.SendProviderNotifications();
+        await service.SendProviderNotifications(frequency);
 
         await emailService
             .Received(notificationEmails.Count)
@@ -1419,7 +1419,7 @@ public class ProviderDataServiceTests
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
 
-        await service.SendProviderNotifications();
+        await service.SendProviderNotifications(frequency);
 
         await notificationRepository
             .Received(notificationEmails.Count)
@@ -1443,8 +1443,8 @@ public class ProviderDataServiceTests
 
         var baseUri = providerSettings.ConnectSiteUri?.TrimEnd('/');
         var expectedNotificationsUri = $"{baseUri}/notifications";
-        var expectedEmployerListUri = $"{baseUri}/employer_list";
-        var expectedSearchFiltersUri = $"{baseUri}/search_filters";
+        var expectedEmployerListUri = $"{baseUri}/employer-list";
+        var expectedSearchFiltersUri = $"{baseUri}/filters";
 
         var guidProvider = Substitute.For<IGuidProvider>();
         guidProvider

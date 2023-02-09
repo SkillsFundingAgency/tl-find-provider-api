@@ -11,6 +11,7 @@ using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
@@ -262,7 +263,10 @@ public static class ServiceCollectionExtensions
             {
                 var providerNotificationEmailJobKey = new JobKey(JobKeys.ProviderNotificationEmail);
                 q.AddJob<ProviderNotificationEmailJob>(opts =>
-                        opts.WithIdentity(providerNotificationEmailJobKey))
+                    {
+                        opts.WithIdentity(providerNotificationEmailJobKey);
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency, NotificationFrequency.Daily.ToString());
+                    })
                     .AddTrigger(opts => opts
                         .ForJob(providerNotificationEmailJobKey)
                         .WithSchedule(
