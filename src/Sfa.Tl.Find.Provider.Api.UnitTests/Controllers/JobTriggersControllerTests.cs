@@ -61,26 +61,7 @@ public class JobTriggersControllerTests
     }
 
     [Fact]
-    public async Task TriggerProviderNotificationEmailJob_Runs_Job()
-    {
-        var scheduler = Substitute.For<IScheduler>();
-        var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetScheduler()
-            .Returns(Task.FromResult(scheduler));
-
-        var controller = new JobTriggersControllerBuilder()
-            .Build(schedulerFactory);
-
-        await controller.TriggerProviderNotificationEmailJob();
-
-        await scheduler
-            .Received(1)
-            .TriggerJob(Arg.Is<JobKey>(k =>
-                k.Name == JobKeys.ProviderNotificationEmail));
-    }
-
-    [Fact]
-    public async Task TriggerProviderNotificationEmailJobImmediate_Runs_Job()
+    public async Task TriggerProviderNotificationEmailImmediateJob_Runs_Job()
     {
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
@@ -96,6 +77,44 @@ public class JobTriggersControllerTests
             .Received(1)
             .TriggerJob(Arg.Is<JobKey>(k =>
                 k.Name == JobKeys.ProviderNotificationEmailImmediate));
+    }
+
+    [Fact]
+    public async Task TriggerProviderNotificationEmailDailyJob_Runs_Job()
+    {
+        var scheduler = Substitute.For<IScheduler>();
+        var schedulerFactory = Substitute.For<ISchedulerFactory>();
+        schedulerFactory.GetScheduler()
+            .Returns(Task.FromResult(scheduler));
+
+        var controller = new JobTriggersControllerBuilder()
+            .Build(schedulerFactory);
+
+        await controller.TriggerProviderNotificationEmailDailyJob();
+
+        await scheduler
+            .Received(1)
+            .TriggerJob(Arg.Is<JobKey>(k =>
+                k.Name == JobKeys.ProviderNotificationEmailDaily));
+    }
+
+    [Fact]
+    public async Task TriggerProviderNotificationEmailWeeklyJob_Runs_Job()
+    {
+        var scheduler = Substitute.For<IScheduler>();
+        var schedulerFactory = Substitute.For<ISchedulerFactory>();
+        schedulerFactory.GetScheduler()
+            .Returns(Task.FromResult(scheduler));
+
+        var controller = new JobTriggersControllerBuilder()
+            .Build(schedulerFactory);
+
+        await controller.TriggerProviderNotificationEmailWeeklyJob();
+
+        await scheduler
+            .Received(1)
+            .TriggerJob(Arg.Is<JobKey>(k =>
+                k.Name == JobKeys.ProviderNotificationEmailWeekly));
     }
 
     [Fact]

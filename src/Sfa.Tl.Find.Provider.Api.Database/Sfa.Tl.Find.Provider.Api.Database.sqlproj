@@ -149,7 +149,7 @@
     <Build Include="Tables\NotificationLocationRoute.sql" />
     <Build Include="Stored Procedures\DeleteNotificationLocation.sql" />
     <Build Include="Stored Procedures\DeleteProviderNotification.sql" />
-    <None Include="Indexes\IX_NotificationLocation_LocationI.sql" />
+    <None Include="Indexes\IX_NotificationLocation_ProviderNotificationId.sql" />
     <Build Include="Stored Procedures\GetNotificationLocationDetail.sql" />
     <Build Include="Stored Procedures\CreateNotificationLocation.sql" />
     <Build Include="Stored Procedures\UpdateNotificationLocation.sql" />

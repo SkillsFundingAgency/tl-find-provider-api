@@ -8,11 +8,11 @@ public class ProviderSettings
 
     public int DefaultNotificationSearchRadius { get; set; }
 
-    public string? NotificationEmailJobSchedule { get; set;}
+    public string? NotificationEmailImmediateSchedule { get; set; }
+    
+    public string? NotificationEmailDailySchedule { get; set;}
 
-    public string? NotificationEmailImmediateJobSchedule { get; set;}
-
-    public int NotificationEmailWeeklyDay { get; set; }
-
+    public string? NotificationEmailWeeklySchedule { get; set; }
+    
     public string? SupportSiteAccessConnectHelpUri { get; set; }
 }

@@ -206,8 +206,9 @@ public static class ServiceCollectionExtensions
         string courseDirectoryImportCronSchedule = null,
         string townDataImportCronSchedule = null,
         string employerInterestCleanupCronSchedule = null,
-        string providerNotificationEmailCronSchedule = null,
-        string providerNotificationEmailImmediateCronSchedule = null)
+        string providerNotificationEmailImmediateCronSchedule = null,
+        string providerNotificationEmailDailyCronSchedule = null,
+        string providerNotificationEmailWeeklyCronSchedule = null)
         {
         services.AddQuartz(q =>
         {
@@ -259,25 +260,52 @@ public static class ServiceCollectionExtensions
                                 .CronSchedule(employerInterestCleanupCronSchedule)));
             }
 
-            if (!string.IsNullOrEmpty(providerNotificationEmailCronSchedule))
-            {
-                var providerNotificationEmailJobKey = new JobKey(JobKeys.ProviderNotificationEmail);
-                q.AddJob<ProviderNotificationEmailJob>(opts =>
-                    {
-                        opts.WithIdentity(providerNotificationEmailJobKey);
-                        opts.UsingJobData(JobDataKeys.NotificationFrequency, NotificationFrequency.Daily.ToString());
-                    })
-                    .AddTrigger(opts => opts
-                        .ForJob(providerNotificationEmailJobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailCronSchedule)));
-            }
-
             if (!string.IsNullOrEmpty(providerNotificationEmailImmediateCronSchedule))
             {
-                var providerNotificationImmediateEmailJobKey = new JobKey(JobKeys.ProviderNotificationEmail);
-                //TODO: Add job
+                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailImmediate);
+                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                    {
+                        opts.WithIdentity(jobKey);
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
+                            NotificationFrequency.Immediately.ToString());
+                    })
+                    .AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(providerNotificationEmailImmediateCronSchedule)));
+            }
+
+            if (!string.IsNullOrEmpty(providerNotificationEmailDailyCronSchedule))
+            {
+                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailDaily);
+                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                    {
+                        opts.WithIdentity(jobKey);
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency, 
+                            NotificationFrequency.Daily.ToString());
+                    })
+                    .AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(providerNotificationEmailDailyCronSchedule)));
+            }
+
+            if (!string.IsNullOrEmpty(providerNotificationEmailWeeklyCronSchedule))
+            {
+                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailWeekly);
+                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                    {
+                        opts.WithIdentity(jobKey);
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
+                            NotificationFrequency.Weekly.ToString());
+                    })
+                    .AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(providerNotificationEmailWeeklyCronSchedule)));
             }
         });
 

@@ -32,9 +32,9 @@ public class SettingsBuilder
     private const int DefaultNotificationSearchRadius = 5;
     private const string SupportSiteAccessConnectHelpUri = "https://test.support.tlevels.gov.uk/hc/en-gb/articles/123456789";
 
-    private const string ProviderNotificationEmailJobSchedule = "0 */15 * * * *";
-    private const string NotificationEmailImmediateJobSchedule = "0 0 6 * * *";
-    private const int ProviderNotificationEmailWeeklyDay = 5;
+    private const string NotificationEmailImmediateSchedule = "0 0/15 * * * ?";
+    private const string ProviderNotificationEmailDailySchedule = "0 0 6 ? * *";
+    private const string ProviderNotificationEmailWeeklySchedule = "0 0 6 ? * * FRI";
 
     private const string EmployerSupportCleanupJobSchedule = "0 0 3 ? * MON-FRI";
     private const int EmployerInterestExpiryNotificationDays = 7;
@@ -159,17 +159,17 @@ public class SettingsBuilder
         string connectSiteUri = ConnectSiteUri,
         int defaultSearchRadius = DefaultSearchRadius,
         int searchNotificationRadius = DefaultNotificationSearchRadius,
-        string notificationEmailJobSchedule = ProviderNotificationEmailJobSchedule,
-        string notificationEmailImmediateJobSchedule = NotificationEmailImmediateJobSchedule,
-        int notificationEmailWeeklyDay = ProviderNotificationEmailWeeklyDay,
+        string notificationEmailImmediateSchedule = NotificationEmailImmediateSchedule,
+        string notificationEmailDailySchedule = ProviderNotificationEmailDailySchedule,
+        string notificationEmailWeeklySchedule = ProviderNotificationEmailWeeklySchedule,
         string supportSiteAccessConnectHelpUri = SupportSiteAccessConnectHelpUri) => new()
         {
             ConnectSiteUri = connectSiteUri,
             DefaultSearchRadius = defaultSearchRadius,
             DefaultNotificationSearchRadius = DefaultNotificationSearchRadius,
-            NotificationEmailJobSchedule = notificationEmailJobSchedule,
-            NotificationEmailImmediateJobSchedule = notificationEmailImmediateJobSchedule,
-            NotificationEmailWeeklyDay = notificationEmailWeeklyDay,
+            NotificationEmailImmediateSchedule = notificationEmailImmediateSchedule,
+            NotificationEmailDailySchedule = notificationEmailDailySchedule,
+            NotificationEmailWeeklySchedule = notificationEmailWeeklySchedule,
             SupportSiteAccessConnectHelpUri = supportSiteAccessConnectHelpUri
         };
 

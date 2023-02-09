@@ -72,9 +72,9 @@ Add a new row to the table with:
     "ProviderSettings": {
         "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
         "DefaultSearchRadius": 20,
-        "NotificationEmailJobSchedule": "0 0 8 * * MON-FRI",
-        "NotificationEmailImmediateJobSchedule": "0 */15 * * * *"
-        "NotificationEmailWeeklyDay": 5
+        "NotificationEmailImmediateSchedule": "0 0/15 * * * ?",
+        "NotificationEmailDailySchedule": "0 0 6 ? * *",
+        "NotificationEmailWeeklySchedule": "0 0 6 ? * *"
     },
     "GoogleMapsApiSettings": {
         "ApiKey": "<API key>",

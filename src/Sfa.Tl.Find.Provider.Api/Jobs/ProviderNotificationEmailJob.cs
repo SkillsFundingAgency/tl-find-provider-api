@@ -34,11 +34,13 @@ public class ProviderNotificationEmailJob : IJob
 
             await _providerDataService.SendProviderNotifications(frequency);
 
-            _logger.LogInformation($"{nameof(ProviderNotificationEmailJob)} job completed successfully.");
+            _logger.LogInformation("{job} {frequency} job completed successfully.",
+                nameof(ProviderNotificationEmailJob)
+                , frequency);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.LogError(e, $"{nameof(ProviderNotificationEmailJob)} job failed.");
+            _logger.LogError(ex, $"{nameof(ProviderNotificationEmailJob)} job failed.");
         }
     }
 }

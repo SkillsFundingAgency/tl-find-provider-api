@@ -146,13 +146,17 @@
           "type": "string",
           "environmentVariable": "ProviderSettings_ConnectSiteUri"
         },
-        "NotificationEmailJobSchedule": {
+        "NotificationEmailImmediateSchedule": {
           "type": "string",
-          "environmentVariable": "ProviderSettings_NotificationEmailJobSchedule"
+          "environmentVariable": "ProviderSettings_NotificationEmailImmediateSchedule"
         },
-        "NotificationEmailImmediateJobSchedule": {
+        "NotificationEmailDailySchedule": {
           "type": "string",
-          "environmentVariable": "ProviderSettings_NotificationEmailImmediateJobSchedule"
+          "environmentVariable": "ProviderSettings_NotificationEmailDailySchedule"
+        },
+        "NotificationEmailWeeklySchedule": {
+          "type": "string",
+          "environmentVariable": "ProviderSettings_NotificationEmailWeeklySchedule"
         },
         "NotificationEmailWeeklyDay": {
           "type": "integer",

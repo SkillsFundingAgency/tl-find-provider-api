@@ -38,7 +38,7 @@ public class ProviderNotificationEmailJobTests
         jobDetail.JobDataMap.Returns(jobDataMap);
 
         var trigger = Substitute.For<ITrigger>();
-        trigger.JobKey.Returns(new JobKey(JobKeys.ProviderNotificationEmail));
+        trigger.JobKey.Returns(new JobKey(JobKeys.ProviderNotificationEmailDaily));
 
         var jobContext = Substitute.For<IJobExecutionContext>();
         jobContext.JobDetail.Returns(jobDetail);
@@ -64,7 +64,7 @@ public class ProviderNotificationEmailJobTests
         jobDetail.JobDataMap.Returns(jobDataMap);
 
         var trigger = Substitute.For<ITrigger>();
-        trigger.JobKey.Returns(new JobKey(JobKeys.ProviderNotificationEmail));
+        trigger.JobKey.Returns(new JobKey(JobKeys.ProviderNotificationEmailDaily));
 
         var jobContext = Substitute.For<IJobExecutionContext>();
         jobContext.JobDetail.Returns(jobDetail);
