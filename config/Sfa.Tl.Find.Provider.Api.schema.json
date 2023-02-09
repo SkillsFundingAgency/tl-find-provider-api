@@ -157,10 +157,6 @@
         "NotificationEmailWeeklySchedule": {
           "type": "string",
           "environmentVariable": "ProviderSettings_NotificationEmailWeeklySchedule"
-        },
-        "NotificationEmailWeeklyDay": {
-          "type": "integer",
-          "environmentVariable": "ProviderSettings_NotificationEmailWeeklyDay"
         }
       },
       "additionalProperties": false,
