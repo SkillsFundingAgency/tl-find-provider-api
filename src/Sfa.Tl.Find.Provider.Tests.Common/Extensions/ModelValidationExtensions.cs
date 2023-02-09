@@ -44,13 +44,13 @@ public static class ModelValidationExtensions
         provider.StudentContactEmail.Should().Be(studentContactEmail);
         provider.StudentContactTelephone.Should().Be(studentContactTelephone);
         provider.StudentContactWebsite.Should().Be(studentContactWebsite);
-        
+
         provider.IsAdditionalData.Should().Be(isAdditionalData);
-        
+
         provider.Locations.Should().NotBeNull();
         provider.Locations.Should().HaveCount(locationCount);
     }
- 
+
     public static void Validate(this ProviderSearchResult result, ProviderSearchResult expected)
     {
         result.UkPrn.Should().Be(expected.UkPrn);
@@ -120,7 +120,7 @@ public static class ModelValidationExtensions
         provider.QualificationId.Should().Be(expected.QualificationId);
         provider.QualificationName.Should().Be(expected.QualificationName);
     }
-    
+
     public static void Validate(this ProviderContactDto provider,
         ProviderContactDto expected)
     {
@@ -296,10 +296,22 @@ public static class ModelValidationExtensions
         qualification.Name.Should().Be(expected.QualificationName);
     }
 
-    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected, bool validateId = false, bool validateUniqueId = false, bool validatePostcode = true, bool validateLatLong = true)
+    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected,
+        bool validateId = false,
+        bool validateUniqueId = false,
+        bool validatePostcode = true,
+        bool validateLatLong = true,
+        bool validateExpiry = true)
     {
-        if(validateId) employerInterest.Id.Should().Be(expected.Id);
-        if (validateUniqueId) employerInterest.UniqueId.Should().Be(expected.UniqueId);
+        if (validateId)
+        {
+            employerInterest.Id.Should().Be(expected.Id);
+        }
+
+        if (validateUniqueId)
+        {
+            employerInterest.UniqueId.Should().Be(expected.UniqueId);
+        }
 
         employerInterest.OrganisationName.Should().Be(expected.OrganisationName);
         employerInterest.ContactName.Should().Be(expected.ContactName);
@@ -308,6 +320,12 @@ public static class ModelValidationExtensions
         employerInterest.Email.Should().Be(expected.Email);
         employerInterest.Telephone.Should().Be(expected.Telephone);
         employerInterest.Website.Should().Be(expected.Website);
+
+        if (validateExpiry)
+        {
+            employerInterest.ExpiryDate.Should().Be(expected.ExpiryDate);
+        }
+        employerInterest.ExtensionCount.Should().Be(expected.ExtensionCount);
 
         if (validatePostcode)
         {

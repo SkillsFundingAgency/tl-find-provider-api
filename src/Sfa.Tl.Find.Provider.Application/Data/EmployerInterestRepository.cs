@@ -271,6 +271,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Website = e.Website,
                             ContactPreferenceType = e.ContactPreferenceType,
                             ExpiryDate = e.ExpiryDate,
+                            ExtensionCount = e.ExtensionCount,
                             CreatedOn = e.CreatedOn,
                             ModifiedOn = e.ModifiedOn,
                             SkillAreas = new List<string>()
@@ -293,8 +294,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     public async Task<IEnumerable<EmployerInterest>> GetExpiringInterest(int daysToExpiry)
     {
         using var connection = _dbContextWrapper.CreateConnection();
-
-        var employerInterestList = new List<EmployerInterest>();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
@@ -326,6 +325,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 Telephone = e.Telephone,
                                 Website = e.Website,
                                 ContactPreferenceType = e.ContactPreferenceType,
+                                ExpiryDate = e.ExpiryDate,
+                                ExtensionCount = e.ExtensionCount,
                                 SkillAreaIds = new List<int>()
                             });
                     }

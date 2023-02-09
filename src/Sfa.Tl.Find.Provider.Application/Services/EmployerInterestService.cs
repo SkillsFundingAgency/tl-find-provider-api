@@ -107,6 +107,8 @@ public class EmployerInterestService : IEmployerInterestService
 
         var expiringInterestList = (await _employerInterestRepository
             .GetExpiringInterest(_employerInterestSettings.ExpiryNotificationDays))
+            .Where(e => e.ExtensionCount < _employerInterestSettings.MaximumExtensions
+                        || _employerInterestSettings.MaximumExtensions == 0)
             .ToList();
 
         foreach (var employerInterest in expiringInterestList)
@@ -158,7 +160,7 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount, bool SearchFiltersApplied)>
         FindEmployerInterest(int locationId)
     {
-        var (searchResults, totalResultsCount, searchFiltersApplied) = 
+        var (searchResults, totalResultsCount, searchFiltersApplied) =
             await _employerInterestRepository
                 .Search(locationId, _employerInterestSettings.SearchRadius);
 
@@ -183,7 +185,7 @@ public class EmployerInterestService : IEmployerInterestService
             double latitude,
             double longitude)
     {
-        var (searchResults, totalResultsCount) = 
+        var (searchResults, totalResultsCount) =
             await _employerInterestRepository
                 .Search(latitude, longitude, _employerInterestSettings.SearchRadius);
 

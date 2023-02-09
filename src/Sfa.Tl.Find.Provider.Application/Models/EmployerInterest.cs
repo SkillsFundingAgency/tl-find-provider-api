@@ -20,6 +20,7 @@ public class EmployerInterest
     public string Telephone { get; init; }
     public string Website { get; init; }
     public DateTime? ExpiryDate { get; init; }
+    public int ExtensionCount { get; init; }
     public ContactPreference? ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
     public List<int>? SkillAreaIds { get; init; }

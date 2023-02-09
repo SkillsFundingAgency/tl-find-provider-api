@@ -74,6 +74,7 @@ public class EmployerInterestServiceTests
                 e.Validate(expectedEmployerInterest,
                     false,
                     false,
+                        false,
                     false,
                     false)),
                 Arg.Is<GeoLocation>(g =>
@@ -216,7 +217,6 @@ public class EmployerInterestServiceTests
                         })),
                 Arg.Any<string>());
     }
-
 
     [Fact]
     public async Task CreateEmployerInterest_Calls_EmailService_With_Expected_Tokens_With_Formatted_Postcode()
@@ -537,7 +537,7 @@ public class EmployerInterestServiceTests
 
         var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
         employerInterestRepository.ExtendExpiry(
-                uniqueId, 
+                uniqueId,
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<int>())
@@ -554,8 +554,8 @@ public class EmployerInterestServiceTests
         await employerInterestRepository
             .Received(1)
             .ExtendExpiry(
-                uniqueId, 
-                settings.RetentionDays, 
+                uniqueId,
+                settings.RetentionDays,
                 settings.ExpiryNotificationDays,
                 settings.MaximumExtensions);
     }
@@ -586,15 +586,19 @@ public class EmployerInterestServiceTests
     }
 
     [Fact]
-    public async Task NotifyExpiringEmployerInterest_Calls_Repository()
+    public async Task NotifyExpiringEmployerInterest_Returns_Expected_Results_With_maximumExtensions()
     {
+        const int maximumExtensions = 10;
+
         var employerInterestList = new EmployerInterestBuilder()
+            .WithExtensionCounts(new[] { maximumExtensions -1, maximumExtensions } )
             .BuildList()
             .ToList();
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings(
             expiryNotificationDays: 7,
-            retentionDays: 12);
+            retentionDays: 12,
+            maximumExtensions: maximumExtensions);
 
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.Today.Returns(_defaultDateToday);
@@ -611,12 +615,12 @@ public class EmployerInterestServiceTests
 
         var result = await service.NotifyExpiringEmployerInterest();
 
-        result.Should().Be(employerInterestList.Count);
+        result.Should().Be(1);
 
         await employerInterestRepository
             .Received(1)
             .GetExpiringInterest(
-                Arg.Is<int>(d => 
+                Arg.Is<int>(d =>
                     d == settings.ExpiryNotificationDays));
     }
 
@@ -779,6 +783,40 @@ public class EmployerInterestServiceTests
                 Arg.Any<string>());
     }
 
+    [Fact]
+    public async Task NotifyExpiringEmployerInterest_Calls_Repository()
+    {
+        var employerInterestList = new EmployerInterestBuilder()
+            .BuildList()
+            .ToList();
+
+        var settings = new SettingsBuilder().BuildEmployerInterestSettings(
+            expiryNotificationDays: 7,
+            retentionDays: 12);
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.Today.Returns(_defaultDateToday);
+
+        var employerInterestRepository = Substitute.For<IEmployerInterestRepository>();
+        employerInterestRepository.GetExpiringInterest(Arg.Any<int>())
+            .Returns(employerInterestList);
+
+        var service = new EmployerInterestServiceBuilder()
+            .Build(
+                dateTimeProvider,
+                employerInterestRepository: employerInterestRepository,
+                employerInterestSettings: settings);
+
+        var result = await service.NotifyExpiringEmployerInterest();
+
+        result.Should().Be(employerInterestList.Count);
+
+        await employerInterestRepository
+            .Received(1)
+            .GetExpiringInterest(
+                Arg.Is<int>(d =>
+                    d == settings.ExpiryNotificationDays));
+    }
 
     [Fact]
     public async Task NotifyExpiringEmployerInterest_Calls_UpdateExtensionEmailSentDate()
@@ -1024,7 +1062,7 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var (searchResults, count) = 
+        var (searchResults, count) =
             await service.FindEmployerInterest(latitude, longitude);
 
         searchResults.Should().BeEquivalentTo(employerInterestSummaryList);
@@ -1070,9 +1108,9 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var (employerInterestSummaries, count) = 
+        var (employerInterestSummaries, count) =
             await service.FindEmployerInterest(latitude, longitude);
-        
+
         var searchResults = employerInterestSummaries
             .ToList();
         searchResults.Should().NotBeNullOrEmpty();
@@ -1111,9 +1149,9 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var (searchResults, count, filtersApplied) = 
+        var (searchResults, count, filtersApplied) =
             await service.FindEmployerInterest(locationId);
-        
+
         searchResults.Should().BeEquivalentTo(employerInterestSummaryList);
         count.Should().Be(employerInterestsCount);
         filtersApplied.Should().Be(searchFiltersApplied);
@@ -1157,9 +1195,9 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var (employerInterestSummaries, count, filtersApplied) = 
+        var (employerInterestSummaries, count, filtersApplied) =
             await service.FindEmployerInterest(locationId);
-        
+
         var searchResults = employerInterestSummaries
             .ToList();
         searchResults.Should().NotBeNullOrEmpty();
@@ -1206,7 +1244,7 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var (employerInterestSummaries, count) = 
+        var (employerInterestSummaries, count) =
             await service.FindEmployerInterest(postcode);
 
         var searchResults = employerInterestSummaries
@@ -1260,7 +1298,7 @@ public class EmployerInterestServiceTests
                 employerInterestRepository: employerInterestRepository,
                 employerInterestSettings: settings);
 
-        var (employerInterestSummaries, count) = 
+        var (employerInterestSummaries, count) =
             await service.FindEmployerInterest(postcode);
 
         var searchResults = employerInterestSummaries
