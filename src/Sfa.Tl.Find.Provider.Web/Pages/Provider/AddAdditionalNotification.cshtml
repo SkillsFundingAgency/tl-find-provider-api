@@ -78,7 +78,7 @@
                     </div>
                 </fieldset>
             </div>
-            <button type="submit" class="govuk-button govuk-!-margin-right-2">Save changes</button>
+            <button type="submit" asp-page-handler="" class=" govuk-button govuk-!-margin-right-2">Save changes</button>
             @if (Model.Locations?.Length > 1)
             {
                 <button type="submit" asp-page-handler="AddLocation" class="govuk-button govuk-button--secondary">Add another notification for this email</button>
