@@ -49,12 +49,9 @@ public class EditNotificationModel : PageModel
 
         NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(providerNotificationId);
 
-        var allLocations = (await _providerDataService
+        HasAvailableLocations = (await _providerDataService
                 .GetAvailableNotificationLocationPostcodes(providerNotificationId))
-                .ToList();
-        HasAvailableLocations = 
-            allLocations.Any(p => (p.Id is null && p.LocationId is not null) //unused location
-            || !allLocations.Any(p => p.Id is not null && p.LocationId is null));
+                .Any();
 
         return Page();
     }

@@ -256,6 +256,10 @@ public class ProviderDataServiceTests
             .BuildList()
             .ToList();
 
+        var expectedLocationNames = new NotificationLocationNameBuilder()
+            .BuildListOfAvailableLocations()
+            .ToList();
+
         var notificationRepository = Substitute.For<INotificationRepository>();
         notificationRepository.GetProviderNotificationLocations(providerNotificationId)
             .Returns(locationNames);
@@ -268,7 +272,7 @@ public class ProviderDataServiceTests
             ?.ToList();
 
         response.Should().NotBeNull();
-        response.Should().BeEquivalentTo(locationNames);
+        response.Should().BeEquivalentTo(expectedLocationNames);
     }
 
     [Fact]
@@ -1398,7 +1402,7 @@ public class ProviderDataServiceTests
 
         var notificationEmails = new NotificationEmailBuilder()
             .BuildList()
-            .Take(1)  
+            .Take(1)
             .ToList();
 
         var notificationRepository = Substitute.For<INotificationRepository>();

@@ -27,14 +27,25 @@ public class NotificationLocationNameBuilder
             {
                 Id = null,
                 LocationId = 3,
-                Name = "Test Location 3",
+                Name = "Test Location 3  (Available)",
                 Postcode = "CV2 4WT"
+            },
+            new()
+            {
+                Id = null,
+                LocationId = 4,
+                Name = "Test Location 4 (Available)",
+                Postcode = "CV2 5WT"
             }
         };
 
     public NotificationLocationName Build() =>
         BuildList()
             .First();
+
+    public IEnumerable<NotificationLocationName> BuildListOfAvailableLocations() =>
+        BuildList()
+            .Where(x => x.Id is null);
 
     public NotificationLocationNameBuilder WithNullFirstLocation()
     {

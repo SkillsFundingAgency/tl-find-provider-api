@@ -30,7 +30,6 @@ public class AddNotificationLocationTests
             .Build(providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(providerNotificationId);
-
     }
 
     [Fact]
@@ -42,7 +41,7 @@ public class AddNotificationLocationTests
             .Build();
 
         var availableLocations = new NotificationLocationNameBuilder()
-            .BuildList()
+            .BuildListOfAvailableLocations()
             .ToList();
 
         var providerDataService = Substitute.For<IProviderDataService>();
@@ -62,22 +61,58 @@ public class AddNotificationLocationTests
         addNotificationLocationModel.Locations.Should().NotBeNullOrEmpty();
         var options = addNotificationLocationModel.Locations;
 
+        options!.Length.Should().Be(availableLocations.Count + 1);
+
         options[0].Should().Match<SelectListItem>(x =>
-            x.Text == "All" && x.Value == "0" && x.Selected);
+            x.Text == "Select a campus" && x.Value == null && x.Selected);
 
-        var orderedAvailableLocations = availableLocations
-            .Where(x => x.Id is null)
-            .OrderBy(r => r.Name)
-            .ToList();
-
-        options!.Length.Should().Be(orderedAvailableLocations.Count + 1);
-
-        for (var i = 1; i < options.Length; i++)
+        var i = 1;
+        foreach (var location in availableLocations
+                     .OrderBy(r => r.Name))
         {
             options[i].Should().Match<SelectListItem>(x =>
-                x.Text == $"{orderedAvailableLocations[i - 1].Name.TruncateWithEllipsis(15).ToUpper()} [{orderedAvailableLocations[i - 1].Postcode}]" &&
-                x.Value == orderedAvailableLocations[i - 1].LocationId.ToString());
+                x.Text == $"{location.Name.TruncateWithEllipsis(15).ToUpper()} [{location.Postcode}]" &&
+                x.Value == location.LocationId.ToString() &&
+                !x.Selected);
+            i++;
         }
+    }
+
+    [Fact]
+    public async Task AddNotificationLocationModel_OnGet_Sets_Provider_Locations_Select_List_For_Single_Location()
+    {
+        var settings = new SettingsBuilder().BuildProviderSettings();
+
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var availableLocations = new NotificationLocationNameBuilder()
+            .BuildListOfAvailableLocations()
+            .Take(1)
+            .ToList();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotification(notification.Id!.Value)
+            .Returns(notification);
+        providerDataService
+            .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
+            .Returns(availableLocations);
+
+        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+            .Build(providerDataService,
+                providerSettings: settings);
+
+        await addNotificationLocationModel.OnGet(notification.Id.Value);
+
+        addNotificationLocationModel.Locations.Should().NotBeNullOrEmpty();
+        var options = addNotificationLocationModel.Locations;
+
+        options!.Length.Should().Be(1);
+        options.Single().Should().Match<SelectListItem>(x =>
+            x.Text == $"{availableLocations.Single().Name.TruncateWithEllipsis(15).ToUpper()} [{availableLocations.Single().Postcode}]" &&
+            x.Value == availableLocations.Single().LocationId.ToString() &&
+            x.Selected);
     }
 
     [Fact]
@@ -179,16 +214,14 @@ public class AddNotificationLocationTests
         var skillAreas = addNotificationLocationModel.Input.SkillAreas;
 
         skillAreas!.Length.Should().Be(routes.Count);
-
-        skillAreas[0].Should().Match<SelectListItem>(x =>
-            x.Text == "Agriculture, environment and animal care" && x.Value == "1");
-
-        var orderedRoutes = routes.OrderBy(r => r.Name).ToArray();
-        for (var i = 1; i < skillAreas.Length; i++)
+        
+        var i = 0;
+        foreach (var route in routes.OrderBy(r => r.Name))
         {
             skillAreas[i].Should().Match<SelectListItem>(x =>
-                x.Text == orderedRoutes[i].Name &&
-                x.Value == orderedRoutes[i].Id.ToString());
+                x.Text == route.Name &&
+                x.Value == route.Id.ToString());
+            i++;
         }
     }
 
@@ -253,7 +286,7 @@ public class AddNotificationLocationTests
         addNotificationLocationModel.Input!.ProviderNotificationId.Should().Be(notification.Id.Value);
         addNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
         addNotificationLocationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
-        addNotificationLocationModel.Input!.SelectedLocation.Should().Be(0);
+        addNotificationLocationModel.Input!.SelectedLocation.Should().Be(null);
     }
 
     [Fact]

@@ -8,6 +8,7 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
@@ -95,17 +96,23 @@ public class AddNotificationLocationModel : PageModel
             ? _providerSettings.DefaultNotificationSearchRadius
             : Constants.DefaultProviderNotificationFilterRadius;
 
+        var providerLocations = (await _providerDataService
+                .GetAvailableNotificationLocationPostcodes(providerNotificationId))
+            .ToList();
+
         Input ??= new InputModel
         {
             ProviderNotificationId = providerNotificationId,
             SelectedSearchRadius = defaultNotificationSearchRadius,
             SelectedFrequency = NotificationFrequency.Immediately,
-            SelectedLocation = 0
+            SelectedLocation = providerLocations.Count == 1 
+                ? providerLocations.Single().LocationId
+                : null
         };
 
         FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
 
-        Locations = await LoadProviderLocationOptions(providerNotificationId, Input.SelectedLocation);
+        Locations = LoadProviderLocationOptions(providerLocations, Input.SelectedLocation);
 
         SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 
@@ -149,14 +156,9 @@ public class AddNotificationLocationModel : PageModel
             .ToArray();
     }
 
-    private async Task<SelectListItem[]> LoadProviderLocationOptions(int providerNotificationId, int? selectedValue)
+    private SelectListItem[] LoadProviderLocationOptions(IList<NotificationLocationName> providerLocations, int? selectedValue)
     {
-        var providerLocations = (await _providerDataService
-            .GetAvailableNotificationLocationPostcodes(providerNotificationId))
-            .ToList();
-
         var selectList = providerLocations
-            .Where(p => p.Id is null && p.LocationId is not null)
             .Select(p
                 => new SelectListItem(
                     $"{p.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Postcode}]",
@@ -164,11 +166,11 @@ public class AddNotificationLocationModel : PageModel
                     p.LocationId == selectedValue))
             .OrderBy(x => x.Text)
             .ToList();
-        
-        return providerLocations.Any(p => p.Id is not null && p.LocationId is null)
+
+        return providerLocations.Count == 1
             ? selectList.ToArray()
             : selectList
-                .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
+                .Prepend(new SelectListItem("Select a campus", null, true))
                 .ToArray();
     }
 
@@ -192,6 +194,7 @@ public class AddNotificationLocationModel : PageModel
 
         public NotificationFrequency SelectedFrequency { get; set; }
 
+        [Required(ErrorMessage = "Select a campus")]
         public int? SelectedLocation { get; set; }
 
         public int? SelectedSearchRadius { get; set; }

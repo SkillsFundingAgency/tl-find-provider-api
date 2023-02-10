@@ -208,8 +208,9 @@ public class ProviderDataService : IProviderDataService
 
     public async Task<IEnumerable<NotificationLocationName>> GetAvailableNotificationLocationPostcodes(int providerNotificationId)
     {
-        return await _notificationRepository
-            .GetProviderNotificationLocations(providerNotificationId);
+        return (await _notificationRepository
+            .GetProviderNotificationLocations(providerNotificationId))
+            .Where(p => p.Id is null && p.LocationId is not null);
     }
 
     public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)
