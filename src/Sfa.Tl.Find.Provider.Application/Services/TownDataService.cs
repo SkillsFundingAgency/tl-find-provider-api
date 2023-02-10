@@ -117,7 +117,7 @@ public class TownDataService : ITownDataService
                                         .TryGetProperty("exceededTransferLimit", out var property)
                                     && property.GetBoolean();
 
-        var towns = //new List<LocationApiItem>();
+        var towns =
             root
             .GetProperty("features")
             .EnumerateArray()
@@ -149,7 +149,6 @@ public class TownDataService : ITownDataService
 
     private async Task SaveTowns(IEnumerable<OnsLocationApiItem> rawData)
     {
-
         var towns = rawData
             .Where(item => !string.IsNullOrEmpty(item.LocationName) &&
                            !string.IsNullOrEmpty(item.LocalAuthorityName) &&
