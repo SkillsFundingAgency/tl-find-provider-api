@@ -68,7 +68,8 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddPageRoute("/Provider/SearchFilters", "/filters");
     options.Conventions.AddPageRoute("/Provider/SearchFilterDetails", "/filters-edit");
     options.Conventions.AddPageRoute("/Provider/Notifications", "/notifications");
-    options.Conventions.AddPageRoute("/Provider/AddNotification", "/notifications-add");
+    options.Conventions.AddPageRoute("/Provider/AddNotification", "/notifications-add-email");
+    options.Conventions.AddPageRoute("/Provider/AddAdditionalNotification", "/notifications-add-email-campus");
     options.Conventions.AddPageRoute("/Provider/EditNotification", "/notifications-edit");
     options.Conventions.AddPageRoute("/Provider/RemoveNotification", "/notifications-remove");
     options.Conventions.AddPageRoute("/Provider/AddNotificationLocation", "/notifications-edit-campus-add");

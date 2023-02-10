@@ -70,8 +70,6 @@ public class AddNotificationLocationModel : PageModel
 
         await Save();
 
-        //TempData[nameof(EditNotificationModel.VerificationEmail)] = Input!.Email;
-
         return RedirectToPage("/Provider/EditNotification", new { id = Input?.ProviderNotificationId });
     }
         
@@ -170,7 +168,7 @@ public class AddNotificationLocationModel : PageModel
         return providerLocations.Count == 1
             ? selectList.ToArray()
             : selectList
-                .Prepend(new SelectListItem("Select a campus", null, true))
+                .Prepend(new SelectListItem("Select a campus", "", true))
                 .ToArray();
     }
 

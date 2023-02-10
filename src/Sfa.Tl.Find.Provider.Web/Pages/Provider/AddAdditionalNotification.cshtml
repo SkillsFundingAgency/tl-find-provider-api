@@ -1,0 +1,91 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.Provider.AddAdditionalNotificationModel
+@{
+    ViewData["Title"] = $"Add new notification for {Model.ProviderNotification?.Email}";
+}
+@section breadcrumbs {
+    <a asp-page="./Notifications" class="govuk-back-link" id="tl-back">Return to notifications</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a sfa-validation-for="Input!.SelectedLocation" href="#Input_SelectedLocation"></a></li>
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <h1 class="govuk-heading-xl">Add a new notification for @Model.ProviderNotification?.Email</h1>
+
+        <form method="post">
+            <div class="govuk-form-group" sfa-validation-for="Input!.SelectedLocation" sfa-validationerror-class="govuk-form-group--error">
+                <label class="govuk-label govuk-!-font-weight-bold" for="campus">
+                    Campus
+                </label>
+                <div id="campus-hint" class="govuk-hint">
+                    You can only select a campus you do not already have notifications set up for
+                </div>
+                <span class="govuk-error-message" id="email-error" asp-validation-for="Input!.SelectedLocation"></span>
+                <select class="govuk-select" aria-describedby="campus-hint" asp-for="Input!.SelectedLocation" asp-items="Model.Locations">
+                </select>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="frequency">
+                    Notification frequency
+                </label>
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedFrequency" asp-items="Model.FrequencyOptions">
+                </select>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="within">
+                    Receive notifications for employers within:
+                </label>
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSearchRadius" asp-items="Model.SearchRadiusOptions">
+                </select>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="skillarea-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h3 class="govuk-fieldset__heading govuk-!-margin-top-3">
+                            Receive notifications for employers interested in the following skill areas:
+                        </h3>
+                    </legend>
+                    <div id="skillarea-hint" class="govuk-hint">
+                        If nothing is selected, you will receive notifications for all skill areas
+                    </div>
+                    <div class="govuk-checkboxes govuk-!-margin-top-4" data-module="govuk-checkboxes">
+                        @foreach (var skillArea in Model?.Input.SkillAreas.Select((value, i) => (value, i)))
+                        {
+                            var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
+                            var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                    @skillArea.value.Text
+                                </label>
+                                <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            </div>
+            <button type="submit" class="govuk-button govuk-!-margin-right-2">Save changes</button>
+            @if (Model.Locations?.Length > 1)
+            {
+                <button type="submit" asp-page-handler="AddLocation" class="govuk-button govuk-button--secondary">Add another notification for this email</button>
+            }
+            <a asp-page="./Notifications" class="govuk-link govuk-!-padding-2 tl-display--inline-block">Cancel</a>
+
+            <input type="hidden" asp-for="Input!.ProviderNotificationId" />
+        </form>
+    </div>
+</div>

@@ -134,13 +134,14 @@ public class EditNotificationLocationTests
 
         skillAreas[0].Should().Match<SelectListItem>(x =>
             x.Text == "Agriculture, environment and animal care" && x.Value == "1");
-
-        var orderedRoutes = routes.OrderBy(r => r.Name).ToArray();
-        for (var i = 1; i < skillAreas.Length; i++)
+        
+        var i = 0;
+        foreach (var route in routes.OrderBy(r => r.Name))
         {
             skillAreas[i].Should().Match<SelectListItem>(x =>
-                x.Text == orderedRoutes[i].Name &&
-                x.Value == orderedRoutes[i].Id.ToString());
+                x.Text == route.Name &&
+                x.Value == route.Id.ToString());
+            i++;
         }
     }
 

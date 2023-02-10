@@ -28,8 +28,6 @@ public class AddNotificationTests
             .Build(providerSettings: settings);
 
         await addNotificationModel.OnGet();
-
-        //addNotificationModel.DefaultSearchRadius.Should().Be(settings.DefaultSearchRadius);
     }
 
     [Fact]
@@ -60,15 +58,15 @@ public class AddNotificationTests
         options[0].Should().Match<SelectListItem>(x =>
             x.Text == "All" && x.Value == "0" && x.Selected);
 
-        var orderedLocations = locations
-            .OrderBy(r => r.Name)
-            .ToArray();
-
-        for (var i = 1; i < options.Length; i++)
+        var i = 1;
+        foreach (var location in locations
+                     .OrderBy(l => l.Name))
         {
             options[i].Should().Match<SelectListItem>(x =>
-                x.Text == $"{orderedLocations[i -1].Name.TruncateWithEllipsis(15).ToUpper()} [{orderedLocations[i - 1].Postcode}]" &&
-                x.Value == orderedLocations[i - 1].Id.ToString());
+                x.Text == $"{location.Name.TruncateWithEllipsis(15).ToUpper()} [{location.Postcode}]" &&
+                x.Value == location.Id.ToString() &&
+                !x.Selected);
+            i++;
         }
     }
 
@@ -184,12 +182,13 @@ public class AddNotificationTests
         skillAreas[0].Should().Match<SelectListItem>(x =>
             x.Text == "Agriculture, environment and animal care" && x.Value == "1");
 
-        var orderedRoutes = routes.OrderBy(r => r.Name).ToArray();
-        for (var i = 1; i < skillAreas.Length; i++)
+        var i = 0;
+        foreach (var route in routes.OrderBy(r => r.Name))
         {
             skillAreas[i].Should().Match<SelectListItem>(x =>
-                x.Text == orderedRoutes[i].Name &&
-                x.Value == orderedRoutes[i].Id.ToString());
+                x.Text == route.Name &&
+                x.Value == route.Id.ToString());
+            i++;
         }
     }
 
@@ -262,7 +261,7 @@ public class AddNotificationTests
             .SaveNotification(Arg.Any<Notification>(),
                 PageContextBuilder.DefaultUkPrn);
     }
-    
+
     [Fact]
     public async Task AddNotification_OnPost_Sets_TempData()
     {
@@ -323,7 +322,7 @@ public class AddNotificationTests
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/Provider/AddNotificationLocation");
+        redirectResult!.PageName.Should().Be("/Provider/AddAdditionalNotification");
         redirectResult.RouteValues.Should().Contain(x =>
             x.Key == "id" &&
             x.Value != null &&

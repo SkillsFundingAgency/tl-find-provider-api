@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,21 +7,23 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
-using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Sfa.Tl.Find.Provider.Web.Authorization;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Azure;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
-[Authorize(nameof(PolicyNames.HasProviderAccount))]
-public class AddNotificationModel : PageModel
+public class AddAdditionalNotificationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
     private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
-    private readonly ILogger<AddNotificationModel> _logger;
+    private readonly ILogger<AddAdditionalNotificationModel> _logger;
+
+    public Notification? ProviderNotification { get; private set; }
 
     public SelectListItem[]? Locations { get; private set; }
 
@@ -33,11 +33,11 @@ public class AddNotificationModel : PageModel
 
     [BindProperty] public InputModel? Input { get; set; }
 
-    public AddNotificationModel(
+    public AddAdditionalNotificationModel(
         IProviderDataService providerDataService,
         ISessionService? sessionService,
         IOptions<ProviderSettings> providerOptions,
-        ILogger<AddNotificationModel> logger)
+        ILogger<AddAdditionalNotificationModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
@@ -47,22 +47,34 @@ public class AddNotificationModel : PageModel
                             ?? throw new ArgumentNullException(nameof(providerOptions));
     }
 
-    public async Task OnGet()
+    public async Task<IActionResult> OnGet(
+            [FromQuery(Name = "id")]
+        int providerNotificationId)
     {
-        await LoadNotificationView();
+        ProviderNotification = await _providerDataService.GetNotification(providerNotificationId);
+        if (ProviderNotification is null)
+        {
+            return RedirectToPage("/Provider/Notifications", new { id = providerNotificationId });
+        }
+
+        await LoadNotificationView(providerNotificationId);
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
         {
-            await LoadNotificationView();
+            await LoadNotificationView(Input!.ProviderNotificationId);
             return Page();
         }
 
         await Save();
 
-        TempData[nameof(NotificationsModel.VerificationEmail)] = Input!.Email;
+        var providerNotification = await _providerDataService.GetNotification(Input!.ProviderNotificationId);
+
+        TempData[nameof(NotificationsModel.VerificationEmail)] = providerNotification?.Email;
 
         return RedirectToPage("/Provider/Notifications");
     }
@@ -71,67 +83,62 @@ public class AddNotificationModel : PageModel
     {
         if (!ModelState.IsValid)
         {
-            await LoadNotificationView();
+            await LoadNotificationView(Input!.ProviderNotificationId);
             return Page();
         }
 
-        var providerNotificationId = await Save();
-        
+        await Save();
+
         return RedirectToPage("/Provider/AddAdditionalNotification",
-            new { id = providerNotificationId });
+            new
+            {
+                id = Input?.ProviderNotificationId
+            });
     }
 
-    private async Task<int> Save()
+    private async Task Save()
     {
-        var ukPrn = HttpContext.User.GetUkPrn().Value;
-
         var routes = GetSelectedSkillAreas(Input!.SkillAreas);
 
         var notification = new Notification
         {
-            Email = Input.Email,
             LocationId = Input.SelectedLocation is not null && Input.SelectedLocation > 0 ? Input.SelectedLocation : null,
             Frequency = Input.SelectedFrequency,
             SearchRadius = Input.SelectedSearchRadius,
             Routes = routes
         };
 
-        return await _providerDataService.SaveNotification(notification, ukPrn);
+        await _providerDataService.SaveNotificationLocation(notification, Input.ProviderNotificationId);
     }
 
-    private async Task LoadNotificationView()
+    private async Task LoadNotificationView(int providerNotificationId)
     {
         var defaultNotificationSearchRadius = _providerSettings.DefaultNotificationSearchRadius > 0
             ? _providerSettings.DefaultNotificationSearchRadius
             : Constants.DefaultProviderNotificationFilterRadius;
 
-        var ukPrn = HttpContext.User.GetUkPrn();
-
-        var providerLocations =
-            (await GetProviderLocations(ukPrn))
+        var providerLocations = (await _providerDataService
+                .GetAvailableNotificationLocationPostcodes(providerNotificationId))
             .ToList();
 
         Input ??= new InputModel
         {
+            ProviderNotificationId = providerNotificationId,
             SelectedSearchRadius = defaultNotificationSearchRadius,
             SelectedFrequency = NotificationFrequency.Immediately,
-            SelectedLocation = 0
+            SelectedLocation = providerLocations.Count == 1
+                ? providerLocations.Single().LocationId
+                : null
         };
 
         FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
 
-        if (providerLocations.Count == 1)
-        {
-            Input.SelectedLocation = providerLocations.Single().Id;
-        }
-        else
-        {
-            Locations = LoadProviderLocationOptions(providerLocations, Input.SelectedLocation);
-        }
+        Locations = LoadProviderLocationOptions(providerLocations, Input.SelectedLocation);
 
         SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 
-        Input.SkillAreas = await LoadSkillAreaOptions(new List<Route>());
+        var routes = GetSelectedSkillAreas(Input!.SkillAreas);
+        Input.SkillAreas = await LoadSkillAreaOptions(routes);
     }
 
     private SelectListItem[] LoadFrequencyOptions(NotificationFrequency selectedValue)
@@ -148,12 +155,11 @@ public class AddNotificationModel : PageModel
 
     private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
     {
-        var values = new List<int> { 5, 10, 20, 30, 40, 50 };
-        return values
+        return new List<int> { 5, 10, 20, 30, 40, 50 }
             .Select(p => new SelectListItem(
                 $"{p} miles",
                 p.ToString(),
-                p == (selectedValue ?? values[0]))
+                p == selectedValue)
             )
             .ToArray();
     }
@@ -171,25 +177,22 @@ public class AddNotificationModel : PageModel
             .ToArray();
     }
 
-    private async Task<IEnumerable<LocationPostcode>> GetProviderLocations(long? ukPrn)
+    private SelectListItem[] LoadProviderLocationOptions(IList<NotificationLocationName> providerLocations, int? selectedValue)
     {
-        if (ukPrn is null) return Array.Empty<LocationPostcode>();
-
-        return await _providerDataService
-            .GetLocationPostcodes(ukPrn.Value);
-    }
-
-    private SelectListItem[] LoadProviderLocationOptions(IEnumerable<LocationPostcode> providerLocations, int? selectedValue)
-    {
-        return providerLocations.Select(p
+        var selectList = providerLocations
+            .Select(p
                 => new SelectListItem(
                     $"{p.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Postcode}]",
-                    p.Id.ToString(),
-                    p.Id == selectedValue)
-            )
+                    p.LocationId.ToString(),
+                    p.LocationId == selectedValue))
             .OrderBy(x => x.Text)
-            .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
-            .ToArray();
+            .ToList();
+
+        return providerLocations.Count == 1
+            ? selectList.ToArray()
+            : selectList
+                .Prepend(new SelectListItem("Select a campus", "", true))
+                .ToArray();
     }
 
     private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)
@@ -208,12 +211,11 @@ public class AddNotificationModel : PageModel
 
     public class InputModel
     {
-        [Required(ErrorMessage = "Enter an email")]
-        [EmailAddress(ErrorMessage = "Enter a valid email")]
-        public string? Email { get; set; }
+        public int ProviderNotificationId { get; set; }
 
         public NotificationFrequency SelectedFrequency { get; set; }
 
+        [Required(ErrorMessage = "Select a campus")]
         public int? SelectedLocation { get; set; }
 
         public int? SelectedSearchRadius { get; set; }

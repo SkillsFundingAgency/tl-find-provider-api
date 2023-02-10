@@ -10,30 +10,30 @@ using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Pages.Provider;
-public class AddNotificationLocationTests
+public class AddAdditionalNotificationTests
 {
     [Fact]
     public void Constructor_Guards_Against_NullParameters()
     {
-        typeof(AddNotificationLocationModel)
+        typeof(AddAdditionalNotificationModel)
             .ShouldNotAcceptNullConstructorArguments();
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_ExpectedProperties()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_ExpectedProperties()
     {
         const int providerNotificationId = 1;
 
         var settings = new SettingsBuilder().BuildProviderSettings();
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(providerNotificationId);
+        await addAdditionalNotificationModel.OnGet(providerNotificationId);
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_Provider_Locations_Select_List()
+    public async Task AddAdditionalNotificationLocationModel_OnGet_Sets_Provider_Locations_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -52,14 +52,14 @@ public class AddNotificationLocationTests
             .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
             .Returns(availableLocations);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.Locations.Should().NotBeNullOrEmpty();
-        var options = addNotificationLocationModel.Locations;
+        addAdditionalNotificationModel.Locations.Should().NotBeNullOrEmpty();
+        var options = addAdditionalNotificationModel.Locations;
 
         options!.Length.Should().Be(availableLocations.Count + 1);
 
@@ -79,7 +79,7 @@ public class AddNotificationLocationTests
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_Provider_Locations_Select_List_For_Single_Location()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_Provider_Locations_Select_List_For_Single_Location()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -99,14 +99,14 @@ public class AddNotificationLocationTests
             .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
             .Returns(availableLocations);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.Locations.Should().NotBeNullOrEmpty();
-        var options = addNotificationLocationModel.Locations;
+        addAdditionalNotificationModel.Locations.Should().NotBeNullOrEmpty();
+        var options = addAdditionalNotificationModel.Locations;
 
         options!.Length.Should().Be(1);
         options.Single().Should().Match<SelectListItem>(x =>
@@ -116,7 +116,7 @@ public class AddNotificationLocationTests
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_FrequencyOptions_Select_List()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_FrequencyOptions_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -128,14 +128,14 @@ public class AddNotificationLocationTests
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
-        var options = addNotificationLocationModel.FrequencyOptions;
+        addAdditionalNotificationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        var options = addAdditionalNotificationModel.FrequencyOptions;
 
         options!.Length.Should().Be(3);
         options[0].Should().Match<SelectListItem>(x =>
@@ -147,7 +147,7 @@ public class AddNotificationLocationTests
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_Search_Radius_Select_List()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_Search_Radius_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -159,14 +159,14 @@ public class AddNotificationLocationTests
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
-        var options = addNotificationLocationModel.SearchRadiusOptions;
+        addAdditionalNotificationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        var options = addAdditionalNotificationModel.SearchRadiusOptions;
 
         options!.Length.Should().Be(6);
         options[0].Should().Match<SelectListItem>(x =>
@@ -184,7 +184,7 @@ public class AddNotificationLocationTests
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_Skill_Area_Select_List()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_Skill_Area_Select_List()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -203,18 +203,18 @@ public class AddNotificationLocationTests
             .GetRoutes()
             .Returns(routes);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.Input.Should().NotBeNull();
-        addNotificationLocationModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
-        var skillAreas = addNotificationLocationModel.Input.SkillAreas;
+        addAdditionalNotificationModel.Input.Should().NotBeNull();
+        addAdditionalNotificationModel.Input!.SkillAreas.Should().NotBeNullOrEmpty();
+        var skillAreas = addAdditionalNotificationModel.Input.SkillAreas;
 
         skillAreas!.Length.Should().Be(routes.Count);
-        
+
         var i = 0;
         foreach (var route in routes.OrderBy(r => r.Name))
         {
@@ -226,7 +226,7 @@ public class AddNotificationLocationTests
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_Selected_Skill_Areas()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_Selected_Skill_Areas()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -245,13 +245,13 @@ public class AddNotificationLocationTests
             .GetRoutes()
             .Returns(routes);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        var skillAreas = addNotificationLocationModel.Input?.SkillAreas;
+        var skillAreas = addAdditionalNotificationModel.Input?.SkillAreas;
         skillAreas.Should().NotBeNull();
         var selectedSkillAreas = skillAreas!.Where(x => x.Selected).ToList();
         selectedSkillAreas.Count.Should().Be(notification.Routes.Count);
@@ -263,7 +263,7 @@ public class AddNotificationLocationTests
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_Initial_Input_Values_With_Default_Search_Radius()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_Initial_Input_Values_With_Default_Search_Radius()
     {
         var settings = new SettingsBuilder().BuildProviderSettings();
 
@@ -276,21 +276,21 @@ public class AddNotificationLocationTests
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.Input.Should().NotBeNull();
-        addNotificationLocationModel.Input!.ProviderNotificationId.Should().Be(notification.Id.Value);
-        addNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
-        addNotificationLocationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
-        addNotificationLocationModel.Input!.SelectedLocation.Should().Be(null);
+        addAdditionalNotificationModel.Input.Should().NotBeNull();
+        addAdditionalNotificationModel.Input!.ProviderNotificationId.Should().Be(notification.Id.Value);
+        addAdditionalNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
+        addAdditionalNotificationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
+        addAdditionalNotificationModel.Input!.SelectedLocation.Should().Be(null);
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Sets_Input_Selected_Values()
+    public async Task AddAdditionalNotificationModel_OnGet_Sets_Input_Selected_Values()
     {
         const int searchRadius = 30;
 
@@ -305,20 +305,20 @@ public class AddNotificationLocationTests
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService,
                 providerSettings: settings);
 
-        await addNotificationLocationModel.OnGet(notification.Id.Value);
+        await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.Input.Should().NotBeNull();
-        addNotificationLocationModel.Input!.ProviderNotificationId.Should().Be(notification.Id!.Value);
-        addNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
-        addNotificationLocationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
+        addAdditionalNotificationModel.Input.Should().NotBeNull();
+        addAdditionalNotificationModel.Input!.ProviderNotificationId.Should().Be(notification.Id!.Value);
+        addAdditionalNotificationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
+        addAdditionalNotificationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnGet_Redirects_To_EditNotification_If_Provider_Notification_Not_Found()
+    public async Task AddAdditionalNotificationModel_OnGet_Redirects_To_EditNotification_If_Provider_Notification_Not_Found()
     {
         const int providerNotificationId = 99;
         var providerDataService = Substitute.For<IProviderDataService>();
@@ -326,14 +326,14 @@ public class AddNotificationLocationTests
             .GetNotification(providerNotificationId)
             .Returns(null as Notification);
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService);
 
-        var result = await addNotificationLocationModel.OnGet(providerNotificationId);
+        var result = await addAdditionalNotificationModel.OnGet(providerNotificationId);
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/Provider/EditNotification");
+        redirectResult!.PageName.Should().Be("/Provider/Notifications");
         redirectResult.RouteValues.Should().Contain(x =>
             x.Key == "id" &&
             x.Value != null &&
@@ -341,16 +341,16 @@ public class AddNotificationLocationTests
     }
 
     [Fact]
-    public async Task AddNotificationLocationModel_OnPost_Saves_To_Repository_And_Redirects()
+    public async Task AddAdditionalNotificationModel_OnPost_Saves_To_Repository_And_Redirects()
     {
         const int providerNotificationId = 1;
 
         var providerDataService = Substitute.For<IProviderDataService>();
 
-        var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
             .Build(providerDataService);
 
-        addNotificationLocationModel.Input = new AddNotificationLocationModel.InputModel
+        addAdditionalNotificationModel.Input = new AddAdditionalNotificationModel.InputModel
         {
             ProviderNotificationId = providerNotificationId,
             SelectedSearchRadius = 30,
@@ -361,15 +361,91 @@ public class AddNotificationLocationTests
             }
         };
 
-        var result = await addNotificationLocationModel.OnPost();
+        var result = await addAdditionalNotificationModel.OnPost();
 
         var redirectResult = result as RedirectToPageResult;
         redirectResult.Should().NotBeNull();
-        redirectResult!.PageName.Should().Be("/Provider/EditNotification");
+        redirectResult!.PageName.Should().Be("/Provider/Notifications");
+
+        await providerDataService
+            .Received(1)
+            .SaveNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
+    }
+
+    [Fact]
+    public async Task AddAdditionalNotificationModel_OnPost_Sets_TempData()
+    {
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .GetNotification(notification.Id!.Value)
+            .Returns(notification);
+
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
+            .Build(providerDataService);
+
+        addAdditionalNotificationModel.Input = new AddAdditionalNotificationModel.InputModel
+        {
+            ProviderNotificationId = notification.Id.Value,
+            SelectedFrequency = NotificationFrequency.Immediately,
+            SelectedLocation = null,
+            SelectedSearchRadius = null,
+            SkillAreas = Array.Empty<SelectListItem>()
+        };
+
+        await addAdditionalNotificationModel.OnPost();
+
+        addAdditionalNotificationModel.TempData.Should().NotBeNull();
+        addAdditionalNotificationModel.TempData
+            .Keys
+            .Should()
+            .Contain("VerificationEmail");
+
+        addAdditionalNotificationModel.TempData
+            .Peek("VerificationEmail")
+            .Should()
+            .Be(notification.Email);
+    }
+
+    [Fact]
+    public async Task AddAdditionalNotification_OnPostAddLocation_Saves_To_Repository_And_Redirects()
+    {
+        var notification = new NotificationBuilder()
+            .Build();
+
+        var providerNotificationId = notification.Id!.Value;
+
+        var providerDataService = Substitute.For<IProviderDataService>();
+        providerDataService
+            .SaveNotification(Arg.Any<Notification>(),
+                PageContextBuilder.DefaultUkPrn)
+            .Returns(providerNotificationId);
+
+        var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
+            .Build(providerDataService);
+
+        addAdditionalNotificationModel.Input = new AddAdditionalNotificationModel.InputModel
+        {
+            ProviderNotificationId = providerNotificationId,
+            SelectedSearchRadius = 30,
+            SelectedFrequency = NotificationFrequency.Daily,
+            SkillAreas = new[]
+            {
+                new SelectListItem("Value 1", "1", true)
+            }
+        };
+
+        var result = await addAdditionalNotificationModel.OnPostAddLocation();
+
+        var redirectResult = result as RedirectToPageResult;
+        redirectResult.Should().NotBeNull();
+        redirectResult!.PageName.Should().Be("/Provider/AddAdditionalNotification");
         redirectResult.RouteValues.Should().Contain(x =>
             x.Key == "id" &&
             x.Value != null &&
-            x.Value.ToString() == $"{providerNotificationId}");
+            x.Value.ToString() == providerNotificationId.ToString());
 
         await providerDataService
             .Received(1)
