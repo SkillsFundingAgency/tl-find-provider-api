@@ -20,10 +20,8 @@ public class SubstituteDynamicParametersWrapper
                 x.CreateParameters(Arg.Any<object>()))
             .Do(x =>
             {
-                //var p = x.Arg<object>();
                 DynamicParameters = new DynamicParameters(x.Arg<object>());
-            })
-            ;
+            });
 
         parameters
             .When(x =>
@@ -32,8 +30,8 @@ public class SubstituteDynamicParametersWrapper
             {
                 DynamicParameters ??= new DynamicParameters();
                 DynamicParameters.Add(x.Arg<string>(), ReturnValue, dbType: x.Arg<DbType?>(), size: x.Arg<int?>());
-            })
-        ;
+            });
+
         parameters.DynamicParameters
             .Returns(_ => DynamicParameters);
 

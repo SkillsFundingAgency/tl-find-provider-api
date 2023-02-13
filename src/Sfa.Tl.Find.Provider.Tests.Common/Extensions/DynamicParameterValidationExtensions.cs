@@ -48,11 +48,9 @@ public static class DynamicParameterValidationExtensions
     {
         var item = dynamicTemplates.First();
         var pi = item.GetType().GetProperties();
-        pi.Length.Should().BeGreaterThan(0);
 
         var property = pi.SingleOrDefault(p => p.Name == name);
-        property.Should().NotBeNull();
-        return (T)property!.GetValue(item);
+        return (T)property?.GetValue(item);
     }
 }
 

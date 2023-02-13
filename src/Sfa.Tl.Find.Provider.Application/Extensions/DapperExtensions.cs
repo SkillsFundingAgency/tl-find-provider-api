@@ -9,6 +9,8 @@ public static class DapperExtensions
         string typeName,
         IEnumerable<string> orderedColumnNames = null)
     {
-        return enumerable.AsDataTable(orderedColumnNames).AsTableValuedParameter(typeName);
+        return enumerable
+            .AsDataTable(orderedColumnNames)
+            .AsTableValuedParameter(typeName);
     }
 }
