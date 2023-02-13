@@ -459,18 +459,29 @@ public class ProviderDataService : IProviderDataService
 
     public async Task SendProviderNotifications(NotificationFrequency frequency)
     {
+        var currentDateTime = _dateTimeProvider.UtcNow;
         var pendingNotificationEmails = await _notificationRepository.GetPendingNotificationEmails(frequency);
-        foreach (var notificationEmail in pendingNotificationEmails)
+
+        var groupedEmails = pendingNotificationEmails
+            .GroupBy(p => p.Email, p => p.NotificationLocationId)
+            .Select(g => new
+            {
+                Email = g.Key,
+                IdList = g
+            });
+
+        foreach (var notificationEmail in groupedEmails)
         {
             await SendProviderNotificationEmail(
-                notificationEmail.NotificationLocationId, 
                 notificationEmail.Email);
 
-            await _notificationRepository.UpdateNotificationSentDate(notificationEmail.NotificationLocationId);
+            await _notificationRepository.UpdateNotificationSentDate(
+                notificationEmail.IdList,
+                currentDateTime);
         }
     }
 
-    public async Task SendProviderNotificationEmail(int notificationId, string emailAddress)
+    public async Task SendProviderNotificationEmail(string emailAddress)
     {
         var siteUri = new Uri(_providerSettings.ConnectSiteUri);
         var notificationsUri = new Uri(siteUri, "notifications");

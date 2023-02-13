@@ -437,7 +437,7 @@ public class NotificationRepository : INotificationRepository
 
             _dynamicParametersWrapper.CreateParameters(new
             {
-                @notificationLocationId = notification.Id.Value,
+                notificationLocationId = notification.Id.Value,
                 frequency = notification.Frequency,
                 searchRadius = notification.SearchRadius,
                 routeIds
@@ -455,8 +455,10 @@ public class NotificationRepository : INotificationRepository
             throw;
         }
     }
-
-    public async Task UpdateNotificationSentDate(int notificationLocationId)
+    
+    public async Task UpdateNotificationSentDate(
+        IEnumerable<int> notificationLocationIds,
+        DateTime notificationDate)
     {
         try
         {
@@ -464,15 +466,17 @@ public class NotificationRepository : INotificationRepository
 
             _dynamicParametersWrapper.CreateParameters(new
             {
-                notificationLocationId
+                ids = notificationLocationIds
+                    .AsTableValuedParameter("dbo.IdListTableType"),
+                notificationDate
             });
 
-            await _dbContextWrapper.ExecuteAsync(
+            var updated = await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "UPDATE dbo.NotificationLocation " +
-                "SET LastNotificationDate = GETUTCDATE(), " +
+                "SET LastNotificationDate = @notificationDate, " +
                 "    ModifiedOn = GETUTCDATE() " +
-                "WHERE Id = @notificationLocationId ",
+                "WHERE Id IN (SELECT Id FROM @ids) ",
                 _dynamicParametersWrapper.DynamicParameters);
         }
         catch (Exception ex)

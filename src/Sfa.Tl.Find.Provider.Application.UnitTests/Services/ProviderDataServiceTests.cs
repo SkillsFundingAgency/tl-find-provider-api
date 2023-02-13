@@ -1396,6 +1396,10 @@ public class ProviderDataServiceTests
     public async Task SendProviderNotifications_Calls_UpdateNotificationSentDate()
     {
         const NotificationFrequency frequency = NotificationFrequency.Daily;
+        var notificationDate = DateTime.Parse("2023-02-13 11:32:42");
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(notificationDate);
 
         var providerSettings = new SettingsBuilder()
             .BuildProviderSettings();
@@ -1404,6 +1408,11 @@ public class ProviderDataServiceTests
             .BuildList()
             .Take(1)
             .ToList();
+
+        var notificationIds   =
+            notificationEmails
+                .Select(x => x.NotificationLocationId)
+                .ToList();
 
         var notificationRepository = Substitute.For<INotificationRepository>();
         notificationRepository.GetPendingNotificationEmails(frequency)
@@ -1419,6 +1428,7 @@ public class ProviderDataServiceTests
 
         var service = new ProviderDataServiceBuilder()
             .Build(
+                dateTimeProvider,
                 emailService: emailService,
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
@@ -1428,12 +1438,14 @@ public class ProviderDataServiceTests
         await notificationRepository
             .Received(notificationEmails.Count)
             .UpdateNotificationSentDate(
-                Arg.Any<int>());
+                Arg.Any<IEnumerable<int>>(),
+                notificationDate);
 
         await notificationRepository
             .Received(1)
             .UpdateNotificationSentDate(
-                notificationEmails.First().NotificationLocationId);
+                notificationIds,
+                notificationDate);
     }
 
     [Fact]
@@ -1477,7 +1489,7 @@ public class ProviderDataServiceTests
                 notificationRepository: notificationRepository,
                 providerSettings: providerSettings);
 
-        await service.SendProviderNotificationEmail(notificationId, notification.Email);
+        await service.SendProviderNotificationEmail(notification.Email);
 
         await emailService
             .Received(1)

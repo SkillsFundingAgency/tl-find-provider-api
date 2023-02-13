@@ -8,11 +8,10 @@ AS
 	WITH Notifications_CTE AS (
 			SELECT	nl.[Id] AS [NotificationLocationId],
 					pn.[Id] AS [ProviderNotificationId],
-					nl.[Frequency],
-					nl.[SearchRadius],
 					pn.[Email],
 					pn.[ProviderId],
 					nl.[LocationId],
+					nl.[SearchRadius] * @metersPerMile AS [SearchRadiusInMeters],
 					nl.[LastNotificationDate],
 					nl.[CreatedOn] AS [NotificationLocationCreatedOn]
 			FROM [NotificationLocation] nl
@@ -23,15 +22,9 @@ AS
 			),
 
 		--Locations where an individual location was chosen
-		Locations_CTE AS (
+		IndividualLocations_CTE AS (
 			SELECT n.[NotificationLocationId],
 				  n.[ProviderNotificationId],
-				  n.[Frequency],
-				  n.[SearchRadius],
-				  n.[LocationId],
-				  l.[Postcode],
-				  l.[Latitude],
-				  l.[Longitude],
 				  l.[Location]
 			FROM Notifications_CTE n
 			INNER JOIN	[dbo].[Location] l
@@ -43,13 +36,6 @@ AS
 		ProviderLocations_CTE AS (
 			SELECT	n.[NotificationLocationId],
 					n.[ProviderNotificationId],
-					n.[Frequency],
-					n.[SearchRadius],
-					l.[Id] AS [LocationId],
-					l.[Name],
-					l.[Postcode],
-					l.[Latitude],
-					l.[Longitude],
 					l.[Location]
 			FROM Notifications_CTE n
 			INNER JOIN	[dbo].[Location] l
@@ -60,21 +46,14 @@ AS
 
 		Combined_CTE AS (
 			SELECT	n.[Email],
-					n.[ProviderNotificationId],
 					n.[NotificationLocationId],
 					n.[LastNotificationDate],
 					n.[NotificationLocationCreatedOn],
-					n.[Frequency],
-					n.[SearchRadius],
-					n.[SearchRadius] * @metersPerMile AS [SearchRadiusInMeters],
-					COALESCE(l.[LocationId], pl.[LocationId]) AS [LocationId],
-					COALESCE(l.[Postcode], pl.[Postcode]) AS [Postcode], 
-					COALESCE(l.[Latitude], pl.[Latitude]) AS [Latitude], 
-					COALESCE(l.[Longitude], pl.[Longitude]) AS [Longitude],
+					n.[SearchRadiusInMeters],
 					COALESCE(l.[Location], pl.[Location]) AS [Location],
 					nlr.[RouteId]
 			FROM Notifications_CTE n
-			LEFT JOIN Locations_CTE l
+			LEFT JOIN IndividualLocations_CTE l
 			ON l.[NotificationLocationId] = n.[NotificationLocationId]
 			LEFT JOIN ProviderLocations_CTE pl
 			ON pl.[NotificationLocationId] = n.[NotificationLocationId]

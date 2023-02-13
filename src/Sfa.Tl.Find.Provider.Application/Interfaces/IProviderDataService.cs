@@ -66,7 +66,7 @@ public interface IProviderDataService
 
     Task SendProviderNotifications(NotificationFrequency frequency);
     
-    Task SendProviderNotificationEmail(int notificationId, string emailAddress);
+    Task SendProviderNotificationEmail(string emailAddress);
 
     Task SendProviderVerificationEmail(int notificationId, string emailAddress);
 

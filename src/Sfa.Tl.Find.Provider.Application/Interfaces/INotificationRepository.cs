@@ -32,7 +32,7 @@ public interface INotificationRepository
 
     Task UpdateLocation(Notification notification);
 
-    Task UpdateNotificationSentDate(int notificationLocationId);
+    Task UpdateNotificationSentDate(IEnumerable<int> notificationLocationIds, DateTime notificationDate);
 
     Task SaveEmailVerificationToken(int notificationId, string emailAddress, Guid? emailVerificationToken);
 

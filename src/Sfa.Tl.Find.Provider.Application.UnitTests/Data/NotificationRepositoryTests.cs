@@ -47,7 +47,7 @@ public class NotificationRepositoryTests
     {
         const int providerNotificationId = 1;
 
-        var (dbContextWrapper, _, dynamicParametersWrapper) = 
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
                 .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
@@ -491,14 +491,6 @@ public class NotificationRepositoryTests
             .WithNullId()
             .Build();
 
-        //var (dbContextWrapper, dbConnection) =
-        //    new DbContextWrapperBuilder()
-        //        .BuildSubstituteWrapperAndConnection();
-
-        //var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
-        //var parameters = new DynamicParameters();
-        //parameters.Add("returnValue", newId, DbType.Int32, ParameterDirection.ReturnValue);
-        //dynamicParametersWrapper.DynamicParameters.Returns(parameters);
         var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
                 .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
@@ -509,6 +501,8 @@ public class NotificationRepositoryTests
                 dynamicParametersWrapper.DapperParameterFactory);
 
         var result = await repository.Create(notification, TestUkPrn);
+        
+        result.Should().Be(newId);
 
         await dbContextWrapper
             .Received(1)
@@ -541,9 +535,7 @@ public class NotificationRepositoryTests
 
         var repository = new NotificationRepositoryBuilder()
             .Build(dbContextWrapper,
-                dynamicParametersWrapper.DapperParameterFactory
-                //dynamicParametersWrapper
-                );
+                dynamicParametersWrapper.DapperParameterFactory);
 
         await repository.Create(notification, TestUkPrn);
 
@@ -573,7 +565,7 @@ public class NotificationRepositoryTests
             new DbContextWrapperBuilder()
                 .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
         dynamicParametersWrapper.ReturnValue = newId;
-        
+
         dbContextWrapper
             .ExecuteAsync(dbConnection,
                 "CreateProviderNotification",
@@ -751,11 +743,12 @@ public class NotificationRepositoryTests
         templates.GetParameter<SqlMapper.ICustomQueryParameter>("routeIds")
             .Should().NotBeNull();
     }
-
+    
     [Fact]
     public async Task UpdateNotificationSentDate_Calls_Database()
     {
-        const int notificationLocationId = 1;
+        var notificationLocationIds = new List<int> { 1, 2, 3 };
+        var notificationDate = DateTime.Parse("2023-02-13 11:32:42");
 
         var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
@@ -765,23 +758,24 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.UpdateNotificationSentDate(notificationLocationId);
+        await repository.UpdateNotificationSentDate(notificationLocationIds, notificationDate);
 
         await dbContextWrapper
             .Received(1)
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
                     s.Contains("UPDATE dbo.NotificationLocation") &&
-                    s.Contains("SET LastNotificationDate = GETUTCDATE(),") &&
+                    s.Contains("SET LastNotificationDate = @notificationDate,") &&
                     s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE Id = @notificationLocationId")),
+                    s.Contains("WHERE Id IN (SELECT Id FROM @ids)")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
     [Fact]
     public async Task UpdateNotificationSentDate_Sets_Dynamic_Parameters()
     {
-        const int notificationLocationId = 1;
+        var notificationLocationIds = new List<int> { 1, 2, 3 };
+        var notificationDate = DateTime.Parse("2023-02-13 11:32:42");
 
         var (dbContextWrapper, _, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
@@ -791,13 +785,15 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.UpdateNotificationSentDate(notificationLocationId);
+        await repository.UpdateNotificationSentDate(notificationLocationIds, notificationDate);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
-        templates.GetDynamicTemplatesCount().Should().Be(1);
-        templates.ContainsNameAndValue("notificationLocationId", notificationLocationId);
+        templates.GetDynamicTemplatesCount().Should().Be(2);
+        templates.GetParameter<SqlMapper.ICustomQueryParameter>("ids")
+            .Should().NotBeNull();
+        templates.ContainsNameAndValue("notificationDate", notificationDate);
     }
 
     [Fact]
@@ -853,7 +849,7 @@ public class NotificationRepositoryTests
         templates.ContainsNameAndValue("email", notification.Email);
         templates.ContainsNameAndValue("emailVerificationToken", verificationToken);
     }
-    
+
     [Fact]
     public async Task VerifyEmailToken_Calls_Database()
     {
