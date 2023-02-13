@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using System.Security.Claims;
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -12,7 +11,6 @@ public class EditNotificationModelBuilder
 {
     public EditNotificationModel Build(
         IProviderDataService? providerDataService = null,
-        ISessionService? sessionService = null,
         ILogger<EditNotificationModel>? logger = null,
         PageContext? pageContext = null,
         bool userIsAuthenticated = true,
@@ -29,7 +27,6 @@ public class EditNotificationModelBuilder
             .Build(userIsAuthenticated, claims);
 
         providerDataService ??= Substitute.For<IProviderDataService>();
-        sessionService ??= Substitute.For<ISessionService>();
         logger ??= Substitute.For<ILogger<EditNotificationModel>>();
 
         var tempDataProvider = Substitute.For<ITempDataProvider>();
@@ -39,7 +36,6 @@ public class EditNotificationModelBuilder
         
         var pageModel = new EditNotificationModel(
             providerDataService,
-            sessionService,
             logger)
         {
             PageContext = pageContext,

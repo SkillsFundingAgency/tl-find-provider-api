@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using System.Security.Claims;
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
@@ -15,7 +14,6 @@ public class AddNotificationLocationModelBuilder
 {
     public AddNotificationLocationModel Build(
         IProviderDataService? providerDataService = null,
-        ISessionService? sessionService = null,
         ProviderSettings? providerSettings = null,
         ILogger<AddNotificationLocationModel>? logger = null,
         PageContext? pageContext = null,
@@ -33,7 +31,6 @@ public class AddNotificationLocationModelBuilder
             .Build(userIsAuthenticated, claims);
 
         providerDataService ??= Substitute.For<IProviderDataService>();
-        sessionService ??= Substitute.For<ISessionService>();
         logger ??= Substitute.For<ILogger<AddNotificationLocationModel>>();
 
         var providerOptions = Options.Create(
@@ -48,7 +45,6 @@ public class AddNotificationLocationModelBuilder
         
         var pageModel = new AddNotificationLocationModel(
             providerDataService,
-            sessionService,
             providerOptions,
             logger)
         {

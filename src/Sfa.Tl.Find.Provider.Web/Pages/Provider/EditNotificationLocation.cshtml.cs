@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
@@ -15,7 +14,6 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 public class EditNotificationLocationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
-    private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<EditNotificationLocationModel> _logger;
 
@@ -29,12 +27,10 @@ public class EditNotificationLocationModel : PageModel
 
     public EditNotificationLocationModel(
         IProviderDataService providerDataService,
-        ISessionService? sessionService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<EditNotificationLocationModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _providerSettings = providerOptions?.Value

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
@@ -12,7 +11,6 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 public class EditNotificationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
-    private readonly ISessionService _sessionService;
     private readonly ILogger<EditNotificationModel> _logger;
 
     public int ProviderNotificationId { get; private set; }
@@ -28,11 +26,9 @@ public class EditNotificationModel : PageModel
 
     public EditNotificationModel(
         IProviderDataService providerDataService,
-        ISessionService? sessionService,
         ILogger<EditNotificationModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 

@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
-using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using System.Security.Claims;
 using Sfa.Tl.Find.Provider.Web.Pages.Provider;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -15,8 +11,6 @@ public class NotificationsModelBuilder
 {
     public NotificationsModel Build(
         IProviderDataService? providerDataService = null,
-        ISessionService? sessionService = null,
-        ProviderSettings? providerSettings = null,
         ILogger<NotificationsModel>? logger = null,
         PageContext? pageContext = null,
         bool userIsAuthenticated = true,
@@ -33,13 +27,7 @@ public class NotificationsModelBuilder
             .Build(userIsAuthenticated, claims);
 
         providerDataService ??= Substitute.For<IProviderDataService>();
-        sessionService ??= Substitute.For<ISessionService>();
         logger ??= Substitute.For<ILogger<NotificationsModel>>();
-
-        var providerOptions = Options.Create(
-            providerSettings
-            ?? new SettingsBuilder()
-                .BuildProviderSettings());
 
         var tempDataProvider = Substitute.For<ITempDataProvider>();
         var tempData = new TempDataDictionary(
@@ -48,8 +36,6 @@ public class NotificationsModelBuilder
 
         var pageModel = new NotificationsModel(
             providerDataService,
-            sessionService,
-            providerOptions,
             logger)
         {
             PageContext = pageContext,

@@ -7,19 +7,15 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
-using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Azure;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
 public class AddAdditionalNotificationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
-    private readonly ISessionService _sessionService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddAdditionalNotificationModel> _logger;
 
@@ -35,12 +31,10 @@ public class AddAdditionalNotificationModel : PageModel
 
     public AddAdditionalNotificationModel(
         IProviderDataService providerDataService,
-        ISessionService? sessionService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<AddAdditionalNotificationModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _providerSettings = providerOptions?.Value
