@@ -4,6 +4,7 @@
 	[UniqueId] UNIQUEIDENTIFIER NOT NULL,
 	[OrganisationName] NVARCHAR(400) NOT NULL,
 	[ContactName] NVARCHAR(400) NOT NULL,
+	--TODO: Remove this column for next release
 	[Postcode] NVARCHAR(10) NULL,
 	[OtherIndustry] NVARCHAR(400) NULL,
 	[AdditionalInformation] NVARCHAR(MAX) NULL,
