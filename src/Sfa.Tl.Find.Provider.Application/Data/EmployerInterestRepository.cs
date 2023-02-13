@@ -189,8 +189,10 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             var itemsToDelete = (await 
                 _dbContextWrapper.QueryAsync<ExpiredEmployerInterestDto>(
                     connection,
-                    "SELECT Id, UniqueId, OrganisationName, Postcode, Email " +
-                    "FROM [dbo].[EmployerInterest] " +
+                    "SELECT ei.Id, ei.UniqueId, ei.OrganisationName, eil.Postcode, ei.Email " +
+                    "FROM [dbo].[EmployerInterest] ei" +
+                    "LEFT JOIN [dbo].[EmployerInterestLocation] eil " +
+                    "ON eil.[EmployerInterestId] = ei.[Id]"+
                     "WHERE [ExpiryDate] < @date",
                      new { date },
                     transaction
@@ -211,31 +213,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             _logger.LogError(ex, "An error occurred when deleting employer interest before date {date}", date);
             throw;
         }
-    }
-
-    public async Task<IEnumerable<EmployerInterest>> GetAll()
-    {
-        using var connection = _dbContextWrapper.CreateConnection();
-
-        return await _dbContextWrapper.QueryAsync<EmployerInterest>(
-            connection,
-            "SELECT Id, " +
-            "UniqueId, " +
-            "OrganisationName, " +
-            "ContactName, " +
-            "Postcode, " +
-            "HasMultipleLocations, " +
-            "LocationCount, " +
-            "IndustryId,  " +
-            "AdditionalInformation, " +
-            "Email, " +
-            "Telephone, " +
-            "ContactPreferenceType, " +
-            "ExpiryDate, " +
-            "CreatedOn, " +
-            "ModifiedOn " +
-            "FROM dbo.EmployerInterest " +
-            "ORDER BY OrganisationName");
     }
 
     public async Task<EmployerInterestDetail> GetDetail(int id)
