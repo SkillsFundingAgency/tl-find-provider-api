@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Microsoft.Extensions.Logging;
-using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
