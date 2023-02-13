@@ -1444,7 +1444,9 @@ public class ProviderDataServiceTests
         await notificationRepository
             .Received(1)
             .UpdateNotificationSentDate(
-                notificationIds,
+                Arg.Is<IEnumerable<int>>(
+                    ids => 
+                        ids.Single() == notificationIds.Single()),
                 notificationDate);
     }
 
