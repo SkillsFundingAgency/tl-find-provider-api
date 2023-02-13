@@ -43,6 +43,7 @@ public class EditNotificationTests
 
         editNotificationModel.Notification.Should().Be(notification);
         editNotificationModel.HasAvailableLocations.Should().BeTrue();
+        editNotificationModel.RemovedLocation.Should().BeNull();
     }
 
     [Fact]

@@ -20,10 +20,8 @@ public class NotificationsTests
     [Fact]
     public async Task NotificationsModel_OnGet_Returns_Page_Result()
     {
-        var settings = new SettingsBuilder().BuildProviderSettings();
-
         var notificationsModel = new NotificationsModelBuilder()
-            .Build(providerSettings: settings);
+            .Build();
 
         var result = await notificationsModel.OnGet();
         result.Should().BeOfType<PageResult>();
@@ -81,12 +79,15 @@ public class NotificationsTests
     [Fact]
     public async Task NotificationsModel_OnGet_Sets_ExpectedProperties()
     {
-        var settings = new SettingsBuilder().BuildProviderSettings();
-
         var notificationsModel = new NotificationsModelBuilder()
-            .Build(providerSettings: settings);
+            .Build();
 
         await notificationsModel.OnGet();
+
+        notificationsModel.AddedNotificationEmail.Should().BeNull();
+        notificationsModel.DeletedNotificationEmail.Should().BeNull();
+        notificationsModel.VerificationEmail.Should().BeNull();
+        notificationsModel.VerifiedEmail.Should().BeNull();
     }
 
     [Fact]

@@ -45,7 +45,7 @@ public class EmployerListTests
         employerListModel.SearchRadius.Should().Be(settings.SearchRadius);
         employerListModel.EmployerInterestRetentionDays.Should().Be(retentionDays);
         employerListModel.EmployerInterestRetentionWeeks.Should().Be(expectedRetentionWeeks);
-
+        employerListModel.DeletedOrganisationName.Should().BeNull();
         employerListModel.SelectedPostcodeHasFilters.Should().BeFalse();
     }
 
