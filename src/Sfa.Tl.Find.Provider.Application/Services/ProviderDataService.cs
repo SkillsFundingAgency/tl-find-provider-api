@@ -467,7 +467,7 @@ public class ProviderDataService : IProviderDataService
             .Select(g => new
             {
                 Email = g.Key,
-                IdList = g
+                IdList = g.ToList()
             });
 
         foreach (var notificationEmail in groupedEmails)
