@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Microsoft.Extensions.Logging;
-using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -13,18 +12,15 @@ public class NotificationRepository : INotificationRepository
     private readonly IDbContextWrapper _dbContextWrapper;
     private readonly IDynamicParametersWrapper _dynamicParametersWrapper;
     private readonly ILogger<NotificationRepository> _logger;
-    private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
     public NotificationRepository(
         IDbContextWrapper dbContextWrapper,
         IDynamicParametersWrapper dynamicParametersWrapper,
-        IReadOnlyPolicyRegistry<string> policyRegistry,
         ILogger<NotificationRepository> logger)
     {
         _dbContextWrapper = dbContextWrapper ?? throw new ArgumentNullException(nameof(dbContextWrapper));
         _dynamicParametersWrapper = dynamicParametersWrapper ??
                                     throw new ArgumentNullException(nameof(dynamicParametersWrapper));
-        _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
     
