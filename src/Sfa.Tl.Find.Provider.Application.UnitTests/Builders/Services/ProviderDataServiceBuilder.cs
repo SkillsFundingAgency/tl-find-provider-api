@@ -23,7 +23,7 @@ public class ProviderDataServiceBuilder
         ISearchFilterRepository searchFilterRepository = null,
         ITownDataService townDataService = null,
         ICacheService cacheService = null,
-        ProviderSettings? providerSettings = null,
+        ProviderSettings providerSettings = null,
         SearchSettings searchSettings = null,
         ILogger<ProviderDataService> logger = null)
     {
