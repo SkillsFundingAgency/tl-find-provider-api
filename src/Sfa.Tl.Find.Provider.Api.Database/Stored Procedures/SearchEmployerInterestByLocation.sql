@@ -93,6 +93,8 @@ AS
 	ON eir.[EmployerInterestId] = ei.[Id]
 	LEFT JOIN Route_CTE r
 	ON r.[Id] = eir.[RouteId]
+	WHERE r.[Id] IS NOT NULL
+		OR (SELECT COUNT(*) FROM SearchFilterRoute_CTE) = 0
 	ORDER BY	ei.[Distance],
 				ei.[CreatedOn] DESC,
 				ei.[OrganisationName], 
