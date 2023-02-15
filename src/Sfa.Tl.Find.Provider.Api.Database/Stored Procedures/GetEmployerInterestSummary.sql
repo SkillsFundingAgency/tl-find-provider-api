@@ -11,12 +11,13 @@ AS
 	WITH EmployerInterest_CTE AS (
 		SELECT ei.[Id],
 			ei.[OrganisationName],
-			ei.[Postcode],
 			ei.[OtherIndustry],
 			ei.[ExpiryDate],
 			ei.[CreatedOn],
 			ei.[ModifiedOn]
-		FROM [dbo].[EmployerInterest] ei),
+		FROM [dbo].[EmployerInterest] ei
+		),
+
 	EmployerInterestIndustry_CTE AS (
 		SELECT eii.[EmployerInterestId],
 			i.[Name],
@@ -24,10 +25,11 @@ AS
 		FROM [dbo].[EmployerInterestIndustry] eii
 		INNER JOIN [dbo].[Industry] i
 		ON eii.[IndustryId] = i.[Id]
-	)
+		)
+
 	SELECT	ei.[Id],
 			ei.[OrganisationName],
-			ei.[Postcode],
+			eil.[Postcode],
 			NULL AS [Distance],
 			COALESCE (i.[Name], ei.[OtherIndustry]) AS Industry,
 			ei.[ExpiryDate],
@@ -36,6 +38,8 @@ AS
 			r.[Id] AS [RouteId],
 			r.[Name] AS [RouteName]
 	FROM EmployerInterest_CTE ei
+	LEFT JOIN	[dbo].[EmployerInterestLocation] eil 
+	ON			eil.[EmployerInterestId] = ei.[Id]
 	LEFT JOIN EmployerInterestIndustry_CTE i
 	ON i.[EmployerInterestId] = ei.[Id]
 	 AND i.[IndustryRowNum] = 1	

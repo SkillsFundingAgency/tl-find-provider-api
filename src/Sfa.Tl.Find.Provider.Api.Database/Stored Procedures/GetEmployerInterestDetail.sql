@@ -7,7 +7,7 @@ AS
 				ei.[UniqueId],
 				ei.[OrganisationName],
 				ei.[ContactName],
-				COALESCE(eil.[Postcode], ei.[Postcode]) AS [Postcode],
+				eil.[Postcode],
 				ei.[Email],
 				ei.[Website],
 				ei.[Telephone],

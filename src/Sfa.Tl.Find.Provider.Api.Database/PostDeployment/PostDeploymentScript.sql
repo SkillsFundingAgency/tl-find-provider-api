@@ -15,3 +15,22 @@ Post-Deployment Script
 :r ".\Seed Qualifications.sql"
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
+
+--TODO: Remove this statement and remove column 
+--from table definition after it has been deleted in live
+ALTER TABLE [dbo].[EmployerInterest] 
+DROP COLUMN IF EXISTS [Postcode];
+
+--To undo this:
+/*
+ALTER TABLE [dbo].[EmployerInterest] 
+ADD [Postcode] NVARCHAR(10) NULL;
+
+WITH cte AS (
+	SELECT EmployerInterestId, Postcode
+	FROM EmployerInterestLocation)
+	UPDATE EmployerInterest 
+	SET Postcode = cte.postcode
+	FROM cte
+	WHERE Id = cte.EmployerInterestId;
+*/

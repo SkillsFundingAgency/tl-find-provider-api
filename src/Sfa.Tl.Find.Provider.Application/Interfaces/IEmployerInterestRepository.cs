@@ -21,8 +21,6 @@ public interface IEmployerInterestRepository
         int expiryNotificationDays, 
         int maximumExtensions);
 
-    Task<IEnumerable<EmployerInterest>> GetAll();
-
     Task<EmployerInterestDetail> GetDetail(int id);
 
     Task<IEnumerable<EmployerInterest>> GetExpiringInterest(int daysToExpiry);

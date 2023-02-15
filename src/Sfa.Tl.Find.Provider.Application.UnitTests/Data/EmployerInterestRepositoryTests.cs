@@ -348,8 +348,10 @@ public class EmployerInterestRepositoryTests
         dbContextWrapper
             .QueryAsync<ExpiredEmployerInterestDto>(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("SELECT Id, UniqueId, OrganisationName, Postcode, Email") &&
-                    s.Contains("FROM [dbo].[EmployerInterest]") &&
+                    s.Contains("SELECT ei.Id, ei.UniqueId, ei.OrganisationName, eil.Postcode, ei.Email") &&
+                    s.Contains("FROM [dbo].[EmployerInterest] ei") &&
+                    s.Contains("LEFT JOIN [dbo].[EmployerInterestLocation] eil") &&
+                    s.Contains("ON eil.[EmployerInterestId] = ei.[Id]") &&
                     s.Contains("[ExpiryDate] < @date")),
                 Arg.Any<object>(),
                 Arg.Is<IDbTransaction>(t => t != null))
@@ -367,33 +369,7 @@ public class EmployerInterestRepositoryTests
         results.Count().Should().Be(employerInterestsCount);
         results.Should().BeEquivalentTo(expiredEmployerInterest);
     }
-
-    [Fact]
-    public async Task GetAll_Returns_Expected_List()
-    {
-        var employerInterests = new EmployerInterestBuilder()
-            .BuildList()
-            .ToList();
-
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
-
-        dbContextWrapper
-            .QueryAsync<EmployerInterest>(dbConnection,
-                Arg.Any<string>())
-            .Returns(employerInterests);
-
-        var repository = new EmployerInterestRepositoryBuilder().Build(dbContextWrapper);
-
-        var results = (await repository.GetAll()).ToList();
-        results.Should().BeEquivalentTo(employerInterests);
-
-        await dbContextWrapper
-            .Received(1)
-            .QueryAsync<EmployerInterest>(dbConnection,
-                Arg.Is<string>(sql => sql.Contains("FROM dbo.EmployerInterest")));
-    }
-
+    
     [Fact]
     public async Task GetDetail_Returns_Expected_Item()
     {
