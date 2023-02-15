@@ -13,14 +13,11 @@ using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
 public class ProviderDataService : IProviderDataService
 {
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IGuidProvider _guidProvider;
     private readonly IPostcodeLookupService _postcodeLookupService;
     private readonly IEmailService _emailService;
     private readonly ITownDataService _townDataService;
@@ -28,37 +25,30 @@ public class ProviderDataService : IProviderDataService
     private readonly IQualificationRepository _qualificationRepository;
     private readonly IRouteRepository _routeRepository;
     private readonly IIndustryRepository _industryRepository;
-    private readonly INotificationRepository _notificationRepository;
     private readonly ICacheService _cacheService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<ProviderDataService> _logger;
     private readonly bool _mergeAdditionalProviderData;
 
     public ProviderDataService(
-        IDateTimeProvider dateTimeProvider,
-        IGuidProvider guidProvider,
         IPostcodeLookupService postcodeLookupService,
         IEmailService emailService,
         IProviderRepository providerRepository,
         IQualificationRepository qualificationRepository,
         IRouteRepository routeRepository,
         IIndustryRepository industryRepository,
-        INotificationRepository notificationRepository,
         ITownDataService townDataService,
         ICacheService cacheService,
         IOptions<ProviderSettings> providerOptions,
         IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
     {
-        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-        _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
         _industryRepository = industryRepository ?? throw new ArgumentNullException(nameof(industryRepository));
-        _notificationRepository = notificationRepository ?? throw new ArgumentNullException(nameof(notificationRepository));
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -316,70 +306,6 @@ public class ProviderDataService : IProviderDataService
         await ClearCaches();
 
         _logger.LogInformation("Loaded {count} providers from stream.", count);
-    }
-
-    public async Task SendProviderNotifications(NotificationFrequency frequency)
-    {
-        var currentDateTime = _dateTimeProvider.UtcNow;
-        var pendingNotificationEmails = await _notificationRepository.GetPendingNotificationEmails(frequency);
-
-        var groupedEmails = pendingNotificationEmails
-            .GroupBy(p => p.Email, p => p.NotificationLocationId)
-            .Select(g => new
-            {
-                Email = g.Key,
-                IdList = g.ToList()
-            });
-
-        foreach (var notificationEmail in groupedEmails)
-        {
-            await SendProviderNotificationEmail(
-                notificationEmail.Email);
-
-            await _notificationRepository.UpdateNotificationSentDate(
-                notificationEmail.IdList,
-                currentDateTime);
-        }
-    }
-
-    public async Task SendProviderNotificationEmail(string emailAddress)
-    {
-        var siteUri = new Uri(_providerSettings.ConnectSiteUri);
-        var notificationsUri = new Uri(siteUri, "notifications");
-        var employerListUri = new Uri(siteUri, "employer-list");
-        var searchFiltersUri = new Uri(siteUri, "filters");
-
-        var uniqueId = _guidProvider.NewGuid();
-
-        await _emailService.SendEmail(
-            emailAddress,
-            EmailTemplateNames.ProviderNotification,
-            new Dictionary<string, string>
-            {
-                { "employer_list_uri", employerListUri.ToString() },
-                { "search_filters_uri", searchFiltersUri.ToString() },
-                { "notifications_uri", notificationsUri.ToString() }
-            },
-            uniqueId.ToString());
-    }
-
-    public async Task SendProviderVerificationEmail(int notificationId, string emailAddress)
-    {
-        var verificationToken = _guidProvider.NewGuid();
-        await SendProviderVerificationEmail(emailAddress, verificationToken);
-
-        await _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
-    }
-
-    public async Task<(bool Success, string Email)> VerifyNotificationEmail(string token)
-    {
-        if (!Guid.TryParse(token, out var realToken))
-        {
-            _logger.LogError("Invalid token received in VerifyNotificationEmail");
-        }
-
-        //await _notificationRepository.RemoveEmailVerificationToken(realToken);
-        return await _notificationRepository.VerifyEmailToken(realToken);
     }
 
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)

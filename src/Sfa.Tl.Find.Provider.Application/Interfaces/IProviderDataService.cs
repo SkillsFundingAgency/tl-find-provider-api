@@ -1,5 +1,4 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
@@ -39,12 +38,4 @@ public interface IProviderDataService
     Task ImportProviderContacts(Stream stream);
 
     Task ImportProviderData(Stream stream, bool isAdditionalData);
-
-    Task SendProviderNotifications(NotificationFrequency frequency);
-    
-    Task SendProviderNotificationEmail(string emailAddress);
-
-    Task SendProviderVerificationEmail(int notificationId, string emailAddress);
-
-    Task<(bool Success, string Email)> VerifyNotificationEmail(string token);
 }

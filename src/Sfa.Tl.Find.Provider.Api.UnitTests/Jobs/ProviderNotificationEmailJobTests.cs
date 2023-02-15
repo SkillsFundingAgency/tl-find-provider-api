@@ -44,14 +44,14 @@ public class ProviderNotificationEmailJobTests
         jobContext.JobDetail.Returns(jobDetail);
         jobContext.Trigger.Returns(trigger);
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var notificationService = Substitute.For<INotificationService>();
 
         var job = new ProviderNotificationEmailJobBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         await job.Execute(jobContext);
 
-        await providerDataService
+        await notificationService
             .Received(1)
             .SendProviderNotifications(frequency);
     }
@@ -72,10 +72,10 @@ public class ProviderNotificationEmailJobTests
 
         var logger = Substitute.For<ILogger<ProviderNotificationEmailJob>>();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var notificationService = Substitute.For<INotificationService>();
 
         var job = new ProviderNotificationEmailJobBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 logger);
 
         await job.Execute(jobContext);
@@ -96,7 +96,7 @@ public class ProviderNotificationEmailJobTests
                 (LogLevel)args[0] == LogLevel.Error &&
                 args[3] != null && args[3] is ArgumentException);
 
-        await providerDataService
+        await notificationService
             .DidNotReceive()
             .SendProviderNotifications(Arg.Any<NotificationFrequency>());
     }

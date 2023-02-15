@@ -7,14 +7,14 @@ namespace Sfa.Tl.Find.Provider.Api.Jobs;
 
 public class ProviderNotificationEmailJob : IJob
 {
-    private readonly IProviderDataService _providerDataService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<ProviderNotificationEmailJob> _logger;
 
     public ProviderNotificationEmailJob(
-        IProviderDataService providerDataService,
+        INotificationService notificationService,
         ILogger<ProviderNotificationEmailJob> logger)
     {
-        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -32,7 +32,7 @@ public class ProviderNotificationEmailJob : IJob
                 throw new ArgumentException("A valid notification frequency was not found in the job data.");
             }
 
-            await _providerDataService.SendProviderNotifications(frequency);
+            await _notificationService.SendProviderNotifications(frequency);
 
             _logger.LogInformation("{job} {frequency} job completed successfully.",
                 nameof(ProviderNotificationEmailJob)
