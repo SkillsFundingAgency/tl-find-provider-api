@@ -33,13 +33,13 @@ public class NotificationsTests
         const string token = "611c0ffc-8144-4ca5-9428-b2a555729947";
         const string email = "test@test.com";
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .VerifyNotificationEmail(token)
             .Returns((Success: true, Email: email));
 
         var notificationsModel = new NotificationsModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         var result = await notificationsModel.OnGet(token);
         var redirectResult = result as RedirectToPageResult;
@@ -63,14 +63,14 @@ public class NotificationsTests
     {
         const string token = "611c0ffc-8144-4ca5-9428-b2a555729947";
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var notificationService = Substitute.For<INotificationService>();
 
         var notificationsModel = new NotificationsModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         await notificationsModel.OnGet(token);
 
-        await providerDataService
+        await notificationService
             .Received(1)
             .VerifyNotificationEmail(
                 token);
@@ -97,13 +97,13 @@ public class NotificationsTests
             .BuildList()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationSummaryList(PageContextBuilder.DefaultUkPrn)
             .Returns(notificationSummaryList);
 
         var notificationsModel = new NotificationsModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         await notificationsModel.OnGet();
 
@@ -120,18 +120,18 @@ public class NotificationsTests
             .Build();
         var notificationId = notification.Id!.Value;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notificationId)
             .Returns(notification);
 
         var notificationsModel = new NotificationsModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         await notificationsModel.OnGetResendEmailVerification(notificationId);
 
-        await providerDataService
+        await notificationService
             .Received(1)
-            .SendProviderVerificationEmail(notificationId, notification.Email);
+            .SendProviderNotificationVerificationEmail(notificationId, notification.Email);
     }
 }

@@ -45,7 +45,7 @@ public class AddNotificationTests
             .Returns(locations);
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(providerDataService: providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -86,7 +86,7 @@ public class AddNotificationTests
             .Returns(locations);
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(providerDataService: providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -105,7 +105,7 @@ public class AddNotificationTests
         var providerDataService = Substitute.For<IProviderDataService>();
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(providerDataService: providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -130,7 +130,7 @@ public class AddNotificationTests
         var providerDataService = Substitute.For<IProviderDataService>();
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(providerDataService: providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -168,7 +168,7 @@ public class AddNotificationTests
             .Returns(routes);
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(providerDataService: providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -200,7 +200,7 @@ public class AddNotificationTests
         var providerDataService = Substitute.For<IProviderDataService>();
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(providerDataService: providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -219,7 +219,7 @@ public class AddNotificationTests
         var providerDataService = Substitute.For<IProviderDataService>();
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(providerDataService: providerDataService,
                 providerSettings: settings);
 
         await addNotificationModel.OnGet();
@@ -234,10 +234,10 @@ public class AddNotificationTests
     {
         const string testEmail = "test@test.com";
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var notificationService = Substitute.For<INotificationService>();
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         addNotificationModel.Input = new AddNotificationModel.InputModel
         {
@@ -256,9 +256,9 @@ public class AddNotificationTests
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Provider/Notifications");
 
-        await providerDataService
+        await notificationService
             .Received(1)
-            .SaveNotification(Arg.Any<Notification>(),
+            .CreateNotification(Arg.Any<Notification>(),
                 PageContextBuilder.DefaultUkPrn);
     }
 
@@ -268,10 +268,8 @@ public class AddNotificationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build();
 
         addNotificationModel.Input = new AddNotificationModel.InputModel
         {
@@ -298,14 +296,14 @@ public class AddNotificationTests
         const int newId = 1;
         const string testEmail = "test@test.com";
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
-            .SaveNotification(Arg.Any<Notification>(),
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
+            .CreateNotification(Arg.Any<Notification>(),
                 PageContextBuilder.DefaultUkPrn)
             .Returns(newId);
 
         var addNotificationModel = new AddNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         addNotificationModel.Input = new AddNotificationModel.InputModel
         {
@@ -328,9 +326,9 @@ public class AddNotificationTests
             x.Value != null &&
             x.Value.ToString() == newId.ToString());
 
-        await providerDataService
+        await notificationService
             .Received(1)
-            .SaveNotification(Arg.Any<Notification>(),
+            .CreateNotification(Arg.Any<Notification>(),
                 PageContextBuilder.DefaultUkPrn);
     }
 }

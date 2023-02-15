@@ -11,7 +11,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class NotificationsModel : PageModel
 {
-    private readonly IProviderDataService _providerDataService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<NotificationsModel> _logger;
 
     public IEnumerable<NotificationSummary>? NotificationList { get; private set; }
@@ -29,10 +29,10 @@ public class NotificationsModel : PageModel
     public string? VerifiedEmail { get; set; }
 
     public NotificationsModel(
-        IProviderDataService providerDataService,
+        INotificationService notificationService,
         ILogger<NotificationsModel> logger)
     {
-        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -41,12 +41,12 @@ public class NotificationsModel : PageModel
     {
         if (token is not null)
         {
-            var verificationResult = await _providerDataService
+            var (success, email) = await _notificationService
                 .VerifyNotificationEmail(token);
 
-            if (verificationResult.Success)
+            if (success)
             {
-                TempData[nameof(VerifiedEmail)] = verificationResult.Email;
+                TempData[nameof(VerifiedEmail)] = email;
             }
 
             return RedirectToPage("/Provider/Notifications");
@@ -55,7 +55,7 @@ public class NotificationsModel : PageModel
         var ukPrn = HttpContext.User.GetUkPrn();
         if (ukPrn > 0)
         {
-            NotificationList = await _providerDataService.GetNotificationSummaryList(ukPrn.Value);
+            NotificationList = await _notificationService.GetNotificationSummaryList(ukPrn.Value);
         }
 
         return Page();
@@ -63,13 +63,13 @@ public class NotificationsModel : PageModel
 
     public async Task<IActionResult> OnGetResendEmailVerification(int id)
     {
-        var notification = await _providerDataService.GetNotification(id);
+        var notification = await _notificationService.GetNotification(id);
         if (notification is null)
         {
             return NotFound();
         }
 
-        await _providerDataService.SendProviderVerificationEmail(id, notification.Email);
+        await _notificationService.SendProviderNotificationVerificationEmail(id, notification.Email);
 
         TempData[nameof(VerificationEmail)] = notification.Email;
 

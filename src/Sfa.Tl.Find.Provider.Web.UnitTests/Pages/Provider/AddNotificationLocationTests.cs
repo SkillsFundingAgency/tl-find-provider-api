@@ -44,16 +44,16 @@ public class AddNotificationLocationTests
             .BuildListOfAvailableLocations()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
-        providerDataService
+        notificationService
             .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
             .Returns(availableLocations);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -91,16 +91,16 @@ public class AddNotificationLocationTests
             .Take(1)
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
-        providerDataService
+        notificationService
             .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
             .Returns(availableLocations);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -123,13 +123,13 @@ public class AddNotificationLocationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -152,15 +152,15 @@ public class AddNotificationLocationTests
         var settings = new SettingsBuilder().BuildProviderSettings();
 
         var notification = new NotificationBuilder()
-            .Build();
+        .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -195,16 +195,19 @@ public class AddNotificationLocationTests
             .BuildList()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
+
+        var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
             .GetRoutes()
             .Returns(routes);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
+                providerDataService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -237,16 +240,19 @@ public class AddNotificationLocationTests
             .BuildList()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
+
+        var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
             .GetRoutes()
             .Returns(routes);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService, 
+                providerDataService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -271,13 +277,13 @@ public class AddNotificationLocationTests
             .WithSearchRadius(null)
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -300,13 +306,13 @@ public class AddNotificationLocationTests
             .WithSearchRadius(searchRadius)
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
@@ -321,13 +327,14 @@ public class AddNotificationLocationTests
     public async Task AddNotificationLocationModel_OnGet_Redirects_To_EditNotification_If_Provider_Notification_Not_Found()
     {
         const int providerNotificationId = 99;
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(providerNotificationId)
             .Returns(null as Notification);
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         var result = await addNotificationLocationModel.OnGet(providerNotificationId);
 
@@ -345,10 +352,10 @@ public class AddNotificationLocationTests
     {
         const int providerNotificationId = 1;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var notificationService = Substitute.For<INotificationService>();
 
         var addNotificationLocationModel = new AddNotificationLocationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         addNotificationLocationModel.Input = new AddNotificationLocationModel.InputModel
         {
@@ -371,8 +378,8 @@ public class AddNotificationLocationTests
             x.Value != null &&
             x.Value.ToString() == $"{providerNotificationId}");
 
-        await providerDataService
+        await notificationService
             .Received(1)
-            .SaveNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
+            .CreateNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
     }
 }

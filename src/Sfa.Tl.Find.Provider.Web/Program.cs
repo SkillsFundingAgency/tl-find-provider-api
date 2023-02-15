@@ -129,6 +129,7 @@ builder.Services
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
+    .AddTransient<INotificationService, NotificationService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
     .AddTransient<ISearchFilterService, SearchFilterService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()

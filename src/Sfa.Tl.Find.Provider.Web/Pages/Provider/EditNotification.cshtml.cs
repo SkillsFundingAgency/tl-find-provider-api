@@ -10,7 +10,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class EditNotificationModel : PageModel
 {
-    private readonly IProviderDataService _providerDataService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<EditNotificationModel> _logger;
 
     public int ProviderNotificationId { get; private set; }
@@ -25,10 +25,10 @@ public class EditNotificationModel : PageModel
     public Notification? Notification { get; private set; }
 
     public EditNotificationModel(
-        IProviderDataService providerDataService,
+        INotificationService notificationService,
         ILogger<EditNotificationModel> logger)
     {
-        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -37,15 +37,15 @@ public class EditNotificationModel : PageModel
         int providerNotificationId)
     {
         ProviderNotificationId = providerNotificationId;
-        Notification = await _providerDataService.GetNotification(providerNotificationId);
+        Notification = await _notificationService.GetNotification(providerNotificationId);
         if (Notification is null)
         {
             return RedirectToPage("/Provider/Notifications");
         }
 
-        NotificationLocationList = await _providerDataService.GetNotificationLocationSummaryList(providerNotificationId);
+        NotificationLocationList = await _notificationService.GetNotificationLocationSummaryList(providerNotificationId);
 
-        HasAvailableLocations = (await _providerDataService
+        HasAvailableLocations = (await _notificationService
                 .GetAvailableNotificationLocationPostcodes(providerNotificationId))
                 .Any();
 
@@ -54,11 +54,11 @@ public class EditNotificationModel : PageModel
 
     public async Task<IActionResult> OnGetRemoveLocation(int id, int providerNotificationId)
     {
-        var notificationLocation = await _providerDataService.GetNotificationLocation(id);
+        var notificationLocation = await _notificationService.GetNotificationLocation(id);
 
         if (notificationLocation is not null)
         {
-            await _providerDataService.DeleteNotificationLocation(id);
+            await _notificationService.DeleteNotificationLocation(id);
 
             TempData[nameof(RemovedLocation)] =
                 notificationLocation.LocationName is not null

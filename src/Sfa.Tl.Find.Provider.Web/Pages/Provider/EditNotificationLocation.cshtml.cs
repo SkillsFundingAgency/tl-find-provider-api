@@ -14,6 +14,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 public class EditNotificationLocationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
+    private readonly INotificationService _notificationService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<EditNotificationLocationModel> _logger;
 
@@ -26,10 +27,12 @@ public class EditNotificationLocationModel : PageModel
     [BindProperty] public InputModel? Input { get; set; }
 
     public EditNotificationLocationModel(
+        INotificationService notificationService,
         IProviderDataService providerDataService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<EditNotificationLocationModel> logger)
     {
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -44,7 +47,7 @@ public class EditNotificationLocationModel : PageModel
         [FromQuery(Name = "locationid")]
         int notificationLocationId)
     {
-        NotificationDetail = await _providerDataService.GetNotificationLocation(notificationLocationId);
+        NotificationDetail = await _notificationService.GetNotificationLocation(notificationLocationId);
         if (NotificationDetail is null)
         {
             return RedirectToPage("/Provider/EditNotification", new { id = providerNotificationId });
@@ -80,7 +83,7 @@ public class EditNotificationLocationModel : PageModel
             Routes = routes
         };
 
-        await _providerDataService.SaveNotificationLocation(notification);
+        await _notificationService.UpdateNotificationLocation(notification);
     }
 
     private async Task LoadNotificationView(int providerNotificationId, int id)

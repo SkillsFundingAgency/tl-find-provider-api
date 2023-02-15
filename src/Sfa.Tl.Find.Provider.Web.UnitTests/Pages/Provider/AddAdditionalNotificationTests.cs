@@ -44,16 +44,16 @@ public class AddAdditionalNotificationTests
             .BuildListOfAvailableLocations()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
-        providerDataService
+        notificationService
             .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
             .Returns(availableLocations);
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addAdditionalNotificationModel.OnGet(notification.Id.Value);
@@ -91,16 +91,16 @@ public class AddAdditionalNotificationTests
             .Take(1)
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
-        providerDataService
+        notificationService
             .GetAvailableNotificationLocationPostcodes(notification.Id!.Value)
             .Returns(availableLocations);
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addAdditionalNotificationModel.OnGet(notification.Id.Value);
@@ -123,13 +123,13 @@ public class AddAdditionalNotificationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addAdditionalNotificationModel.OnGet(notification.Id.Value);
@@ -154,13 +154,13 @@ public class AddAdditionalNotificationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await addAdditionalNotificationModel.OnGet(notification.Id.Value);
@@ -196,7 +196,8 @@ public class AddAdditionalNotificationTests
             .ToList();
 
         var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
         providerDataService
@@ -204,7 +205,8 @@ public class AddAdditionalNotificationTests
             .Returns(routes);
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService, 
+                providerDataService,
                 providerSettings: settings);
 
         await addAdditionalNotificationModel.OnGet(notification.Id.Value);
@@ -237,16 +239,18 @@ public class AddAdditionalNotificationTests
             .BuildList()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
+        var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
             .GetRoutes()
             .Returns(routes);
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService, 
+                providerDataService,
                 providerSettings: settings);
 
         await addAdditionalNotificationModel.OnGet(notification.Id.Value);
@@ -271,7 +275,7 @@ public class AddAdditionalNotificationTests
             .WithSearchRadius(null)
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<INotificationService>();
         providerDataService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
@@ -300,7 +304,7 @@ public class AddAdditionalNotificationTests
             .WithSearchRadius(searchRadius)
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<INotificationService>();
         providerDataService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
@@ -321,7 +325,7 @@ public class AddAdditionalNotificationTests
     public async Task AddAdditionalNotificationModel_OnGet_Redirects_To_EditNotification_If_Provider_Notification_Not_Found()
     {
         const int providerNotificationId = 99;
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var providerDataService = Substitute.For<INotificationService>();
         providerDataService
             .GetNotification(providerNotificationId)
             .Returns(null as Notification);
@@ -345,10 +349,10 @@ public class AddAdditionalNotificationTests
     {
         const int providerNotificationId = 1;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var notificationService = Substitute.For<INotificationService>();
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         addAdditionalNotificationModel.Input = new AddAdditionalNotificationModel.InputModel
         {
@@ -367,9 +371,9 @@ public class AddAdditionalNotificationTests
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Provider/Notifications");
 
-        await providerDataService
+        await notificationService
             .Received(1)
-            .SaveNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
+            .CreateNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
     }
 
     [Fact]
@@ -378,13 +382,13 @@ public class AddAdditionalNotificationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notification.Id!.Value)
             .Returns(notification);
 
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         addAdditionalNotificationModel.Input = new AddAdditionalNotificationModel.InputModel
         {
@@ -417,14 +421,10 @@ public class AddAdditionalNotificationTests
 
         var providerNotificationId = notification.Id!.Value;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
-            .SaveNotification(Arg.Any<Notification>(),
-                PageContextBuilder.DefaultUkPrn)
-            .Returns(providerNotificationId);
-
+        var notificationService = Substitute.For<INotificationService>();
+        
         var addAdditionalNotificationModel = new AddAdditionalNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         addAdditionalNotificationModel.Input = new AddAdditionalNotificationModel.InputModel
         {
@@ -447,8 +447,8 @@ public class AddAdditionalNotificationTests
             x.Value != null &&
             x.Value.ToString() == providerNotificationId.ToString());
 
-        await providerDataService
+        await notificationService
             .Received(1)
-            .SaveNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
+            .CreateNotificationLocation(Arg.Any<Notification>(), providerNotificationId);
     }
 }

@@ -15,6 +15,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
 public class AddNotificationLocationModel : PageModel
 {
+    private readonly INotificationService _notificationService;
     private readonly IProviderDataService _providerDataService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddNotificationLocationModel> _logger;
@@ -30,10 +31,12 @@ public class AddNotificationLocationModel : PageModel
     [BindProperty] public InputModel? Input { get; set; }
 
     public AddNotificationLocationModel(
+        INotificationService notificationService,
         IProviderDataService providerDataService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<AddNotificationLocationModel> logger)
     {
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -45,7 +48,7 @@ public class AddNotificationLocationModel : PageModel
         [FromQuery(Name = "id")]
         int providerNotificationId)
     {
-        ProviderNotification = await _providerDataService.GetNotification(providerNotificationId);
+        ProviderNotification = await _notificationService.GetNotification(providerNotificationId);
         if (ProviderNotification is null)
         {
             return RedirectToPage("/Provider/EditNotification", new { id = providerNotificationId });
@@ -81,7 +84,7 @@ public class AddNotificationLocationModel : PageModel
             Routes = routes
         };
 
-        await _providerDataService.SaveNotificationLocation(notification, Input.ProviderNotificationId);
+        await _notificationService.CreateNotificationLocation(notification, Input.ProviderNotificationId);
     }
 
     private async Task LoadNotificationView(int providerNotificationId)
@@ -90,7 +93,7 @@ public class AddNotificationLocationModel : PageModel
             ? _providerSettings.DefaultNotificationSearchRadius
             : Constants.DefaultProviderNotificationFilterRadius;
 
-        var providerLocations = (await _providerDataService
+        var providerLocations = (await _notificationService
                 .GetAvailableNotificationLocationPostcodes(providerNotificationId))
             .ToList();
 

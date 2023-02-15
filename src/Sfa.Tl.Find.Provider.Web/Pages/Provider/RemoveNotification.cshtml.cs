@@ -10,22 +10,22 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class RemoveNotificationModel : PageModel
 {
-    private readonly IProviderDataService _providerDataService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<RemoveNotificationModel> _logger;
 
     public Notification? Notification { get; private set; }
 
     public RemoveNotificationModel(
-        IProviderDataService providerDataService,
+        INotificationService notificationService,
         ILogger<RemoveNotificationModel> logger)
     {
-        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<IActionResult> OnGet(int id)
     {
-        Notification = await _providerDataService.GetNotification(id);
+        Notification = await _notificationService.GetNotification(id);
 
         return Notification != null ?
             Page() :
@@ -35,7 +35,7 @@ public class RemoveNotificationModel : PageModel
     public async Task<IActionResult> OnPost(int? id)
     {
         var notification = (id is not null)
-            ? await _providerDataService.GetNotification(id.Value)
+            ? await _notificationService.GetNotification(id.Value)
             : null;
 
         if (notification is null)
@@ -43,7 +43,7 @@ public class RemoveNotificationModel : PageModel
             return NotFound();
         }
 
-        await _providerDataService.DeleteNotification(id!.Value);
+        await _notificationService.DeleteNotification(id!.Value);
 
         TempData[nameof(NotificationsModel.DeletedNotificationEmail)] = notification.Email;
 

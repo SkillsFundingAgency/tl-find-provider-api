@@ -10,7 +10,7 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class NotificationsModelBuilder
 {
     public NotificationsModel Build(
-        IProviderDataService? providerDataService = null,
+        INotificationService? notificationService = null,
         ILogger<NotificationsModel>? logger = null,
         PageContext? pageContext = null,
         bool userIsAuthenticated = true,
@@ -26,7 +26,7 @@ public class NotificationsModelBuilder
         pageContext ??= new PageContextBuilder()
             .Build(userIsAuthenticated, claims);
 
-        providerDataService ??= Substitute.For<IProviderDataService>();
+        notificationService ??= Substitute.For<INotificationService>();
         logger ??= Substitute.For<ILogger<NotificationsModel>>();
 
         var tempDataProvider = Substitute.For<ITempDataProvider>();
@@ -35,7 +35,7 @@ public class NotificationsModelBuilder
             tempDataProvider);
 
         var pageModel = new NotificationsModel(
-            providerDataService,
+            notificationService,
             logger)
         {
             PageContext = pageContext,

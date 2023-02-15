@@ -133,83 +133,6 @@ public class ProviderDataService : IProviderDataService
         return routes;
     }
 
-    public async Task DeleteNotification(int notificationId)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Deleting notification {notificationId}", notificationId);
-        }
-
-        await _notificationRepository.Delete(notificationId);
-    }
-
-    public async Task DeleteNotificationLocation(int notificationLocationId)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Deleting notification location {notificationLocationId}", notificationLocationId);
-        }
-
-        await _notificationRepository.DeleteLocation(notificationLocationId);
-    }
-
-    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Getting notifications");
-        }
-
-        var notifications =
-            (await _notificationRepository
-            .GetNotificationSummaryList(ukPrn, _mergeAdditionalProviderData));
-
-        return notifications;
-    }
-
-    public async Task<IEnumerable<NotificationLocationSummary>> GetNotificationLocationSummaryList(int notificationId)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Getting notification locations");
-        }
-
-        var notificationLocations =
-            (await _notificationRepository
-                .GetNotificationLocationSummaryList(notificationId));
-
-        return notificationLocations;
-    }
-
-    public async Task<Notification> GetNotification(int notificationId)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Getting notification {notificationId}", notificationId);
-        }
-
-        return await _notificationRepository
-            .GetNotification(notificationId);
-    }
-
-    public async Task<Notification> GetNotificationLocation(int notificationLocationId)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Getting notification location {notificationLocationId}", notificationLocationId);
-        }
-
-        return await _notificationRepository
-            .GetNotificationLocation(notificationLocationId);
-    }
-
-    public async Task<IEnumerable<NotificationLocationName>> GetAvailableNotificationLocationPostcodes(int providerNotificationId)
-    {
-        return (await _notificationRepository
-            .GetProviderNotificationLocations(providerNotificationId))
-            .Where(p => p.Id is null && p.LocationId is not null);
-    }
-
     public async Task<ProviderSearchResponse> FindProviders(
         string searchTerms,
         IList<int> routeIds = null,
@@ -393,36 +316,6 @@ public class ProviderDataService : IProviderDataService
         await ClearCaches();
 
         _logger.LogInformation("Loaded {count} providers from stream.", count);
-    }
-
-    public async Task<int> SaveNotification(Notification notification, long ukPrn)
-    {
-        if (notification.Id is null)
-        {
-            notification.EmailVerificationToken = _guidProvider.NewGuid();
-            var id = await _notificationRepository.Create(notification, ukPrn);
-            await SendProviderVerificationEmail(notification.Email, notification.EmailVerificationToken!.Value);
-            return id;
-        }
-
-        //TODO: Separate into Create and Update methods - Update doesn't need to return uid;
-        else
-        {
-            await _notificationRepository.Update(notification);
-            return notification.Id.Value;
-        }
-    }
-
-    public async Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null)
-    {
-        if (notification.Id is null && providerNotificationId is not null)
-        {
-            await _notificationRepository.CreateLocation(notification, providerNotificationId.Value);
-        }
-        else
-        {
-            await _notificationRepository.UpdateLocation(notification);
-        }
     }
 
     public async Task SendProviderNotifications(NotificationFrequency frequency)

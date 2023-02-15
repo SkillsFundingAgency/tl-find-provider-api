@@ -40,13 +40,13 @@ public class EditNotificationLocationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(notification.Id!.Value)
             .Returns(notification);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
@@ -71,13 +71,13 @@ public class EditNotificationLocationTests
         var notification = new NotificationBuilder()
             .Build();
         
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(notification.Id!.Value)
             .Returns(notification);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
@@ -112,16 +112,19 @@ public class EditNotificationLocationTests
             .BuildList()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(notification.Id!.Value)
             .Returns(notification);
+        
+        var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
             .GetRoutes()
             .Returns(routes);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
+                providerDataService,
                 providerSettings: settings);
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
@@ -132,9 +135,6 @@ public class EditNotificationLocationTests
 
         skillAreas!.Length.Should().Be(routes.Count);
 
-        skillAreas[0].Should().Match<SelectListItem>(x =>
-            x.Text == "Agriculture, environment and animal care" && x.Value == "1");
-        
         var i = 0;
         foreach (var route in routes.OrderBy(r => r.Name))
         {
@@ -157,16 +157,19 @@ public class EditNotificationLocationTests
             .BuildList()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(notification.Id!.Value)
             .Returns(notification);
+        
+        var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
             .GetRoutes()
             .Returns(routes);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
+                providerDataService,
                 providerSettings: settings);
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
@@ -191,13 +194,13 @@ public class EditNotificationLocationTests
             .WithSearchRadius(null)
             .Build();
         
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(notification.Id!.Value)
             .Returns(notification);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
@@ -207,7 +210,6 @@ public class EditNotificationLocationTests
         editNotificationLocationModel.Input!.ProviderNotificationId.Should().Be(ProviderNotificationId);
         editNotificationLocationModel.Input!.SelectedSearchRadius.Should().Be(settings.DefaultNotificationSearchRadius);
         editNotificationLocationModel.Input!.SelectedFrequency.Should().Be(notification.Frequency);
-        //editNotificationLocationModel.Input!.SelectedLocation.Should().Be(0);
     }
 
     [Fact]
@@ -221,13 +223,13 @@ public class EditNotificationLocationTests
             .WithSearchRadius(searchRadius)
             .Build();
         
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(notification.Id!.Value)
             .Returns(notification);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService,
+            .Build(notificationService,
                 providerSettings: settings);
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
@@ -242,13 +244,13 @@ public class EditNotificationLocationTests
     [Fact]
     public async Task EditNotificationLocationModel_OnGet_Redirects_To_EditNotification_If_Notification_Location_Not_Found()
     {
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(NotificationLocationId)
             .Returns(null as Notification);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         var result = await editNotificationLocationModel.OnGet(ProviderNotificationId, NotificationLocationId);
 
@@ -267,13 +269,13 @@ public class EditNotificationLocationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotificationLocation(notification.Id!.Value)
             .Returns(notification);
 
         var editNotificationLocationModel = new EditNotificationLocationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         editNotificationLocationModel.Input = new EditNotificationLocationModel.InputModel
         {
@@ -297,8 +299,8 @@ public class EditNotificationLocationTests
             x.Value != null &&
             x.Value.ToString() == $"{ProviderNotificationId}");
 
-        await providerDataService
+        await notificationService
             .Received(1)
-            .SaveNotificationLocation(Arg.Any<Notification>());
+            .UpdateNotificationLocation(Arg.Any<Notification>());
     }
 }

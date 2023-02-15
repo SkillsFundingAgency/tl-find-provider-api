@@ -15,6 +15,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
 public class AddAdditionalNotificationModel : PageModel
 {
+    private readonly INotificationService _notificationService;
     private readonly IProviderDataService _providerDataService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddAdditionalNotificationModel> _logger;
@@ -30,10 +31,12 @@ public class AddAdditionalNotificationModel : PageModel
     [BindProperty] public InputModel? Input { get; set; }
 
     public AddAdditionalNotificationModel(
+        INotificationService notificationService,
         IProviderDataService providerDataService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<AddAdditionalNotificationModel> logger)
     {
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -45,7 +48,7 @@ public class AddAdditionalNotificationModel : PageModel
             [FromQuery(Name = "id")]
         int providerNotificationId)
     {
-        ProviderNotification = await _providerDataService.GetNotification(providerNotificationId);
+        ProviderNotification = await _notificationService.GetNotification(providerNotificationId);
         if (ProviderNotification is null)
         {
             return RedirectToPage("/Provider/Notifications", new { id = providerNotificationId });
@@ -66,7 +69,7 @@ public class AddAdditionalNotificationModel : PageModel
 
         await Save();
 
-        var providerNotification = await _providerDataService.GetNotification(Input!.ProviderNotificationId);
+        var providerNotification = await _notificationService.GetNotification(Input!.ProviderNotificationId);
 
         TempData[nameof(NotificationsModel.VerificationEmail)] = providerNotification?.Email;
 
@@ -102,7 +105,7 @@ public class AddAdditionalNotificationModel : PageModel
             Routes = routes
         };
 
-        await _providerDataService.SaveNotificationLocation(notification, Input.ProviderNotificationId);
+        await _notificationService.CreateNotificationLocation(notification, Input.ProviderNotificationId);
     }
 
     private async Task LoadNotificationView(int providerNotificationId)
@@ -111,7 +114,7 @@ public class AddAdditionalNotificationModel : PageModel
             ? _providerSettings.DefaultNotificationSearchRadius
             : Constants.DefaultProviderNotificationFilterRadius;
 
-        var providerLocations = (await _providerDataService
+        var providerLocations = (await _notificationService
                 .GetAvailableNotificationLocationPostcodes(providerNotificationId))
             .ToList();
 
