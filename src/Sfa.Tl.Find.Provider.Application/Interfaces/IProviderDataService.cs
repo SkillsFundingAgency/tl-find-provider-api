@@ -46,10 +46,6 @@ public interface IProviderDataService
 
     Task<IEnumerable<NotificationLocationName>> GetAvailableNotificationLocationPostcodes(int providerNotificationId);
 
-    Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn);
-    
-    Task<SearchFilter> GetSearchFilter(int locationId);
-
     Task<bool> HasQualifications();
 
     Task<bool> HasProviders();
@@ -61,8 +57,6 @@ public interface IProviderDataService
     Task<int> SaveNotification(Notification notification, long ukPrn);
 
     Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null);
-
-    Task SaveSearchFilter(SearchFilter searchFilter);
 
     Task SendProviderNotifications(NotificationFrequency frequency);
     

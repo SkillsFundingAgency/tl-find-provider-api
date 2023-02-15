@@ -29,7 +29,6 @@ public class ProviderDataService : IProviderDataService
     private readonly IRouteRepository _routeRepository;
     private readonly IIndustryRepository _industryRepository;
     private readonly INotificationRepository _notificationRepository;
-    private readonly ISearchFilterRepository _searchFilterRepository;
     private readonly ICacheService _cacheService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<ProviderDataService> _logger;
@@ -45,7 +44,6 @@ public class ProviderDataService : IProviderDataService
         IRouteRepository routeRepository,
         IIndustryRepository industryRepository,
         INotificationRepository notificationRepository,
-        ISearchFilterRepository searchFilterRepository,
         ITownDataService townDataService,
         ICacheService cacheService,
         IOptions<ProviderSettings> providerOptions,
@@ -61,7 +59,6 @@ public class ProviderDataService : IProviderDataService
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
         _industryRepository = industryRepository ?? throw new ArgumentNullException(nameof(industryRepository));
         _notificationRepository = notificationRepository ?? throw new ArgumentNullException(nameof(notificationRepository));
-        _searchFilterRepository = searchFilterRepository ?? throw new ArgumentNullException(nameof(searchFilterRepository));
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -211,30 +208,6 @@ public class ProviderDataService : IProviderDataService
         return (await _notificationRepository
             .GetProviderNotificationLocations(providerNotificationId))
             .Where(p => p.Id is null && p.LocationId is not null);
-    }
-
-    public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Getting search filters");
-        }
-
-        var searchFilters = (await _searchFilterRepository
-            .GetSearchFilterSummaryList(ukPrn, _mergeAdditionalProviderData));
-
-        return searchFilters;
-    }
-
-    public async Task<SearchFilter> GetSearchFilter(int locationId)
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Getting search filter for location {locationId}", locationId);
-        }
-
-        return await _searchFilterRepository
-            .GetSearchFilter(locationId);
     }
 
     public async Task<ProviderSearchResponse> FindProviders(
@@ -450,11 +423,6 @@ public class ProviderDataService : IProviderDataService
         {
             await _notificationRepository.UpdateLocation(notification);
         }
-    }
-
-    public async Task SaveSearchFilter(SearchFilter searchFilter)
-    {
-        await _searchFilterRepository.Save(searchFilter);
     }
 
     public async Task SendProviderNotifications(NotificationFrequency frequency)

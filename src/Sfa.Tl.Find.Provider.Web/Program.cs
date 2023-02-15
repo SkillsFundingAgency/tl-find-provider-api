@@ -130,6 +130,7 @@ builder.Services
     .AddTransient<IEmailService, EmailService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
+    .AddTransient<ISearchFilterService, SearchFilterService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
     .AddTransient<IIndustryRepository, IndustryRepository>()
