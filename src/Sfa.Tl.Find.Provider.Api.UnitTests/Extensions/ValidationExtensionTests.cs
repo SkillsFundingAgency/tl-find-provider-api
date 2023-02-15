@@ -4,7 +4,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 
 public class ValidationExtensionTests
 {
-    [Theory(DisplayName = nameof(ValidationExtensions.TryValidate) + " Search Term Data Tests")]
+    [Theory(DisplayName = $"{nameof(ValidationExtensions.TryValidate)} Search Term Data Tests")]
     [InlineData("CV1 2WT", true, null)]
     [InlineData(null, false, "The search term is required.")]
     [InlineData("", false, "The search term is required.")]
@@ -14,7 +14,7 @@ public class ValidationExtensionTests
         errorMessage.Should().Be(expectedErrorMessage);
     }
 
-    [Theory(DisplayName = nameof(ValidationExtensions.TryValidate) + " Search Term Data Tests")]
+    [Theory(DisplayName = $"{nameof(ValidationExtensions.TryValidate)} Search Term Data Tests")]
     // ReSharper disable StringLiteralTypo
     [InlineData("Newcastle-under-Lyme, Staffordshire", true, null)]
     [InlineData("Westward Ho!", true, null)]
@@ -29,9 +29,8 @@ public class ValidationExtensionTests
         searchTerm!.TryValidate(out var errorMessage).Should().Be(expectedValidationResult);
         errorMessage.Should().Be(expectedErrorMessage);
     }
-
-
-    [Theory(DisplayName = nameof(ValidationExtensions.TryValidate) + " Lat/Long Data Tests")]
+    
+    [Theory(DisplayName = $"{nameof(ValidationExtensions.TryValidate)} Lat/Long Data Tests")]
     [InlineData(51.0, -2.0, true, null)]
     [InlineData(null, null, false, "Both latitude and longitude required if postcode is not provided.")]
     public void Validate_Latitude_Longitude_Data_Tests(double? latitude, double? longitude, bool expectedValidationResult, string expectedErrorMessage)
@@ -40,7 +39,7 @@ public class ValidationExtensionTests
         errorMessage.Should().Be(expectedErrorMessage);
     }
 
-    [Theory(DisplayName = nameof(ValidationExtensions.TryValidate) + " Search Term and Lat/Long Data Tests")]
+    [Theory(DisplayName = $"{nameof(ValidationExtensions.TryValidate)} Search Term and Lat/Long Data Tests")]
     [InlineData(null, 51.0, -2.1, true, null)]
     [InlineData("", 51.0, -1.0, true, null)]
     [InlineData("CV1 2WT", 1.0, 2.0, false, "Either search term or lat/long required, but not both.")]

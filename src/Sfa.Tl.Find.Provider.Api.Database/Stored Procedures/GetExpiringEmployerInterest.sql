@@ -1,11 +1,12 @@
 ﻿CREATE PROCEDURE [dbo].[GetExpiringEmployerInterest]
 	@daysToExpiry [INT]
 AS
+	SET NOCOUNT ON;
 
-	DECLARE @expiryDate [DATETIME2] = 
-			DATEADD(day, 
-				@daysToExpiry, 
-				CAST(CONVERT(CHAR(8), GETUTCDATE(), 112) + ' 23:59:59.9999999' AS DATETIME2))
+	DECLARE @expiryDateFromToday [DATETIME2] = 
+			DATEADD(day,
+			@daysToExpiry, 
+			CAST(CONVERT(CHAR(8), GETUTCDATE(), 112) + ' 23:59:59.9999999' AS DATETIME2))
 
 	SELECT		ei.[Id],
 				ei.[UniqueId],
@@ -17,6 +18,8 @@ AS
 				ei.[Telephone],
 				ei.[ContactPreferenceType],
 				ei.[AdditionalInformation],
+				ei.[ExpiryDate],
+				ei.[ExtensionCount],
 				eil.[Latitude],
 				eil.[Longitude],
 				ei.[CreatedOn],
@@ -35,6 +38,6 @@ AS
 	ON			eir.[EmployerInterestId] = ei.[Id]
 	--We want items that expire in next n days, 
 	--but not where email has been sent in the previous n days
-	WHERE		ei.[ExpiryDate] < @expiryDate
+	WHERE		ei.[ExpiryDate] <= @expiryDateFromToday
 	  AND		(ei.[ExtensionEmailSentDate] IS NULL 
 				 OR	ei.[ExtensionEmailSentDate] < DATEADD(day, -@daysToExpiry, ei.[ExpiryDate]))

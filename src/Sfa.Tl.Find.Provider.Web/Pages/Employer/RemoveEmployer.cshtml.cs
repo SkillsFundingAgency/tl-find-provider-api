@@ -40,10 +40,10 @@ public class RemoveEmployerModel : PageModel
         }
 
         EmployerInterest = await _employerInterestService.GetEmployerInterestDetail(id.Value);
-
-        TempData["DeletedOrganisationName"] = EmployerInterest?.OrganisationName;
-
+        
         await _employerInterestService.DeleteEmployerInterest(id.Value);
+
+        TempData[nameof(EmployerListModel.DeletedOrganisationName)] = EmployerInterest?.OrganisationName;
 
         return RedirectToPage("/Employer/EmployerList");
     }

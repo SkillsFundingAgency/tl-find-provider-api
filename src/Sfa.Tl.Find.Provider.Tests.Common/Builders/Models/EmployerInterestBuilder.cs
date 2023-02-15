@@ -6,8 +6,7 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 public class EmployerInterestBuilder
 {
     private string _additionalInformation;
-    private readonly List<int> _skillAreaIds 
-        = new();
+    private readonly List<int> _extensionCounts = new() { 0, 0 };
     private readonly List<int?> _industryIds 
         = new() { 9, null };
     private readonly List<string> _otherIndustries 
@@ -19,8 +18,9 @@ public class EmployerInterestBuilder
             (52.406587, -1.523157)
         };
     private readonly List<Guid> _uniqueIds = new();
-
-
+      private readonly List<int> _skillAreaIds 
+        = new();
+  
     public IEnumerable<EmployerInterest> BuildList() =>
         new List<EmployerInterest>
         {
@@ -40,6 +40,8 @@ public class EmployerInterestBuilder
                 Telephone = "020 555 6666 ext 1",
                 Website = "https://employer-one.co.uk",
                 ContactPreferenceType = ContactPreference.Email,
+                ExpiryDate = DateTime.Parse("2023-03-31"),
+                ExtensionCount = GetExtensionCount(0),
                 SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int>{ 1, 2 }
             },
             new()
@@ -49,8 +51,8 @@ public class EmployerInterestBuilder
                 OrganisationName = "Test Employer 2",
                 ContactName = "Test Contact 2",
                 Postcode = "CV1 3GT",
-                Latitude = GetLatitude(0),
-                Longitude = GetLongitude(0),
+                Latitude = GetLatitude(1),
+                Longitude = GetLongitude(1),
                 IndustryId = _industryIds.Skip(1).FirstOrDefault(),
                 OtherIndustry = _otherIndustries.Skip(1).FirstOrDefault(),
                 AdditionalInformation = _additionalInformation ?? "These are my requirements: a few good people",
@@ -58,6 +60,8 @@ public class EmployerInterestBuilder
                 Telephone = "020 555 6666 ext 2",
                 Website = "https://employer-two.co.uk",
                 ContactPreferenceType = ContactPreference.Telephone,
+                ExpiryDate = DateTime.Parse("2023-03-31"),
+                ExtensionCount = GetExtensionCount(1),
                 SkillAreaIds = _skillAreaIds.Any() ? _skillAreaIds : new List<int>{ 1 }
             }
         };
@@ -134,6 +138,14 @@ public class EmployerInterestBuilder
         return this;
     }
 
+    public EmployerInterestBuilder WithExtensionCounts(IEnumerable<int> extensionCounts)
+    {
+        _extensionCounts.Clear();
+        _extensionCounts.AddRange(extensionCounts);
+
+        return this;
+    }
+
     public EmployerInterestBuilder WithIndustryId(int? industryId)
     {
         _industryIds.Clear();
@@ -150,7 +162,7 @@ public class EmployerInterestBuilder
         return this;
     }
 
-    public EmployerInterestBuilder WithOtherIndustry(string? otherIndustry)
+    public EmployerInterestBuilder WithOtherIndustry(string otherIndustry)
     {
         _otherIndustries.Clear();
         _otherIndustries.Add(otherIndustry);
@@ -158,7 +170,7 @@ public class EmployerInterestBuilder
         return this;
     }
 
-    public EmployerInterestBuilder WithOtherIndustries(IEnumerable<string?> otherIndustries)
+    public EmployerInterestBuilder WithOtherIndustries(IEnumerable<string> otherIndustries)
     {
         _otherIndustries.Clear();
         _otherIndustries.AddRange(otherIndustries);
@@ -189,6 +201,11 @@ public class EmployerInterestBuilder
 
         return this;
     }
+
+    private int GetExtensionCount(int index) =>
+        _extensionCounts.Count > index
+            ? _extensionCounts[index]
+            : 0;
 
     private double GetLatitude(int index) => 
         _latitudesAndLongitudes.Count > index 

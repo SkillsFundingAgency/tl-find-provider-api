@@ -11,9 +11,8 @@ public class DfeSignInTokenServiceBuilder
         DfeSignInSettings? signInSettings = null)
     {
         signInSettings ??= new SettingsBuilder().BuildDfeSignInSettings();
-        var signInOptions = signInSettings.ToOptions();
 
         return new DfeSignInTokenService(
-            signInOptions);
+            signInSettings.ToOptions());
     }
 }

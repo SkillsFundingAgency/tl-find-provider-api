@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;
 
 public class BusinessRuleExtensionsTests
 {
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.IsAvailableAtDate) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(BusinessRuleExtensions.IsAvailableAtDate)} Data Tests")]
     [InlineData(2020, "2020-12-31", true)]
     [InlineData(2021, "2020-12-31", false)]
     [InlineData(2021, "2021-08-31", false)]
@@ -23,7 +23,7 @@ public class BusinessRuleExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.InterestExpiryDate) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(BusinessRuleExtensions.InterestExpiryDate)} Data Tests")]
     [InlineData("2022-12-01 11:30", null, 30, "2022-12-31")]
     [InlineData("2022-12-01 11:30", null, 84, "2023-02-23")]
     public void EmployerInterestSummary_InterestExpiryDate_Data_Tests(string createdDate, string modifiedDate, int retentionDays, string expectedResult)
@@ -40,7 +40,7 @@ public class BusinessRuleExtensionsTests
         result.Should().Be(expectedResultDate);
     }
 
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.IsInterestExpiring) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(BusinessRuleExtensions.IsInterestExpiring)} Data Tests")]
     [InlineData("2022-12-08 23:59:59.999999", "2022-12-01", false)]
     [InlineData("2022-12-08 23:59:59.999999", "2022-12-02", true)]
     [InlineData("2022-12-08 23:59:59.999999", "2022-12-08", true)]
@@ -57,7 +57,7 @@ public class BusinessRuleExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.IsInterestNew) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(BusinessRuleExtensions.IsInterestNew)} Data Tests")]
     [InlineData("2022-12-01 11:30", null, "2022-12-01", true)]
     [InlineData("2022-12-01 11:30", null, "2022-12-07", true)]
     [InlineData("2022-12-01 11:30", null, "2022-12-08", false)]
@@ -76,7 +76,7 @@ public class BusinessRuleExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(BusinessRuleExtensions.SetSummaryListFlags) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(BusinessRuleExtensions.SetSummaryListFlags)} Data Tests")]
     [InlineData("2022-12-01 11:30", "2022-12-08 23:59:59.999999", "2022-12-01", true, false)]
     [InlineData("2022-12-01 11:30","2022-12-08 23:59:59.999999", "2022-12-02", true, true)]
     [InlineData("2022-12-01 11:30","2022-12-08 23:59:59.999999", "2022-12-08", false, true)]

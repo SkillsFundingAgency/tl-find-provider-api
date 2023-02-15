@@ -80,6 +80,32 @@ public class DbContextWrapper : IDbContextWrapper
                 context);
     }
 
+    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(
+        IDbConnection connection,
+        string sql,
+        Func<TFirst, TSecond, TThird, TReturn> map,
+        object param = null,
+        IDbTransaction transaction = null,
+        string splitOn = "Id",
+        int? commandTimeout = null,
+        CommandType? commandType = null)
+    {
+        var (retryPolicy, context) = _policyRegistry.GetDapperRetryPolicy(_logger);
+
+        return await retryPolicy
+            .ExecuteAsync(async _ =>
+                    await connection
+                        .QueryAsync(
+                            sql,
+                            map,
+                            param,
+                            transaction,
+                            splitOn: splitOn,
+                            commandTimeout: commandTimeout,
+                            commandType: commandType),
+                context);
+    }
+
     public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
         IDbConnection connection,
         string sql,
@@ -151,7 +177,7 @@ public class DbContextWrapper : IDbContextWrapper
                         commandType),
                 context);
     }
-
+    
     public async Task<T> ExecuteScalarAsync<T>(
         IDbConnection connection,
         string sql,

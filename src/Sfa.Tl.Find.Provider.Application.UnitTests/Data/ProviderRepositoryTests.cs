@@ -295,7 +295,13 @@ public class ProviderRepositoryTests
         var repository = await new ProviderRepositoryBuilder()
             .BuildRepositoryWithDataToSearchProviders(totalLocationsCount);
 
-        var searchResults = await repository.Search(fromGeoLocation, null, null, 0, 5, false);
+        var searchResults = await repository.Search(
+            fromGeoLocation,
+            null,
+            null, 
+            0, 
+            5, 
+            false);
 
         searchResults.Should().NotBeNull();
         var searchResultsList = searchResults.SearchResults?.ToList();

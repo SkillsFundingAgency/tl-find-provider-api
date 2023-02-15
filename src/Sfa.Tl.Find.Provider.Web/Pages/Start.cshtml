@@ -11,23 +11,59 @@
         <p class="govuk-body">If you’re a T Level provider, use this service to find employers who have expressed interest in T Levels and industry placements.</p>
 
         <details class="govuk-details" data-module="govuk-details">
-          <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">
-              Make sure employers can find you
-            </span>
-          </summary>
-          <div class="govuk-details__text">
-           Remember to check that your organisation’s details are up to date in the <a href="https://coursedirectory.nationalcareers.service.gov.uk" id="tl-start--ncs" class="govuk-link govuk-link--no-visited-state" >National Careers Service Course Directory</a> so that potential employers and students can find you using our T Level provider search tools. 
-          </div>
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    Make sure employers can find you
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                Remember to check that your organisation’s details are up to date in the <a href="https://coursedirectory.nationalcareers.service.gov.uk" id="tl-start--ncs" class="govuk-link govuk-link--no-visited-state">National Careers Service Course Directory</a> so that potential employers and students can find you using our T Level provider search tools.
+            </div>
         </details>
         <h2 class="govuk-heading-s">Before you start</h2>
-        <p class="govuk-body">You will need to sign in with your DfE Sign-in account. </p>
+        <p class="govuk-body">You will need to sign in with your DfE Sign-in account.  </p>
+        @*  TODO: Use the text below when DfE Sign-in is moved to use roles
+        <p class="govuk-body">You will need to sign in with your DfE Sign-in account and add this service to your account before you can use it.</p>
+        *@
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    How to create a DfE Sign-in account and add this service
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                <h2 class="govuk-heading-s">
+                    Create a DfE Sign-in account
+                </h2>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>Create a DfE Sign-in account. </li>
+                    <li>Add your organisation to your account. </li>
+                    <li>Wait for your organisation’s approver to grant you access.</li>
+                </ul>
+                @*  TODO: Use the text below when DfE Sign-in is moved to use roles
+                <h2 class="govuk-heading-s">
+                    Add this service to your DfE Sign-in account
+                </h2>
+                <ol class="govuk-list govuk-list--number">
+                    <li>Sign into your account and go to 'Services'.</li>
+                    <li>Select 'Request access to a service' from the 'Related actions' list.</li>
+                    <li>Select ‘T Levels Connect with Employers’.</li>
+                    <li>Wait for approval from your organisation’s approver. </li>
+                    <li>This service will now be visible on the services dashboard, ready to use.</li>
+                </ol>
+                *@
+                <p class="govuk-body">
+                    If you’re an approver, you can find more help on the <a href="@Model.SupportSiteAccessConnectHelpUri" class="govuk-link">T Levels support for schools and colleges site</a>.
+                </p>
+            </div>
+        </details>
         <div class="govuk-form-group">
             <a asp-action="SignIn" asp-controller="Account" id="tl-login" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
-              Start now
-              <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
-                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
-              </svg></a>
+                Start now
+                <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+                </svg>
+            </a>
         </div>
     </div>
 </div>

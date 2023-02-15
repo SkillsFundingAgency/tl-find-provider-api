@@ -8,5 +8,7 @@ public class ExpiredEmployerInterestDto
 {
     public int Id { get; init; }
     public Guid UniqueId { get; init; }
+    public string OrganisationName { get; init; }
+    public string Postcode { get; init; }
     public string Email { get; init; }
 }

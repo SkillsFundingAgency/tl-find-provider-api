@@ -27,9 +27,9 @@ public class CourseDataImportJob : IJob
 
             _logger.LogInformation($"{nameof(CourseDataImportJob)} job completed successfully.");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.LogError(e, $"{nameof(CourseDataImportJob)} job failed.");
+            _logger.LogError(ex, $"{nameof(CourseDataImportJob)} job failed.");
         }
     }
 }

@@ -1,0 +1,20 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.Help.IndexModel
+@{
+    ViewData["Title"] = "Information about the service";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+        <h2 class="govuk-heading-l">User role information</h2>
+
+        <ul class="govuk-list govuk-list--bullet">
+            @foreach (var claim in Model.UserClaims)
+            {
+                <li>@claim</li>
+            }
+        </ul>
+    </div>
+</div>

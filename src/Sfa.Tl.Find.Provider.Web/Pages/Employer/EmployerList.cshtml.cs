@@ -33,6 +33,10 @@ public class EmployerListModel : PageModel
 
     public SelectListItem[]? Postcodes { get; private set; }
 
+    public int? SelectedLocationId { get; private set; }
+
+    public bool SelectedPostcodeHasFilters { get; private set; }
+
     [TempData]
     public string? DeletedOrganisationName { get; set; }
 
@@ -71,12 +75,12 @@ public class EmployerListModel : PageModel
 
     public async Task OnGet()
     {
-        UkPrn = GetUkPrn();
+        UkPrn = HttpContext.User.GetUkPrn();
         if (UkPrn is not null && UkPrn > 0)
         {
             await LoadProviderView(UkPrn.Value);
         }
-        else if(User.IsInRole(CustomRoles.Administrator))
+        else if (User.IsInRole(CustomRoles.Administrator))
         {
             await LoadAdministratorView();
         }
@@ -98,28 +102,31 @@ public class EmployerListModel : PageModel
         if (postcodeLocation is not null)
         {
             Input ??= new InputModel();
-            if (ProviderLocations != null && ProviderLocations.ContainsKey(postcodeLocation.Postcode))
+            if (ProviderLocations != null && 
+                ProviderLocations.ContainsKey(postcodeLocation.Postcode) &&
+                postcodeLocation.Id is not null)
             {
                 Input.SelectedPostcode = postcodeLocation.Postcode;
+                SelectedLocationId = postcodeLocation.Id;
+                await PerformSearch(postcodeLocation.Id.Value);
             }
             else
             {
                 Input.SelectedPostcode = EnterPostcodeValue;
                 Input.CustomPostcode = postcodeLocation.Postcode;
+                await PerformSearch(postcodeLocation);
             }
-
-            await PerformSearch(postcodeLocation);
         }
     }
 
     public async Task<IActionResult> OnPost()
     {
-        UkPrn = GetUkPrn();
+        UkPrn = HttpContext.User.GetUkPrn();
         await LoadProviderPostcodes(UkPrn);
         ZeroResultsFound = false;
 
         LocationPostcode? postcodeLocation = null;
-        
+
         //User has selected a postcode from the dropdown
         if (Input?.SelectedPostcode != EnterPostcodeValue)
         {
@@ -214,12 +221,22 @@ public class EmployerListModel : PageModel
             .ToArray();
     }
 
+    private async Task PerformSearch(int locationId)
+    {
+        (EmployerInterestList, _, SelectedPostcodeHasFilters) =
+            await _employerInterestService.FindEmployerInterest(locationId);
+
+        ZeroResultsFound = !EmployerInterestList.Any();
+    }
+
     private async Task PerformSearch(LocationPostcode postcodeLocation)
     {
-        EmployerInterestList = (await _employerInterestService
-            .FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude))
-            .SearchResults;
+        (EmployerInterestList, _) = 
+            await _employerInterestService
+            .FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude);
+        
         ZeroResultsFound = !EmployerInterestList.Any();
+        SelectedPostcodeHasFilters = false;
     }
 
     public class InputModel

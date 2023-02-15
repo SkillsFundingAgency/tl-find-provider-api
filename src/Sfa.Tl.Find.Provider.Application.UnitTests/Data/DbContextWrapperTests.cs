@@ -80,12 +80,44 @@ public class DbContextWrapperTests
 
         var connection = Substitute.For<IDbConnection>();
 
-        var map = Substitute.For<Func<object, object, Qualification>>();
+        var map = Substitute.For<Func<RouteDto, QualificationDto, Route>>();
 
-        var _ = await dbContextWrapper.QueryAsync<Qualification>(
+        var _ = await dbContextWrapper.QueryAsync(
             connection,
             sql,
-            map);
+            map,
+            splitOn: "QualificationId");
+
+        await policy.Received(1).ExecuteAsync(
+            Arg.Any<Func<Context, Task<IEnumerable<Route>>>>(),
+            Arg.Is<Context>(ctx =>
+                ctx.ContainsKey(PolicyContextItems.Logger) &&
+                ctx[PolicyContextItems.Logger] == logger
+            ));
+    }
+
+    [Fact]
+    public async Task QueryAsync_TFirst_TSecond_TThird_Calls_Retry_Policy_With_Logger()
+    {
+        var logger = Substitute.For<ILogger<DbContextWrapper>>();
+
+        var (policy, policyRegistry) = PollyPolicyBuilder.BuildPolicyAndRegistry();
+
+        var dbContextWrapper = new DbContextWrapperBuilder()
+            .Build(policyRegistry: policyRegistry,
+                logger: logger);
+
+        const string sql = "SELECT * FROM Qualification";
+
+        var connection = Substitute.For<IDbConnection>();
+
+        var map = Substitute.For<Func<object, object, object, Qualification>>();
+
+        var _ = await dbContextWrapper.QueryAsync(
+            connection,
+            sql,
+            map,
+            splitOn: "Id, Id2");
 
         await policy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),
@@ -94,7 +126,7 @@ public class DbContextWrapperTests
                 ctx[PolicyContextItems.Logger] == logger
             ));
     }
-    
+
     [Fact]
     public async Task QueryAsync_TFirst_TSecond_TThird_TFourth_Calls_Retry_Policy_With_Logger()
     {
@@ -112,10 +144,11 @@ public class DbContextWrapperTests
 
         var map = Substitute.For<Func<object, object, object, object, Qualification>>();
 
-        var _ = await dbContextWrapper.QueryAsync<Qualification>(
+        var _ = await dbContextWrapper.QueryAsync(
             connection,
             sql,
-            map);
+            map,
+            splitOn: "Id, Id2, Id3");
 
         await policy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),
@@ -124,7 +157,7 @@ public class DbContextWrapperTests
                 ctx[PolicyContextItems.Logger] == logger
             ));
     }
-
+    
     [Fact]
     public async Task QueryAsync_TFirst_TSecond_TThird_TFourth_TFifth_Calls_Retry_Policy_With_Logger()
     {
@@ -142,10 +175,11 @@ public class DbContextWrapperTests
 
         var map = Substitute.For<Func<object, object, object, object, object, Qualification>>();
 
-        var _ = await dbContextWrapper.QueryAsync<Qualification>(
+        var _ = await dbContextWrapper.QueryAsync(
             connection,
             sql,
-            map);
+            map,
+            splitOn: "Id, Id2, Id3, Id4");
 
         await policy.Received(1).ExecuteAsync(
             Arg.Any<Func<Context, Task<IEnumerable<Qualification>>>>(),

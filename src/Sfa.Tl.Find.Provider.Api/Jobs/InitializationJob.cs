@@ -45,9 +45,9 @@ public class InitializationJob : IJob
             
             _logger.LogInformation($"{nameof(InitializationJob)} job completed successfully.");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.LogError(e, $"{nameof(InitializationJob)} job failed.");
+            _logger.LogError(ex, $"{nameof(InitializationJob)} job failed.");
         }
     }
 }

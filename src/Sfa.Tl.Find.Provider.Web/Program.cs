@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
+using Sfa.Tl.Find.Provider.Infrastructure.HealthChecks;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Infrastructure.Providers;
 using Sfa.Tl.Find.Provider.Infrastructure.Services;
@@ -63,6 +65,16 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddPageRoute("/Help/Cookies", "/cookies");
     options.Conventions.AddPageRoute("/Help/Privacy", "/privacy");
     options.Conventions.AddPageRoute("/Help/TermsAndConditions", "/terms-and-conditions");
+    options.Conventions.AddPageRoute("/Provider/SearchFilters", "/filters");
+    options.Conventions.AddPageRoute("/Provider/SearchFilterDetails", "/filters-edit");
+    options.Conventions.AddPageRoute("/Provider/Notifications", "/notifications");
+    options.Conventions.AddPageRoute("/Provider/AddNotification", "/notifications-add-email");
+    options.Conventions.AddPageRoute("/Provider/AddAdditionalNotification", "/notifications-add-email-campus");
+    options.Conventions.AddPageRoute("/Provider/EditNotification", "/notifications-edit");
+    options.Conventions.AddPageRoute("/Provider/RemoveNotification", "/notifications-remove");
+    options.Conventions.AddPageRoute("/Provider/AddNotificationLocation", "/notifications-edit-campus-add");
+    options.Conventions.AddPageRoute("/Provider/EditNotificationLocation", "/notifications-edit-campus");
+    
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/AccessibilityStatement");
@@ -92,6 +104,8 @@ builder.Services
             x.GetService<IHttpContextAccessor>()!,
             builder.Environment.EnvironmentName));
 
+builder.Services.AddHealthChecks();
+
 if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddHsts(options =>
@@ -119,9 +133,11 @@ builder.Services
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
     .AddTransient<IIndustryRepository, IndustryRepository>()
+    .AddTransient<INotificationRepository, NotificationRepository>()
     .AddTransient<IProviderRepository, ProviderRepository>()
     .AddTransient<IQualificationRepository, QualificationRepository>()
     .AddTransient<IRouteRepository, RouteRepository>()
+    .AddTransient<ISearchFilterRepository, SearchFilterRepository>()
     .AddTransient<ITownRepository, TownRepository>();
 
 builder.Services.AddCachingServices(siteConfiguration.RedisCacheConnectionString);
@@ -161,6 +177,11 @@ app.UseWhen(ctx =>
                     await next.Invoke();
                 })
     );
+
+app.UseHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = HealthCheckResponseWriter.WriteJsonResponse
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

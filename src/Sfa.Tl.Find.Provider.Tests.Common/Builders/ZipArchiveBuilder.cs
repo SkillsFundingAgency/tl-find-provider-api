@@ -20,10 +20,9 @@ public class ZipArchiveBuilder
     }
 
     public Stream Build(
-        string entryName = null,
+        string entryName = "test.csv",
         byte[] content = null)
     {
-        entryName ??= "test.csv";
         content ??= new byte[] {1, 2, 3, 4};
 
         var archiveStream = new MemoryStream();
@@ -41,7 +40,7 @@ public class ZipArchiveBuilder
         return archiveStream;
     }
 
-    private async Task WriteZipArchiveEntry(ZipArchive archive, string entryName, byte[] content)
+    private static async Task WriteZipArchiveEntry(ZipArchive archive, string entryName, byte[] content)
     {
         var zipArchiveEntry = archive.CreateEntry(entryName, CompressionLevel.Fastest);
         await using var zipStream = zipArchiveEntry.Open();

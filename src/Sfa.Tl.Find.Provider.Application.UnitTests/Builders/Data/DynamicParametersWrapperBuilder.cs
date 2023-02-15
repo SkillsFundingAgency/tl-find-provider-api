@@ -24,4 +24,20 @@ public class DynamicParametersWrapperBuilder
 
         return dynamicParametersWrapper;
     }
+
+    public IDynamicParametersWrapper BuildWithOutputParameters(
+        IList<(string Name, object Value, DbType Type)> parameterList)
+    {
+        var dynamicParametersWrapper = Substitute.For<IDynamicParametersWrapper>();
+        var parameters = new DynamicParameters();
+
+        foreach (var p in parameterList)
+        {
+            parameters.Add(p.Name, p.Value, p.Type, ParameterDirection.Output);
+        }
+
+        dynamicParametersWrapper.DynamicParameters.Returns(parameters);
+
+        return dynamicParametersWrapper;
+    }
 }

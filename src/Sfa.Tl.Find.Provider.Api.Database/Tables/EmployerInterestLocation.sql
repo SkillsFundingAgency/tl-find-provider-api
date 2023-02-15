@@ -7,7 +7,7 @@
 	[Longitude] DECIMAL(9, 6) NOT NULL,
 	[Location] GEOGRAPHY NULL, 
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
-	[ModifiedOn] DATETIME2(7) NULL
-    CONSTRAINT [PK_EmployerInterestLocation] PRIMARY KEY ([Id])
+	[ModifiedOn] DATETIME2(7) NULL,
+    CONSTRAINT [PK_EmployerInterestLocation] PRIMARY KEY ([Id]),
 	CONSTRAINT [FK_EmployerInterestLocation_EmployerInterest] FOREIGN KEY([EmployerInterestId]) REFERENCES [dbo].[EmployerInterest] ([Id])
 )

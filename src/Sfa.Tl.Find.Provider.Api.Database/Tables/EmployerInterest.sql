@@ -13,8 +13,9 @@
 	[ContactPreferenceType] INT NULL,
 	[ExpiryDate] DATETIME2(7) NULL,
 	[ExtensionEmailSentDate] DATETIME2(7) NULL,
+	[ExtensionCount] INT NOT NULL DEFAULT (0),
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
-	[ModifiedOn] DATETIME2(7) NULL
-    CONSTRAINT [PK_EmployerInterest] PRIMARY KEY ([Id])
+	[ModifiedOn] DATETIME2(7) NULL,
+    CONSTRAINT [PK_EmployerInterest] PRIMARY KEY ([Id]),
 	CONSTRAINT [UQ_UniqueId] UNIQUE([UniqueId])
 )

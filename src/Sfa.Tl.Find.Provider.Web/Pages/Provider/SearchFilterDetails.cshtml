@@ -1,0 +1,60 @@
+﻿@page "{id}"
+@model Sfa.Tl.Find.Provider.Web.Pages.Provider.SearchFilterDetailsModel
+@{
+    ViewData["Title"] = $"Search filters for {Model.SearchFilter?.LocationName?.ToUpper()} [{Model.SearchFilter?.Postcode}]";
+}
+
+@section breadcrumbs {
+    <a asp-page="./SearchFilters" class="govuk-back-link" id="tl-back">Return to search filters</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Search filters for @($"{Model.SearchFilter?.LocationName?.ToUpper()} [{Model.SearchFilter?.Postcode}]")</h1>
+
+        <form method="post">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" asp-for="Input!.SelectedSearchRadius">
+                    Only display employers within:
+                </label>
+                <div id="within-hint" class="govuk-hint">
+                    The default radius is @Model.DefaultSearchRadius miles
+                </div>
+                <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSearchRadius" asp-items="Model.SearchRadiusOptions">
+                </select>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="skillarea-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h3 class="govuk-fieldset__heading govuk-!-margin-top-3">
+                            Only show employers interested in the following skill areas:
+                        </h3>
+                    </legend>
+                    <div id="skillarea-hint" class="govuk-hint">
+                        If nothing is selected, all skill areas will show on the employer list
+                    </div>
+                    <div class="govuk-checkboxes govuk-!-margin-top-4" data-module="govuk-checkboxes">
+                        @foreach (var skillArea in Model?.Input.SkillAreas.Select((value, i) => (value, i)))
+                        {
+                            var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
+                            var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
+                                    @skillArea.value.Text
+                                </label>
+                                <input type="hidden" asp-for="@Model.Input.SkillAreas[skillArea.i].Value" />
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+            <button type="submit" class="govuk-button govuk-!-margin-right-2">Save changes</button>
+            <a asp-page="./SearchFilters" class="govuk-link govuk-!-padding-2 tl-display--inline-block">Cancel</a>
+
+            <input type="hidden" asp-for="Input!.LocationId" />
+        </form>
+    </div>
+</div>

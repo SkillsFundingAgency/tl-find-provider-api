@@ -22,11 +22,10 @@ public class EmailDeliveryStatusControllerBuilder
         logger ??= Substitute.For<ILogger<EmailDeliveryStatusController>>();
 
         emailSettings ??= new SettingsBuilder().BuildEmailSettings();
-        var emailOptions = emailSettings.ToOptions();
 
         var controller = new EmailDeliveryStatusController(
             emailDeliveryStatusService,
-            emailOptions,
+            emailSettings.ToOptions(),
             logger)
         {
             ControllerContext = new ControllerContext

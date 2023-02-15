@@ -25,9 +25,9 @@ public class EmployerInterestCleanupJob : IJob
 
             _logger.LogInformation($"{nameof(EmployerInterestCleanupJob)} job completed successfully.");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.LogError(e, $"{nameof(EmployerInterestCleanupJob)} job failed.");
+            _logger.LogError(ex, $"{nameof(EmployerInterestCleanupJob)} job failed.");
         }
     }
 }

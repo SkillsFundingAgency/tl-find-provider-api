@@ -10,16 +10,21 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProviderStubAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IHttpContextAccessor httpContextAccessor) : base(options, logger, encoder, clock)
+    public ProviderStubAuthHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        UrlEncoder encoder,
+        ISystemClock clock,
+        IHttpContextAccessor httpContextAccessor,
+        ILoggerFactory logger)
+        : base(options, logger, encoder, clock)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var claims = new[]
         {
-            new Claim(ClaimsIdentity.DefaultNameClaimType, "10000001"),
             new Claim(CustomClaimTypes.DisplayName, "Test User"),
             new Claim(CustomClaimTypes.UkPrn, "10000001")
         };
@@ -29,7 +34,6 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
 
         var result = AuthenticateResult.Success(ticket);
 
-        _httpContextAccessor.HttpContext?.Items.Add(ClaimsIdentity.DefaultNameClaimType, "10000001");
         _httpContextAccessor.HttpContext?.Items.Add(CustomClaimTypes.DisplayName, "Test User");
         _httpContextAccessor.HttpContext?.Items.Add(CustomClaimTypes.OrganisationName, "Test Organisation");
 

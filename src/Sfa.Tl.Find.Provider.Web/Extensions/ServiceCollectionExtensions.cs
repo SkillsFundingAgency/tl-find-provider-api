@@ -36,6 +36,10 @@ public static class ServiceCollectionExtensions
             {
                 x.ConfigurePostcodeApiSettings(siteConfiguration);
             })
+            .Configure<ProviderSettings>(x =>
+            {
+                x.ConfigureProviderSettings(siteConfiguration);
+            })
             .Configure<SearchSettings>(x =>
             {
                 x.ConfigureSearchSettings(siteConfiguration);
@@ -114,7 +118,7 @@ public static class ServiceCollectionExtensions
                 {
                     o.Configuration = redisCacheConnectionString;
                 })
-                .AddSingleton<IConnectionMultiplexer>(x =>
+                .AddSingleton<IConnectionMultiplexer>(_ =>
                     ConnectionMultiplexer.Connect(redisCacheConnectionString))
                 .AddSingleton<ICacheService, RedisCacheService>();
         }

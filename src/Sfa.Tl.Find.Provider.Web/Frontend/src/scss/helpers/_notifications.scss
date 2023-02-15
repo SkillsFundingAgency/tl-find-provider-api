@@ -11,4 +11,20 @@
         border-left: 7px solid #00703c;
         background-color: rgb(224, 245, 228);
     }
+
+    &-box {
+        display: inline-flex;
+        padding: 17px 25px 18px 17px;
+        margin: 5px 0px 30px;
+        @include govuk-font($size: 19);
+
+        &--red {
+            border: 5px solid $govuk-error-colour;
+            background-color: #fff8f8;
+
+            .notification-close {
+                line-height: 38px;
+            }
+        }
+    }
 }

@@ -1,6 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[GetAllProviders]
 AS
-
 	SET NOCOUNT ON;
 
 	WITH ProvidersCTE AS (

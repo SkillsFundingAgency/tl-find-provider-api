@@ -8,6 +8,11 @@
             Employers have agreed for their details to be shared for @Model.EmployerInterestRetentionWeeks weeks.<br />
             After @Model.EmployerInterestRetentionWeeks weeks, <strong>their details will expire</strong> unless they agree to extend their interest.
         </p>
+        <p class="govuk-body">
+            <a asp-page="/Provider/SearchFilters" class="govuk-link govuk-link--no-visited-state">Customise your results</a>
+            and <a asp-page="/Provider/Notifications" class="govuk-link govuk-link--no-visited-state">set up notifications</a>
+            to be alerted when new employers are added.
+        </p>
 
         @if (!ViewData.ModelState.IsValid)
         {
@@ -25,14 +30,14 @@
             <div class="govuk-form-group tl-inline-form-group" sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-form-group--error">
 
                 <label class="govuk-label govuk-!-margin-bottom-4" asp-for="Input!.SelectedPostcode">
-                    Select a campus or enter a postcode to see contact details for employers within @Model.SearchRadius miles:
+                    Select a campus or enter a postcode to see contact details for employers:
                 </label>
                 <span class="govuk-error-message" asp-validation-for="Input!.CustomPostcode"></span>
 
                 <select class="govuk-select govuk-!-margin-right-4 govuk-!-margin-bottom-2" asp-for="Input!.SelectedPostcode" asp-items="Model.Postcodes">
                     <option value="">Select campus</option>
                 </select>
-                <div class="tl-employers--search tl-hidden @(Model.Input?.SelectedPostcode == "Enter postcode" ? "active" : string.Empty)">
+                <div class="tl-employers--search @(Model.Input?.SelectedPostcode == "Enter postcode" ? "active" : string.Empty)">
                     <label class="govuk-label govuk-visually-hidden" for="Input!.CustomPostcode">Enter postcode</label>
                     <input class="govuk-input govuk-input--width-10 govuk-!-margin-bottom-2" placeholder="Enter postcode" asp-for="Input!.CustomPostcode" type="text"
                            sfa-validation-for="Input!.CustomPostcode" sfa-validationerror-class="govuk-input--error">
@@ -102,9 +107,32 @@
 else if (Model.ZeroResultsFound == true)
 {
     <div class="tl-card" id="tl-employers--noresults">
-        <p class="govuk-body govuk-!-margin-bottom-0">
-            <strong>There are currently no employers within @Model.SearchRadius miles who have expressed interest in T Levels.</strong><br>
-            Please search another postcode or check back soon to see employers in your area.
-        </p>
+        @if (Model.SelectedLocationId is null)
+        {
+            <p class="govuk-body" govuk-!-margin-bottom-0>
+                <strong>There are currently no employers within @Model.SearchRadius miles who have expressed interest in T Levels.</strong><br>
+                Please search another postcode or check back soon to see employers in your area.
+            </p>
+        }
+        else if (@Model.SelectedPostcodeHasFilters)
+        {
+            <p class="govuk-body" govuk-!-margin-bottom-0>
+                <strong>There are currently no employers within your search filters who have expressed interest in T Levels.</strong><br>
+                You can search another postcode,
+                <a asp-page="/Provider/SearchFilterDetails" asp-route-id="@Model.SelectedLocationId" class="govuk-link govuk-link--no-visited-state">change your search filters</a>
+                or <a asp-page="/Provider/Notifications" class="govuk-link govuk-link--no-visited-state">switch on notifications</a>
+                to be alerted when there are new employers in your area.
+            </p>
+        }
+        else 
+        {
+            <p class="govuk-body" govuk-!-margin-bottom-0>
+                <strong>There are currently no employers within @Model.SearchRadius miles who have expressed interest in T Levels.</strong><br>
+                You can search another postcode,
+                <a asp-page="/Provider/SearchFilterDetails" asp-route-id="@Model.SelectedLocationId" class="govuk-link govuk-link--no-visited-state">change your search area</a>
+                or <a asp-page="/Provider/Notifications" class="govuk-link govuk-link--no-visited-state">switch on notifications</a>
+                to be alerted when there are new employers in your area.
+            </p>
+        }
     </div>
 }

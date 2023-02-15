@@ -9,7 +9,8 @@ public class EmployerInterestDetailBuilder
     private readonly List<string> _skillAreas = new();
 
     public EmployerInterestDetail Build() => 
-        BuildList().First();
+        BuildList()
+            .First();
 
     public IEnumerable<EmployerInterestDetail> BuildList() =>
         new List<EmployerInterestDetail>
@@ -30,6 +31,8 @@ public class EmployerInterestDetailBuilder
                 Website = "https://employer-one.co.uk",
                 ContactPreferenceType = ContactPreference.Email,
                 SkillAreas = _skillAreas,
+                ExpiryDate = DateTime.Parse("2023-03-31"),
+                ExtensionCount = 1,
                 CreatedOn = DateTime.Parse("2022-10-24 12:00"),
                 ModifiedOn = DateTime.Parse("2022-11-05 15:00")
             },
@@ -49,11 +52,13 @@ public class EmployerInterestDetailBuilder
                 Website = "https://employer-two.co.uk",
                 ContactPreferenceType = ContactPreference.Telephone,
                 SkillAreas = _skillAreas,
+                ExpiryDate = DateTime.Parse("2023-03-31"),
+                ExtensionCount = 0,
                 CreatedOn = DateTime.Parse("2022-11-12 12:00"),
                 ModifiedOn = null
             }
         };
-
+    
     public EmployerInterestDetailBuilder WithSkillAreas(IList<string> skillAreas)
     {
         _skillAreas.Clear();

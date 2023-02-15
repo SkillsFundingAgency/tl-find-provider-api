@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
-using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -99,10 +98,9 @@ public class QualificationRepositoryTests
 
         var receivedSqlArgs = new List<string>();
         
-        var dapperParameterWrapper = new SubstituteDynamicParameterWrapper();
-
-        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnectionWithTransaction();
+        var (dbContextWrapper, dbConnection, transaction, dynamicParametersWrapper) = 
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithTransactionWithDynamicParameters();
 
         dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
@@ -126,7 +124,7 @@ public class QualificationRepositoryTests
         var repository = new QualificationRepositoryBuilder()
             .Build(
                 dbContextWrapper,
-                dapperParameterWrapper.DapperParameterFactory,
+                dynamicParametersWrapper.DapperParameterFactory,
                 pollyPolicyRegistry, 
                 logger);
 
@@ -137,7 +135,7 @@ public class QualificationRepositoryTests
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                Arg.Is<object>(o => o == dapperParameterWrapper.DynamicParameters),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );

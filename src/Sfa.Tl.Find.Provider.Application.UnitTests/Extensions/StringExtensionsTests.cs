@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;
 
 public class StringExtensionsTests
 {
-    [Theory(DisplayName = nameof(StringExtensions.IsPostcode) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.IsPostcode)} Data Tests")]
     [InlineData("CV1 2WT", true)]
     [InlineData("cv1 2wt", true)]
     [InlineData("OXX 9XX", false)]
@@ -19,7 +19,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.IsPartialPostcode) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.IsPartialPostcode)} Data Tests")]
     [InlineData("CV1 2WT", false)]
     [InlineData("CV1", true)]
     [InlineData("cv1", true)]
@@ -35,7 +35,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.DoesNotMatch) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.DoesNotMatch)} Data Tests")]
     [InlineData("/", Constants.CssPathPattern, true)]
     [InlineData("/Index", Constants.CssPathPattern, true)]
     [InlineData("/Folder/Index", Constants.CssPathPattern, true)]
@@ -51,7 +51,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
     
-    [Theory(DisplayName = nameof(StringExtensions.IsFullOrPartialPostcode) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.IsFullOrPartialPostcode)} Data Tests")]
     [InlineData("CV1 2WT", true)]
     [InlineData("cv1 2wt", true)]
     [InlineData("OXX 9XX", false)]
@@ -69,7 +69,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.ParseTLevelDefinitionName) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.ParseTLevelDefinitionName)} Data Tests")]
     [InlineData(null, "")]
     [InlineData("", "")]
     [InlineData(" Introduction To Parsing ", "Introduction to Parsing")]
@@ -87,7 +87,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.ToTitleCase) + "Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.ToTitleCase)} Data Tests")]
     [InlineData(null, null)]
     [InlineData("", "")]
     [InlineData("hello world", "Hello World")]
@@ -106,7 +106,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.ToSearchableString) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.ToSearchableString)} Data Tests")]
     // ReSharper disable StringLiteralTypo
     [InlineData(null, null)]
     [InlineData("CV1 2WT", "cv12wt")]
@@ -128,7 +128,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.ReplaceBreaksWithNewlines) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.ReplaceBreaksWithNewlines)} Data Tests")]
     [InlineData(null, null)]
     [InlineData("", "")]
     [InlineData("<br />", "\n")]
@@ -141,7 +141,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.ReplaceMultipleLineBreaks) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.ReplaceMultipleLineBreaks)} Data Tests")]
     [InlineData(null, null)]
     [InlineData("", "")]
     [InlineData("hello world", "hello world")]
@@ -154,7 +154,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.ReplaceRedactedHttpStrings) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.ReplaceRedactedHttpStrings)} Data Tests")]
     [InlineData(null, null)]
     [InlineData("", "")]
     [InlineData("http___www.test.com/", "http://www.test.com/")]
@@ -165,7 +165,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
     
-    [Theory(DisplayName = nameof(StringExtensions.ToTrimmedOrNullString) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.ToTrimmedOrNullString)} Data Tests")]
     [InlineData(null, null)]
     [InlineData("", null)]
     [InlineData(" ", null)]
@@ -177,7 +177,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.Truncate) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.Truncate)} Data Tests")]
     [InlineData(null, 10, null)]
     [InlineData("", 10, "")]
     [InlineData(" ", 10, " ")]
@@ -190,7 +190,7 @@ public class StringExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(StringExtensions.Truncate) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(StringExtensions.Truncate)} Data Tests")]
     // ReSharper disable StringLiteralTypo
     [InlineData(null, 15, null)]
     [InlineData("", 15, "")]

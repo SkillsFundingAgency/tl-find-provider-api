@@ -44,13 +44,13 @@ public static class ModelValidationExtensions
         provider.StudentContactEmail.Should().Be(studentContactEmail);
         provider.StudentContactTelephone.Should().Be(studentContactTelephone);
         provider.StudentContactWebsite.Should().Be(studentContactWebsite);
-        
+
         provider.IsAdditionalData.Should().Be(isAdditionalData);
-        
+
         provider.Locations.Should().NotBeNull();
         provider.Locations.Should().HaveCount(locationCount);
     }
- 
+
     public static void Validate(this ProviderSearchResult result, ProviderSearchResult expected)
     {
         result.UkPrn.Should().Be(expected.UkPrn);
@@ -120,7 +120,7 @@ public static class ModelValidationExtensions
         provider.QualificationId.Should().Be(expected.QualificationId);
         provider.QualificationName.Should().Be(expected.QualificationName);
     }
-    
+
     public static void Validate(this ProviderContactDto provider,
         ProviderContactDto expected)
     {
@@ -193,10 +193,24 @@ public static class ModelValidationExtensions
 
     public static void Validate(this LocationPostcode locationPostcode, LocationPostcode expected)
     {
+        locationPostcode.Id.Should().Be(expected.Id);
         locationPostcode.Postcode.Should().Be(expected.Postcode);
         locationPostcode.Name.Should().Be(expected.Name);
         locationPostcode.Latitude.Should().Be(expected.Latitude);
         locationPostcode.Longitude.Should().Be(expected.Longitude);
+    }
+
+    public static void Validate(this LocationPostcode locationPostcode, LocationPostcodeDto expected)
+    {
+        locationPostcode.Id.Should().Be(expected.LocationId);
+        locationPostcode.Name.Should().Be(expected.LocationName);
+        locationPostcode.Postcode.Should().Be(expected.Postcode);
+    }
+
+    public static void Validate(this Route route, RouteDto expected)
+    {
+        route.Id.Should().Be(expected.RouteId);
+        route.Name.Should().Be(expected.RouteName);
     }
 
     public static void Validate(this DeliveryYearSearchResult deliveryYear, DeliveryYearSearchResult expected)
@@ -276,10 +290,28 @@ public static class ModelValidationExtensions
         qualification.Name.Should().Be(expected.Name);
     }
 
-    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected, bool validateId = false, bool validateUniqueId = false, bool validatePostcode = true, bool validateLatLong = true)
+    public static void Validate(this Qualification qualification, QualificationDto expected)
     {
-        if(validateId) employerInterest.Id.Should().Be(expected.Id);
-        if (validateUniqueId) employerInterest.UniqueId.Should().Be(expected.UniqueId);
+        qualification.Id.Should().Be(expected.QualificationId);
+        qualification.Name.Should().Be(expected.QualificationName);
+    }
+
+    public static bool Validate(this EmployerInterest employerInterest, EmployerInterest expected,
+        bool validateId = false,
+        bool validateUniqueId = false,
+        bool validatePostcode = true,
+        bool validateLatLong = true,
+        bool validateExpiry = true)
+    {
+        if (validateId)
+        {
+            employerInterest.Id.Should().Be(expected.Id);
+        }
+
+        if (validateUniqueId)
+        {
+            employerInterest.UniqueId.Should().Be(expected.UniqueId);
+        }
 
         employerInterest.OrganisationName.Should().Be(expected.OrganisationName);
         employerInterest.ContactName.Should().Be(expected.ContactName);
@@ -288,6 +320,12 @@ public static class ModelValidationExtensions
         employerInterest.Email.Should().Be(expected.Email);
         employerInterest.Telephone.Should().Be(expected.Telephone);
         employerInterest.Website.Should().Be(expected.Website);
+
+        if (validateExpiry)
+        {
+            employerInterest.ExpiryDate.Should().Be(expected.ExpiryDate);
+        }
+        employerInterest.ExtensionCount.Should().Be(expected.ExtensionCount);
 
         if (validatePostcode)
         {
@@ -343,8 +381,53 @@ public static class ModelValidationExtensions
         employerInterestSummary.ExpiryDate.Should().Be(expected.ExpiryDate);
         employerInterestSummary.CreatedOn.Should().Be(expected.CreatedOn);
         employerInterestSummary.ModifiedOn.Should().Be(expected.ModifiedOn);
-        //employerInterestSummary.SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
-        //employerInterestSummary.SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+    }
 
+    public static void Validate(this SearchFilter searchFilter, SearchFilterDto expected)
+    {
+        searchFilter.Id.Should().Be(expected.Id);
+        searchFilter.LocationId.Should().Be(expected.LocationId);
+        searchFilter.LocationName.Should().Be(expected.LocationName);
+        searchFilter.Postcode.Should().Be(expected.Postcode);
+        searchFilter.SearchRadius.Should().Be(expected.SearchRadius);
+    }
+
+    public static void Validate(this Notification notification, NotificationDto expected)
+    {
+        notification.Id.Should().Be(expected.Id);
+        notification.Email.Should().Be(expected.Email);
+        notification.IsEmailVerified.Should().Be(expected.IsEmailVerified);
+        notification.EmailVerificationToken.Should().Be(expected.EmailVerificationToken);
+        notification.Frequency.Should().Be(expected.Frequency);
+        notification.LocationId.Should().Be(expected.LocationId);
+        notification.LocationName.Should().Be(expected.LocationName);
+        notification.Postcode.Should().Be(expected.Postcode);
+        notification.SearchRadius.Should().Be(expected.SearchRadius);
+    }
+
+    public static void Validate(this NotificationSummary notificationSummary, NotificationSummaryDto expected)
+    {
+        notificationSummary.Id.Should().Be(expected.Id);
+        notificationSummary.Email.Should().Be(expected.Email);
+        notificationSummary.IsEmailVerified.Should().Be(expected.IsEmailVerified);
+    }
+
+    public static void Validate(this NotificationLocationSummary notificationLocationSummary, NotificationLocationSummaryDto expected)
+    {
+        notificationLocationSummary.Id.Should().Be(expected.Id);
+        notificationLocationSummary.Frequency.Should().Be(expected.Frequency);
+        notificationLocationSummary.SearchRadius.Should().Be(expected.SearchRadius);
+
+        notificationLocationSummary.Location?.Id.Should().Be(expected.LocationId);
+        notificationLocationSummary.Location?.Name.Should().Be(expected.LocationName);
+        notificationLocationSummary.Location?.Postcode.Should().Be(expected.Postcode);
+    }
+
+    public static void Validate(this NotificationLocationName locationPostcode, NotificationLocationNameDto expected)
+    {
+        locationPostcode.Id.Should().Be(expected.NotificationLocationId);
+        locationPostcode.LocationId.Should().Be(expected.LocationId);
+        locationPostcode.Postcode.Should().Be(expected.Postcode);
+        locationPostcode.Name.Should().Be(expected.LocationName);
     }
 }

@@ -12,7 +12,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Web.Controllers;
 
-[Authorize]
+//[Authorize]
 public class TimeoutController : Controller
 {
     private readonly DfeSignInSettings _signInSettings;

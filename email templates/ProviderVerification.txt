@@ -1,0 +1,7 @@
+Your email address has been added to the Connect with employers interested in T Levels service. 
+
+[Verify your email address](((email_verification_link))) to start receiving email notifications when new employers are added to the service.
+
+You can [change your notification settings](((notifications_uri))) at any time. 
+
+T Levels support

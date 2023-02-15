@@ -21,4 +21,9 @@ public interface IDynamicParametersWrapper
         string name, 
         DbType? dbType = default,
         int? size = default);
+
+    IDynamicParametersWrapper AddReturnValueParameter(
+        string name,
+        DbType? dbType = default,
+        int? size = default);
 }

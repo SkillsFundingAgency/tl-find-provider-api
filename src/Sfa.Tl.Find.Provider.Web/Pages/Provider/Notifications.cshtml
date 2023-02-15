@@ -1,0 +1,122 @@
+﻿@page
+@model Sfa.Tl.Find.Provider.Web.Pages.Provider.NotificationsModel
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+@section breadcrumbs {
+    <a asp-page="/Employer/EmployerList" class="govuk-back-link" id="tl-back">Return to employer list</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @if (Model.VerificationEmail != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    <strong>We have sent a verification email to @Model.VerificationEmail</strong><br /><br />Click the link in the email to start receiving notifications.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
+
+        @if (Model.VerifiedEmail != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    @Model.VerifiedEmail has been verified
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
+
+        @if (Model.DeletedNotificationEmail != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    @Model.DeletedNotificationEmail has been removed.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
+
+        @if (Model.AddedNotificationEmail != null)
+        {
+            <div class="tl-notification tl-notification--green">
+                <div>
+                    @Model.AddedNotificationEmail has been added.
+                    <br /><br /><a class="govuk-link govuk-!-margin-bottom-0 notification-close" href="#">Close</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Notifications</h1>
+        <p class="govuk-body">Set up and manage notifications to alert you when new employers have been added to the service. </p>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @if (Model.NotificationList != null && Model.NotificationList.Any())
+        {
+            <table class="govuk-table tl-employers--table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Email</th>
+                        <th scope="col" class="govuk-table__header">Campus</th>
+                        <th scope="col" class="govuk-table__header"></th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                @foreach (var notification in Model.NotificationList)
+                {
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header tl-wordwrap">
+                            @notification.Email
+                            @if (!notification.IsEmailVerified)
+                            {
+                                <strong class="govuk-tag govuk-tag--red">Pending</strong>
+                            }
+                        </th>
+                        <td class="govuk-table__cell tl-table__cell__list">
+                            <div class="tl-employers--table--inline-header"><strong>Campus</strong></div>
+                            <div class="tl-employers--table--inline-cell">
+                                @if (notification.Locations is not null && notification.Locations.Any())
+                                {
+                                    @foreach (var location in notification.Locations)
+                                    {
+                                        if (location.LocationId is not null)
+                                        {
+                                            <p>@($"{location.Name?.ToUpper()} [{location.Postcode}]")</p>
+                                        }
+                                        else
+                                        {
+                                            <p>All</p>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </td> 
+                        <td class="govuk-table__cell">
+                            @if (notification.IsEmailVerified)
+                            {
+                                <a asp-page="./EditNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state">Change</a>
+                            }
+                            else
+                            {
+                                <a asp-page="./Notifications" asp-page-handler="ResendEmailVerification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state">Resend verification</a>
+                            }
+                            <a asp-page="./RemoveNotification" asp-route-id="@notification.Id" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-5">Remove</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        <a asp-page="./AddNotification" class="govuk-button">Add a new email</a>
+    </div>
+</div>
+
+

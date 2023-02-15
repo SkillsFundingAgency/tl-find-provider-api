@@ -27,9 +27,19 @@ public class SettingsBuilder
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
     private const bool MergeAdditionalProviderData = true;
 
+    private const string ConnectSiteUri = "https://test.connect.tlevels.gov.uk/";
+    private const int DefaultSearchRadius = 20;
+    private const int DefaultNotificationSearchRadius = 5;
+    private const string SupportSiteAccessConnectHelpUri = "https://test.support.tlevels.gov.uk/hc/en-gb/articles/123456789";
+
+    private const string NotificationEmailImmediateSchedule = "0 0/15 * * * ?";
+    private const string ProviderNotificationEmailDailySchedule = "0 0 6 ? * *";
+    private const string ProviderNotificationEmailWeeklySchedule = "0 0 6 ? * * FRI";
+
     private const string EmployerSupportCleanupJobSchedule = "0 0 3 ? * MON-FRI";
     private const int EmployerInterestExpiryNotificationDays = 7;
     private const int EmployerInterestRetentionDays = 10;
+    private const int EmployerInterestMaximumExtensions = 20;
     private const int EmployerInterestSearchRadius = 30;
     private const string EmployerSupportSiteUri = "https://test.employerssupportgov.uk/";
     private const string RegisterInterestUri = "https://test.employerssupportgov.uk/registerinterest";
@@ -117,12 +127,14 @@ public class SettingsBuilder
         string unsubscribeEmployerUri = UnsubscribeEmployerUri,
         int expiryNotificationDays = EmployerInterestExpiryNotificationDays,
         int retentionDays = EmployerInterestRetentionDays,
+        int maximumExtensions = EmployerInterestMaximumExtensions,
         int searchRadius = EmployerInterestSearchRadius) => new()
         {
             CleanupJobSchedule = cleanupJobSchedule,
             EmployerSupportSiteUri = employerSupportSiteUri,
             ExpiryNotificationDays = expiryNotificationDays,
             ExtendEmployerUri = extendEmployerUri,
+            MaximumExtensions = maximumExtensions,
             RetentionDays = retentionDays,
             SearchRadius = searchRadius,
             RegisterInterestUri = registerInterestUri,
@@ -143,11 +155,29 @@ public class SettingsBuilder
             BaseUri = postcodeRetrieverUri
         };
 
-    public SearchSettings BuildSearchSettings(
-        bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
+    public ProviderSettings BuildProviderSettings(
+        string connectSiteUri = ConnectSiteUri,
+        int defaultSearchRadius = DefaultSearchRadius,
+        int searchNotificationRadius = DefaultNotificationSearchRadius,
+        string notificationEmailImmediateSchedule = NotificationEmailImmediateSchedule,
+        string notificationEmailDailySchedule = ProviderNotificationEmailDailySchedule,
+        string notificationEmailWeeklySchedule = ProviderNotificationEmailWeeklySchedule,
+        string supportSiteAccessConnectHelpUri = SupportSiteAccessConnectHelpUri) => new()
         {
-            MergeAdditionalProviderData = mergeAdditionalProviderData
+            ConnectSiteUri = connectSiteUri,
+            DefaultSearchRadius = defaultSearchRadius,
+            DefaultNotificationSearchRadius = DefaultNotificationSearchRadius,
+            NotificationEmailImmediateSchedule = notificationEmailImmediateSchedule,
+            NotificationEmailDailySchedule = notificationEmailDailySchedule,
+            NotificationEmailWeeklySchedule = notificationEmailWeeklySchedule,
+            SupportSiteAccessConnectHelpUri = supportSiteAccessConnectHelpUri
         };
+
+    public SearchSettings BuildSearchSettings(
+            bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
+            {
+                MergeAdditionalProviderData = mergeAdditionalProviderData
+            };
 
     public SiteConfiguration BuildConfigurationOptions(
         ApiSettings apiSettings = null,
@@ -157,6 +187,7 @@ public class SettingsBuilder
         EmployerInterestSettings employerInterestSettings = null,
         GoogleMapsApiSettings googleMapsApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
+        ProviderSettings providerSettings = null,
         SearchSettings searchSettings = null,
         string blobStorageConnectionString = BlobStorageConnectionString,
         string sqlConnectionString = SqlConnectionString,
@@ -171,6 +202,7 @@ public class SettingsBuilder
             EmployerInterestSettings = employerInterestSettings ?? BuildEmployerInterestSettings(),
             GoogleMapsApiSettings = googleMapsApiSettings ?? BuildGoogleMapsApiSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
+            ProviderSettings = providerSettings ?? BuildProviderSettings(),
             SearchSettings = searchSettings ?? BuildSearchSettings(),
             BlobStorageConnectionString = blobStorageConnectionString,
             SqlConnectionString = sqlConnectionString,

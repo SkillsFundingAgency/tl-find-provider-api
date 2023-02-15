@@ -14,7 +14,7 @@ public class PageExtensionsTests
         PageExtensions.GetServiceName().Should().Be(DefaultServiceName);
     }
 
-    [Theory(DisplayName = "PageExtensions Data Tests")]
+    [Theory(DisplayName = $"{nameof(PageExtensions)} Data Tests")]
     [InlineData(true, null, DefaultServiceName)]
     [InlineData(true, "", DefaultServiceName)]
     [InlineData(true, DefaultServiceName + "", DefaultServiceName)]
@@ -29,7 +29,7 @@ public class PageExtensionsTests
         generatedTitle.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = "PageExtensions Data Tests")]
+    [Theory(DisplayName = $"{nameof(PageExtensions)} Data Tests")]
     [InlineData(null, DefaultServiceName)]
     [InlineData("", DefaultServiceName)]
     [InlineData(DefaultServiceName + "", DefaultServiceName)]

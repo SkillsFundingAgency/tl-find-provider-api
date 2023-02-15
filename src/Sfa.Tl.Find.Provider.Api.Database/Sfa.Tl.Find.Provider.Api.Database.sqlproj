@@ -70,7 +70,9 @@
     <None Include="Sfa.Tl.Find.Provider.Api.Database.Local.publish.xml" />
     <Build Include="Types\IdListTableType.sql" />
     <None Include="PostDeployment\Seed Email Templates.sql" />
-    <None Include="PostDeployment\Set Expiry Dates.sql" />
+    <None Include="Indexes\IX_SearchFilterRoute_SearchFilterId.sql" />
+    <None Include="Indexes\IX_SearchFilter_LocationId.sql" />
+    <None Include="Indexes\IX_NotificationLocation_LocationId.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />
@@ -126,6 +128,34 @@
     <Build Include="Indexes\IX_EmployerInterestIndustry_IndustryId.sql" />
     <Build Include="Stored Procedures\GetEmployerInterestDetail.sql" />
     <Build Include="Stored Procedures\GetExpiringEmployerInterest.sql" />
+    <Build Include="Tables\SearchFilter.sql" />
+    <Build Include="Tables\SearchFilterRoute.sql" />
+    <None Include="Indexes\IX_SearchFilterRoute_RouteId.sql" />
+    <Build Include="Stored Procedures\GetSearchFilterDetail.sql" />
+    <Build Include="Stored Procedures\GetSearchFilterSummary.sql" />
+    <Build Include="Stored Procedures\CreateOrUpdateSearchFilter.sql" />
+    <Build Include="Stored Procedures\SearchEmployerInterestByLocation.sql" />
+    <Build Include="Stored Procedures\GetNotificationDetail.sql" />
+    <None Include="Indexes\IX_NotificationLocationRoute_RouteId.sql" />
+    <None Include="Indexes\IX_NotificationLocationRoute_LocationId.sql" />
+    <Build Include="Stored Procedures\GetNotificationSummary.sql" />
+    <Build Include="Stored Procedures\CreateProviderNotification.sql" />
+    <Build Include="Stored Procedures\UpdateNotification.sql" />
+    <Build Include="Stored Procedures\DeleteSearchFilter.sql" />
+    <Build Include="Tables\ProviderNotification.sql" />
+    <None Include="Indexes\IX_ProviderNotification_ProviderId.sql" />
+    <Build Include="Stored Procedures\GetNotificationLocationSummary.sql" />
+    <Build Include="Tables\NotificationLocation.sql" />
+    <Build Include="Tables\NotificationLocationRoute.sql" />
+    <Build Include="Stored Procedures\DeleteNotificationLocation.sql" />
+    <Build Include="Stored Procedures\DeleteProviderNotification.sql" />
+    <None Include="Indexes\IX_NotificationLocation_ProviderNotificationId.sql" />
+    <Build Include="Stored Procedures\GetNotificationLocationDetail.sql" />
+    <Build Include="Stored Procedures\CreateNotificationLocation.sql" />
+    <Build Include="Stored Procedures\UpdateNotificationLocation.sql" />
+    <Build Include="Stored Procedures\GetProviderNotificationLocations.sql" />
+    <Build Include="Stored Procedures\GetPendingNotifications.sql" />
+    <Build Include="Stored Procedures\VerifyNotificationEmailToken.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

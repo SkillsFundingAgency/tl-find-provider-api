@@ -189,7 +189,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             var itemsToDelete = (await 
                 _dbContextWrapper.QueryAsync<ExpiredEmployerInterestDto>(
                     connection,
-                    "SELECT Id, UniqueId, Email " +
+                    "SELECT Id, UniqueId, OrganisationName, Postcode, Email " +
                     "FROM [dbo].[EmployerInterest] " +
                     "WHERE [ExpiryDate] < @date",
                      new { date },
@@ -271,6 +271,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             Website = e.Website,
                             ContactPreferenceType = e.ContactPreferenceType,
                             ExpiryDate = e.ExpiryDate,
+                            ExtensionCount = e.ExtensionCount,
                             CreatedOn = e.CreatedOn,
                             ModifiedOn = e.ModifiedOn,
                             SkillAreas = new List<string>()
@@ -293,8 +294,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     public async Task<IEnumerable<EmployerInterest>> GetExpiringInterest(int daysToExpiry)
     {
         using var connection = _dbContextWrapper.CreateConnection();
-
-        var employerInterestList = new List<EmployerInterest>();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
@@ -326,6 +325,8 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 Telephone = e.Telephone,
                                 Website = e.Website,
                                 ContactPreferenceType = e.ContactPreferenceType,
+                                ExpiryDate = e.ExpiryDate,
+                                ExtensionCount = e.ExtensionCount,
                                 SkillAreaIds = new List<int>()
                             });
                     }
@@ -451,7 +452,76 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         return (searchResults, totalEmployerInterestsCount);
     }
 
-    public async Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDaysToExtend, int expiryNotificationDays)
+    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount, bool SearchFiltersApplied)> Search(int locationId, int defaultSearchRadius)
+    {
+        using var connection = _dbContextWrapper.CreateConnection();
+        
+        _dynamicParametersWrapper.CreateParameters(new
+        {
+            locationId,
+            defaultSearchRadius
+        })
+            .AddOutputParameter("@totalEmployerInterestsCount", DbType.Int32)
+            .AddOutputParameter("@searchFiltersApplied", DbType.Boolean);
+
+        var summaryList = new Dictionary<int, EmployerInterestSummary>();
+
+        await _dbContextWrapper
+            .QueryAsync<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>(
+                connection,
+                "SearchEmployerInterestByLocation",
+                (e, r) =>
+                {
+                    if (!summaryList.TryGetValue(e.Id, out var summaryItem))
+                    {
+                        summaryList.Add(e.Id,
+                            summaryItem = new EmployerInterestSummary
+                            {
+                                Id = e.Id,
+                                OrganisationName = e.OrganisationName,
+                                Distance = e.Distance,
+                                Industry = e.Industry,
+                                ExpiryDate = e.ExpiryDate,
+                                CreatedOn = e.CreatedOn,
+                                ModifiedOn = e.ModifiedOn,
+                                SkillAreas = new List<string>()
+                            });
+                    }
+
+                    if (r is not null)
+                    {
+                        summaryItem.SkillAreas.Add(r.RouteName);
+                    }
+
+                    return summaryItem;
+                },
+                _dynamicParametersWrapper.DynamicParameters,
+                splitOn: "Id, RouteId",
+                commandType: CommandType.StoredProcedure);
+
+        var totalEmployerInterestsCount = _dynamicParametersWrapper
+            .DynamicParameters
+            .Get<int>("@totalEmployerInterestsCount");
+
+        var searchFiltersApplied = _dynamicParametersWrapper
+            .DynamicParameters
+            .Get<bool>("@searchFiltersApplied");
+
+        var searchResults = summaryList
+            .Values
+            .OrderBy(e => e.Distance)
+            .ThenByDescending(e => e.CreatedOn)
+            .ThenBy(e => e.OrganisationName)
+            .ToList();
+        
+        return (searchResults, totalEmployerInterestsCount, searchFiltersApplied);
+    }
+
+    public async Task<bool> ExtendExpiry(
+        Guid uniqueId,
+        int numberOfDaysToExtend,
+        int expiryNotificationDays,
+        int maximumExtensions)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -461,16 +531,19 @@ public class EmployerInterestRepository : IEmployerInterestRepository
         {
             uniqueId, 
             numberOfDaysToExtend,
-            expiryNotificationDays
+            expiryNotificationDays,
+            maximumExtensions
         });
 
         var rowsAffected = await _dbContextWrapper.ExecuteAsync(
             connection,
             "UPDATE dbo.EmployerInterest " +
             "SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate), " +
+            "    ExtensionCount = ExtensionCount + 1, " +
             "    ModifiedOn = GETUTCDATE() " +
             "WHERE UniqueId = @uniqueId " +
-            "AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())",
+            "  AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())" +
+            "  AND ExtensionCount < @maximumExtensions",
             _dynamicParametersWrapper.DynamicParameters);
 
         return rowsAffected > 0;

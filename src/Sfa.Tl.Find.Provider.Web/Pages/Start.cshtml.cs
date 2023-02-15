@@ -1,17 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages;
 
 public class StartModel : PageModel
 {
+    private readonly ProviderSettings _providerSettings;
     private readonly ILogger<StartModel> _logger;
 
+    public string? SupportSiteAccessConnectHelpUri { get; private set; }
+
     public StartModel(
+        IOptions<ProviderSettings> providerOptions,
         ILogger<StartModel> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _providerSettings = providerOptions?.Value
+                            ?? throw new ArgumentNullException(nameof(providerOptions));
     }
 
     public IActionResult OnGet()
@@ -27,6 +35,8 @@ public class StartModel : PageModel
 
             return RedirectToPage(AuthenticationExtensions.AuthenticatedUserStartPage);
         }
+
+        SupportSiteAccessConnectHelpUri = _providerSettings.SupportSiteAccessConnectHelpUri;
 
         return Page();
     }

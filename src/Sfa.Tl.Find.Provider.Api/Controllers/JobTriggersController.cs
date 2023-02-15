@@ -2,6 +2,7 @@
 using Quartz;
 using Sfa.Tl.Find.Provider.Api.Attributes;
 using Sfa.Tl.Find.Provider.Application.Models;
+// ReSharper disable StringLiteralTypo
 
 namespace Sfa.Tl.Find.Provider.Api.Controllers;
 
@@ -24,37 +25,42 @@ public class JobTriggersController : ControllerBase
     }
 
     [HttpPost]
-    // ReSharper disable once StringLiteralTypo
     [Route("importcoursedirectory")]
-    public async Task TriggerCourseDirectoryImportJob()
-    {
-        const string jobKey = JobKeys.CourseDirectoryImport;
-        _logger.LogInformation("Request to trigger {job} received",
-            jobKey);
-
-        var scheduler = await _schedulerFactory.GetScheduler();
-        await scheduler.TriggerJob(new JobKey(jobKey));
-    }
+    public async Task TriggerCourseDirectoryImportJob() =>
+        await TriggerJob(JobKeys.CourseDirectoryImport);
 
     [HttpPost]
-    // ReSharper disable once StringLiteralTypo
     [Route("employerinterestcleanup")]
-    public async Task TriggerEmployerInterestCleanupJob()
-    {
-        const string jobKey = JobKeys.EmployerInterestCleanup;
-        _logger.LogInformation("Request to trigger {job} received", 
-            jobKey);
-
-        var scheduler = await _schedulerFactory.GetScheduler();
-        await scheduler.TriggerJob(new JobKey(jobKey));
-    }
+    public async Task TriggerEmployerInterestCleanupJob() =>
+        await TriggerJob(JobKeys.EmployerInterestCleanup);
 
     [HttpPost]
-    // ReSharper disable once StringLiteralTypo
+    [Route("providernotificationemailimmediate")]
+    public async Task TriggerProviderNotificationEmailImmediateJob() =>
+        await TriggerJob(JobKeys.ProviderNotificationEmailImmediate);
+
+    [HttpPost]
+    [Route("providernotificationemaildaily")]
+    public async Task TriggerProviderNotificationEmailDailyJob() =>
+        await TriggerJob(JobKeys.ProviderNotificationEmailDaily);
+
+    [HttpPost]
+    [Route("providernotificationemailweekly")]
+    public async Task TriggerProviderNotificationEmailWeeklyJob() =>
+        await TriggerJob(JobKeys.ProviderNotificationEmailWeekly);
+    
+    [HttpPost]
     [Route("startuptasks")]
-    public async Task TriggerStartupTasksJob()
+    public async Task TriggerStartupTasksJob() =>
+        await TriggerJob(JobKeys.StartupTasks);
+
+    [HttpPost]
+    [Route("importtowns")]
+    public async Task TriggerImportTownDataJob() => 
+        await TriggerJob(JobKeys.ImportTownData);
+
+    private async Task TriggerJob(string jobKey)
     {
-        const string jobKey = JobKeys.StartupTasks;
         _logger.LogInformation("Request to trigger {job} received",
             jobKey);
 
