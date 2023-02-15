@@ -16,7 +16,7 @@ public class RouteRepositoryTests
         typeof(RouteRepository)
             .ShouldNotAcceptNullConstructorArguments();
     }
-        
+
     [Fact]
     public async Task GetAll_Returns_Expected_List()
     {
@@ -56,12 +56,12 @@ public class RouteRepositoryTests
             .ToList();
 
         results.Count.Should().Be(1);
-        results[0].Id.Should().Be(routeDtoList[0].RouteId);
-        results[0].Name.Should().Be(routeDtoList[0].RouteName);
+        results[0].Validate(routeDtoList[0]);
+
         results[0].NumberOfQualifications.Should().Be(1);
         results[0].NumberOfQualificationsOffered.Should().Be(1);
+
         results[0].Qualifications.Should().NotBeNullOrEmpty();
-        results[0].Qualifications[0].Id.Should().Be(qualificationDtoList[0].QualificationId);
-        results[0].Qualifications[0].Name.Should().Be(qualificationDtoList[0].QualificationName);
+        results[0].Qualifications[0].Validate(qualificationDtoList[0]);
     }
 }

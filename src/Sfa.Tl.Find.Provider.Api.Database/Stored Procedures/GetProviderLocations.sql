@@ -12,7 +12,7 @@ AS
 	  AND	p.[IsDeleted] = 0
 	  AND	(@includeAdditionalData = 1 OR (@includeAdditionalData = 0 AND p.[IsAdditionalData] = 0))
 	)
-	  SELECT p.[Id],
+	  SELECT l.[Id],
 			 l.[Postcode],
 			 l.[Name],
 			 l.[Latitude],

@@ -91,6 +91,10 @@
           "type": "integer",
           "environmentVariable": "EmployerInterestSettings_ExpiryNotificationDays"
         },
+        "MaximumExtensions": {
+          "type": "integer",
+          "environmentVariable": "EmployerInterestSettings_MaximumExtensions"
+        },
         "RegisterInterestUri": {
           "type": "string",
           "environmentVariable": "EmployerInterestSettings_RegisterInterestUri"
@@ -132,6 +136,32 @@
       "additionalProperties": false,
       "required": [
         "BaseUri"
+      ],
+      "type": "object"
+    },
+    "ProviderSettings": {
+      "properties": {
+        "ConnectSiteUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ProviderSettings_ConnectSiteUri"
+        },
+        "NotificationEmailImmediateSchedule": {
+          "type": "string",
+          "environmentVariable": "ProviderSettings_NotificationEmailImmediateSchedule"
+        },
+        "NotificationEmailDailySchedule": {
+          "type": "string",
+          "environmentVariable": "ProviderSettings_NotificationEmailDailySchedule"
+        },
+        "NotificationEmailWeeklySchedule": {
+          "type": "string",
+          "environmentVariable": "ProviderSettings_NotificationEmailWeeklySchedule"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "ConnectSiteUri"
       ],
       "type": "object"
     },

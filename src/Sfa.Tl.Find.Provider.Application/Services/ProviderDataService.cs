@@ -12,43 +12,65 @@ using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.WebUtilities;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
 public class ProviderDataService : IProviderDataService
 {
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ITownDataService _townDataService;
+    private readonly IGuidProvider _guidProvider;
     private readonly IPostcodeLookupService _postcodeLookupService;
+    private readonly IEmailService _emailService;
+    private readonly ITownDataService _townDataService;
     private readonly IProviderRepository _providerRepository;
     private readonly IQualificationRepository _qualificationRepository;
     private readonly IRouteRepository _routeRepository;
     private readonly IIndustryRepository _industryRepository;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly ISearchFilterRepository _searchFilterRepository;
     private readonly ICacheService _cacheService;
+    private readonly ProviderSettings _providerSettings;
     private readonly ILogger<ProviderDataService> _logger;
     private readonly bool _mergeAdditionalProviderData;
 
     public ProviderDataService(
         IDateTimeProvider dateTimeProvider,
+        IGuidProvider guidProvider,
         IPostcodeLookupService postcodeLookupService,
+        IEmailService emailService,
         IProviderRepository providerRepository,
         IQualificationRepository qualificationRepository,
         IRouteRepository routeRepository,
         IIndustryRepository industryRepository,
+        INotificationRepository notificationRepository,
+        ISearchFilterRepository searchFilterRepository,
         ITownDataService townDataService,
         ICacheService cacheService,
+        IOptions<ProviderSettings> providerOptions,
         IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
     {
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        _guidProvider = guidProvider ?? throw new ArgumentNullException(nameof(guidProvider));
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
+        _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _providerRepository = providerRepository ?? throw new ArgumentNullException(nameof(providerRepository));
         _qualificationRepository = qualificationRepository ?? throw new ArgumentNullException(nameof(qualificationRepository));
         _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
         _industryRepository = industryRepository ?? throw new ArgumentNullException(nameof(industryRepository));
+        _notificationRepository = notificationRepository ?? throw new ArgumentNullException(nameof(notificationRepository));
+        _searchFilterRepository = searchFilterRepository ?? throw new ArgumentNullException(nameof(searchFilterRepository));
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        if (providerOptions is null) throw new ArgumentNullException(nameof(providerOptions));
+        if (searchOptions is null) throw new ArgumentNullException(nameof(searchOptions));
+
+        _providerSettings = providerOptions?.Value
+                            ?? throw new ArgumentNullException(nameof(providerOptions));
 
         _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
                                        ?? throw new ArgumentNullException(nameof(searchOptions));
@@ -112,6 +134,107 @@ public class ProviderDataService : IProviderDataService
         }
 
         return routes;
+    }
+
+    public async Task DeleteNotification(int notificationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Deleting notification {notificationId}", notificationId);
+        }
+
+        await _notificationRepository.Delete(notificationId);
+    }
+
+    public async Task DeleteNotificationLocation(int notificationLocationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Deleting notification location {notificationLocationId}", notificationLocationId);
+        }
+
+        await _notificationRepository.DeleteLocation(notificationLocationId);
+    }
+
+    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notifications");
+        }
+
+        var notifications =
+            (await _notificationRepository
+            .GetNotificationSummaryList(ukPrn, _mergeAdditionalProviderData));
+
+        return notifications;
+    }
+
+    public async Task<IEnumerable<NotificationLocationSummary>> GetNotificationLocationSummaryList(int notificationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notification locations");
+        }
+
+        var notificationLocations =
+            (await _notificationRepository
+                .GetNotificationLocationSummaryList(notificationId));
+
+        return notificationLocations;
+    }
+
+    public async Task<Notification> GetNotification(int notificationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notification {notificationId}", notificationId);
+        }
+
+        return await _notificationRepository
+            .GetNotification(notificationId);
+    }
+
+    public async Task<Notification> GetNotificationLocation(int notificationLocationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting notification location {notificationLocationId}", notificationLocationId);
+        }
+
+        return await _notificationRepository
+            .GetNotificationLocation(notificationLocationId);
+    }
+
+    public async Task<IEnumerable<NotificationLocationName>> GetAvailableNotificationLocationPostcodes(int providerNotificationId)
+    {
+        return (await _notificationRepository
+            .GetProviderNotificationLocations(providerNotificationId))
+            .Where(p => p.Id is null && p.LocationId is not null);
+    }
+
+    public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting search filters");
+        }
+
+        var searchFilters = (await _searchFilterRepository
+            .GetSearchFilterSummaryList(ukPrn, _mergeAdditionalProviderData));
+
+        return searchFilters;
+    }
+
+    public async Task<SearchFilter> GetSearchFilter(int locationId)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting search filter for location {locationId}", locationId);
+        }
+
+        return await _searchFilterRepository
+            .GetSearchFilter(locationId);
     }
 
     public async Task<ProviderSearchResponse> FindProviders(
@@ -299,6 +422,105 @@ public class ProviderDataService : IProviderDataService
         _logger.LogInformation("Loaded {count} providers from stream.", count);
     }
 
+    public async Task<int> SaveNotification(Notification notification, long ukPrn)
+    {
+        if (notification.Id is null)
+        {
+            notification.EmailVerificationToken = _guidProvider.NewGuid();
+            var id = await _notificationRepository.Create(notification, ukPrn);
+            await SendProviderVerificationEmail(notification.Email, notification.EmailVerificationToken!.Value);
+            return id;
+        }
+
+        //TODO: Separate into Create and Update methods - Update doesn't need to return uid;
+        else
+        {
+            await _notificationRepository.Update(notification);
+            return notification.Id.Value;
+        }
+    }
+
+    public async Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null)
+    {
+        if (notification.Id is null && providerNotificationId is not null)
+        {
+            await _notificationRepository.CreateLocation(notification, providerNotificationId.Value);
+        }
+        else
+        {
+            await _notificationRepository.UpdateLocation(notification);
+        }
+    }
+
+    public async Task SaveSearchFilter(SearchFilter searchFilter)
+    {
+        await _searchFilterRepository.Save(searchFilter);
+    }
+
+    public async Task SendProviderNotifications(NotificationFrequency frequency)
+    {
+        var currentDateTime = _dateTimeProvider.UtcNow;
+        var pendingNotificationEmails = await _notificationRepository.GetPendingNotificationEmails(frequency);
+
+        var groupedEmails = pendingNotificationEmails
+            .GroupBy(p => p.Email, p => p.NotificationLocationId)
+            .Select(g => new
+            {
+                Email = g.Key,
+                IdList = g.ToList()
+            });
+
+        foreach (var notificationEmail in groupedEmails)
+        {
+            await SendProviderNotificationEmail(
+                notificationEmail.Email);
+
+            await _notificationRepository.UpdateNotificationSentDate(
+                notificationEmail.IdList,
+                currentDateTime);
+        }
+    }
+
+    public async Task SendProviderNotificationEmail(string emailAddress)
+    {
+        var siteUri = new Uri(_providerSettings.ConnectSiteUri);
+        var notificationsUri = new Uri(siteUri, "notifications");
+        var employerListUri = new Uri(siteUri, "employer-list");
+        var searchFiltersUri = new Uri(siteUri, "filters");
+
+        var uniqueId = _guidProvider.NewGuid();
+
+        await _emailService.SendEmail(
+            emailAddress,
+            EmailTemplateNames.ProviderNotification,
+            new Dictionary<string, string>
+            {
+                { "employer_list_uri", employerListUri.ToString() },
+                { "search_filters_uri", searchFiltersUri.ToString() },
+                { "notifications_uri", notificationsUri.ToString() }
+            },
+            uniqueId.ToString());
+    }
+
+    public async Task SendProviderVerificationEmail(int notificationId, string emailAddress)
+    {
+        var verificationToken = _guidProvider.NewGuid();
+        await SendProviderVerificationEmail(emailAddress, verificationToken);
+
+        await _notificationRepository.SaveEmailVerificationToken(notificationId, emailAddress, verificationToken);
+    }
+
+    public async Task<(bool Success, string Email)> VerifyNotificationEmail(string token)
+    {
+        if (!Guid.TryParse(token, out var realToken))
+        {
+            _logger.LogError("Invalid token received in VerifyNotificationEmail");
+        }
+
+        //await _notificationRepository.RemoveEmailVerificationToken(realToken);
+        return await _notificationRepository.VerifyEmailToken(realToken);
+    }
+
     private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
     {
         try
@@ -409,6 +631,26 @@ public class ProviderDataService : IProviderDataService
             SearchResults = searchResults.ToList(),
             TotalResults = totalSearchResults
         };
+    }
+
+    private async Task SendProviderVerificationEmail(string emailAddress, Guid token)
+    {
+        var siteUri = new Uri(_providerSettings.ConnectSiteUri);
+        var notificationsUri = new Uri(siteUri, "notifications");
+        var verificationUri = new Uri(QueryHelpers.AddQueryString(
+            notificationsUri.AbsoluteUri,
+            "token",
+            token.ToString("D").ToLower()));
+
+        await _emailService.SendEmail(
+            emailAddress,
+            EmailTemplateNames.ProviderVerification,
+            new Dictionary<string, string>
+            {
+                { "email_verification_link", verificationUri.ToString() },
+                { "notifications_uri", notificationsUri.ToString() }
+            },
+            token.ToString());
     }
 
     private async Task ClearCaches()

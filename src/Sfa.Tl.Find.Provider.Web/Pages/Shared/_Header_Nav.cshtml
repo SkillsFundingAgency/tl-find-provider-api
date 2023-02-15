@@ -6,15 +6,20 @@
     var ukPrn = Context.User.GetClaim(CustomClaimTypes.UkPrn);
 
     <div class="tl-accountbar">
-    <p>
-        <span>@Context.User.GetClaim(CustomClaimTypes.OrganisationName)</span>
-        @if (!string.IsNullOrEmpty(ukPrn))
-        {
-            <span>[UKPRN:@ukPrn]</span>
-        }
+        <p>
+            <span>@Context.User.GetClaim(CustomClaimTypes.OrganisationName)</span>
+            @if (!string.IsNullOrEmpty(ukPrn))
+            {
+                <span>[UKPRN:@ukPrn]</span>
+            }
         </p>
         @*<button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>*@
         <div class="tl-accountbar--nav">
+            @if (!string.IsNullOrEmpty(ukPrn))
+            {
+                <a class="govuk-link tl-accountbar--link" asp-page="/Provider/SearchFilters">Search filters</a>
+                <a class="govuk-link tl-accountbar--link" asp-page="/Provider/Notifications">Notifications</a>
+            }
             <a class="govuk-link tl-accountbar--link" asp-controller="Account" asp-action="SignOut">Sign out</a>
         </div>
     </div>

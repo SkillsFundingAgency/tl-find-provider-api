@@ -22,6 +22,7 @@ public class EmployerInterestDetail
     public string AdditionalInformation { get; init; }
     public List<string> SkillAreas { get; init; }
     public DateTime? ExpiryDate { get; init; }
+    public int ExtensionCount { get; init; }
     public DateTime CreatedOn { get; init; }
     public DateTime? ModifiedOn { get; init; }
 }

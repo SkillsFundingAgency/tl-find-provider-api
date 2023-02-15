@@ -22,12 +22,11 @@ public class DfeSignInApiServiceBuilder
             .Build();
 
         signInSettings ??= new SettingsBuilder().BuildDfeSignInSettings();
-        var signInOptions = signInSettings.ToOptions();
 
         return new DfeSignInApiService(
             httpClient,
             tokenService,
-            signInOptions,
+            signInSettings.ToOptions(),
             logger);
     }
 

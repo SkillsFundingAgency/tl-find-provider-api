@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Sfa.Tl.Find.Provider.Application.Data;
@@ -7,7 +6,6 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
-using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -347,11 +345,10 @@ public class EmployerInterestRepositoryTests
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
             .BuildWithOutputParameter("employerInterestsDeleted", employerInterestsCount);
 
-
         dbContextWrapper
             .QueryAsync<ExpiredEmployerInterestDto>(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("SELECT Id, UniqueId, Email") &&
+                    s.Contains("SELECT Id, UniqueId, OrganisationName, Postcode, Email") &&
                     s.Contains("FROM [dbo].[EmployerInterest]") &&
                     s.Contains("[ExpiryDate] < @date")),
                 Arg.Any<object>(),
@@ -556,7 +553,7 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
-    public async Task Search_Returns_Expected_List()
+    public async Task Search_By_Lat_Long_Returns_Expected_List()
     {
         const double latitude = 52.400997;
         const double longitude = -1.508122;
@@ -611,10 +608,71 @@ public class EmployerInterestRepositoryTests
     }
 
     [Fact]
+    public async Task Search_By_Location_Returns_Expected_List()
+    {
+        const int locationId = 1;
+        const int defaultSearchRadius = 25;
+        const int employerInterestsCount = 1000;
+        const bool searchFiltersApplied = true;
+
+        var employerInterestSummaryDtoList = new EmployerInterestSummaryDtoBuilder()
+            .BuildList()
+            .ToList();
+        var routeDtoList = new RouteDtoBuilder()
+            .BuildList()
+            .ToList();
+
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
+            .BuildWithOutputParameters(
+                new List<(string, object, DbType)>
+                {
+                    new ("totalEmployerInterestsCount", employerInterestsCount, DbType.Int32),
+                    new ("@searchFiltersApplied", searchFiltersApplied, DbType.Binary)
+                });
+
+        var callIndex = 0;
+
+        await dbContextWrapper
+            .QueryAsync(dbConnection,
+                "SearchEmployerInterestByLocation",
+                Arg.Do<Func<EmployerInterestSummaryDto, RouteDto, EmployerInterestSummary>>(
+                    x =>
+                    {
+                        var e = employerInterestSummaryDtoList[callIndex];
+                        var r = routeDtoList[callIndex];
+                        x.Invoke(e, r);
+
+                        callIndex++;
+                    }),
+                Arg.Any<object>(),
+                splitOn: Arg.Any<string>(),
+                commandType: CommandType.StoredProcedure
+            );
+
+        var repository = new EmployerInterestRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper);
+
+        var results = await repository.Search(locationId, defaultSearchRadius);
+
+        var searchResults = results.SearchResults?.ToList();
+
+        searchResults.Should().NotBeNullOrEmpty();
+        searchResults!.Count.Should().Be(1);
+        results.TotalResultsCount.Should().Be(employerInterestsCount);
+        searchResults.First().Validate(employerInterestSummaryDtoList.First());
+        searchResults[0].SkillAreas[0].Should().Be(routeDtoList[0].RouteName);
+    }
+
+    [Fact]
     public async Task ExtendExpiry_Calls_Database_And_Returns_True_When_Update_Completed()
     {
         const int numberOfDaysToExtend = 84;
         const int expiryNotificationDays = 7;
+        const int maximumExtensions = 10;
         var uniqueId = new Guid();
         
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
@@ -636,7 +694,8 @@ public class EmployerInterestRepositoryTests
         var result = await repository.ExtendExpiry(
             uniqueId, 
             numberOfDaysToExtend,
-            expiryNotificationDays);
+            expiryNotificationDays,
+            maximumExtensions);
 
         result.Should().BeTrue();
 
@@ -645,7 +704,9 @@ public class EmployerInterestRepositoryTests
             .ExecuteAsync(dbConnection, 
                 Arg.Is<string>(s => 
                     s.Contains("UPDATE dbo.EmployerInterest") &&
-                    s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate)") &&
+                    s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate),") &&
+                    s.Contains("ExtensionCount = ExtensionCount + 1,") &&
+                    s.Contains("ModifiedOn = GETUTCDATE()") &&
                     s.Contains("WHERE UniqueId = @uniqueId") &&
                     s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
@@ -656,6 +717,7 @@ public class EmployerInterestRepositoryTests
     {
         const int numberOfDaysToExtend = 84;
         const int expiryNotificationDays = 7;
+        const int maximumExtensions = 10;
         var uniqueId = new Guid();
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
@@ -677,7 +739,8 @@ public class EmployerInterestRepositoryTests
         var result = await repository.ExtendExpiry(
             uniqueId, 
             numberOfDaysToExtend,
-            expiryNotificationDays);
+            expiryNotificationDays,
+            maximumExtensions);
 
         result.Should().BeFalse();
 
@@ -689,7 +752,8 @@ public class EmployerInterestRepositoryTests
                     s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate),") &&
                     s.Contains("ModifiedOn = GETUTCDATE()") &&
                     s.Contains("WHERE UniqueId = @uniqueId") &&
-                    s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())")),
+                    s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())") &&
+                    s.Contains("AND ExtensionCount < @maximumExtensions")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
 
@@ -698,45 +762,29 @@ public class EmployerInterestRepositoryTests
     {
         const int numberOfDaysToExtend = 84;
         const int expiryNotificationDays = 7;
+        const int maximumExtensions = 10;
         var uniqueId = new Guid();
 
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .BuildSubstitute();
-
-        var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
-            .Build();
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
-                dynamicParametersWrapper);
+                dynamicParametersWrapper.DapperParameterFactory);
 
         await repository.ExtendExpiry(uniqueId, 
             numberOfDaysToExtend,
-            expiryNotificationDays);
+            expiryNotificationDays, 
+            maximumExtensions);
 
-        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-            .SingleOrDefault(p => p.Name == "templates");
-
-        fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-        pi.Length.Should().Be(3);
-
-        var uniqueIdProperty = pi.SingleOrDefault(p => p.Name == "uniqueId");
-        uniqueIdProperty.Should().NotBeNull();
-        uniqueIdProperty!.GetValue(item).Should().Be(uniqueId);
-        
-        var numberOfDaysToExtendProperty = pi.SingleOrDefault(p => p.Name == "numberOfDaysToExtend");
-        numberOfDaysToExtendProperty.Should().NotBeNull();
-        numberOfDaysToExtendProperty!.GetValue(item).Should().Be(numberOfDaysToExtend);
-
-        var expiryNotificationDaysProperty = pi.SingleOrDefault(p => p.Name == "expiryNotificationDays");
-        expiryNotificationDaysProperty.Should().NotBeNull();
-        expiryNotificationDaysProperty!.GetValue(item).Should().Be(expiryNotificationDays);
+        templates.GetDynamicTemplatesCount().Should().Be(4);
+        templates.ContainsNameAndValue("uniqueId", uniqueId);
+        templates.ContainsNameAndValue("numberOfDaysToExtend", numberOfDaysToExtend);
+        templates.ContainsNameAndValue("expiryNotificationDays", expiryNotificationDays);
+        templates.ContainsNameAndValue("maximumExtensions", maximumExtensions);
     }
 
     [Fact]
@@ -744,10 +792,9 @@ public class EmployerInterestRepositoryTests
     {
         const int id = 10;
 
-        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnection();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var (dbContextWrapper, dbConnection, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -771,10 +818,9 @@ public class EmployerInterestRepositoryTests
     {
         const int id = 10;
 
-        var dbContextWrapper = new DbContextWrapperBuilder()
-            .BuildSubstitute();
-
-        var dynamicParametersWrapper = new SubstituteDynamicParameterWrapper();
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
 
         var repository = new EmployerInterestRepositoryBuilder()
             .Build(dbContextWrapper,
@@ -782,20 +828,8 @@ public class EmployerInterestRepositoryTests
 
         await repository.UpdateExtensionEmailSentDate(id);
         
-        var fieldInfo = dynamicParametersWrapper.DynamicParameters.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-            .SingleOrDefault(p => p.Name == "templates");
-
-        fieldInfo.Should().NotBeNull();
-        var templates = fieldInfo!.GetValue(dynamicParametersWrapper.DynamicParameters) as IList<object>;
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
-
-        var item = templates!.First();
-        var pi = item.GetType().GetProperties();
-        pi.Length.Should().Be(1);
-
-        var dynamicProperty = pi.Single();
-        dynamicProperty.Name.Should().Be("id");
-        dynamicProperty.GetValue(item).Should().Be(id);
+        templates.ContainsNameAndValue("id", id);
     }
 }

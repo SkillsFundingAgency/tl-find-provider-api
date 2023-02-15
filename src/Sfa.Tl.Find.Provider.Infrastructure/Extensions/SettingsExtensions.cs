@@ -36,7 +36,7 @@ public static class SettingsExtensions
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-        settings.Administrators= configuration.DfeSignInSettings?.Administrators;
+        settings.Administrators = configuration.DfeSignInSettings?.Administrators;
         settings.ApiUri = configuration.DfeSignInSettings?.ApiUri;
         settings.ApiSecret = configuration.DfeSignInSettings?.ApiSecret;
         settings.Audience = configuration.DfeSignInSettings?.Audience;
@@ -67,6 +67,7 @@ public static class SettingsExtensions
         settings.CleanupJobSchedule = configuration.EmployerInterestSettings?.CleanupJobSchedule;
         settings.ExtendEmployerUri = configuration.EmployerInterestSettings?.ExtendEmployerUri;
         settings.ExpiryNotificationDays = configuration.EmployerInterestSettings?.ExpiryNotificationDays ?? 0;
+        settings.MaximumExtensions = configuration.EmployerInterestSettings?.MaximumExtensions ?? 0;
         settings.RetentionDays = configuration.EmployerInterestSettings?.RetentionDays ?? 0;
         settings.UnsubscribeEmployerUri = configuration.EmployerInterestSettings?.UnsubscribeEmployerUri;
         settings.RegisterInterestUri = configuration.EmployerInterestSettings?.RegisterInterestUri;
@@ -88,6 +89,20 @@ public static class SettingsExtensions
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
         settings.BaseUri = configuration.PostcodeApiSettings?.BaseUri;
+    }
+
+    public static void ConfigureProviderSettings(this ProviderSettings settings, SiteConfiguration configuration)
+    {
+        if (settings == null) throw new ArgumentNullException(nameof(settings));
+        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+
+        settings.ConnectSiteUri = configuration.ProviderSettings?.ConnectSiteUri;
+        settings.DefaultSearchRadius = configuration.ProviderSettings?.DefaultSearchRadius ?? 0;
+        settings.DefaultNotificationSearchRadius = configuration.ProviderSettings?.DefaultNotificationSearchRadius ?? 0;
+        settings.NotificationEmailImmediateSchedule = configuration.ProviderSettings?.NotificationEmailImmediateSchedule;
+        settings.NotificationEmailDailySchedule = configuration.ProviderSettings?.NotificationEmailDailySchedule;
+        settings.NotificationEmailWeeklySchedule = configuration.ProviderSettings?.NotificationEmailWeeklySchedule;
+        settings.SupportSiteAccessConnectHelpUri = configuration.ProviderSettings?.SupportSiteAccessConnectHelpUri;
     }
 
     public static void ConfigureSearchSettings(this SearchSettings settings, SiteConfiguration configuration)

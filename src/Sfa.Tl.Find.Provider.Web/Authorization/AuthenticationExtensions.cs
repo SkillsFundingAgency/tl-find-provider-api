@@ -40,7 +40,8 @@ public static class AuthenticationExtensions
 
         services.AddSingleton<ITicketStore, RedisCacheTicketStore>();
         services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
-            .Configure<ITicketStore>((options, store) => {
+            .Configure<ITicketStore>((options, store) =>
+            {
                 options.SessionStore = store;
             });
 
@@ -186,13 +187,16 @@ public static class AuthenticationExtensions
                     }
 
                     //TODO: Remove this and Administrators setting when DSI gives us roles
-                    if (!string.IsNullOrEmpty(signInSettings.Administrators))
+                    if (!string.IsNullOrEmpty(signInSettings.Administrators)
+                        && !claims.Any(c => c is {Type: ClaimTypes.Role, Value: CustomRoles.Administrator}))
                     {
                         var admins = signInSettings.Administrators?
                             .Split(new[] { ';', ',' },
                                 StringSplitOptions.RemoveEmptyEntries);
                         var email = ctx.Principal.FindFirst("email")?.Value;
-                        if (admins is not null && admins.Any(a =>  string.Compare(a, email, StringComparison.OrdinalIgnoreCase) == 0))
+                        
+                        if (admins is not null && 
+                            admins.Any(a => string.Compare(a.Trim(), email, StringComparison.OrdinalIgnoreCase) == 0))
                         {
                             claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
                         }

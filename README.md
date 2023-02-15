@@ -61,9 +61,20 @@ Add a new row to the table with:
     "EmployerInterestSettings": {
         "CleanupJobSchedule": "0 0 3 * * ?",
         "EmployerSupportSiteUri": "https://test.employers.tlevels.gov.uk/",
-        "UnsubscribeEmployerUri": "https://localhost:7191/EmployerInterest/Unsubscribe",
+        "UnsubscribeEmployerUri": "https://test.employers.tlevels.gov.uk/hc/en-gb/articles/8050093018258?step=withdraw",
+        "ExtendEmployerUri": "https://test.employers.tlevels.gov.uk/hc/en-gb/articles/8050093018258?step=extend",
+        "RegisterInterestUri": "https://test.employers.tlevels.gov.uk/hc/en-gb/articles/8050093018258",
+        "ExpiryNotificationDays": 7,
+        "MaximumExtensions": 20,
         "RetentionDays": 84,
         "SearchRadius": 30
+      },
+    "ProviderSettings": {
+        "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
+        "DefaultSearchRadius": 20,
+        "NotificationEmailImmediateSchedule": "0 0/15 * * * ?",
+        "NotificationEmailDailySchedule": "0 0 6 ? * *",
+        "NotificationEmailWeeklySchedule": "0 0 6 ? * *"
     },
     "GoogleMapsApiSettings": {
         "ApiKey": "<API key>",
@@ -117,6 +128,12 @@ Add a new row to the table with:
         "Timeout": 30,
         "Administrators": "<list of administrator email addresses>"
     },
+    "ProviderSettings": {
+        "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
+        "DefaultSearchRadius": 20,
+        "SupportSiteAccessConnectHelpUri": "https://support.tlevels.gov.uk/hc/en-gb/articles/9753415632914"
+    },
+
     "PostcodeApiSettings": {
         "BaseUri": "https://api.postcodes.io/"
     }

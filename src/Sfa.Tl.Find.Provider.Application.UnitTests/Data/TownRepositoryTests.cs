@@ -6,7 +6,6 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Data;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Policies;
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Repositories;
-using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -70,10 +69,9 @@ public class TownRepositoryTests
             
         var receivedSqlArgs = new List<string>();
 
-        var dapperParameterWrapper = new SubstituteDynamicParameterWrapper();
-        
-        var (dbContextWrapper, dbConnection, transaction) = new DbContextWrapperBuilder()
-            .BuildSubstituteWrapperAndConnectionWithTransaction();
+        var (dbContextWrapper, dbConnection, transaction, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithTransactionWithDynamicParameters();
 
         dbContextWrapper
             .QueryAsync<(string Change, int ChangeCount)>(dbConnection,
@@ -97,7 +95,7 @@ public class TownRepositoryTests
         var repository = new TownRepositoryBuilder()
             .Build(
                 dbContextWrapper,
-                dapperParameterWrapper.DapperParameterFactory,
+                dynamicParametersWrapper.DapperParameterFactory,
                 pollyPolicyRegistry, 
                 logger);
 
@@ -108,7 +106,7 @@ public class TownRepositoryTests
             .QueryAsync<(string Change, int ChangeCount)>(
                 dbConnection,
                 Arg.Any<string>(),
-                Arg.Is<object>(o => o == dapperParameterWrapper.DynamicParameters),
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
                 Arg.Is<IDbTransaction>(t => t == transaction),
                 commandType: CommandType.StoredProcedure
             );
@@ -166,6 +164,7 @@ public class TownRepositoryTests
         var repository = new TownRepositoryBuilder().Build(dbContextWrapper);
 
         var results = (await repository.Search(searchTerm, maxResults)).ToList();
+        
         results.Should().BeEquivalentTo(towns);
         await dbContextWrapper
             .Received(1)
@@ -173,5 +172,30 @@ public class TownRepositoryTests
                 Arg.Is<string>(sql => 
                     sql.Contains("FROM dbo.[TownSearchView]")),
                 Arg.Any<object>());
+    }
+
+    [Fact]
+    public async Task Search_Sets_Dynamic_Parameters()
+    {
+        const string searchTerm = "Coventry";
+        const string expectedSearchString = "coventry%";
+        const int maxResults = 10;
+
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+
+        var repository = new TownRepositoryBuilder().Build(
+            dbContextWrapper,
+            dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.Search(searchTerm, maxResults);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(2);
+        templates.ContainsNameAndValue("maxResults", maxResults);
+        templates.ContainsNameAndValue("query", expectedSearchString);
     }
 }

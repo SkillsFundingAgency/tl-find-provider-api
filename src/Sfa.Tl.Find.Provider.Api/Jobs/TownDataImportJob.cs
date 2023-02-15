@@ -26,9 +26,9 @@ public class TownDataImportJob : IJob
 
             _logger.LogInformation($"{nameof(TownDataImportJob)} job completed successfully.");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.LogError(e, $"{nameof(TownDataImportJob)} job failed.");
+            _logger.LogError(ex, $"{nameof(TownDataImportJob)} job failed.");
         }
     }
 }

@@ -97,7 +97,7 @@
                         <th scope="row" class="govuk-table__header govuk-!-width-one-quarter">Contact preference</th>
                         <td class="govuk-table__cell">
                             @{
-                                var contactPreference = (Model.EmployerInterest?.ContactPreferenceType).GetContactPreferenceDisplayName();
+                                var contactPreference = (Model.EmployerInterest?.ContactPreferenceType).GetEnumDisplayName();
                             }
                             @contactPreference
                         </td>

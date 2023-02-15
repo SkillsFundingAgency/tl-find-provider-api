@@ -22,6 +22,8 @@ public class EmployerInterestDetailDtoBuilder
         Telephone = "020 555 6666 ext 1",
         Website = "https://employer-one.co.uk",
         ContactPreferenceType = ContactPreference.Email,
+        ExpiryDate = DateTime.Parse("2023-03-31"),
+        ExtensionCount = 1,
         CreatedOn = DateTime.Parse("2022-10-24 12:00"),
         ModifiedOn = DateTime.Parse("2022-11-05 15:00")
     };

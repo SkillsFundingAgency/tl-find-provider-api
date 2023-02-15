@@ -11,8 +11,7 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class PageContextBuilder
 {
-    public const string DefaultUkPrn = "10000001";
-    public const string DefaultNameClaimType = "10000001";
+    public const long DefaultUkPrn = 10000001;
     public const string DefaultDisplayName = "Test User";
     public const string DefaultOrganisationName = "Test Organisation";
 
@@ -31,8 +30,7 @@ public class PageContextBuilder
                 ? userClaims 
                 : new List<Claim>
                 {
-                    new(CustomClaimTypes.UkPrn, DefaultUkPrn),
-                    new(ClaimsIdentity.DefaultNameClaimType, DefaultNameClaimType),
+                    new(CustomClaimTypes.UkPrn, DefaultUkPrn.ToString()),
                     new(CustomClaimTypes.DisplayName, DefaultDisplayName),
                     new(CustomClaimTypes.OrganisationName, DefaultOrganisationName)
                 };

@@ -79,7 +79,7 @@
       "required": [
         "GovNotifyApiKey"
       ],
-      "type":"object"
+      "type": "object"
     },
     "EmployerInterestSettings": {
       "properties": {
@@ -110,6 +110,36 @@
       "additionalProperties": false,
       "required": [
         "BaseUri"
+      ],
+      "type": "object"
+    },
+    "ProviderSettings": {
+      "properties": {
+        "ConnectSiteUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ProviderSettings_ConnectSiteUri"
+        },
+        "DefaultSearchRadius": {
+          "minLength": 1,
+          "type": "integer",
+          "environmentVariable": "ProviderSettings_DefaultSearchRadius"
+        },
+        "DefaultNotificationSearchRadius": {
+          "minLength": 1,
+          "type": "integer",
+          "environmentVariable": "ProviderSettings_DefaultNotificationSearchRadius"
+        },
+        "SupportSiteAccessConnectHelpUri": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "ProviderSettings_SupportSiteAccessConnectHelpUri"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "ConnectSiteUri",
+        "DefaultSearchRadius"
       ],
       "type": "object"
     },

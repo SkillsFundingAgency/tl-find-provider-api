@@ -5,7 +5,7 @@ namespace Sfa.Tl.Find.Provider.Application.UnitTests.Caching;
 
 public class CacheKeysTests
 {
-    [Theory(DisplayName = nameof(CacheKeys.LatLongKey) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(CacheKeys.LatLongKey)} Data Tests")]
     [InlineData(52.400997, -1.508122, "LAT_LONG__52.400997_-1.508122")]
     public void LatLong_Key_Returns_Expected_Value(double latitude, double longitude, string expectedKey)
     {
@@ -14,7 +14,7 @@ public class CacheKeysTests
         key.Should().Be(expectedKey);
     }
 
-    [Theory(DisplayName = nameof(CacheKeys.PostcodeKey) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(CacheKeys.PostcodeKey)} Data Tests")]
     [InlineData("cv12wt", "POSTCODE__CV12WT")]
     [InlineData("CV1 2WT", "POSTCODE__CV12WT")]
     public void Postcode_Key_Returns_Expected_Value(string postcode, string expectedKey)
@@ -23,7 +23,7 @@ public class CacheKeysTests
         key.Should().Be(expectedKey);
     }
 
-    [Theory(DisplayName = nameof(CacheKeys.UserCacheKey) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(CacheKeys.UserCacheKey)} Data Tests")]
     [InlineData("7ff3469a-0c11-4c16-814b-2b9c5aaadf34", 
         CacheKeys.UserSessionActivityKey, 
         "USERID:7ff3469a-0c11-4c16-814b-2b9c5aaadf34:USER_SESSION_ACTIVITY")]

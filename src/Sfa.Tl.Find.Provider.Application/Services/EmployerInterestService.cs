@@ -90,9 +90,10 @@ public class EmployerInterestService : IEmployerInterestService
     public async Task<bool> ExtendEmployerInterest(Guid id)
     {
         return await _employerInterestRepository
-            .ExtendExpiry(id, 
-                _employerInterestSettings.RetentionDays, 
-                _employerInterestSettings.ExpiryNotificationDays);
+            .ExtendExpiry(id,
+                _employerInterestSettings.RetentionDays,
+                _employerInterestSettings.ExpiryNotificationDays,
+                _employerInterestSettings.MaximumExtensions);
     }
 
     public async Task<int> NotifyExpiringEmployerInterest()
@@ -106,6 +107,8 @@ public class EmployerInterestService : IEmployerInterestService
 
         var expiringInterestList = (await _employerInterestRepository
             .GetExpiringInterest(_employerInterestSettings.ExpiryNotificationDays))
+            .Where(e => e.ExtensionCount < _employerInterestSettings.MaximumExtensions
+                        || _employerInterestSettings.MaximumExtensions == 0)
             .ToList();
 
         foreach (var employerInterest in expiringInterestList)
@@ -129,7 +132,7 @@ public class EmployerInterestService : IEmployerInterestService
             return 0;
         }
 
-        var expiredInterest= (await _employerInterestRepository
+        var expiredInterest = (await _employerInterestRepository
                 .DeleteExpired(_dateTimeProvider.Today))
             .ToList();
 
@@ -153,28 +156,43 @@ public class EmployerInterestService : IEmployerInterestService
             .GetSummaryList())
             .SetSummaryListFlags(_dateTimeProvider.Today);
     }
-   
-    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(string postcode)
+
+    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount, bool SearchFiltersApplied)>
+        FindEmployerInterest(int locationId)
+    {
+        var (searchResults, totalResultsCount, searchFiltersApplied) =
+            await _employerInterestRepository
+                .Search(locationId, _employerInterestSettings.SearchRadius);
+
+        var summaryList = searchResults
+            .SetSummaryListFlags(_dateTimeProvider.Today);
+
+        return (summaryList, TotalResultsCount: totalResultsCount, SearchFiltersApplied: searchFiltersApplied);
+    }
+
+    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)>
+        FindEmployerInterest(string postcode)
     {
         var geoLocation = await GetPostcode(postcode);
 
         return await FindEmployerInterest(
-            geoLocation.Latitude, 
+            geoLocation.Latitude,
             geoLocation.Longitude);
     }
 
-    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> FindEmployerInterest(
-        double latitude,
-        double longitude)
+    public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)>
+        FindEmployerInterest(
+            double latitude,
+            double longitude)
     {
-        var results = await _employerInterestRepository
+        var (searchResults, totalResultsCount) =
+            await _employerInterestRepository
                 .Search(latitude, longitude, _employerInterestSettings.SearchRadius);
 
-        var summaryList = results
-            .SearchResults
+        var summaryList = searchResults
             .SetSummaryListFlags(_dateTimeProvider.Today);
 
-        return (summaryList, results.TotalResultsCount);
+        return (summaryList, TotalResultsCount: totalResultsCount);
     }
 
     public Task<EmployerInterestDetail> GetEmployerInterestDetail(int id)
@@ -204,17 +222,19 @@ public class EmployerInterestService : IEmployerInterestService
             employerInterest.UniqueId.ToString());
     }
 
-    private async Task<bool> SendEmployerInterestRemovedEmail(ExpiredEmployerInterestDto item)
+    private async Task<bool> SendEmployerInterestRemovedEmail(ExpiredEmployerInterestDto expiredInterest)
     {
         return await _emailService.SendEmail(
-            item.Email,
+            expiredInterest.Email,
             EmailTemplateNames.EmployerInterestRemoved,
             new Dictionary<string, string>
             {
+                { "organisation_name", expiredInterest.OrganisationName ?? "" },
+                { "postcode", expiredInterest.Postcode ?? "" },
                 { "register_interest_uri", _employerInterestSettings.RegisterInterestUri ?? "" },
                 { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" }
             },
-            item.UniqueId.ToString());
+            expiredInterest.UniqueId.ToString());
     }
 
     private async Task<bool> SendEmployerRegisterInterestEmail(EmployerInterest employerInterest, GeoLocation geoLocation)
@@ -227,13 +247,13 @@ public class EmployerInterestService : IEmployerInterestService
                 { "details_list", await BuildEmployerInterestDetailsList(employerInterest, geoLocation) },
                 { "employer_support_site", _employerInterestSettings.EmployerSupportSiteUri ?? "" },
                 { "employer_unsubscribe_uri", BuildUriWithUniqueId(_employerInterestSettings.UnsubscribeEmployerUri, employerInterest) }
-            }, 
+            },
             employerInterest.UniqueId.ToString());
     }
 
     private static string BuildUriWithUniqueId(string baseUri, EmployerInterest employerInterest)
     {
-        return !string.IsNullOrEmpty(baseUri) 
+        return !string.IsNullOrEmpty(baseUri)
             ? new Uri(QueryHelpers.AddQueryString(
                 baseUri.TrimEnd('/'),
                 "id",
@@ -288,15 +308,15 @@ public class EmployerInterestService : IEmployerInterestService
         {
             detailsList.AppendLine($"* Website: {employerInterest.Website}");
         }
-        
+
         detailsList.AppendLine($"* Organisation’s primary industry: {industry}");
         detailsList.AppendLine($"* Industry placement area{(skillAreas.Count > 1 ? "s" : "")}: {placementAreas}");
         detailsList.AppendLine($"* Postcode: {geoLocation.Location}");
         if (!string.IsNullOrEmpty(employerInterest.AdditionalInformation))
         {
-            detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks() }");
+            detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks()}");
         }
-        
+
         return detailsList.ToString();
     }
 

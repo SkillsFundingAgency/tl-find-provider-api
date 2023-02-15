@@ -11,6 +11,7 @@ using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
+using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
@@ -70,6 +71,10 @@ public static class ServiceCollectionExtensions
             .Configure<PostcodeApiSettings>(x =>
             {
                 x.ConfigurePostcodeApiSettings(siteConfiguration);
+            })
+            .Configure<ProviderSettings>(x =>
+            {
+                x.ConfigureProviderSettings(siteConfiguration);
             })
             .Configure<SearchSettings>(x =>
             {
@@ -200,8 +205,11 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string courseDirectoryImportCronSchedule = null,
         string townDataImportCronSchedule = null,
-        string employerInterestCleanupCronSchedule = null)
-    {
+        string employerInterestCleanupCronSchedule = null,
+        string providerNotificationEmailImmediateCronSchedule = null,
+        string providerNotificationEmailDailyCronSchedule = null,
+        string providerNotificationEmailWeeklyCronSchedule = null)
+        {
         services.AddQuartz(q =>
         {
             q.SchedulerName = "Find a Provider Quartz Scheduler";
@@ -227,17 +235,18 @@ public static class ServiceCollectionExtensions
                                 .CronSchedule(courseDirectoryImportCronSchedule)));
             }
 
-            if (!string.IsNullOrEmpty(townDataImportCronSchedule))
-            {
-                var townDataImportJobKey = new JobKey(JobKeys.ImportTownData);
-                q.AddJob<TownDataImportJob>(opts =>
-                        opts.WithIdentity(townDataImportJobKey))
-                    .AddTrigger(opts => opts
-                        .ForJob(townDataImportJobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(townDataImportCronSchedule)));
-            }
+            // Removed because the ONS API now requires a key. Use the manual file upload instead
+            //if (!string.IsNullOrEmpty(townDataImportCronSchedule))
+            //{
+            //    var townDataImportJobKey = new JobKey(JobKeys.ImportTownData);
+            //    q.AddJob<TownDataImportJob>(opts =>
+            //            opts.WithIdentity(townDataImportJobKey))
+            //        .AddTrigger(opts => opts
+            //            .ForJob(townDataImportJobKey)
+            //            .WithSchedule(
+            //                CronScheduleBuilder
+            //                    .CronSchedule(townDataImportCronSchedule)));
+            //}
 
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
             {
@@ -249,6 +258,54 @@ public static class ServiceCollectionExtensions
                         .WithSchedule(
                             CronScheduleBuilder
                                 .CronSchedule(employerInterestCleanupCronSchedule)));
+            }
+
+            if (!string.IsNullOrEmpty(providerNotificationEmailImmediateCronSchedule))
+            {
+                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailImmediate);
+                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                    {
+                        opts.WithIdentity(jobKey);
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
+                            NotificationFrequency.Immediately.ToString());
+                    })
+                    .AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(providerNotificationEmailImmediateCronSchedule)));
+            }
+
+            if (!string.IsNullOrEmpty(providerNotificationEmailDailyCronSchedule))
+            {
+                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailDaily);
+                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                    {
+                        opts.WithIdentity(jobKey);
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency, 
+                            NotificationFrequency.Daily.ToString());
+                    })
+                    .AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(providerNotificationEmailDailyCronSchedule)));
+            }
+
+            if (!string.IsNullOrEmpty(providerNotificationEmailWeeklyCronSchedule))
+            {
+                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailWeekly);
+                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                    {
+                        opts.WithIdentity(jobKey);
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
+                            NotificationFrequency.Weekly.ToString());
+                    })
+                    .AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithSchedule(
+                            CronScheduleBuilder
+                                .CronSchedule(providerNotificationEmailWeeklyCronSchedule)));
             }
         });
 

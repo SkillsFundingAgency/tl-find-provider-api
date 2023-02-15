@@ -12,6 +12,7 @@ public class SiteConfiguration
     public EmployerInterestSettings? EmployerInterestSettings { get; init; }
     public GoogleMapsApiSettings? GoogleMapsApiSettings { get; init; }
     public PostcodeApiSettings? PostcodeApiSettings { get; init; }
+    public ProviderSettings? ProviderSettings { get; init; }
     public SearchSettings? SearchSettings { get; init; }
     public string? BlobStorageConnectionString { get; init; }
     public string? SqlConnectionString { get; init; }

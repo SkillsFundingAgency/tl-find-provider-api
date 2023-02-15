@@ -15,10 +15,14 @@ public interface IEmployerInterestRepository
 
     Task<IEnumerable<ExpiredEmployerInterestDto>> DeleteExpired(DateTime date);
 
-    Task<bool> ExtendExpiry(Guid uniqueId, int numberOfDaysToExtend, int expiryNotificationDays);
+    Task<bool> ExtendExpiry(
+        Guid uniqueId,
+        int numberOfDaysToExtend, 
+        int expiryNotificationDays, 
+        int maximumExtensions);
 
     Task<IEnumerable<EmployerInterest>> GetAll();
-    
+
     Task<EmployerInterestDetail> GetDetail(int id);
 
     Task<IEnumerable<EmployerInterest>> GetExpiringInterest(int daysToExpiry);
@@ -26,9 +30,13 @@ public interface IEmployerInterestRepository
     Task<IEnumerable<EmployerInterestSummary>> GetSummaryList();
 
     Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount)> Search(
-        double latitude, 
-        double longitude, 
+        double latitude,
+        double longitude,
         int searchRadius);
+
+    Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount, bool SearchFiltersApplied)> Search(
+        int locationId,
+        int defaultSearchRadius);
 
     Task UpdateExtensionEmailSentDate(int id);
 }

@@ -26,7 +26,7 @@ public class JourneyExtensionsTests
             }
         };
 
-    [Theory(DisplayName = nameof(JourneyExtensions.CreateJourneyLink) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JourneyExtensions.CreateJourneyLink)} Data Tests")]
     [MemberData(nameof(JourneyLinksForPostcodeLocations))]
     public void GeoLocation_CreateJourneyLink_Data_Tests(
         GeoLocation fromGeoLocation, 
@@ -37,7 +37,7 @@ public class JourneyExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory(DisplayName = nameof(JourneyExtensions.CreateJourneyLink) + " Data Tests")]
+    [Theory(DisplayName = $"{nameof(JourneyExtensions.CreateJourneyLink)} Data Tests")]
     [MemberData(nameof(JourneyLinksForPostcodeLocations))]
     public void GeoLocation_CreateJourneyLink_To_Postcode_String_Data_Tests(
         GeoLocation fromGeoLocation,

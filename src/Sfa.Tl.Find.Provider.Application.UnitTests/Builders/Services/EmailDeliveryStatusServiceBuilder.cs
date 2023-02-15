@@ -19,12 +19,11 @@ public  class EmailDeliveryStatusServiceBuilder
         logger ??= Substitute.For<ILogger<EmailDeliveryStatusService>>();
 
         emailSettings ??= new SettingsBuilder().BuildEmailSettings();
-        var emailOptions = emailSettings.ToOptions();
         
         return new EmailDeliveryStatusService(
             emailService,
             emailTemplateRepository,
-            emailOptions,
+            emailSettings.ToOptions(),
             logger);
     }
 }

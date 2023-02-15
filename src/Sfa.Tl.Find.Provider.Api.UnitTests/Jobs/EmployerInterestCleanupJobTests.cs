@@ -2,6 +2,7 @@
 using Sfa.Tl.Find.Provider.Api.Jobs;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Jobs;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.Jobs;
@@ -32,7 +33,7 @@ public class EmployerInterestCleanupJobTests
             .Returns(count);
 
         var trigger = Substitute.For<ITrigger>();
-        trigger.JobKey.Returns(new JobKey("Test"));
+        trigger.JobKey.Returns(new JobKey(JobKeys.EmployerInterestCleanup));
         var jobContext = Substitute.For<IJobExecutionContext>();
         jobContext.Trigger.Returns(trigger);
 

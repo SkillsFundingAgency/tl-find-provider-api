@@ -39,6 +39,6 @@ public static class CacheKeys
     private static string ExpandTypeName(Type t) =>
         !t.IsGenericType || t.IsGenericTypeDefinition
             ? !t.IsGenericTypeDefinition ? t.Name : t.Name.Remove(t.Name.IndexOf('`'))
-            : $"{ExpandTypeName(t.GetGenericTypeDefinition())}<{string.Join(',', t.GetGenericArguments().Select(x => ExpandTypeName(x)))}>";
+            : $"{ExpandTypeName(t.GetGenericTypeDefinition())}<{string.Join(',', t.GetGenericArguments().Select(ExpandTypeName))}>";
 
 }

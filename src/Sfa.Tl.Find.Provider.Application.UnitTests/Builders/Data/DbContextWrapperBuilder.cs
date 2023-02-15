@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
+using Sfa.Tl.Find.Provider.Application.UnitTests.TestHelpers.Data;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
@@ -19,14 +20,14 @@ public class DbContextWrapperBuilder
             ? new SettingsBuilder().BuildConnectionStringSettings()
             : new SettingsBuilder().BuildConnectionStringSettings(connectionString);
 
-        var connectionStringOptions = connectionStringSettings
-            .ToOptions();
-
         policyRegistry ??= Substitute.For<IReadOnlyPolicyRegistry<string>>();
 
         logger ??= Substitute.For<ILogger<DbContextWrapper>>();
 
-        return new DbContextWrapper(connectionStringOptions, policyRegistry, logger);
+        return new DbContextWrapper(
+            connectionStringSettings.ToOptions(), 
+            policyRegistry, 
+            logger);
     }
 
     public IDbContextWrapper BuildSubstitute()
@@ -53,6 +54,20 @@ public class DbContextWrapperBuilder
         return (dbContextWrapper, dbConnection);
     }
 
+    public (IDbContextWrapper, IDbConnection, SubstituteDynamicParametersWrapper) BuildSubstituteWrapperAndConnectionWithDynamicParameters()
+    {
+        var dbConnection = Substitute.For<IDbConnection>();
+
+        var dbContextWrapper = Substitute.For<IDbContextWrapper>();
+        dbContextWrapper
+            .CreateConnection()
+            .Returns(dbConnection);
+
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+
+        return (dbContextWrapper, dbConnection, dynamicParametersWrapper);
+    }
+
     public (IDbContextWrapper, IDbConnection, IDbTransaction) BuildSubstituteWrapperAndConnectionWithTransaction()
     {
         var transaction = Substitute.For<IDbTransaction>();
@@ -64,5 +79,20 @@ public class DbContextWrapperBuilder
             .Returns(transaction);
 
         return (dbContextWrapper, dbConnection, transaction);
+    }
+
+    public (IDbContextWrapper, IDbConnection, IDbTransaction, SubstituteDynamicParametersWrapper) BuildSubstituteWrapperAndConnectionWithTransactionWithDynamicParameters()
+    {
+        var transaction = Substitute.For<IDbTransaction>();
+
+        var (dbContextWrapper, dbConnection) = BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .BeginTransaction(dbConnection)
+            .Returns(transaction);
+
+        var dynamicParametersWrapper = new SubstituteDynamicParametersWrapper();
+
+        return (dbContextWrapper, dbConnection, transaction, dynamicParametersWrapper);
     }
 }
