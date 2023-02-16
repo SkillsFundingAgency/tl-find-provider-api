@@ -156,8 +156,10 @@ public class ServiceCollectionExtensionsTests
     public void AddQuartzServices_With_Cron_Schedule_Should_AddService()
     {
         var services = new ServiceCollection();
+        var connectionStringSettings = new SettingsBuilder().BuildConnectionStringSettings();
 
         services.AddQuartzServices(
+            connectionStringSettings.SqlConnectionString,
             "0 0 9 ? * MON-FRI",
             "0 0 10 ? * *",
             "0 0 11 ? * *",
@@ -174,8 +176,9 @@ public class ServiceCollectionExtensionsTests
     public void AddQuartzServices_Without_Cron_Schedule_Should_AddService()
     {
         var services = new ServiceCollection();
+        var connectionStringSettings = new SettingsBuilder().BuildConnectionStringSettings();
 
-        services.AddQuartzServices();
+        services.AddQuartzServices(connectionStringSettings.SqlConnectionString);
 
         services.Should().Contain(t =>
             t.ImplementationType != null &&
