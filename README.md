@@ -68,7 +68,7 @@ Add a new row to the table with:
         "MaximumExtensions": 20,
         "RetentionDays": 84,
         "SearchRadius": 30
-      },
+    },
     "ProviderSettings": {
         "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
         "DefaultSearchRadius": 20,
