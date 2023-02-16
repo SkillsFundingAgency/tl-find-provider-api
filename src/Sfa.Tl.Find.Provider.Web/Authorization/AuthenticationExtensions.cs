@@ -146,7 +146,7 @@ public static class AuthenticationExtensions
                     return Task.FromException(ctx.Failure);
                 },
 
-                // that event is called after the OIDC middleware received the authorisation code,
+                // This event is called after the OIDC middleware received the authorisation code,
                 // redeemed it for an access token and a refresh token,
                 // and validated the identity token
                 OnTokenValidated = async ctx =>
@@ -165,43 +165,25 @@ public static class AuthenticationExtensions
                         var dfeSignInApiClient = ctx.HttpContext.RequestServices.GetRequiredService<IDfeSignInApiService>();
                         var (organisationInfo, userInfo) = await dfeSignInApiClient.GetDfeSignInInfo(organisationId, userId);
 
-                        //claims.AddRange(new List<Claim>
-                        //{
+                        claims.AddRange(new List<Claim>
+                        {
                         //    new(ClaimTypes.GivenName, ctx.Principal.FindFirst("given_name")?.Value ?? string.Empty),
                         //    new(ClaimTypes.Surname, ctx.Principal.FindFirst("family_name")?.Value ?? string.Empty),
-                        //    new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
-                        //});
+                            new(ClaimTypes.Email, ctx.Principal.FindFirst("email")?.Value ?? string.Empty)
+                        });
 
                         claims
                             .AddIfNotNullOrEmpty(CustomClaimTypes.UserId, userId)
                             //.AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationId, organisationId)
                             .AddIfNotNullOrEmpty(CustomClaimTypes.OrganisationName, organisationInfo?.Name)
-                            .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn?.ToString())
-                            //.AddIfNotNullOrEmpty(CustomClaimTypes.Urn, organisationInfo?.Urn?.ToString())
-                            ;
+                            .AddIfNotNullOrEmpty(CustomClaimTypes.UkPrn, organisationInfo?.UkPrn?.ToString());
 
                         if (userInfo.Roles != null && userInfo.Roles.Any())
                         {
                             claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
                         }
                     }
-
-                    //TODO: Remove this and Administrators setting when DSI gives us roles
-                    if (!string.IsNullOrEmpty(signInSettings.Administrators)
-                        && !claims.Any(c => c is {Type: ClaimTypes.Role, Value: CustomRoles.Administrator}))
-                    {
-                        var admins = signInSettings.Administrators?
-                            .Split(new[] { ';', ',' },
-                                StringSplitOptions.RemoveEmptyEntries);
-                        var email = ctx.Principal.FindFirst("email")?.Value;
-                        
-                        if (admins is not null && 
-                            admins.Any(a => string.Compare(a.Trim(), email, StringComparison.OrdinalIgnoreCase) == 0))
-                        {
-                            claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
-                        }
-                    }
-
+                    
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
 
                     ctx.Properties ??= new AuthenticationProperties();

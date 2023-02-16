@@ -84,8 +84,6 @@ public class DfeSignInApiService : IDfeSignInApiService
 
     private async Task<DfeUserInfo> GetUserInfo(string organisationId, string userId)
     {
-        var userClaims = new DfeUserInfo();
-
         var requestUri = $"/services/{_clientId}/organisations/{organisationId}/users/{userId}";
 
         try
@@ -94,7 +92,7 @@ public class DfeSignInApiService : IDfeSignInApiService
 
             if (response.IsSuccessStatusCode)
             {
-                userClaims = JsonSerializer
+                return JsonSerializer
                     .Deserialize<DfeUserInfo>(
                         await response.Content.ReadAsStringAsync(),
                         new JsonSerializerOptions
@@ -102,17 +100,16 @@ public class DfeSignInApiService : IDfeSignInApiService
                             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                         });
             }
-            else
-            {
-                userClaims.UserId = Guid.Parse(userId);
-                userClaims.Roles = new List<Role>();
-            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Call to {uri} failed.", requestUri);
         }
 
-        return userClaims;
+        return new DfeUserInfo()
+        {
+            UserId = Guid.Parse(userId),
+            Roles = new List<Role>()
+        };
     }
 }
