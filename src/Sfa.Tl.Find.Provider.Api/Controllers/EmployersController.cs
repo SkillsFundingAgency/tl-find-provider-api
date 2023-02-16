@@ -122,8 +122,9 @@ public class EmployersController : ControllerBase
             _logger.LogDebug($"{nameof(EmployersController)} {nameof(ExtendInterest)} called.");
         }
 
-        var extended = await _employerInterestService.ExtendEmployerInterest(id);
-        return extended
+        var extensionResult = await _employerInterestService.ExtendEmployerInterest(id);
+        //TODO: Return extensionResult as json
+        return extensionResult.Success
             ? Ok()
             : NotFound();
     }

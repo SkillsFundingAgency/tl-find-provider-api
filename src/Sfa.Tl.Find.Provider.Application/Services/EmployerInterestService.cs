@@ -87,7 +87,7 @@ public class EmployerInterestService : IEmployerInterestService
         return count;
     }
 
-    public async Task<bool> ExtendEmployerInterest(Guid id)
+    public async Task<ExtensionResult> ExtendEmployerInterest(Guid id)
     {
         return await _employerInterestRepository
             .ExtendExpiry(id,

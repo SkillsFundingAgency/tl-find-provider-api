@@ -15,7 +15,7 @@ public interface IEmployerInterestRepository
 
     Task<IEnumerable<ExpiredEmployerInterestDto>> DeleteExpired(DateTime date);
 
-    Task<bool> ExtendExpiry(
+    Task<ExtensionResult> ExtendExpiry(
         Guid uniqueId,
         int numberOfDaysToExtend, 
         int expiryNotificationDays, 

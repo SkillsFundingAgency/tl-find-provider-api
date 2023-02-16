@@ -650,15 +650,17 @@ public class EmployerInterestRepositoryTests
         const int expiryNotificationDays = 7;
         const int maximumExtensions = 10;
         var uniqueId = new Guid();
+        var extensionResult = new ExtensionResultBuilder().Build();
         
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .ExecuteAsync(dbConnection,
+            .QueryAsync<ExtensionResult>(dbConnection,
                 Arg.Any<string>(),
-                Arg.Any<object>())
-            .Returns(1);
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
+            .Returns(new List<ExtensionResult> { extensionResult });
 
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
             .Build();
@@ -673,19 +675,14 @@ public class EmployerInterestRepositoryTests
             expiryNotificationDays,
             maximumExtensions);
 
-        result.Should().BeTrue();
+        result.Should().Be(extensionResult);
 
         await dbContextWrapper
             .Received(1)
-            .ExecuteAsync(dbConnection, 
-                Arg.Is<string>(s => 
-                    s.Contains("UPDATE dbo.EmployerInterest") &&
-                    s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate),") &&
-                    s.Contains("ExtensionCount = ExtensionCount + 1,") &&
-                    s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE UniqueId = @uniqueId") &&
-                    s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())")),
-                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+            .QueryAsync<ExtensionResult>(dbConnection,
+                "ExtendEmployerInterestExpiry",
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
     }
 
     [Fact]
@@ -695,15 +692,18 @@ public class EmployerInterestRepositoryTests
         const int expiryNotificationDays = 7;
         const int maximumExtensions = 10;
         var uniqueId = new Guid();
+        var extensionResult = new ExtensionResultBuilder()
+            .Build(false, 0);
 
         var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
             .BuildSubstituteWrapperAndConnection();
 
         dbContextWrapper
-            .ExecuteAsync(dbConnection,
+            .QueryAsync<ExtensionResult>(dbConnection,
                 Arg.Any<string>(),
-                Arg.Any<object>())
-            .Returns(0);
+                Arg.Any<object>(),
+                commandType: CommandType.StoredProcedure)
+            .Returns(new List<ExtensionResult> { extensionResult });
 
         var dynamicParametersWrapper = new DynamicParametersWrapperBuilder()
             .Build();
@@ -718,19 +718,14 @@ public class EmployerInterestRepositoryTests
             expiryNotificationDays,
             maximumExtensions);
 
-        result.Should().BeFalse();
+        result.Success.Should().BeFalse();
 
         await dbContextWrapper
             .Received(1)
-            .ExecuteAsync(dbConnection,
-                Arg.Is<string>(s =>
-                    s.Contains("UPDATE dbo.EmployerInterest") &&
-                    s.Contains("SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate),") &&
-                    s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE UniqueId = @uniqueId") &&
-                    s.Contains("AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())") &&
-                    s.Contains("AND ExtensionCount < @maximumExtensions")),
-                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
+            .QueryAsync<ExtensionResult>(dbConnection,
+                "ExtendEmployerInterestExpiry",
+                Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters),
+                commandType: CommandType.StoredProcedure);
     }
 
     [Fact]

@@ -91,10 +91,12 @@ public class EmployersControllerTests
     public async Task ExtendInterest_Returns_Ok_Result_For_Successful_Extension()
     {
         var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var extensionResult = new ExtensionResultBuilder().Build();
         var employerInterestService = Substitute.For<IEmployerInterestService>();
+
         employerInterestService
             .ExtendEmployerInterest(uniqueId)
-            .Returns(true);
+            .Returns(extensionResult);
 
         var controller = new EmployersControllerBuilder()
             .Build(employerInterestService);
@@ -105,13 +107,16 @@ public class EmployersControllerTests
     }
 
     [Fact]
-    public async Task ExtendInterest_Returns_Not_Found_For_Successful_Extension()
+    public async Task ExtendInterest_Returns_Not_Found_For_Unsuccessful_Extension()
     {
         var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var extensionResult = new ExtensionResultBuilder()
+            .Build(success: false);
         var employerInterestService = Substitute.For<IEmployerInterestService>();
+
         employerInterestService
             .ExtendEmployerInterest(uniqueId)
-            .Returns(false);
+            .Returns(extensionResult);
 
         var controller = new EmployersControllerBuilder()
             .Build(employerInterestService);

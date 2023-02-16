@@ -532,6 +532,7 @@ public class EmployerInterestServiceTests
     public async Task ExtendEmployerInterest_By_UniqueId_Calls_Repository()
     {
         var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var extensionResult = new ExtensionResultBuilder().Build();
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
 
@@ -541,7 +542,7 @@ public class EmployerInterestServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<int>())
-            .Returns(true);
+            .Returns(extensionResult);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(employerInterestRepository: employerInterestRepository,
@@ -549,7 +550,8 @@ public class EmployerInterestServiceTests
 
         var result = await service.ExtendEmployerInterest(uniqueId);
 
-        result.Should().BeTrue();
+        result.Success.Should().BeTrue();
+        result.ExtensionsRemaining.Should().Be(extensionResult.ExtensionsRemaining);
 
         await employerInterestRepository
             .Received(1)
