@@ -81,6 +81,7 @@ try
         .AddTransient<IEmailService, EmailService>()
         .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
         .AddTransient<IEmployerInterestService, EmployerInterestService>()
+        .AddTransient<INotificationService, NotificationService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
