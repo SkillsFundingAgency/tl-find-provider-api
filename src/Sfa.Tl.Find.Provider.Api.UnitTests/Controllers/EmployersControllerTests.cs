@@ -103,7 +103,11 @@ public class EmployersControllerTests
 
         var result = await controller.ExtendInterest(uniqueId);
 
-        result.Should().BeOfType(typeof(OkResult));
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+
+        var receivedExtensionResult = okResult!.Value as ExtensionResult;
+        receivedExtensionResult.Should().BeEquivalentTo(extensionResult);
     }
 
     [Fact]
@@ -123,6 +127,10 @@ public class EmployersControllerTests
 
         var result = await controller.ExtendInterest(uniqueId);
 
-        result.Should().BeOfType(typeof(NotFoundResult));
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+
+        var receivedExtensionResult = okResult!.Value as ExtensionResult;
+        receivedExtensionResult.Should().BeEquivalentTo(extensionResult);
     }
 }

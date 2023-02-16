@@ -123,9 +123,6 @@ public class EmployersController : ControllerBase
         }
 
         var extensionResult = await _employerInterestService.ExtendEmployerInterest(id);
-        //TODO: Return extensionResult as json
-        return extensionResult.Success
-            ? Ok()
-            : NotFound();
+        return Ok(extensionResult);
     }
 }
