@@ -8,7 +8,7 @@ public static class AuthorizationPolicyExtension
     {
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(PolicyNames.HasProviderAccount,
+            options.AddPolicy(PolicyNames.IsProvider,
                 policy =>
                 {
                     policy.RequireAuthenticatedUser();

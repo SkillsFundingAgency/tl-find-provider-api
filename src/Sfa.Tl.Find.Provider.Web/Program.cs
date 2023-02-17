@@ -43,6 +43,7 @@ else
     builder.Services.AddWebDataProtection(siteConfiguration);
 }
 
+builder.Services.AddSingleton<IAuthorizationHandler, AdministratorAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderOrAdministratorAuthorizationHandler>();
 builder.Services.AddAuthorizationPolicies();
