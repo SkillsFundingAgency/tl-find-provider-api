@@ -13,14 +13,14 @@ public static class AuthorizationPolicyExtension
                 {
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim(CustomClaimTypes.UkPrn);
-                    policy.Requirements.Add(new ProviderUkPrnRequirement());
+                    policy.Requirements.Add(new ProviderRequirement());
                 });
 
             options.AddPolicy(PolicyNames.IsProviderOrAdministrator,
                 policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new ProviderUkPrnOrAdministratorRequirement());
+                    policy.Requirements.Add(new ProviderOrAdministratorRequirement());
                 });
         });
     }

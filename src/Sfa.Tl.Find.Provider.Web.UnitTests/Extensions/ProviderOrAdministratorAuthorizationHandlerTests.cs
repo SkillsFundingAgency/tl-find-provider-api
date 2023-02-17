@@ -5,14 +5,14 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 
 namespace Sfa.Tl.Find.Provider.Web.UnitTests.Extensions;
 
-public class ProviderUkPrnOrAdministratorAuthorizationHandlerTests
+public class ProviderOrAdministratorAuthorizationHandlerTests
 {
     private const string TestUkPrn = "12345678";
 
     private readonly List<IAuthorizationRequirement> _authorizationRequirements =
         new()
         {
-            new ProviderUkPrnOrAdministratorRequirement()
+            new ProviderOrAdministratorRequirement()
         };
 
     [Fact]
@@ -32,7 +32,7 @@ public class ProviderUkPrnOrAdministratorAuthorizationHandlerTests
             user,
             null);
 
-        var handler = new ProviderUkPrnOrAdministratorAuthorizationHandler();
+        var handler = new ProviderOrAdministratorAuthorizationHandler();
 
         await handler.HandleAsync(context);
 
@@ -56,7 +56,7 @@ public class ProviderUkPrnOrAdministratorAuthorizationHandlerTests
             user,
             null);
 
-        var handler = new ProviderUkPrnOrAdministratorAuthorizationHandler();
+        var handler = new ProviderOrAdministratorAuthorizationHandler();
 
         await handler.HandleAsync(context);
 
@@ -80,7 +80,7 @@ public class ProviderUkPrnOrAdministratorAuthorizationHandlerTests
             user,
             null);
 
-        var handler = new ProviderUkPrnOrAdministratorAuthorizationHandler();
+        var handler = new ProviderOrAdministratorAuthorizationHandler();
 
         await handler.HandleAsync(context);
 
@@ -104,7 +104,7 @@ public class ProviderUkPrnOrAdministratorAuthorizationHandlerTests
             user,
             null);
 
-        var handler = new ProviderUkPrnOrAdministratorAuthorizationHandler();
+        var handler = new ProviderOrAdministratorAuthorizationHandler();
 
         await handler.HandleAsync(context);
 
@@ -125,7 +125,7 @@ public class ProviderUkPrnOrAdministratorAuthorizationHandlerTests
             user,
             null);
 
-        var handler = new ProviderUkPrnOrAdministratorAuthorizationHandler();
+        var handler = new ProviderOrAdministratorAuthorizationHandler();
 
         await handler.HandleAsync(context);
 

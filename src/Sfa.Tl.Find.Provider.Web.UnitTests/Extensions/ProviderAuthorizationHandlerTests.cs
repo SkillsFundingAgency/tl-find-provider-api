@@ -12,7 +12,7 @@ public class ProviderAuthorizationHandlerTests
     private readonly List<IAuthorizationRequirement> _authorizationRequirements = 
         new()
         {
-            new ProviderUkPrnRequirement()
+            new ProviderRequirement()
         };
     
     [Fact]
@@ -22,7 +22,8 @@ public class ProviderAuthorizationHandlerTests
             new ClaimsIdentity(
                 new List<Claim>
                 {
-                    new(CustomClaimTypes.UkPrn, TestUkPrn)
+                    new(CustomClaimTypes.UkPrn, TestUkPrn),
+                    new(ClaimTypes.Role, CustomRoles.ProviderEndUser)
                 },
                 AuthenticationExtensions.AuthenticationTypeName));
 
