@@ -15,3 +15,6 @@ Post-Deployment Script
 :r ".\Seed Qualifications.sql"
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
+
+--Set up tables for Quartz Job Store
+:r ".\CreateQuartzJobStore.sql"
