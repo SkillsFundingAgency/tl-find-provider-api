@@ -190,11 +190,11 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                 _dbContextWrapper.QueryAsync<ExpiredEmployerInterestDto>(
                     connection,
                     "SELECT ei.Id, ei.UniqueId, ei.OrganisationName, eil.Postcode, ei.Email " +
-                    "FROM [dbo].[EmployerInterest] ei" +
+                    "FROM [dbo].[EmployerInterest] ei " +
                     "LEFT JOIN [dbo].[EmployerInterestLocation] eil " +
                     "ON eil.[EmployerInterestId] = ei.[Id]" +
                     "WHERE [ExpiryDate] < @date",
-                     new { date },
+                    _dynamicParametersWrapper.DynamicParameters,
                     transaction
                     ))?.ToList();
 
