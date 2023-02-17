@@ -3,6 +3,7 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.Jobs;
 
+[DisallowConcurrentExecution]
 public class EmployerInterestCleanupJob : IJob
 {
     private readonly IEmployerInterestService _employerInterestService;

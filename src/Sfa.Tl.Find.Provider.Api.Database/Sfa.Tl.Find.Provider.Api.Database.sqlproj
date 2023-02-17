@@ -73,6 +73,7 @@
     <None Include="Indexes\IX_SearchFilterRoute_SearchFilterId.sql" />
     <None Include="Indexes\IX_SearchFilter_LocationId.sql" />
     <None Include="Indexes\IX_NotificationLocation_LocationId.sql" />
+    <None Include="PostDeployment\CreateQuartzJobStore.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Provider.sql" />

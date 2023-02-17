@@ -16,6 +16,9 @@ Post-Deployment Script
 :r ".\Seed Routes.sql"
 :r ".\Seed RouteQualification.sql"
 
+--Set up tables for Quartz Job Store
+:r ".\CreateQuartzJobStore.sql"
+
 --TODO: Remove this statement and remove column 
 --from table definition after it has been deleted in live
 ALTER TABLE [dbo].[EmployerInterest] 

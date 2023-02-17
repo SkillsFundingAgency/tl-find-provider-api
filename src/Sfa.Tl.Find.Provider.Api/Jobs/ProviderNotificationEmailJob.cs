@@ -5,6 +5,7 @@ using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Api.Jobs;
 
+[DisallowConcurrentExecution]
 public class ProviderNotificationEmailJob : IJob
 {
     private readonly INotificationService _notificationService;
@@ -33,10 +34,13 @@ public class ProviderNotificationEmailJob : IJob
             }
 
             await _notificationService.SendProviderNotifications(frequency);
-
-            _logger.LogInformation("{job} {frequency} job completed successfully.",
-                nameof(ProviderNotificationEmailJob)
-                , frequency);
+            
+            _logger.LogInformation("{job} with key {key} ({frequency}) job completed successfully. [{allowConcurrent}]",
+                nameof(ProviderNotificationEmailJob),
+                context.JobDetail.Key,
+                frequency,
+                context.JobDetail.ConcurrentExecutionDisallowed
+                );
         }
         catch (Exception ex)
         {

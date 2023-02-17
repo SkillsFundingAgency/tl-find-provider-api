@@ -101,6 +101,7 @@ try
         siteConfiguration.EmailSettings.GovNotifyApiKey);
 
     builder.Services.AddQuartzServices(
+        siteConfiguration.SqlConnectionString,
         siteConfiguration.CourseDirectoryImportSchedule,
         siteConfiguration.TownDataImportSchedule,
         siteConfiguration.EmployerInterestSettings?.CleanupJobSchedule,

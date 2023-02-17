@@ -100,13 +100,13 @@ public static class ServiceCollectionExtensions
                 .Select(s => s.TrimEnd('/'))
                 .ToArray();
 
-            services.AddCors(options => 
+            services.AddCors(options =>
                 options
                     .AddPolicy(policyName, builder =>
                         builder
                             .WithMethods(
-                                HttpMethod.Get.Method, 
-                                HttpMethod.Post.Method, 
+                                HttpMethod.Get.Method,
+                                HttpMethod.Post.Method,
                                 HttpMethod.Delete.Method)
                             .AllowAnyHeader()
                             .WithOrigins(corsOrigins)));
@@ -203,18 +203,27 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddQuartzServices(
         this IServiceCollection services,
+        string sqlConnectionString,
         string courseDirectoryImportCronSchedule = null,
         string townDataImportCronSchedule = null,
         string employerInterestCleanupCronSchedule = null,
         string providerNotificationEmailImmediateCronSchedule = null,
         string providerNotificationEmailDailyCronSchedule = null,
         string providerNotificationEmailWeeklyCronSchedule = null)
-        {
+    {
         services.AddQuartz(q =>
         {
             q.SchedulerName = "Find a Provider Quartz Scheduler";
 
             q.UseMicrosoftDependencyInjectionJobFactory();
+
+            q.UsePersistentStore(x =>
+            {
+                x.UseProperties = true;
+                x.UseClustering();
+                x.UseSqlServer(sqlConnectionString);
+                x.UseJsonSerializer();
+            });
 
             var startupJobKey = new JobKey(JobKeys.StartupTasks);
             q.AddJob<InitializationJob>(opts =>
@@ -282,7 +291,7 @@ public static class ServiceCollectionExtensions
                 q.AddJob<ProviderNotificationEmailJob>(opts =>
                     {
                         opts.WithIdentity(jobKey);
-                        opts.UsingJobData(JobDataKeys.NotificationFrequency, 
+                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
                             NotificationFrequency.Daily.ToString());
                     })
                     .AddTrigger(opts => opts
