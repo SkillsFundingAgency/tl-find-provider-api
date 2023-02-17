@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -5,11 +6,13 @@ using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
+[Authorize(nameof(PolicyNames.HasProviderAccount))]
 public class SearchFilterDetailsModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
