@@ -18,7 +18,3 @@ Post-Deployment Script
 
 --Set up tables for Quartz Job Store
 :r ".\CreateQuartzJobStore.sql"
-
---Set up tables for Quartz Job Store
-:r ".\CreateQuartzJobStore.sql"
-
