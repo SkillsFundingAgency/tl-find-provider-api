@@ -16,6 +16,7 @@ using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
+[ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class AddAdditionalNotificationModel : PageModel
 {
     private readonly INotificationService _notificationService;

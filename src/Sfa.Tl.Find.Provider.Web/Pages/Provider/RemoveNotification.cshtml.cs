@@ -8,6 +8,7 @@ using Sfa.Tl.Find.Provider.Web.Authorization;
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
+[ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class RemoveNotificationModel : PageModel
 {
     private readonly INotificationService _notificationService;
