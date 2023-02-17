@@ -8,11 +8,15 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
+using Sfa.Tl.Find.Provider.Web.Authorization;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
+[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class AddAdditionalNotificationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;

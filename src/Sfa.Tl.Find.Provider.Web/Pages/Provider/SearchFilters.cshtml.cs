@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -11,6 +12,7 @@ using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
 [Authorize(nameof(PolicyNames.HasProviderAccount))]
+[ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class SearchFiltersModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
