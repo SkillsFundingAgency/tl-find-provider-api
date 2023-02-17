@@ -95,7 +95,8 @@ public class ProviderOrAdministratorAuthorizationHandlerTests
             new ClaimsIdentity(
                 new List<Claim>
                 {
-                    new(CustomClaimTypes.UkPrn, TestUkPrn)
+                    new(CustomClaimTypes.UkPrn, TestUkPrn),
+                    new(ClaimTypes.Role, CustomRoles.ProviderEndUser)
                 },
                 AuthenticationExtensions.AuthenticationTypeName));
 

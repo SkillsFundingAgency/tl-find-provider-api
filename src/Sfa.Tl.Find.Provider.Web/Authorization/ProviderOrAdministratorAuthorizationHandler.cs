@@ -24,6 +24,12 @@ public class ProviderOrAdministratorAuthorizationHandler : AuthorizationHandler<
             .FindFirst(c => c.Type.Equals(
             CustomClaimTypes.UkPrn))?.Value;
 
-        return ukPrn is not null || context.User.IsInRole(CustomRoles.Administrator);
+        var isProvider = ukPrn is not null &&
+               (context.User.IsInRole(CustomRoles.ProviderEndUser) ||
+                context.User.IsInRole(CustomRoles.ProviderApprover));
+
+        var isAdministrator = context.User.IsInRole(CustomRoles.Administrator);
+
+        return isProvider || isAdministrator;
     }
 }

@@ -16,6 +16,13 @@ public static class AuthorizationPolicyExtension
                     policy.Requirements.Add(new ProviderRequirement());
                 });
 
+            options.AddPolicy(PolicyNames.IsAdministrator,
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(new AdministratorRequirement());
+                });
+
             options.AddPolicy(PolicyNames.IsProviderOrAdministrator,
                 policy =>
                 {
