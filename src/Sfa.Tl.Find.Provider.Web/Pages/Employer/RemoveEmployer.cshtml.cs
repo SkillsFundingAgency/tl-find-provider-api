@@ -8,6 +8,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Authorization;
 namespace Sfa.Tl.Find.Provider.Web.Pages.Employer;
 
 [Authorize(Roles = CustomRoles.Administrator)]
+[ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class RemoveEmployerModel : PageModel
 {
     public EmployerInterestDetail? EmployerInterest { get; private set; }

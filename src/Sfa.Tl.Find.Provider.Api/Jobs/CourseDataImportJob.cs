@@ -3,6 +3,7 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 
 namespace Sfa.Tl.Find.Provider.Api.Jobs;
 
+[DisallowConcurrentExecution]
 public class CourseDataImportJob : IJob
 {
     private readonly ICourseDirectoryService _courseDirectoryService;

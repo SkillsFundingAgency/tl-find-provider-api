@@ -220,7 +220,7 @@ public static class ServiceCollectionExtensions
             q.UsePersistentStore(x =>
             {
                 x.UseProperties = true;
-                //x.UseClustering();
+                x.UseClustering();
                 x.UseSqlServer(sqlConnectionString);
                 x.UseJsonSerializer();
             });
