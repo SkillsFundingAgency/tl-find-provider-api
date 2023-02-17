@@ -6,7 +6,7 @@ namespace Sfa.Tl.Find.Provider.Web.Pages.Help;
 
 [Authorize]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
-public class IndexModel : PageModel
+public class InfoModel : PageModel
 {
     public IList<string> UserClaims { get; set; }
         = new List<string>();
