@@ -211,7 +211,6 @@ public static class ServiceCollectionExtensions
         string providerNotificationEmailDailyCronSchedule = null,
         string providerNotificationEmailWeeklyCronSchedule = null)
     {
-        //services.AddTransient<QuartzTriggerListener>();
         services.AddQuartz(q =>
         {
             q.SchedulerName = "Find a Provider Quartz Scheduler";
@@ -226,14 +225,24 @@ public static class ServiceCollectionExtensions
                 x.UseJsonSerializer();
             });
 
-            q.AddTriggerListener<QuartzTriggerListener>();
-
+            //q.AddTriggerListener<QuartzTriggerListener>();
+            
             var startupJobKey = new JobKey(JobKeys.StartupTasks);
             q.AddJob<InitializationJob>(opts =>
                     opts.WithIdentity(startupJobKey))
                 .AddTrigger(opts => opts
                     .ForJob(startupJobKey)
                     .StartNow());
+
+            //var job = JobBuilder
+            //    .Create<InitializationJob>()
+            //    .WithIdentity(startupJobKey)
+            //    .Build();
+            //var trigger = TriggerBuilder.Create()
+            //    .WithIdentity($"{startupJobKey} trigger",)
+            //    .StartNow()
+            //    .Build();
+            //q.Scheduler.ScheduleJob(job, trigger);
 
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {

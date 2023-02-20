@@ -23,15 +23,14 @@ public class ProviderNotificationEmailJob : IJob
     {
         try
         {
-            var currentlyExecutingJobs = await context.Scheduler.GetCurrentlyExecutingJobs();
-            if (currentlyExecutingJobs.Any(x => 
+            if ((await context.Scheduler.GetCurrentlyExecutingJobs())
+                .Any(x => 
                     x.FireInstanceId != context.FireInstanceId
                     && x.JobDetail.Key.Equals(context.JobDetail.Key)))
             {
                 _logger.LogInformation("Duplicate job detected for {jobKey} - exiting immediately.",
                     context.JobDetail.Key.Name);
-
-                return ;
+                return;
             }
 
             var frequencyString = context

@@ -23,6 +23,16 @@ public class CourseDataImportJob : IJob
 
         try
         {
+            if ((await context.Scheduler.GetCurrentlyExecutingJobs())
+                .Any(x =>
+                    x.FireInstanceId != context.FireInstanceId
+                    && x.JobDetail.Key.Equals(context.JobDetail.Key)))
+            {
+                _logger.LogInformation("Duplicate job detected for {jobKey} - exiting immediately.",
+                    context.JobDetail.Key.Name);
+                return;
+            }
+
             //await _courseDirectoryService.ImportQualifications();
             await _courseDirectoryService.ImportProviders();
 
