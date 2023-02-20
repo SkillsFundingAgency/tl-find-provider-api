@@ -14,6 +14,8 @@ public interface INotificationRepository
     Task DeleteLocation(int notificationLocationId);
 
     Task<IEnumerable<NotificationLocationName>> GetProviderNotificationLocations(int providerNotificationId);
+    
+    Task<DateTime?> GetLastNotificationSentDate(IEnumerable<int> idList);
 
     Task<Notification> GetNotification(int notificationId);
 

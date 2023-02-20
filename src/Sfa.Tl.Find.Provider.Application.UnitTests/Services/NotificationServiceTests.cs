@@ -356,6 +356,48 @@ public class NotificationServiceTests
     }
 
     [Fact]
+    public async Task SendProviderNotifications_Does_Not_Call_EmailService_If_Already_Updated()
+    {
+        const NotificationFrequency frequency = NotificationFrequency.Daily;
+        var notificationDate = DateTime.Parse("2023-02-13 11:32:42");
+
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(notificationDate);
+
+        var providerSettings = new SettingsBuilder()
+            .BuildProviderSettings();
+
+        var notificationEmails = new NotificationEmailBuilder()
+            .BuildList()
+            .ToList();
+
+        var notificationRepository = Substitute.For<INotificationRepository>();
+        notificationRepository.GetPendingNotificationEmails(frequency)
+            .Returns(notificationEmails);
+        notificationRepository.GetLastNotificationSentDate(Arg.Any<IEnumerable<int>>())
+            .Returns(notificationDate);
+
+        var emailService = Substitute.For<IEmailService>();
+
+        var service = new NotificationServiceBuilder()
+            .Build(
+                dateTimeProvider,
+                emailService: emailService,
+                notificationRepository: notificationRepository,
+                providerSettings: providerSettings);
+
+        await service.SendProviderNotifications(frequency);
+
+        await emailService
+            .DidNotReceive()
+            .SendEmail(
+                Arg.Any<string>(),
+                EmailTemplateNames.ProviderNotification,
+                Arg.Any<IDictionary<string, string>>(),
+                Arg.Any<string>());
+    }
+
+    [Fact]
     public async Task SendProviderNotifications_Calls_UpdateNotificationSentDate()
     {
         const NotificationFrequency frequency = NotificationFrequency.Daily;

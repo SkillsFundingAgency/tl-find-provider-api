@@ -145,6 +145,16 @@ public class NotificationService : INotificationService
 
         foreach (var notificationEmail in groupedEmails)
         {
+            var lastNotificationSent = await _notificationRepository
+                .GetLastNotificationSentDate(notificationEmail.IdList);
+
+            if (lastNotificationSent >= currentDateTime)
+            {
+                _logger.LogWarning("Skipping emails because the notification sent time has already been updated. Ids: {ids}",
+                    string.Join(',', notificationEmail.IdList));
+                continue;
+            }
+
             await SendProviderNotificationEmail(
                 notificationEmail.Email);
 

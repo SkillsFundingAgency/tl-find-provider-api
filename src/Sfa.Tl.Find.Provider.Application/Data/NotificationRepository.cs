@@ -85,7 +85,7 @@ public class NotificationRepository : INotificationRepository
                 routeIds
             });
 
-            var result = await _dbContextWrapper.ExecuteAsync(
+            await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "CreateNotificationLocation",
                 _dynamicParametersWrapper.DynamicParameters,
@@ -150,6 +150,31 @@ public class NotificationRepository : INotificationRepository
                 "GetProviderNotificationLocations",
                 _dynamicParametersWrapper.DynamicParameters,
                 commandType: CommandType.StoredProcedure);
+    }
+
+    public async Task<DateTime?> GetLastNotificationSentDate(IEnumerable<int> idList)
+    {
+        try
+        {
+            using var connection = _dbContextWrapper.CreateConnection();
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                idList
+            });
+
+            return await _dbContextWrapper.ExecuteScalarAsync<DateTime?>(
+                connection,
+                "SELECT MAX(LastNotificationDate) " +
+                "FROM NotificationLocation " +
+                "WHERE ID in @idList",
+                _dynamicParametersWrapper.DynamicParameters);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred getting the last notification date");
+            throw;
+        }
     }
 
     public async Task<Notification> GetNotification(
@@ -408,7 +433,7 @@ public class NotificationRepository : INotificationRepository
                 routeIds
             });
 
-            var result = await _dbContextWrapper.ExecuteAsync(
+            await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "UpdateNotification",
                 _dynamicParametersWrapper.DynamicParameters,
@@ -439,7 +464,7 @@ public class NotificationRepository : INotificationRepository
                 routeIds
             });
 
-            var result = await _dbContextWrapper.ExecuteAsync(
+            await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "UpdateNotificationLocation",
                 _dynamicParametersWrapper.DynamicParameters,
@@ -467,7 +492,7 @@ public class NotificationRepository : INotificationRepository
                 notificationDate
             });
 
-            var updated = await _dbContextWrapper.ExecuteAsync(
+            await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "UPDATE dbo.NotificationLocation " +
                 "SET LastNotificationDate = @notificationDate, " +
