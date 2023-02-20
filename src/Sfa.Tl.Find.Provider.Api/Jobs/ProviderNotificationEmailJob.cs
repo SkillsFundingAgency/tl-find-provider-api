@@ -23,6 +23,17 @@ public class ProviderNotificationEmailJob : IJob
     {
         try
         {
+            var currentlyExecutingJobs = await context.Scheduler.GetCurrentlyExecutingJobs();
+            if (currentlyExecutingJobs.Any(x => 
+                    x.FireInstanceId != context.FireInstanceId
+                    && x.JobDetail.Key.Equals(context.JobDetail.Key)))
+            {
+                _logger.LogInformation("Duplicate job detected for {jobKey} - exiting immediately.",
+                    context.JobDetail.Key.Name);
+
+                return ;
+            }
+
             var frequencyString = context
                 .JobDetail
                 .JobDataMap
@@ -35,12 +46,9 @@ public class ProviderNotificationEmailJob : IJob
 
             await _notificationService.SendProviderNotifications(frequency);
             
-            _logger.LogInformation("{job} with key {key} ({frequency}) job completed successfully. [{allowConcurrent}]",
-                nameof(ProviderNotificationEmailJob),
-                context.JobDetail.Key,
-                frequency,
-                context.JobDetail.ConcurrentExecutionDisallowed
-                );
+            _logger.LogInformation("Job {jobKey} with frequency {frequency} - job completed successfully.",
+                context.JobDetail.Key.Name,
+                frequency);
         }
         catch (Exception ex)
         {

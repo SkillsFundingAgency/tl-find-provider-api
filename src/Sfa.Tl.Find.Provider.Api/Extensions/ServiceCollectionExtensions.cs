@@ -211,6 +211,7 @@ public static class ServiceCollectionExtensions
         string providerNotificationEmailDailyCronSchedule = null,
         string providerNotificationEmailWeeklyCronSchedule = null)
     {
+        //services.AddTransient<QuartzTriggerListener>();
         services.AddQuartz(q =>
         {
             q.SchedulerName = "Find a Provider Quartz Scheduler";
@@ -224,6 +225,8 @@ public static class ServiceCollectionExtensions
                 x.UseSqlServer(sqlConnectionString);
                 x.UseJsonSerializer();
             });
+
+            q.AddTriggerListener<QuartzTriggerListener>();
 
             var startupJobKey = new JobKey(JobKeys.StartupTasks);
             q.AddJob<InitializationJob>(opts =>
@@ -241,7 +244,8 @@ public static class ServiceCollectionExtensions
                         .ForJob(courseDataImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(courseDirectoryImportCronSchedule)));
+                                .CronSchedule(courseDirectoryImportCronSchedule)
+                                .WithMisfireHandlingInstructionIgnoreMisfires()));
             }
 
             // Removed because the ONS API now requires a key. Use the manual file upload instead
@@ -254,7 +258,8 @@ public static class ServiceCollectionExtensions
             //            .ForJob(townDataImportJobKey)
             //            .WithSchedule(
             //                CronScheduleBuilder
-            //                    .CronSchedule(townDataImportCronSchedule)));
+            //                    .CronSchedule(townDataImportCronSchedule)
+            //                    .WithMisfireHandlingInstructionIgnoreMisfires()));
             //}
 
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
@@ -266,7 +271,8 @@ public static class ServiceCollectionExtensions
                         .ForJob(employerInterestCleanupJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(employerInterestCleanupCronSchedule)));
+                                .CronSchedule(employerInterestCleanupCronSchedule)
+                                .WithMisfireHandlingInstructionIgnoreMisfires()));
             }
 
             if (!string.IsNullOrEmpty(providerNotificationEmailImmediateCronSchedule))
@@ -282,7 +288,8 @@ public static class ServiceCollectionExtensions
                         .ForJob(jobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailImmediateCronSchedule)));
+                                .CronSchedule(providerNotificationEmailImmediateCronSchedule)
+                                .WithMisfireHandlingInstructionIgnoreMisfires()));
             }
 
             if (!string.IsNullOrEmpty(providerNotificationEmailDailyCronSchedule))
@@ -298,7 +305,8 @@ public static class ServiceCollectionExtensions
                         .ForJob(jobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailDailyCronSchedule)));
+                                .CronSchedule(providerNotificationEmailDailyCronSchedule)
+                                .WithMisfireHandlingInstructionIgnoreMisfires()));
             }
 
             if (!string.IsNullOrEmpty(providerNotificationEmailWeeklyCronSchedule))
@@ -314,7 +322,8 @@ public static class ServiceCollectionExtensions
                         .ForJob(jobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailWeeklyCronSchedule)));
+                                .CronSchedule(providerNotificationEmailWeeklyCronSchedule)
+                                .WithMisfireHandlingInstructionIgnoreMisfires()));
             }
         });
 
