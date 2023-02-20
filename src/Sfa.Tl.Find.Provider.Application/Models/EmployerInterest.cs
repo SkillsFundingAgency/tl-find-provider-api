@@ -24,4 +24,5 @@ public class EmployerInterest
     public ContactPreference? ContactPreferenceType { get; init; }
     public string AdditionalInformation { get; init; }
     public List<int>? SkillAreaIds { get; init; }
+    public List<NamedLocation>? Locations { get; init; }
 }

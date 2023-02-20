@@ -43,12 +43,17 @@ public class EmployersController : ControllerBase
 
         try
         {
+            var postcode =
+                employerInterest.Locations != null && employerInterest.Locations.Any()
+                    ? employerInterest.Locations.First().Postcode
+                    : employerInterest.Postcode;
+
             //TODO: Validate the model - for now, just enforce max lengths
             var cleanEmployerInterest = new EmployerInterest
             {
                 OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
                 ContactName = employerInterest.ContactName?.Trim().Truncate(400),
-                Postcode = employerInterest.Postcode,
+                Postcode = postcode,
                 IndustryId = employerInterest.IndustryId,
                 OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
                 AdditionalInformation = employerInterest.AdditionalInformation
@@ -62,7 +67,8 @@ public class EmployersController : ControllerBase
                     ?.ReplaceRedactedHttpStrings()
                     .Truncate(500),
                 ContactPreferenceType = employerInterest.ContactPreferenceType,
-                SkillAreaIds = employerInterest.SkillAreaIds
+                SkillAreaIds = employerInterest.SkillAreaIds,
+                Locations = employerInterest.Locations
             };
 
             var uniqueId = await _employerInterestService
