@@ -29,8 +29,7 @@ public class SearchFilterRepository : ISearchFilterRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            ukPrn,
-            includeAdditionalData
+            ukPrn
         });
 
         var searchFilters = new Dictionary<int, SearchFilter>();

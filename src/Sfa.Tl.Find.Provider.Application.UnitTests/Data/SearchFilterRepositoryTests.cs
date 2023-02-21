@@ -91,9 +91,8 @@ public class SearchFilterRepositoryTests
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
-        templates.GetDynamicTemplatesCount().Should().Be(2);
+        templates.GetDynamicTemplatesCount().Should().Be(1);
         templates.ContainsNameAndValue("ukPrn", ukPrn);
-        templates.ContainsNameAndValue("includeAdditionalData", includeAdditionalData);
     }
 
     [Fact]

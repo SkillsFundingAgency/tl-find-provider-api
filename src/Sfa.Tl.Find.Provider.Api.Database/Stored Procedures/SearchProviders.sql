@@ -5,10 +5,12 @@
 	@qualificationIds [dbo].[IdListTableType] READONLY,
 	@page INT,
 	@pageSize INT,
-	@includeAdditionalData BIT,
 	@totalLocationsCount INT OUTPUT
 AS
 	SET NOCOUNT ON;
+
+	--Set this locally - it will be removed in a future release 
+	DECLARE @includeAdditionalData BIT = 1;
 
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326);
 

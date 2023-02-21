@@ -228,9 +228,8 @@ public class NotificationRepositoryTests
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
-        templates.GetDynamicTemplatesCount().Should().Be(2);
+        templates.GetDynamicTemplatesCount().Should().Be(1);
         templates.ContainsNameAndValue("ukPrn", TestUkPrn);
-        templates.ContainsNameAndValue("includeAdditionalData", includeAdditionalData);
     }
 
     [Fact]

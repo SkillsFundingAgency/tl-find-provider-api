@@ -1,7 +1,9 @@
 ﻿CREATE PROCEDURE [dbo].[GetRoutes]
-	@includeAdditionalData BIT
 AS
 	SET NOCOUNT ON;
+
+	--Set this locally - it will be removed in a future release 
+	DECLARE @includeAdditionalData BIT = 1;
 
 	WITH ProvidersCTE AS (
 		SELECT	p.[Id],

@@ -21,11 +21,6 @@ public class RouteRepository : IRouteRepository
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
-        _dynamicParametersWrapper.CreateParameters(new
-        {
-            includeAdditionalData
-        });
-
         var routes = new Dictionary<int, Route>();
 
         await _dbContextWrapper.QueryAsync<RouteDto, QualificationDto, Route>(
@@ -56,7 +51,6 @@ public class RouteRepository : IRouteRepository
 
                 return routeResult;
             },
-            _dynamicParametersWrapper.DynamicParameters,
             splitOn: "RouteId, QualificationId",
             commandType: CommandType.StoredProcedure);
 

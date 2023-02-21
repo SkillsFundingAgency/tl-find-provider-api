@@ -311,8 +311,7 @@ public class NotificationRepository : INotificationRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            ukPrn,
-            includeAdditionalData
+            ukPrn
         });
 
         var notifications = new Dictionary<int, NotificationSummary>();
