@@ -19,8 +19,6 @@ public class CourseDataImportJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.LogInformation($"{nameof(CourseDataImportJob)} job triggered. {context?.Trigger.JobKey.Name}");
-
         try
         {
             if ((await context.Scheduler.GetCurrentlyExecutingJobs())
@@ -32,6 +30,9 @@ public class CourseDataImportJob : IJob
                     context.JobDetail.Key.Name);
                 return;
             }
+
+            _logger.LogInformation("{jobKey} job triggered.",
+                context.Trigger.JobKey.Name);
 
             //await _courseDirectoryService.ImportQualifications();
             await _courseDirectoryService.ImportProviders();
