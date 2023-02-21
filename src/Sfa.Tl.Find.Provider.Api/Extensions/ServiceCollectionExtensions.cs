@@ -227,23 +227,6 @@ public static class ServiceCollectionExtensions
 
             //q.AddTriggerListener<QuartzTriggerListener>();
             
-            var startupJobKey = new JobKey(JobKeys.StartupTasks);
-            q.AddJob<InitializationJob>(opts =>
-                    opts.WithIdentity(startupJobKey))
-                .AddTrigger(opts => opts
-                    .ForJob(startupJobKey)
-                    .StartNow());
-
-            //var job = JobBuilder
-            //    .Create<InitializationJob>()
-            //    .WithIdentity(startupJobKey)
-            //    .Build();
-            //var trigger = TriggerBuilder.Create()
-            //    .WithIdentity($"{startupJobKey} trigger",)
-            //    .StartNow()
-            //    .Build();
-            //q.Scheduler.ScheduleJob(job, trigger);
-
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {
                 var courseDataImportJobKey = new JobKey(JobKeys.CourseDirectoryImport);
@@ -256,21 +239,7 @@ public static class ServiceCollectionExtensions
                                 .CronSchedule(courseDirectoryImportCronSchedule)
                                 .WithMisfireHandlingInstructionIgnoreMisfires()));
             }
-
-            // Removed because the ONS API now requires a key. Use the manual file upload instead
-            //if (!string.IsNullOrEmpty(townDataImportCronSchedule))
-            //{
-            //    var townDataImportJobKey = new JobKey(JobKeys.ImportTownData);
-            //    q.AddJob<TownDataImportJob>(opts =>
-            //            opts.WithIdentity(townDataImportJobKey))
-            //        .AddTrigger(opts => opts
-            //            .ForJob(townDataImportJobKey)
-            //            .WithSchedule(
-            //                CronScheduleBuilder
-            //                    .CronSchedule(townDataImportCronSchedule)
-            //                    .WithMisfireHandlingInstructionIgnoreMisfires()));
-            //}
-
+            
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
             {
                 var employerInterestCleanupJobKey = new JobKey(JobKeys.EmployerInterestCleanup);
