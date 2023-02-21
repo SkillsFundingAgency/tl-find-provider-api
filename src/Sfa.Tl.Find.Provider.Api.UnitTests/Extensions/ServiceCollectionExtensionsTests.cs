@@ -46,9 +46,6 @@ public class ServiceCollectionExtensionsTests
         var postcodeApiOptions = serviceProvider.GetRequiredService<IOptions<PostcodeApiSettings>>();
         postcodeApiOptions.Value.Should().BeEquivalentTo(siteConfiguration.PostcodeApiSettings);
 
-        var searchOptions = serviceProvider.GetRequiredService<IOptions<SearchSettings>>();
-        searchOptions.Value.Should().BeEquivalentTo(siteConfiguration.SearchSettings);
-
         var connectionStringOptions = serviceProvider.GetRequiredService<IOptions<ConnectionStringSettings>>();
         connectionStringOptions.Value.Should().NotBeNull();
         connectionStringOptions.Value.BlobStorageConnectionString.Should().BeEquivalentTo(siteConfiguration.BlobStorageConnectionString);

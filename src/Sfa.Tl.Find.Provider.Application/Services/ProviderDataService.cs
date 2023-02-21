@@ -39,7 +39,6 @@ public class ProviderDataService : IProviderDataService
         ITownDataService townDataService,
         ICacheService cacheService,
         IOptions<ProviderSettings> providerOptions,
-        IOptions<SearchSettings> searchOptions,
         ILogger<ProviderDataService> logger)
     {
         _postcodeLookupService = postcodeLookupService ?? throw new ArgumentNullException(nameof(postcodeLookupService));
@@ -53,7 +52,6 @@ public class ProviderDataService : IProviderDataService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         if (providerOptions is null) throw new ArgumentNullException(nameof(providerOptions));
-        if (searchOptions is null) throw new ArgumentNullException(nameof(searchOptions));
 
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));

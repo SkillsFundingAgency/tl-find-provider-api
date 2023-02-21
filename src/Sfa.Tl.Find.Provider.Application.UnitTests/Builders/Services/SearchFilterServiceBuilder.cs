@@ -11,20 +11,13 @@ public class SearchFilterServiceBuilder
 {
     public ISearchFilterService Build(
         ISearchFilterRepository searchFilterRepository = null,
-        ProviderSettings providerSettings = null,
-        SearchSettings searchSettings = null,
         ILogger<SearchFilterService> logger = null)
     {
         searchFilterRepository ??= Substitute.For<ISearchFilterRepository>();
         logger ??= Substitute.For<ILogger<SearchFilterService>>();
 
-        providerSettings ??= new SettingsBuilder().BuildProviderSettings();
-        searchSettings ??= new SettingsBuilder().BuildSearchSettings();
-
         return new SearchFilterService(
             searchFilterRepository,
-            providerSettings.ToOptions(),
-            searchSettings.ToOptions(),
             logger);
     }
 }

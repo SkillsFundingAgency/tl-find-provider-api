@@ -23,7 +23,6 @@ public class NotificationService : INotificationService
         IEmailService emailService,
         INotificationRepository notificationRepository,
         IOptions<ProviderSettings> providerOptions,
-        IOptions<SearchSettings> searchOptions,
         ILogger<NotificationService> logger)
     {
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
@@ -33,7 +32,6 @@ public class NotificationService : INotificationService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         if (providerOptions is null) throw new ArgumentNullException(nameof(providerOptions));
-        if (searchOptions is null) throw new ArgumentNullException(nameof(searchOptions));
 
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));

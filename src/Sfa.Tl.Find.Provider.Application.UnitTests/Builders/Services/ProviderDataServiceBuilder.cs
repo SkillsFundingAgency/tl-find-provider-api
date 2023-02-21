@@ -20,7 +20,6 @@ public class ProviderDataServiceBuilder
         ITownDataService townDataService = null,
         ICacheService cacheService = null,
         ProviderSettings providerSettings = null,
-        SearchSettings searchSettings = null,
         ILogger<ProviderDataService> logger = null)
     {
         postcodeLookupService ??= Substitute.For<IPostcodeLookupService>();
@@ -34,7 +33,6 @@ public class ProviderDataServiceBuilder
         logger ??= Substitute.For<ILogger<ProviderDataService>>();
 
         providerSettings ??= new SettingsBuilder().BuildProviderSettings();
-        searchSettings ??= new SettingsBuilder().BuildSearchSettings();
 
         return new ProviderDataService(
             postcodeLookupService,
@@ -46,7 +44,6 @@ public class ProviderDataServiceBuilder
             townDataService,
             cacheService,
             providerSettings.ToOptions(),
-            searchSettings.ToOptions(),
             logger);
     }
 }

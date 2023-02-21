@@ -16,7 +16,6 @@ public class NotificationServiceBuilder
         IEmailService emailService = null,
         INotificationRepository notificationRepository = null,
         ProviderSettings providerSettings = null,
-        SearchSettings searchSettings = null,
         ILogger<NotificationService> logger = null)
     {
         dateTimeProvider ??= Substitute.For<IDateTimeProvider>();
@@ -26,7 +25,6 @@ public class NotificationServiceBuilder
         logger ??= Substitute.For<ILogger<NotificationService>>();
 
         providerSettings ??= new SettingsBuilder().BuildProviderSettings();
-        searchSettings ??= new SettingsBuilder().BuildSearchSettings();
 
         return new NotificationService(
             dateTimeProvider,
@@ -34,7 +32,6 @@ public class NotificationServiceBuilder
             emailService,
             notificationRepository,
             providerSettings.ToOptions(),
-            searchSettings.ToOptions(),
             logger);
     }
 }

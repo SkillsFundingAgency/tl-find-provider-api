@@ -336,13 +336,9 @@ public class ProviderDataServiceTests
         postcodeLookupService.GetPostcode(fromGeoLocation.Location)
             .Returns(fromGeoLocation);
 
-        var searchSettings = new SettingsBuilder()
-            .BuildSearchSettings();
-
         var service = new ProviderDataServiceBuilder().Build(
             postcodeLookupService: postcodeLookupService,
-            providerRepository: providerRepository,
-            searchSettings: searchSettings);
+            providerRepository: providerRepository);
 
         var results = await service
             .FindProviders(fromGeoLocation.Location,

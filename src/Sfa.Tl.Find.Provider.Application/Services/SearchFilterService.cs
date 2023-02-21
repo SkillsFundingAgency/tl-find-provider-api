@@ -8,23 +8,14 @@ namespace Sfa.Tl.Find.Provider.Application.Services;
 public class SearchFilterService : ISearchFilterService
 {
     private readonly ISearchFilterRepository _searchFilterRepository;
-    private readonly ProviderSettings _providerSettings;
     private readonly ILogger<SearchFilterService> _logger;
 
     public SearchFilterService(
         ISearchFilterRepository searchFilterRepository,
-        IOptions<ProviderSettings> providerOptions,
-        IOptions<SearchSettings> searchOptions,
         ILogger<SearchFilterService> logger)
     {
         _searchFilterRepository = searchFilterRepository ?? throw new ArgumentNullException(nameof(searchFilterRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-        if (providerOptions is null) throw new ArgumentNullException(nameof(providerOptions));
-        if (searchOptions is null) throw new ArgumentNullException(nameof(searchOptions));
-
-        _providerSettings = providerOptions?.Value
-                            ?? throw new ArgumentNullException(nameof(providerOptions));
     }
 
     public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)

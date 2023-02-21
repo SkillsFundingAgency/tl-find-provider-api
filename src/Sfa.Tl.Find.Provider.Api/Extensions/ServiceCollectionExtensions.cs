@@ -76,10 +76,6 @@ public static class ServiceCollectionExtensions
             {
                 x.ConfigureProviderSettings(siteConfiguration);
             })
-            .Configure<SearchSettings>(x =>
-            {
-                x.ConfigureSearchSettings(siteConfiguration);
-            })
             .Configure<ConnectionStringSettings>(x =>
             {
                 x.ConfigureConnectionStringSettings(siteConfiguration);

@@ -13,7 +13,6 @@ public class SiteConfiguration
     public GoogleMapsApiSettings? GoogleMapsApiSettings { get; init; }
     public PostcodeApiSettings? PostcodeApiSettings { get; init; }
     public ProviderSettings? ProviderSettings { get; init; }
-    public SearchSettings? SearchSettings { get; init; }
     public string? BlobStorageConnectionString { get; init; }
     public string? SqlConnectionString { get; init; }
     public string? RedisCacheConnectionString { get; init; }

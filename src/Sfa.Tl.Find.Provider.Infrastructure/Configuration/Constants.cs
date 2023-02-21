@@ -18,7 +18,6 @@ public static class Constants
     public const string PostcodeApiSettingsConfigKey = "PostcodeApiSettings";
     public const string ProviderSettingsConfigKey = "ProviderSettings";
     public const string RedisCacheConnectionStringConfigKey = "RedisCacheConnectionString";
-    public const string SearchSettingsConfigKey = "SearchSettings";
     public const string SqlConnectionStringConfigKey = "SqlConnectionString";
     public const string TownDataImportScheduleConfigKey = "TownDataImportSchedule";
     public const string SkipProviderAuthenticationConfigKey = "StubProviderAuth";

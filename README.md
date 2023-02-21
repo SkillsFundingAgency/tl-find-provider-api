@@ -83,9 +83,6 @@ Add a new row to the table with:
     "TownDataImportSchedule": "<CRON string>",
     "PostcodeApiSettings": {
         "BaseUri": "https://api.postcodes.io/"
-    },
-    "SearchSettings": {
-        "MergeAdditionalProviderData": false
     }
 }
 ```
