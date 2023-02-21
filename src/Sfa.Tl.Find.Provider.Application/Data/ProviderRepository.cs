@@ -110,8 +110,7 @@ public class ProviderRepository : IProviderRepository
     }
 
     public async Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(
-        long ukPrn,
-        bool includeAdditionalData)
+        long ukPrn)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
@@ -243,8 +242,7 @@ public class ProviderRepository : IProviderRepository
         IList<int> routeIds,
         IList<int> qualificationIds,
         int page,
-        int pageSize,
-        bool includeAdditionalData)
+        int pageSize)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 

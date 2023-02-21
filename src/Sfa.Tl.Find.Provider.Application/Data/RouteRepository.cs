@@ -17,7 +17,7 @@ public class RouteRepository : IRouteRepository
         _dynamicParametersWrapper = dynamicParametersWrapper ?? throw new ArgumentNullException(nameof(dynamicParametersWrapper));
     }
 
-    public async Task<IEnumerable<Route>> GetAll(bool includeAdditionalData)
+    public async Task<IEnumerable<Route>> GetAll()
     {
         using var connection = _dbContextWrapper.CreateConnection();
 

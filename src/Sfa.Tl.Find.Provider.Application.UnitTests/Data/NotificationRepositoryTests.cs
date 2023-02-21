@@ -160,8 +160,6 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task GetNotificationSummaryList_Returns_Expected_Results()
     {
-        const bool includeAdditionalData = true;
-
         var notificationSummaries = new NotificationSummaryBuilder()
             .BuildList()
             .ToList();
@@ -200,7 +198,7 @@ public class NotificationRepositoryTests
 
         var repository = new NotificationRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetNotificationSummaryList(TestUkPrn, includeAdditionalData))
+        var results = (await repository.GetNotificationSummaryList(TestUkPrn))
             .ToList();
 
         results.Should().NotBeNullOrEmpty();
@@ -213,8 +211,6 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task GetNotificationSummaryList_Sets_Dynamic_Parameters()
     {
-        const bool includeAdditionalData = true;
-
         var (dbContextWrapper, _, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
                 .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
@@ -223,7 +219,7 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.GetNotificationSummaryList(TestUkPrn, includeAdditionalData);
+        await repository.GetNotificationSummaryList(TestUkPrn);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();

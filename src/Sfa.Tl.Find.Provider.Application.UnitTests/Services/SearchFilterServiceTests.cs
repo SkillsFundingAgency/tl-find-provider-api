@@ -31,7 +31,7 @@ public class SearchFilterServiceTests
             .ToList();
 
         var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
-        searchFilterRepository.GetSearchFilterSummaryList(ukPrn, Arg.Any<bool>())
+        searchFilterRepository.GetSearchFilterSummaryList(ukPrn)
             .Returns(searchFilters);
 
         var service = new SearchFilterServiceBuilder()
@@ -42,7 +42,7 @@ public class SearchFilterServiceTests
 
         await searchFilterRepository
             .Received(1)
-            .GetSearchFilterSummaryList(ukPrn, true);
+            .GetSearchFilterSummaryList(ukPrn);
     }
 
     [Fact]

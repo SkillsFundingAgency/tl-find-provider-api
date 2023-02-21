@@ -28,7 +28,6 @@ public class ProviderDataService : IProviderDataService
     private readonly ICacheService _cacheService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<ProviderDataService> _logger;
-    private readonly bool _mergeAdditionalProviderData;
 
     public ProviderDataService(
         IPostcodeLookupService postcodeLookupService,
@@ -58,9 +57,6 @@ public class ProviderDataService : IProviderDataService
 
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));
-
-        _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
-                                       ?? throw new ArgumentNullException(nameof(searchOptions));
     }
 
     public async Task<IEnumerable<Industry>> GetIndustries()
@@ -115,7 +111,7 @@ public class ProviderDataService : IProviderDataService
         if (routes is null)
         {
             routes = (await _routeRepository
-                .GetAll(_mergeAdditionalProviderData))
+                .GetAll())
                 .ToList();
             await _cacheService.Set(key, routes);
         }
@@ -251,7 +247,7 @@ public class ProviderDataService : IProviderDataService
         }
 
         return await _providerRepository
-            .GetLocationPostcodes(ukPrn, _mergeAdditionalProviderData);
+            .GetLocationPostcodes(ukPrn);
     }
 
     public async Task ImportProviderContacts(Stream stream)
@@ -409,8 +405,7 @@ public class ProviderDataService : IProviderDataService
                     routeIds,
                     qualificationIds,
                     page,
-                    pageSize,
-                    _mergeAdditionalProviderData);
+                    pageSize);
 
         return new ProviderSearchResponse
         {

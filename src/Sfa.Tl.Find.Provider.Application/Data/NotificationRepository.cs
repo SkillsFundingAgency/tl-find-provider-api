@@ -304,8 +304,7 @@ public class NotificationRepository : INotificationRepository
         return notification;
     }
 
-    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn,
-        bool includeAdditionalData)
+    public async Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 

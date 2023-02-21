@@ -10,7 +10,6 @@ public class SearchFilterService : ISearchFilterService
     private readonly ISearchFilterRepository _searchFilterRepository;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<SearchFilterService> _logger;
-    private readonly bool _mergeAdditionalProviderData;
 
     public SearchFilterService(
         ISearchFilterRepository searchFilterRepository,
@@ -26,9 +25,6 @@ public class SearchFilterService : ISearchFilterService
 
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));
-
-        _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
-                                       ?? throw new ArgumentNullException(nameof(searchOptions));
     }
 
     public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn)
@@ -39,7 +35,7 @@ public class SearchFilterService : ISearchFilterService
         }
 
         return await _searchFilterRepository
-            .GetSearchFilterSummaryList(ukPrn, _mergeAdditionalProviderData);
+            .GetSearchFilterSummaryList(ukPrn);
     }
 
     public async Task<SearchFilter> GetSearchFilter(int locationId)

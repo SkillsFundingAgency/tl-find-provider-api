@@ -5,8 +5,7 @@ namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 public interface ISearchFilterRepository
 {
     Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(
-        long ukPrn,
-        bool includeAdditionalData);
+        long ukPrn);
 
     Task<SearchFilter> GetSearchFilter(int locationId);
 

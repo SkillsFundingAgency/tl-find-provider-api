@@ -16,7 +16,6 @@ public class NotificationService : INotificationService
     private readonly INotificationRepository _notificationRepository;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<NotificationService> _logger;
-    private readonly bool _mergeAdditionalProviderData;
 
     public NotificationService(
         IDateTimeProvider dateTimeProvider,
@@ -38,9 +37,6 @@ public class NotificationService : INotificationService
 
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));
-
-        _mergeAdditionalProviderData = searchOptions?.Value?.MergeAdditionalProviderData
-                                       ?? throw new ArgumentNullException(nameof(searchOptions));
     }
 
     public async Task<int> CreateNotification(Notification notification, long ukPrn)
@@ -85,7 +81,7 @@ public class NotificationService : INotificationService
 
         var notifications =
             (await _notificationRepository
-            .GetNotificationSummaryList(ukPrn, _mergeAdditionalProviderData));
+            .GetNotificationSummaryList(ukPrn));
 
         return notifications;
     }

@@ -240,7 +240,7 @@ public class NotificationServiceTests
             .ToList();
 
         var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotificationSummaryList(ukPrn, Arg.Any<bool>())
+        notificationRepository.GetNotificationSummaryList(ukPrn)
             .Returns(notificationSummaries);
 
         var service = new NotificationServiceBuilder()
@@ -251,7 +251,7 @@ public class NotificationServiceTests
 
         await notificationRepository
             .Received(1)
-            .GetNotificationSummaryList(ukPrn, true);
+            .GetNotificationSummaryList(ukPrn);
     }
 
     [Fact]

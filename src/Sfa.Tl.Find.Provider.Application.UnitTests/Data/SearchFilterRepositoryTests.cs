@@ -22,8 +22,7 @@ public class SearchFilterRepositoryTests
     public async Task GetSearchFilters_Returns_Expected_Results()
     {
         const long ukPrn = 12345678;
-        const bool includeAdditionalData = true;
-
+        
         var searchFilters = new SearchFilterBuilder()
             .BuildList()
             .ToList();
@@ -62,7 +61,7 @@ public class SearchFilterRepositoryTests
 
         var repository = new SearchFilterRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetSearchFilterSummaryList(ukPrn, includeAdditionalData))
+        var results = (await repository.GetSearchFilterSummaryList(ukPrn))
             .ToList();
 
         results.Should().NotBeNullOrEmpty();
@@ -76,7 +75,6 @@ public class SearchFilterRepositoryTests
     public async Task GetSearchFilterSummaryList_Sets_Dynamic_Parameters()
     {
         const long ukPrn = 12345678;
-        const bool includeAdditionalData = true;
 
         var (dbContextWrapper, _, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
@@ -86,7 +84,7 @@ public class SearchFilterRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.GetSearchFilterSummaryList(ukPrn, includeAdditionalData);
+        await repository.GetSearchFilterSummaryList(ukPrn);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
