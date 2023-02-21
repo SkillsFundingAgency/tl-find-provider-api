@@ -391,8 +391,9 @@ public class NotificationRepositoryTests
 
         dbContextWrapper
             .QueryAsync<NotificationEmail>(dbConnection,
-                "GetPendingNotifications",
+                "GetPendingNotificationsWithUpdate",
                 Arg.Any<object>(),
+                Arg.Any<IDbTransaction>(),
                 commandType: CommandType.StoredProcedure)
             .Returns(notificationEmails);
 
@@ -831,7 +832,7 @@ public class NotificationRepositoryTests
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
                     s.Contains("UPDATE dbo.NotificationLocation ") &&
-                    s.Contains("SET LastNotificationDate = @notificationDate, ") &&
+                    s.Contains("SET LastNotificationSentDate = @notificationDate, ") &&
                     s.Contains("ModifiedOn = GETUTCDATE() ") &&
                     s.Contains("WHERE Id IN (SELECT Id FROM @ids)")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));

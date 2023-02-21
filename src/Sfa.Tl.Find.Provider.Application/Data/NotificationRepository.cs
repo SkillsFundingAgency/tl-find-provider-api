@@ -23,7 +23,7 @@ public class NotificationRepository : INotificationRepository
                                     throw new ArgumentNullException(nameof(dynamicParametersWrapper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     public async Task<int> Create(Notification notification, long ukPrn)
     {
         try
@@ -129,7 +129,7 @@ public class NotificationRepository : INotificationRepository
             _dynamicParametersWrapper.DynamicParameters,
             commandType: CommandType.StoredProcedure);
     }
-    
+
     public async Task<IEnumerable<NotificationLocationName>> GetProviderNotificationLocations(int providerNotificationId)
     {
         if (providerNotificationId <= 0)
@@ -234,19 +234,35 @@ public class NotificationRepository : INotificationRepository
 
     public async Task<IEnumerable<NotificationEmail>> GetPendingNotificationEmails(NotificationFrequency frequency)
     {
-        using var connection = _dbContextWrapper.CreateConnection();
-
-        _dynamicParametersWrapper.CreateParameters(new
+        try
         {
-            frequency
-        });
+            using var connection = _dbContextWrapper.CreateConnection();
+            connection.Open();
 
-        return await _dbContextWrapper
-            .QueryAsync<NotificationEmail>(
-                connection,
-                "GetPendingNotifications",
-                _dynamicParametersWrapper.DynamicParameters,
-                commandType: CommandType.StoredProcedure);
+            using var transaction = _dbContextWrapper.BeginTransaction(connection);
+
+            _dynamicParametersWrapper.CreateParameters(new
+            {
+                frequency
+            });
+
+            var results = await _dbContextWrapper
+                .QueryAsync<NotificationEmail>(
+                    connection,
+                    "GetPendingNotificationsWithUpdate",
+                    _dynamicParametersWrapper.DynamicParameters,
+                    transaction,
+                    commandType: CommandType.StoredProcedure);
+
+            transaction.Commit();
+
+            return results;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when getting pending notifications for frequency {frequency}", frequency);
+            throw;
+        }
     }
 
     public async Task<Notification> GetNotificationLocation(
@@ -474,7 +490,7 @@ public class NotificationRepository : INotificationRepository
             throw;
         }
     }
-    
+
     public async Task UpdateNotificationSentDate(
         IEnumerable<int> notificationLocationIds,
         DateTime notificationDate)
@@ -493,7 +509,7 @@ public class NotificationRepository : INotificationRepository
             await _dbContextWrapper.ExecuteAsync(
                 connection,
                 "UPDATE dbo.NotificationLocation " +
-                "SET LastNotificationDate = @notificationDate, " +
+                "SET LastNotificationSentDate = @notificationDate, " +
                 "    ModifiedOn = GETUTCDATE() " +
                 "WHERE Id IN (SELECT Id FROM @ids) ",
                 _dynamicParametersWrapper.DynamicParameters);
@@ -536,7 +552,7 @@ public class NotificationRepository : INotificationRepository
             throw;
         }
     }
-    
+
     public async Task<(bool Success, string Email)> VerifyEmailToken(Guid emailVerificationToken)
     {
         try
@@ -553,7 +569,7 @@ public class NotificationRepository : INotificationRepository
                 "VerifyNotificationEmailToken",
                 _dynamicParametersWrapper.DynamicParameters,
                 commandType: CommandType.StoredProcedure);
-            
+
             return (email is not null, email);
         }
         catch (Exception ex)
