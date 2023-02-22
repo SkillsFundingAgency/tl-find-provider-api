@@ -218,8 +218,8 @@ public static class ServiceCollectionExtensions
                 x.UseProperties = true;
                 x.UseClustering(t =>
                 {
-                    t.CheckinInterval = TimeSpan.FromSeconds(1);
-                    t.CheckinMisfireThreshold = TimeSpan.FromSeconds(1);
+                    t.CheckinInterval = TimeSpan.FromSeconds(20);
+                    t.CheckinMisfireThreshold = TimeSpan.FromSeconds(60);
                 });
                 x.UseSqlServer(sqlConnectionString);
                 x.UseJsonSerializer();
@@ -236,8 +236,7 @@ public static class ServiceCollectionExtensions
                         .ForJob(courseDataImportJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(courseDirectoryImportCronSchedule)
-                                .WithMisfireHandlingInstructionIgnoreMisfires()));
+                                .CronSchedule(courseDirectoryImportCronSchedule)));
             }
             
             if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
@@ -249,8 +248,7 @@ public static class ServiceCollectionExtensions
                         .ForJob(employerInterestCleanupJobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(employerInterestCleanupCronSchedule)
-                                .WithMisfireHandlingInstructionIgnoreMisfires()));
+                                .CronSchedule(employerInterestCleanupCronSchedule)));
             }
 
             if (!string.IsNullOrEmpty(providerNotificationEmailImmediateCronSchedule))
@@ -266,8 +264,7 @@ public static class ServiceCollectionExtensions
                         .ForJob(jobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailImmediateCronSchedule)
-                                .WithMisfireHandlingInstructionIgnoreMisfires()));
+                                .CronSchedule(providerNotificationEmailImmediateCronSchedule)));
             }
 
             if (!string.IsNullOrEmpty(providerNotificationEmailDailyCronSchedule))
@@ -283,8 +280,7 @@ public static class ServiceCollectionExtensions
                         .ForJob(jobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailDailyCronSchedule)
-                                .WithMisfireHandlingInstructionIgnoreMisfires()));
+                                .CronSchedule(providerNotificationEmailDailyCronSchedule)));
             }
 
             if (!string.IsNullOrEmpty(providerNotificationEmailWeeklyCronSchedule))
@@ -300,8 +296,7 @@ public static class ServiceCollectionExtensions
                         .ForJob(jobKey)
                         .WithSchedule(
                             CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailWeeklyCronSchedule)
-                                .WithMisfireHandlingInstructionIgnoreMisfires()));
+                                .CronSchedule(providerNotificationEmailWeeklyCronSchedule)));
             }
         });
 

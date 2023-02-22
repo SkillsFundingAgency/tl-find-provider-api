@@ -158,6 +158,7 @@
     <Build Include="Stored Procedures\GetPendingNotifications.sql" />
     <Build Include="Stored Procedures\VerifyNotificationEmailToken.sql" />
     <Build Include="Stored Procedures\ExtendEmployerInterestExpiry.sql" />
+    <Build Include="Stored Procedures\GetPendingNotificationsWithUpdate.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\PostDeploymentScript.sql" />

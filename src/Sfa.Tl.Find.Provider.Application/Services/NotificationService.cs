@@ -126,7 +126,6 @@ public class NotificationService : INotificationService
     
     public async Task SendProviderNotifications(NotificationFrequency frequency)
     {
-        var currentDateTime = _dateTimeProvider.UtcNow;
         var pendingNotificationEmails = await _notificationRepository.GetPendingNotificationEmails(frequency);
 
         var groupedEmails = pendingNotificationEmails
@@ -139,6 +138,7 @@ public class NotificationService : INotificationService
 
         foreach (var notificationEmail in groupedEmails)
         {
+            var currentDateTime = _dateTimeProvider.UtcNow;
             var lastNotificationSent = await _notificationRepository
                 .GetLastNotificationSentDate(notificationEmail.IdList);
 
