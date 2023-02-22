@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 public class SearchFilterService : ISearchFilterService

@@ -2,7 +2,6 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using Sfa.Tl.Find.Provider.Application.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Api.UnitTests.IntegrationTests;
 
