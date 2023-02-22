@@ -815,8 +815,9 @@ public class ProviderDataServiceTests
         "info@testschool.com",
         "020 5555 5555",
             "https://www.testschool.com/",
-            locationCount: 1,
-            isAdditionalData: true);
+            locationCount: 1);
+
+        provider.IsAdditionalData.Should().Be(true);
 
         var location = provider!.Locations.First();
 
