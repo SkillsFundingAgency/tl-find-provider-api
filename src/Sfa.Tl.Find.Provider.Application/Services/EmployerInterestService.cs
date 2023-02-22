@@ -311,7 +311,7 @@ public class EmployerInterestService : IEmployerInterestService
 
         detailsList.AppendLine($"* Organisation’s primary industry: {industry}");
         detailsList.AppendLine($"* Industry placement area{(skillAreas.Count > 1 ? "s" : "")}: {placementAreas}");
-        detailsList.AppendLine($"* Postcode: {geoLocation.Location}");
+        detailsList.AppendLine($"* Location: {(!string.IsNullOrEmpty(employerInterest.LocationName) ? $"{employerInterest.LocationName} - ": null)}{geoLocation.Location}");
         if (!string.IsNullOrEmpty(employerInterest.AdditionalInformation))
         {
             detailsList.AppendLine($"* Additional information: {employerInterest.AdditionalInformation.ReplaceMultipleLineBreaks()}");

@@ -199,7 +199,7 @@ public class EmployerInterestServiceTests
             $"* Website: {employerInterest.Website}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement areas: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {employerInterest.Postcode}\r\n" +
+            $"* Location: {employerInterest.LocationName} - {employerInterest.Postcode}\r\n" +
             $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
 
         await emailService
@@ -295,7 +295,7 @@ public class EmployerInterestServiceTests
             $"* Website: {employerInterest.Website}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement areas: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {expectedPostcode}\r\n" +
+            $"* Location: {expectedPostcode}\r\n" +
             $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
 
         await emailService
@@ -442,7 +442,7 @@ public class EmployerInterestServiceTests
             $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement area: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {employerInterest.Postcode}\r\n";
+            $"* Location: {employerInterest.Postcode}\r\n";
 
         await emailService
             .Received(1)
@@ -765,7 +765,7 @@ public class EmployerInterestServiceTests
             $"* Website: {firstEmployerInterest.Website}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement areas: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {firstEmployerInterest.Postcode}\r\n" +
+            $"* Location: {firstEmployerInterest.LocationName} - {firstEmployerInterest.Postcode}\r\n" +
             $"* Additional information: {firstEmployerInterest.AdditionalInformation}\r\n";
 
         await emailService

@@ -3,6 +3,7 @@
 	[UniqueId] UNIQUEIDENTIFIER NOT NULL,
 	[OrganisationName] NVARCHAR(400) NOT NULL,
 	[ContactName] NVARCHAR(400) NOT NULL,
+	[LocationName] NVARCHAR(400) NOT NULL,
 	[Postcode] NVARCHAR(10) NULL,
 	[Latitude] DECIMAL(9, 6) NULL,
 	[Longitude] DECIMAL(9, 6) NULL,

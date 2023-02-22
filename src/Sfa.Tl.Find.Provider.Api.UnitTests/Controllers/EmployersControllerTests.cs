@@ -29,7 +29,7 @@ public class EmployersControllerTests
     {
         var uniqueId = Guid.Parse("6f3606b9-8323-49d5-b405-14bacb3a82e5");
 
-        var employerInterest = new EmployerInterestBuilder()
+        var employerInterest = new EmployerInterestInputModelBuilder()
             .Build();
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
@@ -46,12 +46,12 @@ public class EmployersControllerTests
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();
 
-        var jsonString = okResult!.Value?.ToString();
-        var expectedJson = new { id = uniqueId };
+        var expectedResult = new
+        {
+            ids = new[] { uniqueId }
+        };
 
-        jsonString.Should().Be(expectedJson.ToString());
-        expectedJson.Should().BeEquivalentTo(okResult.Value);
-        okResult.Value.Should().BeEquivalentTo(expectedJson);
+        okResult!.Value.Should().BeEquivalentTo(expectedResult);
     }
 
     [Fact]

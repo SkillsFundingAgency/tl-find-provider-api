@@ -12,6 +12,10 @@
     {
       "name": "Test",
       "postcode": "CV1 2WT"
+    },
+    {
+      "name": "Another",
+      "postcode": "CV1 3WT"
     }
   ],
   "skillAreaIds": [ 9, 11 ]

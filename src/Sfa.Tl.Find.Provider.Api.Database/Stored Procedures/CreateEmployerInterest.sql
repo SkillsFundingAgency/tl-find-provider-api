@@ -40,11 +40,13 @@ AS
     --Create location record
     INSERT INTO [dbo].[EmployerInterestLocation] (
 	    [EmployerInterestId],
+        [Name],
 	    [Postcode],
 	    [Latitude],
 	    [Longitude],
 	    [Location])
     SELECT @newId,
+        [LocationName],
 	    [Postcode],
 	    [Latitude],
 	    [Longitude],

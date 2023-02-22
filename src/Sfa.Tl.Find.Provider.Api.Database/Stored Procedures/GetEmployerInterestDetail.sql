@@ -7,6 +7,7 @@ AS
 				ei.[UniqueId],
 				ei.[OrganisationName],
 				ei.[ContactName],
+				eil.[Name] AS [LocationName],
 				eil.[Postcode],
 				ei.[Email],
 				ei.[Website],

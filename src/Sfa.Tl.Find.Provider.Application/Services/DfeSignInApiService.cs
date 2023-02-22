@@ -106,7 +106,7 @@ public class DfeSignInApiService : IDfeSignInApiService
             _logger.LogError(ex, "Call to {uri} failed.", requestUri);
         }
 
-        return new DfeUserInfo()
+        return new DfeUserInfo
         {
             UserId = Guid.Parse(userId),
             Roles = new List<Role>()

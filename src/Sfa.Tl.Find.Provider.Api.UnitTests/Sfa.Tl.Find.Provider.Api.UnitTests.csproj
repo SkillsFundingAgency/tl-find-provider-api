@@ -10,9 +10,11 @@
 
   <ItemGroup>
     <None Remove="Builders\Json\Assets\createEmployerInterest.json" />
+    <None Remove="Builders\Json\Assets\createEmployerInterestWithTwoLocations.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Builders\Json\Assets\createEmployerInterestWithTwoLocations.json" />
     <EmbeddedResource Include="Builders\Json\Assets\createEmployerInterest.json" />
   </ItemGroup>
 
