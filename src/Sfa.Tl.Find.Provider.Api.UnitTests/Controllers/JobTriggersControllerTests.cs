@@ -38,7 +38,7 @@ public class JobTriggersControllerTests
         await scheduler
             .Received(1)
             .TriggerJob(Arg.Is<JobKey>( k => 
-                k.Name == JobKeys.CourseDirectoryImport));
+                k.Name == JobKeys.CourseDataImport));
     }
 
     [Fact]

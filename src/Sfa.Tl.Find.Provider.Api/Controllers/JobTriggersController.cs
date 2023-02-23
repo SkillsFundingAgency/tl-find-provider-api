@@ -27,7 +27,7 @@ public class JobTriggersController : ControllerBase
     [HttpPost]
     [Route("importcoursedirectory")]
     public async Task TriggerCourseDirectoryImportJob() =>
-        await TriggerJob(JobKeys.CourseDirectoryImport);
+        await TriggerJob(JobKeys.CourseDataImport);
 
     [HttpPost]
     [Route("employerinterestcleanup")]

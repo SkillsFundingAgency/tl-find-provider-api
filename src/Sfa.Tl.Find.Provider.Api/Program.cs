@@ -103,7 +103,6 @@ try
     builder.Services.AddQuartzServices(
         siteConfiguration.SqlConnectionString,
         siteConfiguration.CourseDirectoryImportSchedule,
-        siteConfiguration.TownDataImportSchedule,
         siteConfiguration.EmployerInterestSettings?.CleanupJobSchedule,
         siteConfiguration.ProviderSettings?.NotificationEmailImmediateSchedule,
         siteConfiguration.ProviderSettings?.NotificationEmailDailySchedule,
@@ -166,6 +165,8 @@ try
     {
         endpoints.MapControllers();
     });
+
+    app.UseResponseCaching();
 
     app.Run();
 }
