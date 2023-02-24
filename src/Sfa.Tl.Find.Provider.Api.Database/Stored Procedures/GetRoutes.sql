@@ -2,17 +2,10 @@
 AS
 	SET NOCOUNT ON;
 
-	--Set this locally - it will be removed in a future release 
-	DECLARE @includeAdditionalData BIT = 1;
-
 	WITH ProvidersCTE AS (
-		SELECT	p.[Id],
-				--Need to filter so providers in the additional data set are overidden by ones in the main data set
-				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
+		SELECT	p.[Id]
 		FROM	[Provider] p
-		WHERE	p.[IsDeleted] = 0
-		  --If not merging additional data, have to make sure we only include non-additional data
-		  AND	(@includeAdditionalData = 1 OR (@includeAdditionalData = 0 AND p.[IsAdditionalData] = 0))),
+		WHERE	p.[IsDeleted] = 0),
 	
 	--Need to group here to remove multiple delivery years
 	LocationQualificationCTE AS (
@@ -37,8 +30,6 @@ AS
 		ON		r.[Id] = rq.[RouteId]
 		  AND	r.[IsDeleted] = 0
 		WHERE	l.[IsDeleted] = 0
-		--Only include the first row to make sure main data set takes priority
-		  AND	p.[ProviderRowNum] = 1
 	  )
 	SELECT	r.[Id] AS [RouteId], 
 			r.[Name] AS [RouteName], 

@@ -1,6 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[UpdateLocationQualifications]
-	@data [dbo].[LocationQualificationDataTableType] READONLY,
-	@isAdditionalData BIT
+	@data [dbo].[LocationQualificationDataTableType] READONLY
 AS
 	SET NOCOUNT ON;
 
@@ -14,17 +13,13 @@ AS
 	SELECT l.[Id] AS [LocationId],
 		d.[Postcode],
 		d.[DeliveryYear],
-		d.[QualificationId],
-		d.[IsAdditionalData]
+		d.[QualificationId]
 	FROM @data d
 	INNER JOIN [dbo].[Provider] p
 	ON p.[UkPrn] = d.[UkPrn]
 	INNER JOIN [dbo].[Location] l
 	ON l.[ProviderId] = p.[Id]
 	AND l.[Postcode] = d.[Postcode]
-	--Make sure "normal" and additional data are kept separate
-	AND p.[IsAdditionalData] = d.[IsAdditionalData]
-	AND l.[IsAdditionalData] = d.[IsAdditionalData]
 	)
 		MERGE INTO [dbo].[LocationQualification] AS t
 		USING LocationQualificationYearsCTE AS s
@@ -33,26 +28,22 @@ AS
 		  t.[LocationId] = s.[LocationId]
 		  AND t.[DeliveryYear] = s.[DeliveryYear]
 		  AND t.[QualificationId] = s.[QualificationId]
-		  AND t.[IsAdditionalData] = s.[IsAdditionalData]
 		)
 
 		WHEN NOT MATCHED BY TARGET THEN INSERT
 		(
 			[LocationId],
 			[DeliveryYear],
-			[QualificationId],
-			[IsAdditionalData]
+			[QualificationId]
 		)
 		VALUES
 		(
 			s.[LocationId],
 			s.[DeliveryYear],
-			s.[QualificationId],
-			s.[IsAdditionalData]
+			s.[QualificationId]
 		)
 
 		WHEN NOT MATCHED BY SOURCE 
-		  AND t.[IsAdditionalData] = @isAdditionalData
 		THEN DELETE
 
 		OUTPUT $action, 

@@ -85,7 +85,6 @@ public static class ModelValidationExtensions
         provider.Email.Should().Be(expected.Email);
         provider.Telephone.Should().Be(expected.Telephone);
         provider.Website.Should().Be(expected.Website);
-        provider.IsAdditionalData.Should().Be(expected.IsAdditionalData);
 
         provider.Locations.Should().NotBeNull();
         provider.Locations.Count.Should().Be(expected.Locations.Count);

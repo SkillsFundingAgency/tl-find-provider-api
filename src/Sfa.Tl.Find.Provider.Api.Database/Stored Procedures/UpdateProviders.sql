@@ -1,6 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[UpdateProviders]
-	@data [dbo].[ProviderDataTableType] READONLY,
-	@isAdditionalData BIT
+	@data [dbo].[ProviderDataTableType] READONLY
 AS
 	SET NOCOUNT ON;
 
@@ -15,7 +14,6 @@ AS
 	ON
 	(
 		t.[UkPrn] = s.[UkPrn]
-		AND t.[IsAdditionalData] = s.[IsAdditionalData]
 	)
 
 	WHEN MATCHED 
@@ -79,8 +77,7 @@ AS
 		t.[Postcode] = s.[Postcode],
 		t.[Email] = s.[Email],
 		t.[Telephone] = s.[Telephone],
-		t.[Website] = s.[Website],
-		t.[IsAdditionalData] = s.[IsAdditionalData],
+		t.[Website] = s.[Website],		
 		--t.[EmployerContactEmail] = s.[EmployerContactEmail],
 		--t.[EmployerContactTelephone] = s.[EmployerContactTelephone],
 		--t.[EmployerContactWebsite] = s.[EmployerContactWebsite],
@@ -107,8 +104,7 @@ AS
 		[EmployerContactWebsite],
 		[StudentContactEmail],
 		[StudentContactTelephone],
-		[StudentContactWebsite],
-		[IsAdditionalData]
+		[StudentContactWebsite]
 	)
 	VALUES
 	(
@@ -127,13 +123,11 @@ AS
 		s.[EmployerContactWebsite],
 		s.[StudentContactEmail],
 		s.[StudentContactTelephone],
-		s.[StudentContactWebsite],
-		s.[IsAdditionalData]
+		s.[StudentContactWebsite]
 	)
 
 	WHEN NOT MATCHED BY SOURCE 
 			AND t.[IsDeleted] <> 1
-			AND t.[IsAdditionalData] = @isAdditionalData
 	THEN UPDATE SET
 		t.[IsDeleted] = 1,
 		t.[ModifiedOn] = GETUTCDATE() --Soft delete

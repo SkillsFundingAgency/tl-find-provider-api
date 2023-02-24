@@ -127,21 +127,20 @@ public class ProviderRepository : IProviderRepository
                 commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<bool> HasAny(bool isAdditionalData = false)
+    public async Task<bool> HasAny()
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         var result = await _dbContextWrapper.ExecuteScalarAsync<int>(
             connection,
             "SELECT COUNT(1) " +
-            "WHERE EXISTS (SELECT 1 FROM dbo.Provider WHERE IsAdditionalData = @isAdditionalData)",
-            new { isAdditionalData = isAdditionalData ? 1 : 0 }
+            "WHERE EXISTS (SELECT 1 FROM dbo.Provider)"
         );
 
         return result != 0;
     }
 
-    public async Task Save(IList<Models.Provider> providers, bool isAdditionalData = false)
+    public async Task Save(IList<Models.Provider> providers)
     {
         try
         {
@@ -156,7 +155,7 @@ public class ProviderRepository : IProviderRepository
                     locationQualificationData.AddRange(
                         location
                             .DeliveryYears
-                            .MapToLocationQualificationDtoList(provider.UkPrn, location.Postcode, isAdditionalData));
+                            .MapToLocationQualificationDtoList(provider.UkPrn, location.Postcode));
                 }
             }
 
@@ -164,7 +163,7 @@ public class ProviderRepository : IProviderRepository
 
             await retryPolicy
                 .ExecuteAsync(async _ =>
-                        await PerformSave(providers, locationData, locationQualificationData, isAdditionalData),
+                        await PerformSave(providers, locationData, locationQualificationData),
                     context);
         }
         catch (Exception ex)
@@ -177,8 +176,7 @@ public class ProviderRepository : IProviderRepository
     private async Task PerformSave(
         IEnumerable<Models.Provider> providers,
         IEnumerable<LocationDto> locationData,
-        IEnumerable<LocationQualificationDto> locationQualificationData,
-        bool isAdditionalData = false)
+        IEnumerable<LocationQualificationDto> locationQualificationData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
@@ -187,8 +185,7 @@ public class ProviderRepository : IProviderRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            data = providers.AsTableValuedParameter("dbo.ProviderDataTableType"),
-            isAdditionalData
+            data = providers.AsTableValuedParameter("dbo.ProviderDataTableType")
         });
 
         var providerUpdateResult = await _dbContextWrapper
@@ -203,8 +200,7 @@ public class ProviderRepository : IProviderRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            data = locationData.AsTableValuedParameter("dbo.LocationDataTableType"),
-            isAdditionalData
+            data = locationData.AsTableValuedParameter("dbo.LocationDataTableType")
         });
 
         var locationUpdateResult = await _dbContextWrapper
@@ -219,8 +215,7 @@ public class ProviderRepository : IProviderRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType"),
-            isAdditionalData
+            data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType")
         });
 
         var locationQualificationUpdateResult = await _dbContextWrapper

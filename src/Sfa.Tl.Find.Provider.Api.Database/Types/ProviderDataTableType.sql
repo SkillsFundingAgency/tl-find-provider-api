@@ -15,6 +15,5 @@
 	[EmployerContactWebsite] NVARCHAR(500) NULL,
 	[StudentContactEmail] NVARCHAR(320) NULL,
 	[StudentContactTelephone] NVARCHAR(150) NULL,
-	[StudentContactWebsite] NVARCHAR(500) NULL,
-	[IsAdditionalData] BIT NOT NULL
+	[StudentContactWebsite] NVARCHAR(500) NULL
 )

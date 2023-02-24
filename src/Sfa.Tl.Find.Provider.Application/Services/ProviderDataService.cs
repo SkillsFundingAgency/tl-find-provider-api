@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Text.Json;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
@@ -291,81 +290,6 @@ public class ProviderDataService : IProviderDataService
         return await _providerRepository.HasAny();
     }
 
-    public async Task ImportProviderData(Stream stream, bool isAdditionalData)
-    {
-        var jsonDocument = await JsonDocument
-            .ParseAsync(stream);
-
-        var count = await LoadAdditionalProviderData(jsonDocument);
-        await ClearCaches();
-
-        _logger.LogInformation("Loaded {count} providers from stream.", count);
-    }
-
-    private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
-    {
-        try
-        {
-            var providers = jsonDocument
-                    .RootElement
-                    .GetProperty("providers")
-                    .EnumerateArray()
-                    .Select(p =>
-                        new Models.Provider
-                        {
-                            UkPrn = p.GetProperty("ukPrn").GetInt64(),
-                            Name = p.GetProperty("name").GetString(),
-                            Postcode = p.SafeGetString("postcode"),
-                            Town = p.SafeGetString("town"),
-                            Email = p.SafeGetString("email"),
-                            Telephone = p.SafeGetString("telephone"),
-                            Website = p.SafeGetString("website"),
-                            IsAdditionalData = true,
-                            Locations = p.GetProperty("locations")
-                                .EnumerateArray()
-                                .Select(l =>
-                                    new Location
-                                    {
-                                        Postcode = l.GetProperty("postcode").GetString(),
-                                        Name = l.SafeGetString("name", defaultValue: p.SafeGetString("name")),
-                                        Town = l.SafeGetString("town"),
-                                        Latitude = l.SafeGetDouble("latitude"),
-                                        Longitude = l.SafeGetDouble("longitude"),
-                                        Email = l.SafeGetString("email"),
-                                        Telephone = l.SafeGetString("telephone"),
-                                        Website = l.SafeGetString("website"),
-                                        IsAdditionalData = true,
-                                        DeliveryYears = l.TryGetProperty("deliveryYears", out var deliveryYears)
-                                            ? deliveryYears.EnumerateArray()
-                                                .Select(d =>
-                                                    new DeliveryYear
-                                                    {
-                                                        Year = d.GetProperty("year").GetInt16(),
-                                                        Qualifications = d.GetProperty("qualifications")
-                                                            .EnumerateArray()
-                                                            .Select(q => new Qualification
-                                                            {
-                                                                Id = q.GetInt32()
-                                                            })
-                                                            .ToList()
-                                                    })
-                                                .ToList()
-                                            : new List<DeliveryYear>()
-                                    }).ToList()
-                        })
-                    .ToList();
-
-            await _providerRepository.Save(providers, true);
-
-            return providers.Count;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"{nameof(LoadAdditionalProviderData)} failed.");
-            throw;
-        }
-    }
-
     private async Task<GeoLocation> GetPostcode(string postcode)
     {
         var geoLocation = postcode.Length <= 4
@@ -431,12 +355,5 @@ public class ProviderDataService : IProviderDataService
                 { "notifications_uri", notificationsUri.ToString() }
             },
             token.ToString());
-    }
-
-    private async Task ClearCaches()
-    {
-        await _cacheService.Remove<IList<Qualification>>(CacheKeys.QualificationsKey);
-        await _cacheService.Remove<IList<Route>>(CacheKeys.RoutesKey);
-        await _cacheService.Remove<ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

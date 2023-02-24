@@ -3,16 +3,11 @@
 AS
 	SET NOCOUNT ON;
 	
-	--Set this locally - it will be removed in a future release 
-	DECLARE @includeAdditionalData BIT = 1;
-	
 	WITH ProvidersCTE AS (
-	SELECT	p.[Id],
-			ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
+	SELECT	p.[Id]
 	FROM	[Provider] p
 	WHERE	p.[UkPrn] = @ukPrn
 	  AND	p.[IsDeleted] = 0
-	  AND	(@includeAdditionalData = 1 OR (@includeAdditionalData = 0 AND p.[IsAdditionalData] = 0))
 	)
 		SELECT n.[Id],
 		   n.[Email],

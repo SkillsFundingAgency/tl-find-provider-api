@@ -23,7 +23,6 @@ public class Provider
     public string StudentContactEmail { get; init; }
     public string StudentContactTelephone { get; init; }
     public string StudentContactWebsite { get; init; }
-    public bool IsAdditionalData { get; init; }
 
     [Write(false)]
     public ICollection<Location> Locations { get; init; }
