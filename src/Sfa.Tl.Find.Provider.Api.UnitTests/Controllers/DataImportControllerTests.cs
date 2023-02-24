@@ -22,42 +22,6 @@ public class DataImportControllerTests
         typeof(DataImportController)
             .ShouldNotAcceptNullOrBadConstructorArguments();
     }
-
-    [Fact]
-    public async Task UploadProviderContacts_Processes_File()
-    {
-        var providerDataService = Substitute.For<IProviderDataService>();
-
-        var controller = new DataImportControllerBuilder()
-            .Build(providerDataService);
-
-        await using var stream = await BuildTestCsvFileStream();
-        var file = new FormFile(stream, 0, stream.Length, "test_form_file", "test.csv");
-
-        var result = await controller.UploadProviderContacts(file);
-
-        var okResult = result as AcceptedResult;
-        okResult.Should().NotBeNull();
-        okResult!.StatusCode.Should().Be(202);
-
-        await providerDataService
-            .Received(1)
-            .ImportProviderContacts(Arg.Any<Stream>());
-    }
-
-    [Fact]
-    public async Task UploadProviderContacts_For_Missing_File_Returns_Returns_BadRequest_Result()
-    {
-        var controller = new DataImportControllerBuilder()
-            .Build();
-
-        var result = await controller.UploadProviderContacts(null);
-
-        var badRequestResult = result as BadRequestObjectResult;
-        badRequestResult.Should().NotBeNull();
-        badRequestResult!.StatusCode.Should().Be(400);
-        badRequestResult!.Value.Should().Be("File is required.");
-    }
     
     [Fact]
     public async Task UploadTowns_Processes_File()

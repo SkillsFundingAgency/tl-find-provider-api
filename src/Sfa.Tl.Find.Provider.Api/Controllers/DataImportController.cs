@@ -13,50 +13,15 @@ namespace Sfa.Tl.Find.Provider.Api.Controllers;
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class DataImportController : ControllerBase
 {
-    private readonly IProviderDataService _providerDataService;
     private readonly ITownDataService _townDataService;
     private readonly ILogger<DataImportController> _logger;
 
     public DataImportController(
-        IProviderDataService providerDataService,
         ITownDataService townDataService,
         ILogger<DataImportController> logger)
     {
-        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _townDataService = townDataService ?? throw new ArgumentNullException(nameof(townDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    [HttpPost]
-    [Route("provider/contacts")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadProviderContacts([FromForm] IFormFile file)
-    {
-        try
-        {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug($"{nameof(DataImportController)} {nameof(UploadProviderContacts)} called.");
-            }
-
-            if (file is null)
-            {
-                _logger.LogWarning($"{nameof(DataImportController)} {nameof(UploadProviderContacts)} has no file.");
-                return BadRequest("File is required.");
-            }
-
-            await _providerDataService.ImportProviderContacts(
-                file.OpenReadStream());
-
-            return Accepted();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred. Returning error result.");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
     }
     
     [HttpGet]

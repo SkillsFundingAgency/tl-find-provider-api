@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.ClassMaps;
@@ -245,39 +244,6 @@ public class ProviderDataService : IProviderDataService
 
         return await _providerRepository
             .GetLocationPostcodes(ukPrn);
-    }
-
-    public async Task ImportProviderContacts(Stream stream)
-    {
-        using var reader = new StreamReader(stream);
-        using var csvReader = new CsvReader(reader,
-            new CsvConfiguration(CultureInfo.CurrentCulture)
-            {
-                PrepareHeaderForMatch = args =>
-                {
-                    if (string.Compare(args.Header, "UKPRN", StringComparison.CurrentCultureIgnoreCase) == 0)
-                    {
-                        return "UkPrn";
-                    }
-
-                    return args.Header
-                            .Replace(" ", "");
-                },
-                MissingFieldFound = _ => { /* ignore empty column values */ }
-            });
-
-        csvReader.Context.TypeConverterOptionsCache.GetOptions<string>()
-            .NullValues
-            .AddRange(new[] { "", "NULL", "NA", "N/A" });
-
-        var contacts = csvReader
-            .GetRecords<ProviderContactDto>()
-            .ToList();
-
-        var resultCount = await _providerRepository.UpdateProviderContacts(contacts);
-
-        _logger.LogInformation("Updated contacts for {resultCount} providers from {contactsCount}.",
-            resultCount, contacts.Count);
     }
 
     public async Task<bool> HasQualifications()

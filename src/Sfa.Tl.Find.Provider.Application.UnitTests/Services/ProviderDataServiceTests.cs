@@ -5,8 +5,6 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Csv;
-using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Json;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
 
@@ -16,7 +14,6 @@ public class ProviderDataServiceTests
 {
     private const int TestPage = 3;
     private const int TestPageSize = Constants.DefaultPageSize + 10;
-    private const int TestUkPrn = 10099099;
 
     private readonly IList<int> _testRouteIds = new List<int> { 6, 7 };
     private readonly IList<int> _testQualificationIds = new List<int> { 37, 40, 51 };
@@ -726,49 +723,5 @@ public class ProviderDataServiceTests
         await providerRepository
             .Received(1)
             .HasAny();
-    }
-    
-    [Fact]
-    public async Task ImportProviderContacts_Works_As_Expected()
-    {
-        var receivedProviders = new List<ProviderContactDto>();
-
-        var providerRepository = Substitute.For<IProviderRepository>();
-        await providerRepository
-            .UpdateProviderContacts(Arg.Do<IEnumerable<ProviderContactDto>>(
-                p =>
-                    receivedProviders.AddRange(p)));
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(providerRepository: providerRepository);
-
-        await using var stream = ProviderContactsCsvBuilder
-            .BuildProviderContactsCsvAsStream();
-
-        await service.ImportProviderContacts(stream);
-
-        await providerRepository
-            .Received(1)
-            .UpdateProviderContacts(Arg.Is<IEnumerable<ProviderContactDto>>(
-                p => p.Any()));
-
-        var providerContacts = receivedProviders.SingleOrDefault(p => p.UkPrn == 10000055);
-
-        var expectedContacts = new ProviderContactDtoBuilder().Build();
-        providerContacts.Validate(
-            new ProviderContactDto
-            {
-                UkPrn = 10000055,
-                Name = "ABINGDON AND WITNEY COLLEGE",
-                EmployerContactEmail = "employer.guidance@abingdon-witney.ac.uk",
-                EmployerContactTelephone = "01235 789010",
-                EmployerContactWebsite = "http://www.abingdon-witney.ac.uk/employers",
-                StudentContactEmail = "student.counseller@abingdon-witney.ac.uk",
-                StudentContactTelephone = "01235 789010",
-                StudentContactWebsite = "http://www.abingdon-witney.ac.uk/students"
-            });
-
-        providerContacts.Validate(expectedContacts);
-
     }
 }
