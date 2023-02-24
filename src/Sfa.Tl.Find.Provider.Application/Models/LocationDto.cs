@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 // ReSharper disable All
 
-namespace Sfa.Tl.Find.Provider.Api.Models;
+namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("UKPRN {" + nameof(UkPrn) + "}" +
                  " {" + nameof(Postcode) + "}" +

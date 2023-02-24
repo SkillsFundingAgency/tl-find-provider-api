@@ -1,6 +1,7 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
+using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
 
 namespace Sfa.Tl.Find.Provider.Application.UnitTests.Extensions;
 
@@ -26,19 +27,7 @@ public class MappingExtensionsTests
         var result = location.MapToLocationDto(ukPrn);
 
         result.Should().NotBeNull();
-
-        result.UkPrn.Should().Be(ukPrn);
-        result.Postcode.Should().Be(location.Postcode);
-        result.Name.Should().Be(location.Name);
-        result.AddressLine1.Should().Be(location.AddressLine1);
-        result.AddressLine2.Should().Be(location.AddressLine2);
-        result.Town.Should().Be(location.Town);
-        result.County.Should().Be(location.County);
-        result.Email.Should().Be(location.Email);
-        result.Telephone.Should().Be(location.Telephone);
-        result.Website.Should().Be(location.Website);
-        result.Latitude.Should().Be(location.Latitude);
-        result.Longitude.Should().Be(location.Longitude);
+        result.Validate(location, ukPrn);
     }
 
     [Fact]
@@ -66,18 +55,7 @@ public class MappingExtensionsTests
 
         for (var i = 0; i < result.Count; i++)
         {
-            result[i].UkPrn.Should().Be(ukPrn);
-            result[i].Postcode.Should().Be(locations[i].Postcode);
-            result[i].Name.Should().Be(locations[i].Name);
-            result[i].AddressLine1.Should().Be(locations[i].AddressLine1);
-            result[i].AddressLine2.Should().Be(locations[i].AddressLine2);
-            result[i].Town.Should().Be(locations[i].Town);
-            result[i].County.Should().Be(locations[i].County);
-            result[i].Email.Should().Be(locations[i].Email);
-            result[i].Telephone.Should().Be(locations[i].Telephone);
-            result[i].Website.Should().Be(locations[i].Website);
-            result[i].Latitude.Should().Be(locations[i].Latitude);
-            result[i].Longitude.Should().Be(locations[i].Longitude);
+            result[i].Validate(locations[i], ukPrn);
         }
     }
     
