@@ -8,12 +8,19 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
-        <h2 class="govuk-heading-l">User role information</h2>
-
+        <h2 class="govuk-heading-l">User roles</h2>
         <ul class="govuk-list govuk-list--bullet">
-            @foreach (var claim in Model.UserClaims)
+            @foreach (var role in Model.UserRoles.OrderBy(x => x))
             {
-                <li>@claim</li>
+                <li>@role</li>
+            }
+        </ul>
+
+        <h2 class="govuk-heading-l">Other claims</h2>
+        <ul class="govuk-list govuk-list--bullet">
+            @foreach (var claim in Model.UserClaims.OrderBy(x => x.Key))
+            {
+                <li><strong>@claim.Key</strong>: @claim.Value</li>
             }
         </ul>
     </div>
