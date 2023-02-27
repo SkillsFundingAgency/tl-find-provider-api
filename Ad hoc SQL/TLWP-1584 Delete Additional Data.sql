@@ -197,7 +197,7 @@ INTO @providerNotificationId;
 
 WHILE @@FETCH_STATUS = 0  
 BEGIN  
-SELECT @searchFilterId
+SELECT @providerNotificationId
 	EXEC DeleteProviderNotification @providerNotificationId
     FETCH NEXT FROM @ProviderNotificationCursor  
         INTO @providerNotificationId

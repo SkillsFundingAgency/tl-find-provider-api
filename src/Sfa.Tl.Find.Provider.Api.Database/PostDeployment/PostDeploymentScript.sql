@@ -25,11 +25,11 @@ ALTER TABLE [dbo].[EmployerInterest]
 DROP COLUMN IF EXISTS [Postcode];
 
 ALTER TABLE [dbo].[Provider] 
-DROP COLUMN IF EXISTS [IsAdditionalData];
+	DROP COLUMN IF EXISTS [IsAdditionalData];
 ALTER TABLE [dbo].[Location] 
-DROP COLUMN IF EXISTS [IsAdditionalData];
+	DROP COLUMN IF EXISTS [IsAdditionalData];
 ALTER TABLE [dbo].[LocationQualification] 
-DROP COLUMN IF EXISTS [IsAdditionalData];
+	DROP COLUMN IF EXISTS [IsAdditionalData];
 
 --To undo this:
 /*
