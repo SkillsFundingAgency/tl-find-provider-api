@@ -68,7 +68,7 @@ Add a new row to the table with:
         "MaximumExtensions": 20,
         "RetentionDays": 84,
         "SearchRadius": 30
-      },
+    },
     "ProviderSettings": {
         "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",
         "DefaultSearchRadius": 20,
@@ -83,9 +83,6 @@ Add a new row to the table with:
     "TownDataImportSchedule": "<CRON string>",
     "PostcodeApiSettings": {
         "BaseUri": "https://api.postcodes.io/"
-    },
-    "SearchSettings": {
-        "MergeAdditionalProviderData": false
     }
 }
 ```
@@ -206,7 +203,6 @@ API calls need to include an `Authorization` header with an HMAC signature.
 (Locations currently does not require the authorization header.)
 
 
-
 ## Database
 
 ##### Initialization and post-deployment
@@ -216,9 +212,11 @@ Some data is seeded into the database during deployment:
 - **Qualifications** - an initial list of qualifications, which will be overwriten by the nightly import
 - **Routes** - a hard-coded list of routes
 - **RouteQualification** - a hard-coded list of mappings ([below](#route_mapping))
+- **Email Templates** - email template mappings for GOV>UK Notify email templates
+ 
+Note that qualifications can be imported from the Course Directory; however the route qualification mapping needs the qualification ids so they have been added in the post-deployment script, and the calls to import from Course Directory have been commented out (if those lines are restored, two tests will fail and will need to be fixed).
 
-Note that qualifications will be imported from the Course Directory; however the route qualification mapping needs the qualification ids so they have been added in the post-deployment script.
-
+To import providers from course directory, either wait for the scheduled import or call the job trigger helper endpoint, e.g. for local development call `https://localhost:55961/api/v3/jobtriggers/importcoursedirectory` - this will need an HMAC Authentication header as mentioned in the Calling the API section.
 
 ##### <a name="route_mapping"></a> Route mapping
 
@@ -318,12 +316,3 @@ If you want to run without starting Azurite, then the other settings can be set.
   }
 }
 ```
-
-
-## Notes
-
-While we wait for the final framework codes, temporary codes have been created in the database post deployment scripts.
-
-Until then, calls to `_courseDirectoryService.ImportQualifications()` 
-have been removed from `InitializationJob` and `CourseDataImportJob`
-When these lines are restored, two tests will need to be fixed because they now expect the mothod not to be called.

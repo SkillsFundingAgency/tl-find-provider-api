@@ -29,7 +29,7 @@ public class CourseDataImportJobTests
         var courseDirectoryService = Substitute.For<ICourseDirectoryService>();
 
         var trigger = Substitute.For<ITrigger>();
-        trigger.JobKey.Returns(new JobKey(JobKeys.CourseDirectoryImport));
+        trigger.JobKey.Returns(new JobKey(JobKeys.CourseDataImport));
         var jobContext = Substitute.For<IJobExecutionContext>();
         jobContext.Trigger.Returns(trigger);
 

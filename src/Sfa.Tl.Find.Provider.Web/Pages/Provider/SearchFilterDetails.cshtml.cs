@@ -12,11 +12,12 @@ using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
-[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[Authorize(nameof(PolicyNames.IsProvider))]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class SearchFilterDetailsModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
+    private readonly ISearchFilterService _searchFilterService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<SearchFilterDetailsModel> _logger;
 
@@ -30,10 +31,12 @@ public class SearchFilterDetailsModel : PageModel
 
     public SearchFilterDetailsModel(
         IProviderDataService providerDataService,
+        ISearchFilterService searchFilterService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<SearchFilterDetailsModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _searchFilterService = searchFilterService?? throw new ArgumentNullException(nameof(searchFilterService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));
@@ -45,7 +48,7 @@ public class SearchFilterDetailsModel : PageModel
             ? _providerSettings.DefaultSearchRadius
             : Constants.DefaultProviderSearchFilterRadius;
 
-        SearchFilter = await _providerDataService.GetSearchFilter(id);
+        SearchFilter = await _searchFilterService.GetSearchFilter(id);
 
         if (SearchFilter is null)
         {
@@ -84,7 +87,7 @@ public class SearchFilterDetailsModel : PageModel
             Routes = routes
         };
 
-        await _providerDataService.SaveSearchFilter(searchFilter);
+        await _searchFilterService.SaveSearchFilter(searchFilter);
 
         return RedirectToPage("/Provider/SearchFilters");
     }

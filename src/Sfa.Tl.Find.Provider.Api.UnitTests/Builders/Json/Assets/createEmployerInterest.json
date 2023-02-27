@@ -8,6 +8,11 @@
   "website": "https://mycompany.co.uk",
   "contactPreferenceType": 1,
   "contactName": "Mike Wild",
-  "postcode": "CV1 2WT",
+  "locations": [
+    {
+      "name": "Test",
+      "postcode": "CV1 2WT"
+    }
+  ],
   "skillAreaIds": [ 9, 11 ]
 }

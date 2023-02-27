@@ -19,10 +19,21 @@ public class CourseDataImportJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.LogInformation($"{nameof(CourseDataImportJob)} job triggered. {context?.Trigger.JobKey.Name}");
-
         try
         {
+            if ((await context.Scheduler.GetCurrentlyExecutingJobs())
+                .Any(x =>
+                    x.FireInstanceId != context.FireInstanceId
+                    && x.JobDetail.Key.Equals(context.JobDetail.Key)))
+            {
+                _logger.LogInformation("Duplicate job detected for {jobKey} - exiting immediately.",
+                    context.JobDetail.Key.Name);
+                return;
+            }
+
+            _logger.LogInformation("{jobKey} job triggered.",
+                context.Trigger.JobKey.Name);
+
             //await _courseDirectoryService.ImportQualifications();
             await _courseDirectoryService.ImportProviders();
 

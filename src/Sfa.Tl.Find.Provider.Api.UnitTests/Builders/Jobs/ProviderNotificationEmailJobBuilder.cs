@@ -6,14 +6,14 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Jobs;
 public class ProviderNotificationEmailJobBuilder
 {
     public ProviderNotificationEmailJob Build(
-        IProviderDataService providerDataService = null,
+        INotificationService notificationService = null,
         ILogger<ProviderNotificationEmailJob> logger = null)
     {
-        providerDataService ??= Substitute.For<IProviderDataService>();
+        notificationService ??= Substitute.For<INotificationService>();
         logger ??= Substitute.For<ILogger<ProviderNotificationEmailJob>>();
 
         return new ProviderNotificationEmailJob(
-            providerDataService,
+            notificationService,
             logger);
     }
 }

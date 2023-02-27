@@ -7,7 +7,6 @@ AS
 	SET NOCOUNT ON;
 
 	DECLARE @metersPerMile DECIMAL = 1609.3399999999999E0;
-	DECLARE @searchRadius DECIMAL =  @defaultSearchRadius;
 	DECLARE @searchRadiusInMeters DECIMAL;
 
 	DECLARE @searchFilterId INT;
@@ -19,22 +18,20 @@ AS
 	IF (@locationId IS NULL)
 		RAISERROR ('Either @locationId or both @latitude and @longitude required' ,1 ,1)
 
-	SELECT @fromLocation = [Location],
+	SELECT  @fromLocation = [Location],
 			@searchFilterId = sf.[Id],
-			@searchRadius = CASE WHEN sf.[Id] IS NOT NULL 
+			@searchRadiusInMeters = CASE WHEN sf.[Id] IS NOT NULL 
 						THEN  sf.[SearchRadius]
 						ELSE @defaultSearchRadius 
-					END
+					END * @metersPerMile,
+			@searchFiltersApplied = CASE WHEN (sf.[Id] IS NOT NULL) 
+									 THEN 1 
+									 ELSE 0 
+								END
 	FROM [dbo].[Location] l
 	LEFT JOIN [dbo].[SearchFilter] sf
 	ON sf.[LocationId] = l.[Id] 
-	WHERE l.[Id] = @locationId
-
-	SET @searchRadiusInMeters = @searchRadius * @metersPerMile;
-	SET @searchFiltersApplied = CASE WHEN (@searchFilterId IS NOT NULL) 
-									 THEN 1 
-									 ELSE 0 
-								END;
+	WHERE l.[Id] = @locationId;
 	
 	WITH EmployerInterest_CTE AS (
 		SELECT ei.[Id],

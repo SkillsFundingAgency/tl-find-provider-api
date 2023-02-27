@@ -29,7 +29,7 @@ public class EmployersControllerTests
     {
         var uniqueId = Guid.Parse("6f3606b9-8323-49d5-b405-14bacb3a82e5");
 
-        var employerInterest = new EmployerInterestBuilder()
+        var employerInterest = new EmployerInterestInputModelBuilder()
             .Build();
 
         var employerInterestService = Substitute.For<IEmployerInterestService>();
@@ -46,12 +46,12 @@ public class EmployersControllerTests
         var okResult = result as OkObjectResult;
         okResult.Should().NotBeNull();
 
-        var jsonString = okResult!.Value?.ToString();
-        var expectedJson = new { id = uniqueId };
+        var expectedResult = new
+        {
+            ids = new[] { uniqueId }
+        };
 
-        jsonString.Should().Be(expectedJson.ToString());
-        expectedJson.Should().BeEquivalentTo(okResult.Value);
-        okResult.Value.Should().BeEquivalentTo(expectedJson);
+        okResult!.Value.Should().BeEquivalentTo(expectedResult);
     }
 
     [Fact]
@@ -91,33 +91,46 @@ public class EmployersControllerTests
     public async Task ExtendInterest_Returns_Ok_Result_For_Successful_Extension()
     {
         var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var extensionResult = new ExtensionResultBuilder().Build();
         var employerInterestService = Substitute.For<IEmployerInterestService>();
+
         employerInterestService
             .ExtendEmployerInterest(uniqueId)
-            .Returns(true);
+            .Returns(extensionResult);
 
         var controller = new EmployersControllerBuilder()
             .Build(employerInterestService);
 
         var result = await controller.ExtendInterest(uniqueId);
 
-        result.Should().BeOfType(typeof(OkResult));
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+
+        var receivedExtensionResult = okResult!.Value as ExtensionResult;
+        receivedExtensionResult.Should().BeEquivalentTo(extensionResult);
     }
 
     [Fact]
-    public async Task ExtendInterest_Returns_Not_Found_For_Successful_Extension()
+    public async Task ExtendInterest_Returns_Not_Found_For_Unsuccessful_Extension()
     {
         var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var extensionResult = new ExtensionResultBuilder()
+            .Build(success: false);
         var employerInterestService = Substitute.For<IEmployerInterestService>();
+
         employerInterestService
             .ExtendEmployerInterest(uniqueId)
-            .Returns(false);
+            .Returns(extensionResult);
 
         var controller = new EmployersControllerBuilder()
             .Build(employerInterestService);
 
         var result = await controller.ExtendInterest(uniqueId);
 
-        result.Should().BeOfType(typeof(NotFoundResult));
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+
+        var receivedExtensionResult = okResult!.Value as ExtensionResult;
+        receivedExtensionResult.Should().BeEquivalentTo(extensionResult);
     }
 }

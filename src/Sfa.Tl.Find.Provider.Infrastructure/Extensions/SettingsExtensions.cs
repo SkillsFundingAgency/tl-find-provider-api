@@ -104,12 +104,4 @@ public static class SettingsExtensions
         settings.NotificationEmailWeeklySchedule = configuration.ProviderSettings?.NotificationEmailWeeklySchedule;
         settings.SupportSiteAccessConnectHelpUri = configuration.ProviderSettings?.SupportSiteAccessConnectHelpUri;
     }
-
-    public static void ConfigureSearchSettings(this SearchSettings settings, SiteConfiguration configuration)
-    {
-        if (settings == null) throw new ArgumentNullException(nameof(settings));
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
-        settings.MergeAdditionalProviderData = configuration.SearchSettings?.MergeAdditionalProviderData ?? false;
-    }
 }

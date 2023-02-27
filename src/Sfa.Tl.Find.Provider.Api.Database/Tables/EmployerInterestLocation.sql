@@ -2,6 +2,7 @@
 (
 	[Id] INT IDENTITY(1,1) NOT NULL,
 	[EmployerInterestId] INT NOT NULL,
+	[Name] NVARCHAR(400) NULL,
 	[Postcode] NVARCHAR(10) NOT NULL,
 	[Latitude] DECIMAL(9, 6) NOT NULL,
 	[Longitude] DECIMAL(9, 6) NOT NULL,

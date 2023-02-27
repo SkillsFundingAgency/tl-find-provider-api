@@ -7,20 +7,19 @@ public class EmployerInterestBuilder
 {
     private string _additionalInformation;
     private readonly List<int> _extensionCounts = new() { 0, 0 };
-    private readonly List<int?> _industryIds 
+    private readonly List<int?> _industryIds
         = new() { 9, null };
-    private readonly List<string> _otherIndustries 
+    private readonly List<string> _otherIndustries
         = new() { null, "Test Industry" };
-    private readonly List<(double, double)> _latitudesAndLongitudes 
+    private readonly List<(double, double)> _latitudesAndLongitudes
         = new()
         {
             (52.400997, -1.508122),
             (52.406587, -1.523157)
         };
     private readonly List<Guid> _uniqueIds = new();
-      private readonly List<int> _skillAreaIds 
-        = new();
-  
+    private readonly List<int> _skillAreaIds = new();
+
     public IEnumerable<EmployerInterest> BuildList() =>
         new List<EmployerInterest>
         {
@@ -30,6 +29,7 @@ public class EmployerInterestBuilder
                 UniqueId = _uniqueIds.FirstOrDefault(),
                 OrganisationName = "Test Employer",
                 ContactName = "Test Contact",
+                LocationName = "Head office",
                 Postcode = "CV1 2WT",
                 Latitude = GetLatitude(0),
                 Longitude = GetLongitude(0),
@@ -50,6 +50,7 @@ public class EmployerInterestBuilder
                 UniqueId = _uniqueIds.Skip(1).FirstOrDefault(),
                 OrganisationName = "Test Employer 2",
                 ContactName = "Test Contact 2",
+                LocationName = "Remote office",
                 Postcode = "CV1 3GT",
                 Latitude = GetLatitude(1),
                 Longitude = GetLongitude(1),
@@ -80,6 +81,7 @@ public class EmployerInterestBuilder
             UniqueId = default,
             OrganisationName = "Test Employer",
             ContactName = "Test Contact",
+            LocationName = null,
             Postcode = "CV1 2WT",
             IndustryId = 9,
             OtherIndustry = null,
@@ -114,7 +116,7 @@ public class EmployerInterestBuilder
             SkillAreaIds = employerInterest.SkillAreaIds
         };
     }
-    
+
     public EmployerInterestBuilder WithAdditionalInformation(string additionalInformation)
     {
         _additionalInformation = additionalInformation;
@@ -207,13 +209,13 @@ public class EmployerInterestBuilder
             ? _extensionCounts[index]
             : 0;
 
-    private double GetLatitude(int index) => 
-        _latitudesAndLongitudes.Count > index 
-            ? _latitudesAndLongitudes[index].Item1 
+    private double GetLatitude(int index) =>
+        _latitudesAndLongitudes.Count > index
+            ? _latitudesAndLongitudes[index].Item1
             : 0;
 
-    private double GetLongitude(int index) => 
-        _latitudesAndLongitudes.Count > index 
-            ? _latitudesAndLongitudes[index].Item2 
+    private double GetLongitude(int index) =>
+        _latitudesAndLongitudes.Count > index
+            ? _latitudesAndLongitudes[index].Item2
             : 0;
 }

@@ -12,7 +12,7 @@ namespace Sfa.Tl.Find.Provider.Api.UnitTests.Extensions;
 public class ServiceCollectionExtensionsTests
 {
     private const string CorsTestPolicyName = "TestPolicy";
-    
+
     [Fact]
     public void AddApiVersioningPolicy_Should_AddService()
     {
@@ -45,9 +45,6 @@ public class ServiceCollectionExtensionsTests
 
         var postcodeApiOptions = serviceProvider.GetRequiredService<IOptions<PostcodeApiSettings>>();
         postcodeApiOptions.Value.Should().BeEquivalentTo(siteConfiguration.PostcodeApiSettings);
-
-        var searchOptions = serviceProvider.GetRequiredService<IOptions<SearchSettings>>();
-        searchOptions.Value.Should().BeEquivalentTo(siteConfiguration.SearchSettings);
 
         var connectionStringOptions = serviceProvider.GetRequiredService<IOptions<ConnectionStringSettings>>();
         connectionStringOptions.Value.Should().NotBeNull();
@@ -161,24 +158,10 @@ public class ServiceCollectionExtensionsTests
         services.AddQuartzServices(
             connectionStringSettings.SqlConnectionString,
             "0 0 9 ? * MON-FRI",
-            "0 0 10 ? * *",
             "0 0 11 ? * *",
             "0 0/15 * * * ?",
             "0 0 6 ? * *",
             "0 0 6 ? * FRI");
-
-        services.Should().Contain(t =>
-            t.ImplementationType != null &&
-            t.ImplementationType.Name == "QuartzHostedService");
-    }
-
-    [Fact]
-    public void AddQuartzServices_Without_Cron_Schedule_Should_AddService()
-    {
-        var services = new ServiceCollection();
-        var connectionStringSettings = new SettingsBuilder().BuildConnectionStringSettings();
-
-        services.AddQuartzServices(connectionStringSettings.SqlConnectionString);
 
         services.Should().Contain(t =>
             t.ImplementationType != null &&

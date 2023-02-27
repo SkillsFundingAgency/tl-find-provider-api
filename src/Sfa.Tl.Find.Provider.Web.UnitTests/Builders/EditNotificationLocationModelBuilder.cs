@@ -13,6 +13,7 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class EditNotificationLocationModelBuilder
 {
     public EditNotificationLocationModel Build(
+        INotificationService? notificationService = null,
         IProviderDataService? providerDataService = null,
         ProviderSettings? providerSettings = null,
         ILogger<EditNotificationLocationModel>? logger = null,
@@ -30,6 +31,7 @@ public class EditNotificationLocationModelBuilder
         pageContext ??= new PageContextBuilder()
             .Build(userIsAuthenticated, claims);
 
+        notificationService ??= Substitute.For<INotificationService>();
         providerDataService ??= Substitute.For<IProviderDataService>();
         logger ??= Substitute.For<ILogger<EditNotificationLocationModel>>();
 
@@ -44,6 +46,7 @@ public class EditNotificationLocationModelBuilder
             tempDataProvider);
         
         var pageModel = new EditNotificationLocationModel(
+            notificationService,
             providerDataService,
             providerOptions,
             logger)

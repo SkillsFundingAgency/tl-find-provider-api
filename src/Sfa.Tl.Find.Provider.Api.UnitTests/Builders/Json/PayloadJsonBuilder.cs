@@ -11,4 +11,11 @@ public static class PayloadJsonBuilder
             .BuildJsonFromResourceStream(
                 AssetFolderPath,
                 "createEmployerInterest");
+
+    public static string BuildCreateEmployerInterestPayloadWithTwoLocations() =>
+        typeof(PayloadJsonBuilder)
+            .BuildJsonFromResourceStream(
+                AssetFolderPath,
+                "createEmployerInterestWithTwoLocations");
+
 }

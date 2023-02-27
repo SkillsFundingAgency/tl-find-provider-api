@@ -11,7 +11,7 @@ public interface IEmployerInterestService
 
     Task<int> DeleteEmployerInterest(Guid uniqueId);
 
-    Task<bool> ExtendEmployerInterest(Guid id);
+    Task<ExtensionResult> ExtendEmployerInterest(Guid id);
 
     Task<int> NotifyExpiringEmployerInterest();
     

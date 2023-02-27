@@ -1,5 +1,4 @@
 ﻿using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 
 namespace Sfa.Tl.Find.Provider.Application.Interfaces;
 
@@ -32,24 +31,6 @@ public interface IProviderDataService
 
     Task<IEnumerable<Route>> GetRoutes();
 
-    Task DeleteNotification(int notificationId);
-
-    Task DeleteNotificationLocation(int notificationLocationId);
-
-    Task<IEnumerable<NotificationSummary>> GetNotificationSummaryList(long ukPrn);
-
-    Task<IEnumerable<NotificationLocationSummary>> GetNotificationLocationSummaryList(int notificationId);
-
-    Task<Notification> GetNotification(int notificationId);
-
-    Task<Notification> GetNotificationLocation(int notificationLocationId);
-
-    Task<IEnumerable<NotificationLocationName>> GetAvailableNotificationLocationPostcodes(int providerNotificationId);
-
-    Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(long ukPrn);
-    
-    Task<SearchFilter> GetSearchFilter(int locationId);
-
     Task<bool> HasQualifications();
 
     Task<bool> HasProviders();
@@ -57,18 +38,4 @@ public interface IProviderDataService
     Task ImportProviderContacts(Stream stream);
 
     Task ImportProviderData(Stream stream, bool isAdditionalData);
-
-    Task<int> SaveNotification(Notification notification, long ukPrn);
-
-    Task SaveNotificationLocation(Notification notification, int? providerNotificationId = null);
-
-    Task SaveSearchFilter(SearchFilter searchFilter);
-
-    Task SendProviderNotifications(NotificationFrequency frequency);
-    
-    Task SendProviderNotificationEmail(string emailAddress);
-
-    Task SendProviderVerificationEmail(int notificationId, string emailAddress);
-
-    Task<(bool Success, string Email)> VerifyNotificationEmail(string token);
 }

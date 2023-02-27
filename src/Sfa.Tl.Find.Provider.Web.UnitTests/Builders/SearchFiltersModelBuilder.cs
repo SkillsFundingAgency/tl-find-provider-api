@@ -12,7 +12,7 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class SearchFiltersModelBuilder
 {
     public SearchFiltersModel Build(
-        IProviderDataService? providerDataService = null,
+        ISearchFilterService? searchFilterService = null,
         ProviderSettings? providerSettings = null,
         ILogger<SearchFiltersModel>? logger = null,
         PageContext? pageContext = null,
@@ -29,7 +29,7 @@ public class SearchFiltersModelBuilder
         pageContext ??= new PageContextBuilder()
             .Build(userIsAuthenticated, claims);
 
-        providerDataService ??= Substitute.For<IProviderDataService>();
+        searchFilterService ??= Substitute.For<ISearchFilterService>();
         logger ??= Substitute.For<ILogger<SearchFiltersModel>>();
 
         var providerOptions = Options.Create(
@@ -38,7 +38,7 @@ public class SearchFiltersModelBuilder
                 .BuildProviderSettings());
 
         var pageModel = new SearchFiltersModel(
-            providerDataService,
+            searchFilterService,
             providerOptions,
             logger)
         {

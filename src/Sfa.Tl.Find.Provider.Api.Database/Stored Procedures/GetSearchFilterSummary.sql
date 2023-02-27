@@ -1,8 +1,10 @@
 ﻿CREATE PROCEDURE [dbo].[GetSearchFilterSummary]
-	@ukPrn BIGINT,
-	@includeAdditionalData BIT
+	@ukPrn BIGINT
 AS
 	SET NOCOUNT ON;
+
+	--Set this locally - it will be removed in a future release 
+	DECLARE @includeAdditionalData BIT = 1;
 
 	WITH ProvidersCTE AS (
 	SELECT	p.[Id],

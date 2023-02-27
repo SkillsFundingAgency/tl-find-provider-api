@@ -34,7 +34,7 @@ public class EmployersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     // ReSharper disable once StringLiteralTypo
     [Route("createinterest")]
-    public async Task<IActionResult> CreateInterest(EmployerInterest employerInterest)
+    public async Task<IActionResult> CreateInterest(EmployerInterestInputModel employerInterest)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -43,34 +43,57 @@ public class EmployersController : ControllerBase
 
         try
         {
-            //TODO: Validate the model - for now, just enforce max lengths
-            var cleanEmployerInterest = new EmployerInterest
-            {
-                OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
-                ContactName = employerInterest.ContactName?.Trim().Truncate(400),
-                Postcode = employerInterest.Postcode,
-                IndustryId = employerInterest.IndustryId,
-                OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
-                AdditionalInformation = employerInterest.AdditionalInformation
-                    ?.ToTrimmedOrNullString()
-                    ?.ReplaceRedactedHttpStrings()
-                    ?.ReplaceBreaksWithNewlines(),
-                Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
-                Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
-                Website = employerInterest.Website
-                    ?.ToTrimmedOrNullString()
-                    ?.ReplaceRedactedHttpStrings()
-                    .Truncate(500),
-                ContactPreferenceType = employerInterest.ContactPreferenceType,
-                SkillAreaIds = employerInterest.SkillAreaIds
-            };
+            //var postcode =
+            //    employerInterest.Locations != null && employerInterest.Locations.Any()
+            //        ? employerInterest.Locations.First().Postcode
+            //        : employerInterest.Postcode;
+            //TODO: Remove Postcode from input model and stop passing it
+            var employerLocations =
+                employerInterest.Locations != null && employerInterest.Locations.Any()
+                    ? employerInterest.Locations
+                    : new List<NamedLocation>
+                    {
+                        new()
+                        {
+                            Postcode = employerInterest.Postcode
+                        }
+                    };
 
-            var uniqueId = await _employerInterestService
-                .CreateEmployerInterest(cleanEmployerInterest);
+            var createdUniqueIdentifiers = new List<Guid>();
+            foreach (var employerLocation in employerLocations)
+            {
+                //TODO: Validate the model - for now, just enforce max lengths
+                var cleanEmployerInterest = new EmployerInterest
+                {
+                    OrganisationName = employerInterest.OrganisationName?.Trim().Truncate(400),
+                    ContactName = employerInterest.ContactName?.Trim().Truncate(400),
+                    Postcode = employerLocation.Postcode,
+                    LocationName = employerLocation.Name,
+                    IndustryId = employerInterest.IndustryId,
+                    OtherIndustry = employerInterest.OtherIndustry?.ToTrimmedOrNullString().Truncate(400),
+                    AdditionalInformation = employerInterest.AdditionalInformation
+                        ?.ToTrimmedOrNullString()
+                        ?.ReplaceRedactedHttpStrings()
+                        ?.ReplaceBreaksWithNewlines(),
+                    Email = employerInterest.Email?.ToTrimmedOrNullString().Truncate(320),
+                    Telephone = employerInterest.Telephone?.ToTrimmedOrNullString().Truncate(150),
+                    Website = employerInterest.Website
+                        ?.ToTrimmedOrNullString()
+                        ?.ReplaceRedactedHttpStrings()
+                        .Truncate(500),
+                    ContactPreferenceType = employerInterest.ContactPreferenceType,
+                    SkillAreaIds = employerInterest.SkillAreaIds
+                };
+
+                var uniqueId = await _employerInterestService
+                    .CreateEmployerInterest(cleanEmployerInterest);
+
+                createdUniqueIdentifiers.Add(uniqueId);
+            }
 
             return Ok(new
             {
-                id = uniqueId
+                ids = createdUniqueIdentifiers
             });
         }
         catch (Exception ex)
@@ -122,9 +145,7 @@ public class EmployersController : ControllerBase
             _logger.LogDebug($"{nameof(EmployersController)} {nameof(ExtendInterest)} called.");
         }
 
-        var extended = await _employerInterestService.ExtendEmployerInterest(id);
-        return extended
-            ? Ok()
-            : NotFound();
+        var extensionResult = await _employerInterestService.ExtendEmployerInterest(id);
+        return Ok(extensionResult);
     }
 }

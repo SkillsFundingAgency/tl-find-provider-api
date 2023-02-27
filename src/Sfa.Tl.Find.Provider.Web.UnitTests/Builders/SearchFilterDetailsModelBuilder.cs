@@ -13,6 +13,7 @@ public class SearchFilterDetailsModelBuilder
 {
     public SearchFilterDetailsModel Build(
         IProviderDataService? providerDataService = null,
+        ISearchFilterService? searchFilterService = null,
         ProviderSettings? providerSettings = null,
         ILogger<SearchFilterDetailsModel>? logger = null,
         PageContext? pageContext = null,
@@ -30,6 +31,7 @@ public class SearchFilterDetailsModelBuilder
             .Build(userIsAuthenticated, claims);
 
         providerDataService ??= Substitute.For<IProviderDataService>();
+        searchFilterService ??= Substitute.For<ISearchFilterService>();
         logger ??= Substitute.For<ILogger<SearchFilterDetailsModel>>();
 
         var providerOptions = Options.Create(
@@ -39,6 +41,7 @@ public class SearchFilterDetailsModelBuilder
 
         var pageModel = new SearchFilterDetailsModel(
             providerDataService,
+            searchFilterService,
             providerOptions,
             logger)
         {

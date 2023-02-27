@@ -160,8 +160,6 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task GetNotificationSummaryList_Returns_Expected_Results()
     {
-        const bool includeAdditionalData = true;
-
         var notificationSummaries = new NotificationSummaryBuilder()
             .BuildList()
             .ToList();
@@ -200,7 +198,7 @@ public class NotificationRepositoryTests
 
         var repository = new NotificationRepositoryBuilder().Build(dbContextWrapper);
 
-        var results = (await repository.GetNotificationSummaryList(TestUkPrn, includeAdditionalData))
+        var results = (await repository.GetNotificationSummaryList(TestUkPrn))
             .ToList();
 
         results.Should().NotBeNullOrEmpty();
@@ -213,8 +211,6 @@ public class NotificationRepositoryTests
     [Fact]
     public async Task GetNotificationSummaryList_Sets_Dynamic_Parameters()
     {
-        const bool includeAdditionalData = true;
-
         var (dbContextWrapper, _, dynamicParametersWrapper) =
             new DbContextWrapperBuilder()
                 .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
@@ -223,14 +219,13 @@ public class NotificationRepositoryTests
             .Build(dbContextWrapper,
                 dynamicParametersWrapper.DapperParameterFactory);
 
-        await repository.GetNotificationSummaryList(TestUkPrn, includeAdditionalData);
+        await repository.GetNotificationSummaryList(TestUkPrn);
 
         var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
         templates.Should().NotBeNullOrEmpty();
 
-        templates.GetDynamicTemplatesCount().Should().Be(2);
+        templates.GetDynamicTemplatesCount().Should().Be(1);
         templates.ContainsNameAndValue("ukPrn", TestUkPrn);
-        templates.ContainsNameAndValue("includeAdditionalData", includeAdditionalData);
     }
 
     [Fact]
@@ -396,8 +391,9 @@ public class NotificationRepositoryTests
 
         dbContextWrapper
             .QueryAsync<NotificationEmail>(dbConnection,
-                "GetPendingNotifications",
+                "GetPendingNotificationsWithUpdate",
                 Arg.Any<object>(),
+                Arg.Any<IDbTransaction>(),
                 commandType: CommandType.StoredProcedure)
             .Returns(notificationEmails);
 
@@ -407,6 +403,77 @@ public class NotificationRepositoryTests
         var results = await repository.GetPendingNotificationEmails(frequency);
 
         results.Should().BeEquivalentTo(notificationEmails);
+    }
+
+    [Fact]
+    public async Task GetPendingNotificationEmails_Sets_Dynamic_Parameters()
+    {
+        const NotificationFrequency frequency = NotificationFrequency.Daily;
+
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetPendingNotificationEmails(frequency);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("frequency", frequency);
+    }
+
+    [Fact]
+    public async Task GetLastNotificationSentDate_Returns_Expected_Result()
+    {
+        const NotificationFrequency frequency = NotificationFrequency.Immediately;
+        var idList = new List<int> {1, 2};
+        var lastNotificationDate = DateTime.Parse("2023-02-20 10:31:44.44");
+        
+        var (dbContextWrapper, dbConnection) = new DbContextWrapperBuilder()
+            .BuildSubstituteWrapperAndConnection();
+
+        dbContextWrapper
+            .ExecuteScalarAsync<DateTime?>(dbConnection,
+                Arg.Is<string>(s =>
+                    s.Contains("SELECT MAX(LastNotificationDate) ") &&
+                    s.Contains("FROM NotificationLocation ") &&
+                    s.Contains("WHERE ID in @idList")),
+                Arg.Any<object>())
+            .Returns(lastNotificationDate);
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper);
+
+        var result = await repository.GetLastNotificationSentDate(idList);
+
+        result.Should().Be(lastNotificationDate);
+    }
+
+    [Fact]
+    public async Task GetLastNotificationSentDate_Sets_Dynamic_Parameters()
+    {
+        var idList = new List<int> { 1, 2 };
+
+        var (dbContextWrapper, _, dynamicParametersWrapper) =
+            new DbContextWrapperBuilder()
+                .BuildSubstituteWrapperAndConnectionWithDynamicParameters();
+
+        var repository = new NotificationRepositoryBuilder()
+            .Build(dbContextWrapper,
+                dynamicParametersWrapper.DapperParameterFactory);
+
+        await repository.GetLastNotificationSentDate(idList);
+
+        var templates = dynamicParametersWrapper.DynamicParameters.GetDynamicTemplates();
+        templates.Should().NotBeNullOrEmpty();
+
+        templates.GetDynamicTemplatesCount().Should().Be(1);
+        templates.ContainsNameAndValue("idList", idList);
     }
 
     [Fact]
@@ -764,9 +831,9 @@ public class NotificationRepositoryTests
             .Received(1)
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("UPDATE dbo.NotificationLocation") &&
-                    s.Contains("SET LastNotificationDate = @notificationDate,") &&
-                    s.Contains("ModifiedOn = GETUTCDATE()") &&
+                    s.Contains("UPDATE dbo.NotificationLocation ") &&
+                    s.Contains("SET LastNotificationSentDate = @notificationDate, ") &&
+                    s.Contains("ModifiedOn = GETUTCDATE() ") &&
                     s.Contains("WHERE Id IN (SELECT Id FROM @ids)")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }
@@ -816,10 +883,10 @@ public class NotificationRepositoryTests
             .Received(1)
             .ExecuteAsync(dbConnection,
                 Arg.Is<string>(s =>
-                    s.Contains("UPDATE dbo.ProviderNotification") &&
-                    s.Contains("SET EmailVerificationToken = @emailVerificationToken,") &&
-                    s.Contains("ModifiedOn = GETUTCDATE()") &&
-                    s.Contains("WHERE Id = @providerNotificationId") &&
+                    s.Contains("UPDATE dbo.ProviderNotification ") &&
+                    s.Contains("SET EmailVerificationToken = @emailVerificationToken, ") &&
+                    s.Contains("ModifiedOn = GETUTCDATE() ") &&
+                    s.Contains("WHERE Id = @providerNotificationId ") &&
                     s.Contains("AND Email = @email")),
                 Arg.Is<object>(o => o == dynamicParametersWrapper.DynamicParameters));
     }

@@ -8,19 +8,26 @@ public static class AuthorizationPolicyExtension
     {
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(PolicyNames.HasProviderAccount,
+            options.AddPolicy(PolicyNames.IsProvider,
                 policy =>
                 {
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim(CustomClaimTypes.UkPrn);
-                    policy.Requirements.Add(new ProviderUkPrnRequirement());
+                    policy.Requirements.Add(new ProviderRequirement());
+                });
+
+            options.AddPolicy(PolicyNames.IsAdministrator,
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(new AdministratorRequirement());
                 });
 
             options.AddPolicy(PolicyNames.IsProviderOrAdministrator,
                 policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new ProviderUkPrnOrAdministratorRequirement());
+                    policy.Requirements.Add(new ProviderOrAdministratorRequirement());
                 });
         });
     }

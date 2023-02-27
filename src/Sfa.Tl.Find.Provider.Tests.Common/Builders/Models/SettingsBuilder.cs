@@ -25,7 +25,6 @@ public class SettingsBuilder
     private const string GoogleMapsBaseUri = "https://maps.googleapis.com/maps/api/";
 
     private const string PostcodeRetrieverUri = "https://test.api.postcodes.io/";
-    private const bool MergeAdditionalProviderData = true;
 
     private const string ConnectSiteUri = "https://test.connect.tlevels.gov.uk/";
     private const int DefaultSearchRadius = 20;
@@ -173,12 +172,6 @@ public class SettingsBuilder
             SupportSiteAccessConnectHelpUri = supportSiteAccessConnectHelpUri
         };
 
-    public SearchSettings BuildSearchSettings(
-            bool mergeAdditionalProviderData = MergeAdditionalProviderData) => new()
-            {
-                MergeAdditionalProviderData = mergeAdditionalProviderData
-            };
-
     public SiteConfiguration BuildConfigurationOptions(
         ApiSettings apiSettings = null,
         CourseDirectoryApiSettings courseDirectoryApiSettings = null,
@@ -188,7 +181,6 @@ public class SettingsBuilder
         GoogleMapsApiSettings googleMapsApiSettings = null,
         PostcodeApiSettings postcodeApiSettings = null,
         ProviderSettings providerSettings = null,
-        SearchSettings searchSettings = null,
         string blobStorageConnectionString = BlobStorageConnectionString,
         string sqlConnectionString = SqlConnectionString,
         string redisCacheConnectionString = RedisCacheConnectionString,
@@ -203,7 +195,6 @@ public class SettingsBuilder
             GoogleMapsApiSettings = googleMapsApiSettings ?? BuildGoogleMapsApiSettings(),
             PostcodeApiSettings = postcodeApiSettings ?? BuildPostcodeApiSettings(),
             ProviderSettings = providerSettings ?? BuildProviderSettings(),
-            SearchSettings = searchSettings ?? BuildSearchSettings(),
             BlobStorageConnectionString = blobStorageConnectionString,
             SqlConnectionString = sqlConnectionString,
             RedisCacheConnectionString = redisCacheConnectionString,

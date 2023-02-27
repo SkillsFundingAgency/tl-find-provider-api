@@ -8,14 +8,14 @@ namespace Sfa.Tl.Find.Provider.Api.Jobs;
 [DisallowConcurrentExecution]
 public class ProviderNotificationEmailJob : IJob
 {
-    private readonly IProviderDataService _providerDataService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<ProviderNotificationEmailJob> _logger;
 
     public ProviderNotificationEmailJob(
-        IProviderDataService providerDataService,
+        INotificationService notificationService,
         ILogger<ProviderNotificationEmailJob> logger)
     {
-        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -23,6 +23,16 @@ public class ProviderNotificationEmailJob : IJob
     {
         try
         {
+            if ((await context.Scheduler.GetCurrentlyExecutingJobs())
+                .Any(x => 
+                    x.FireInstanceId != context.FireInstanceId
+                    && x.JobDetail.Key.Equals(context.JobDetail.Key)))
+            {
+                _logger.LogInformation("Duplicate job detected for {jobKey} - exiting immediately.",
+                    context.JobDetail.Key.Name);
+                return;
+            }
+
             var frequencyString = context
                 .JobDetail
                 .JobDataMap
@@ -33,14 +43,11 @@ public class ProviderNotificationEmailJob : IJob
                 throw new ArgumentException("A valid notification frequency was not found in the job data.");
             }
 
-            await _providerDataService.SendProviderNotifications(frequency);
+            await _notificationService.SendProviderNotifications(frequency);
             
-            _logger.LogInformation("{job} with key {key} ({frequency}) job completed successfully. [{allowConcurrent}]",
-                nameof(ProviderNotificationEmailJob),
-                context.JobDetail.Key,
-                frequency,
-                context.JobDetail.ConcurrentExecutionDisallowed
-                );
+            _logger.LogInformation("Job {jobKey} with frequency {frequency} - job completed successfully.",
+                context.JobDetail.Key.Name,
+                frequency);
         }
         catch (Exception ex)
         {
