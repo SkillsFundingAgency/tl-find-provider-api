@@ -22,15 +22,13 @@ public class SearchFilterRepository : ISearchFilterRepository
     }
 
     public async Task<IEnumerable<SearchFilter>> GetSearchFilterSummaryList(
-        long ukPrn,
-        bool includeAdditionalData)
+        long ukPrn)
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            ukPrn,
-            includeAdditionalData
+            ukPrn
         });
 
         var searchFilters = new Dictionary<int, SearchFilter>();

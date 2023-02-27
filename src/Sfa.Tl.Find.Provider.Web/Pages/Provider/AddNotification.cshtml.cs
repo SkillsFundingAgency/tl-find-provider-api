@@ -16,11 +16,12 @@ using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
-[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[Authorize(nameof(PolicyNames.IsProvider))]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class AddNotificationModel : PageModel
 {
     private readonly IProviderDataService _providerDataService;
+    private readonly INotificationService _notificationService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<AddNotificationModel> _logger;
 
@@ -33,10 +34,12 @@ public class AddNotificationModel : PageModel
     [BindProperty] public InputModel? Input { get; set; }
 
     public AddNotificationModel(
+        INotificationService notificationService,
         IProviderDataService providerDataService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<AddNotificationModel> logger)
     {
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -93,7 +96,7 @@ public class AddNotificationModel : PageModel
             Routes = routes
         };
 
-        return await _providerDataService.SaveNotification(notification, ukPrn);
+        return await _notificationService.CreateNotification(notification, ukPrn);
     }
 
     private async Task LoadNotificationView()

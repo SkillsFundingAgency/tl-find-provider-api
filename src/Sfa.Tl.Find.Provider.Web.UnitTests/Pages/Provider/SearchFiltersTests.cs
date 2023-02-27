@@ -35,21 +35,16 @@ public  class SearchFiltersTests
             .BuildList()
             .ToList();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var searchFilterService = Substitute.For<ISearchFilterService>();
+        searchFilterService
             .GetSearchFilterSummaryList(PageContextBuilder.DefaultUkPrn)
             .Returns(searchFilterList);
 
         var searchFiltersModel = new SearchFiltersModelBuilder()
-            .Build(providerDataService);
+            .Build(searchFilterService);
 
         await searchFiltersModel.OnGet();
-
-        searchFiltersModel
-            .SearchFilterList
-            .Should()
-            .NotBeNullOrEmpty();
-
+        
         searchFiltersModel
             .SearchFilterList
             .Should()

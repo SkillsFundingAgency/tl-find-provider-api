@@ -23,9 +23,7 @@ public static class ModelValidationExtensions
         string studentContactEmail = null,
         string studentContactTelephone = null,
         string studentContactWebsite = null,
-        int locationCount = 0,
-        bool isAdditionalData = false
-        )
+        int locationCount = 0)
     {
         provider.UkPrn.Should().Be(ukPrn);
         provider.Name.Should().Be(name);
@@ -44,8 +42,6 @@ public static class ModelValidationExtensions
         provider.StudentContactEmail.Should().Be(studentContactEmail);
         provider.StudentContactTelephone.Should().Be(studentContactTelephone);
         provider.StudentContactWebsite.Should().Be(studentContactWebsite);
-
-        provider.IsAdditionalData.Should().Be(isAdditionalData);
 
         provider.Locations.Should().NotBeNull();
         provider.Locations.Should().HaveCount(locationCount);

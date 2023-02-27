@@ -81,6 +81,7 @@ try
         .AddTransient<IEmailService, EmailService>()
         .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()
         .AddTransient<IEmployerInterestService, EmployerInterestService>()
+        .AddTransient<INotificationService, NotificationService>()
         .AddTransient<IProviderDataService, ProviderDataService>()
         .AddTransient<ITownDataService, TownDataService>()
         .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
@@ -102,7 +103,6 @@ try
     builder.Services.AddQuartzServices(
         siteConfiguration.SqlConnectionString,
         siteConfiguration.CourseDirectoryImportSchedule,
-        siteConfiguration.TownDataImportSchedule,
         siteConfiguration.EmployerInterestSettings?.CleanupJobSchedule,
         siteConfiguration.ProviderSettings?.NotificationEmailImmediateSchedule,
         siteConfiguration.ProviderSettings?.NotificationEmailDailySchedule,
@@ -166,6 +166,8 @@ try
         endpoints.MapControllers();
     });
 
+    app.UseResponseCaching();
+
     app.Run();
 }
 catch (Exception ex)
@@ -177,7 +179,8 @@ catch (Exception ex)
         .GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
     var appInsightsConnectionString = Environment
         .GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
-    if (!string.IsNullOrEmpty(appInsightsInstrumentationKey))
+
+    if (!string.IsNullOrEmpty(appInsightsConnectionString))
     {
         var client = new TelemetryClient(new TelemetryConfiguration
         {

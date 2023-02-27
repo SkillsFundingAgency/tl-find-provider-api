@@ -13,6 +13,7 @@ public class EmployerInterestDetailDtoBuilder
         UniqueId = _uniqueId,
         OrganisationName = "Test Employer",
         ContactName = "Test Contact",
+        LocationName = "Test Location",
         Postcode = "CV1 2WT",
         Latitude = 52.400997,
         Longitude = -1.508122,

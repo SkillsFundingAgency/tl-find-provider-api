@@ -8,7 +8,7 @@ public interface IProviderRepository
 
     Task<IEnumerable<ProviderDetailFlat>> GetAllFlattened();
 
-    Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(long ukPrn, bool includeAdditionalData);
+    Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(long ukPrn);
 
     Task<bool> HasAny(bool isAdditionalData = false);
 
@@ -19,8 +19,7 @@ public interface IProviderRepository
         IList<int> routeIds,
         IList<int> qualificationIds,
         int page,
-        int pageSize,
-        bool includeAdditionalData);
+        int pageSize);
 
     Task<int> UpdateProviderContacts(IEnumerable<ProviderContactDto> contacts);
 }

@@ -52,7 +52,7 @@ public class RouteRepositoryTests
         var repository = new RouteRepositoryBuilder().Build(dbContextWrapper);
 
         var results = (await repository
-            .GetAll(true))
+            .GetAll())
             .ToList();
 
         results.Count.Should().Be(1);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Sfa.Tl.Find.Provider.Api.Controllers;
 using Sfa.Tl.Find.Provider.Api.UnitTests.Builders.Controllers;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -84,6 +85,6 @@ public class LocationsControllerTests
 
         var statusCodeResult = result as StatusCodeResult;
         statusCodeResult.Should().NotBeNull();
-        statusCodeResult!.StatusCode.Should().Be(422);
+        statusCodeResult!.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
     }
 }

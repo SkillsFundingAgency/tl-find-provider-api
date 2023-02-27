@@ -2,7 +2,6 @@
 using Sfa.Tl.Find.Provider.Application.UnitTests.Builders.Services;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Application.Services;
 using Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 using Sfa.Tl.Find.Provider.Tests.Common.Extensions;
@@ -144,7 +143,7 @@ public class ProviderDataServiceTests
             .ToList();
 
         var routeRepository = Substitute.For<IRouteRepository>();
-        routeRepository.GetAll(true)
+        routeRepository.GetAll()
             .Returns(routes);
 
         var cacheService = Substitute.For<ICacheService>();
@@ -160,429 +159,7 @@ public class ProviderDataServiceTests
 
         await routeRepository
             .Received(1)
-            .GetAll(true);
-    }
-
-    [Fact]
-    public async Task DeleteNotification_Calls_Repository()
-    {
-        const int id = 101;
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        await service.DeleteNotification(id);
-
-        await notificationRepository
-            .Received(1)
-            .Delete(id);
-    }
-
-    [Fact]
-    public async Task DeleteNotificationLocation_Calls_Repository()
-    {
-        const int id = 101;
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        await service.DeleteNotificationLocation(id);
-
-        await notificationRepository
-            .Received(1)
-            .DeleteLocation(id);
-    }
-
-    [Fact]
-    public async Task GetNotificationSummaryList_Returns_Expected_List()
-    {
-        const long ukPrn = 12345678;
-
-        var notificationSummaries = new NotificationSummaryBuilder()
-            .BuildList()
-            .ToList();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotificationSummaryList(ukPrn, Arg.Any<bool>())
-            .Returns(notificationSummaries);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        var results = (await service.GetNotificationSummaryList(ukPrn)).ToList();
-        results.Should().BeEquivalentTo(notificationSummaries);
-
-        await notificationRepository
-            .Received(1)
-            .GetNotificationSummaryList(ukPrn, true);
-    }
-
-    [Fact]
-    public async Task GetNotificationLocationSummaryList_Returns_Expected_List()
-    {
-        const int notificationId = 1;
-
-        var notificationLocationSummaries = new NotificationLocationSummaryBuilder()
-            .BuildList()
-            .ToList();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotificationLocationSummaryList(notificationId)
-            .Returns(notificationLocationSummaries);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        var results = (await service.GetNotificationLocationSummaryList(notificationId)).ToList();
-        results.Should().BeEquivalentTo(notificationLocationSummaries);
-
-        await notificationRepository
-        .Received(1)
-            .GetNotificationLocationSummaryList(notificationId);
-    }
-
-
-
-    [Fact]
-    public async Task GetAvailableNotificationLocationPostcodes_Returns_Expected_List()
-    {
-        const int providerNotificationId = 1;
-
-        var locationNames = new NotificationLocationNameBuilder()
-            .BuildList()
-            .ToList();
-
-        var expectedLocationNames = new NotificationLocationNameBuilder()
-            .BuildListOfAvailableLocations()
-            .ToList();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetProviderNotificationLocations(providerNotificationId)
-            .Returns(locationNames);
-
-        var service = new ProviderDataServiceBuilder().Build(
-            notificationRepository: notificationRepository);
-
-        var response = (await service
-                .GetAvailableNotificationLocationPostcodes(providerNotificationId))
-            ?.ToList();
-
-        response.Should().NotBeNull();
-        response.Should().BeEquivalentTo(expectedLocationNames);
-    }
-
-    [Fact]
-    public async Task SaveNotification_Calls_Repository_For_Create_When_Id_Is_Null()
-    {
-        const int newId = 1;
-
-        var notification = new NotificationBuilder()
-            .WithNullId()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository
-            .Create(notification, TestUkPrn)
-            .Returns(newId);
-
-        var uniqueId = Guid.Parse("b4fd2a81-dcc9-43b9-9f4e-be76d1faa801");
-        var guidProvider = Substitute.For<IGuidProvider>();
-        guidProvider
-            .NewGuid()
-            .Returns(uniqueId);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(guidProvider: guidProvider,
-                notificationRepository: notificationRepository);
-
-        var result = await service.SaveNotification(notification, TestUkPrn);
-
-        result.Should().Be(newId);
-
-        await notificationRepository
-            .Received(1)
-            .Create(Arg.Is<Notification>(n =>
-                    ReferenceEquals(n, notification) &&
-                    n.EmailVerificationToken == uniqueId),
-                TestUkPrn);
-    }
-
-    [Fact]
-    public async Task SaveNotification_Calls_Repository_For_Update()
-    {
-        var notification = new NotificationBuilder()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        await service.SaveNotification(notification, TestUkPrn);
-
-        await notificationRepository
-            .Received(1)
-            .Update(notification);
-    }
-
-    [Fact]
-    public async Task SaveNotification_Sends_Email_Verification_Email_For_Create()
-    {
-        var uniqueId = Guid.Parse("f0f7d306-f114-42c5-adeb-87b67e580f1a");
-
-        var providerSettings = new SettingsBuilder()
-            .BuildProviderSettings();
-
-        var baseUri = providerSettings.ConnectSiteUri?.TrimEnd('/');
-        var expectedNotificationsUri = $"{baseUri}/notifications";
-        var expectedVerificationUri = $"{baseUri}/notifications?token={uniqueId:D}";
-
-        var guidProvider = Substitute.For<IGuidProvider>();
-        guidProvider
-            .NewGuid()
-        .Returns(uniqueId);
-
-        var notification = new NotificationBuilder()
-            .WithNullId()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var emailService = Substitute.For<IEmailService>();
-        emailService.SendEmail(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>())
-            .Returns(true);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(
-                guidProvider: guidProvider,
-                emailService: emailService,
-                notificationRepository: notificationRepository,
-                providerSettings: providerSettings);
-
-        await service.SaveNotification(notification, TestUkPrn);
-
-        await emailService
-            .Received(1)
-            .SendEmail(
-                notification.Email,
-                EmailTemplateNames.ProviderVerification,
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>());
-
-        await emailService
-            .Received(1)
-            .SendEmail(
-                notification.Email,
-                EmailTemplateNames.ProviderVerification,
-                Arg.Is<IDictionary<string, string>>(tokens =>
-                    tokens.ValidateTokens(
-                        new Dictionary<string, string>
-                        {
-                            { "email_verification_link", expectedVerificationUri },
-                            { "notifications_uri", expectedNotificationsUri }
-                        })),
-                Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task SaveNotification_Does_Not_Send_Email_Verification_Email_For_Update()
-    {
-        var uniqueId = Guid.Parse("f0f7d306-f114-42c5-adeb-87b67e580f1a");
-
-        var providerSettings = new SettingsBuilder()
-            .BuildProviderSettings();
-
-        var guidProvider = Substitute.For<IGuidProvider>();
-        guidProvider
-            .NewGuid()
-        .Returns(uniqueId);
-
-        var notification = new NotificationBuilder()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var emailService = Substitute.For<IEmailService>();
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(
-                guidProvider: guidProvider,
-                emailService: emailService,
-                notificationRepository: notificationRepository,
-                providerSettings: providerSettings);
-
-        await service.SaveNotification(notification, 0);
-
-        await emailService
-            .DidNotReceiveWithAnyArgs()
-            .SendEmail(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task SaveNotificationLocation_Calls_Repository_For_Create()
-    {
-        const int providerNotificationId = 10;
-        var notification = new NotificationBuilder()
-            .WithNullId()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var uniqueId = Guid.Parse("b4fd2a81-dcc9-43b9-9f4e-be76d1faa801");
-        var guidProvider = Substitute.For<IGuidProvider>();
-        guidProvider
-            .NewGuid()
-            .Returns(uniqueId);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        await service.SaveNotificationLocation(notification, providerNotificationId);
-
-        await notificationRepository
-            .Received(1)
-            .CreateLocation(notification, providerNotificationId);
-    }
-
-    [Fact]
-    public async Task SaveNotificationLocation_Calls_Repository_For_Update()
-    {
-        var notification = new NotificationBuilder()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        await service.SaveNotificationLocation(notification);
-
-        await notificationRepository
-            .Received(1)
-            .UpdateLocation(notification);
-    }
-
-    [Fact]
-    public async Task GetNotification_Returns_Expected_Item()
-    {
-        const int id = 1;
-
-        var notification = new NotificationBuilder()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotification(id)
-            .Returns(notification);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        var result = await service.GetNotification(id);
-        result.Should().BeEquivalentTo(notification);
-
-        await notificationRepository
-            .Received(1)
-            .GetNotification(id);
-    }
-
-    [Fact]
-    public async Task GetNotificationLocation_Returns_Expected_Item()
-    {
-        const int id = 1;
-
-        var notification = new NotificationBuilder()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotificationLocation(id)
-            .Returns(notification);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(notificationRepository: notificationRepository);
-
-        var result = await service.GetNotificationLocation(id);
-        result.Should().BeEquivalentTo(notification);
-
-        await notificationRepository
-            .Received(1)
-            .GetNotificationLocation(id);
-    }
-
-    [Fact]
-    public async Task GetSearchFilters_Returns_Expected_List()
-    {
-        const long ukPrn = 12345678;
-
-        var searchFilters = new SearchFilterBuilder()
-            .BuildList()
-            .ToList();
-
-        var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
-        searchFilterRepository.GetSearchFilterSummaryList(ukPrn, Arg.Any<bool>())
-            .Returns(searchFilters);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(searchFilterRepository: searchFilterRepository);
-
-        var results = (await service.GetSearchFilterSummaryList(ukPrn)).ToList();
-        results.Should().BeEquivalentTo(searchFilters);
-
-        await searchFilterRepository
-            .Received(1)
-            .GetSearchFilterSummaryList(ukPrn, true);
-    }
-
-    [Fact]
-    public async Task GetSearchFilter_Returns_Expected_Item()
-    {
-        const int id = 1;
-
-        var searchFilter = new SearchFilterBuilder()
-            .Build();
-
-        var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
-        searchFilterRepository.GetSearchFilter(id)
-            .Returns(searchFilter);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(searchFilterRepository: searchFilterRepository);
-
-        var result = await service.GetSearchFilter(id);
-        result.Should().BeEquivalentTo(searchFilter);
-
-        await searchFilterRepository
-            .Received(1)
-            .GetSearchFilter(id);
-    }
-
-    [Fact]
-    public async Task SaveSearchFilter_Calls_Repository()
-    {
-        var searchFilter = new SearchFilterBuilder()
-            .Build();
-
-        var searchFilterRepository = Substitute.For<ISearchFilterRepository>();
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(searchFilterRepository: searchFilterRepository);
-
-        await service.SaveSearchFilter(searchFilter);
-
-        await searchFilterRepository
-            .Received(1)
-            .Save(searchFilter);
+            .GetAll();
     }
 
     [Fact]
@@ -605,7 +182,7 @@ public class ProviderDataServiceTests
 
         await routeRepository
             .DidNotReceive()
-            .GetAll(true);
+            .GetAll();
     }
 
     [Fact]
@@ -752,21 +329,16 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((new ProviderSearchResultBuilder().BuildList(), totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
         postcodeLookupService.GetPostcode(fromGeoLocation.Location)
             .Returns(fromGeoLocation);
 
-        var searchSettings = new SettingsBuilder()
-            .BuildSearchSettings();
-
         var service = new ProviderDataServiceBuilder().Build(
             postcodeLookupService: postcodeLookupService,
-            providerRepository: providerRepository,
-            searchSettings: searchSettings);
+            providerRepository: providerRepository);
 
         var results = await service
             .FindProviders(fromGeoLocation.Location,
@@ -792,12 +364,11 @@ public class ProviderDataServiceTests
                     // ReSharper disable CompareOfFloatsByEqualityOperator
                     p.Latitude == fromGeoLocation.Latitude &&
                     p.Longitude == fromGeoLocation.Longitude),
-                // ReSharper restore CompareOfFloatsByEqualityOperator
-                Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
-                Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
-                Arg.Is<int>(p => p == TestPage),
-                Arg.Is<int>(s => s == TestPageSize),
-                Arg.Is<bool>(b => b == searchSettings.MergeAdditionalProviderData));
+                    // ReSharper restore CompareOfFloatsByEqualityOperator
+                    Arg.Is<IList<int>>(r => r.ListIsEquivalentTo(_testRouteIds)),
+                    Arg.Is<IList<int>>(q => q.ListIsEquivalentTo(_testQualificationIds)),
+                    Arg.Is<int>(p => p == TestPage),
+                    Arg.Is<int>(s => s == TestPageSize));
     }
 
     [Fact]
@@ -813,8 +384,7 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -850,8 +420,7 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -891,8 +460,7 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -936,8 +504,7 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -984,8 +551,7 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -1029,8 +595,7 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((searchResults, totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -1072,8 +637,7 @@ public class ProviderDataServiceTests
                 Arg.Any<List<int>>(),
                 Arg.Any<List<int>>(),
                 Arg.Any<int>(),
-                Arg.Any<int>(),
-                Arg.Any<bool>())
+                Arg.Any<int>())
             .Returns((new ProviderSearchResultBuilder().BuildList(), totalSearchResults));
 
         var postcodeLookupService = Substitute.For<IPostcodeLookupService>();
@@ -1112,7 +676,7 @@ public class ProviderDataServiceTests
             .ToList();
 
         var providerRepository = Substitute.For<IProviderRepository>();
-        providerRepository.GetLocationPostcodes(ukPrn, Arg.Any<bool>())
+        providerRepository.GetLocationPostcodes(ukPrn)
             .Returns(locationPostcodes);
 
         var service = new ProviderDataServiceBuilder().Build(
@@ -1251,8 +815,9 @@ public class ProviderDataServiceTests
         "info@testschool.com",
         "020 5555 5555",
             "https://www.testschool.com/",
-            locationCount: 1,
-            isAdditionalData: true);
+            locationCount: 1);
+
+        provider.IsAdditionalData.Should().Be(true);
 
         var location = provider!.Locations.First();
 
@@ -1341,259 +906,5 @@ public class ProviderDataServiceTests
 
         providerContacts.Validate(expectedContacts);
 
-    }
-
-    [Fact]
-    public async Task SendProviderNotifications_Calls_EmailService()
-    {
-        const NotificationFrequency frequency = NotificationFrequency.Daily;
-
-        var providerSettings = new SettingsBuilder()
-            .BuildProviderSettings();
-
-        var notificationEmails = new NotificationEmailBuilder()
-            .BuildList()
-            .ToList();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetPendingNotificationEmails(frequency)
-            .Returns(notificationEmails);
-
-        var emailService = Substitute.For<IEmailService>();
-        emailService.SendEmail(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>())
-            .Returns(true);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(
-                emailService: emailService,
-                notificationRepository: notificationRepository,
-                providerSettings: providerSettings);
-
-        await service.SendProviderNotifications(frequency);
-
-        await emailService
-            .Received(notificationEmails.Count)
-            .SendEmail(
-                Arg.Any<string>(),
-                EmailTemplateNames.ProviderNotification,
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>());
-
-        await emailService
-            .Received(1)
-            .SendEmail(
-                notificationEmails.First().Email,
-                EmailTemplateNames.ProviderNotification,
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task SendProviderNotifications_Calls_UpdateNotificationSentDate()
-    {
-        const NotificationFrequency frequency = NotificationFrequency.Daily;
-        var notificationDate = DateTime.Parse("2023-02-13 11:32:42");
-
-        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        dateTimeProvider.UtcNow.Returns(notificationDate);
-
-        var providerSettings = new SettingsBuilder()
-            .BuildProviderSettings();
-
-        var notificationEmails = new NotificationEmailBuilder()
-            .BuildList()
-            .Take(1)
-            .ToList();
-
-        var notificationIds   =
-            notificationEmails
-                .Select(x => x.NotificationLocationId)
-                .ToList();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetPendingNotificationEmails(frequency)
-            .Returns(notificationEmails);
-
-        var emailService = Substitute.For<IEmailService>();
-        emailService.SendEmail(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>())
-            .Returns(true);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(
-                dateTimeProvider,
-                emailService: emailService,
-                notificationRepository: notificationRepository,
-                providerSettings: providerSettings);
-
-        await service.SendProviderNotifications(frequency);
-
-        await notificationRepository
-            .Received(notificationEmails.Count)
-            .UpdateNotificationSentDate(
-                Arg.Any<IEnumerable<int>>(),
-                notificationDate);
-
-        await notificationRepository
-            .Received(1)
-            .UpdateNotificationSentDate(
-                Arg.Is<IEnumerable<int>>(
-                    ids => 
-                        ids.Single() == notificationIds.Single()),
-                notificationDate);
-    }
-
-    [Fact]
-    public async Task SendProviderNotificationEmail_Calls_EmailService()
-    {
-        const int notificationId = 1;
-        var uniqueId = Guid.Parse("f0f7d306-f114-42c5-adeb-87b67e580f1a");
-
-        var providerSettings = new SettingsBuilder()
-            .BuildProviderSettings();
-
-        var baseUri = providerSettings.ConnectSiteUri?.TrimEnd('/');
-        var expectedNotificationsUri = $"{baseUri}/notifications";
-        var expectedEmployerListUri = $"{baseUri}/employer-list";
-        var expectedSearchFiltersUri = $"{baseUri}/filters";
-
-        var guidProvider = Substitute.For<IGuidProvider>();
-        guidProvider
-            .NewGuid()
-        .Returns(uniqueId);
-
-        var notification = new NotificationBuilder()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotification(notificationId)
-            .Returns(notification);
-
-        var emailService = Substitute.For<IEmailService>();
-        emailService.SendEmail(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>())
-            .Returns(true);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(
-                guidProvider: guidProvider,
-                emailService: emailService,
-                notificationRepository: notificationRepository,
-                providerSettings: providerSettings);
-
-        await service.SendProviderNotificationEmail(notification.Email);
-
-        await emailService
-            .Received(1)
-            .SendEmail(
-                notification.Email,
-                EmailTemplateNames.ProviderNotification,
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>());
-
-        await emailService
-            .Received(1)
-            .SendEmail(
-                notification.Email,
-                EmailTemplateNames.ProviderNotification,
-                Arg.Is<IDictionary<string, string>>(tokens =>
-                    tokens.ValidateTokens(
-                        new Dictionary<string, string>
-                        {
-                            { "employer_list_uri", expectedEmployerListUri },
-                            { "search_filters_uri", expectedSearchFiltersUri },
-                            { "notifications_uri", expectedNotificationsUri }
-                        })),
-                Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task SendProviderVerificationEmail_Calls_EmailService_And_Repository()
-    {
-        const int notificationId = 1;
-        var uniqueId = Guid.Parse("f0f7d306-f114-42c5-adeb-87b67e580f1a");
-
-        var providerSettings = new SettingsBuilder()
-            .BuildProviderSettings();
-
-        var baseUri = providerSettings.ConnectSiteUri?.TrimEnd('/');
-        var expectedNotificationsUri = $"{baseUri}/notifications";
-        var expectedVerificationUri = $"{baseUri}/notifications?token={uniqueId:D}";
-
-        var guidProvider = Substitute.For<IGuidProvider>();
-        guidProvider
-            .NewGuid()
-        .Returns(uniqueId);
-
-        var notification = new NotificationBuilder()
-            .Build();
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-        notificationRepository.GetNotification(notificationId)
-            .Returns(notification);
-
-        var emailService = Substitute.For<IEmailService>();
-        emailService.SendEmail(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                Arg.Any<IDictionary<string, string>>(),
-                Arg.Any<string>())
-            .Returns(true);
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(
-                guidProvider: guidProvider,
-                emailService: emailService,
-                notificationRepository: notificationRepository,
-                providerSettings: providerSettings);
-
-        await service.SendProviderVerificationEmail(notificationId, notification.Email);
-
-        await emailService
-            .Received(1)
-            .SendEmail(
-                notification.Email,
-                EmailTemplateNames.ProviderVerification,
-                Arg.Is<IDictionary<string, string>>(tokens =>
-                    tokens.ValidateTokens(
-                        new Dictionary<string, string>
-                        {
-                            { "email_verification_link", expectedVerificationUri },
-                            { "notifications_uri", expectedNotificationsUri }
-                        })),
-                Arg.Any<string>());
-
-        await notificationRepository
-            .Received(1)
-            .SaveEmailVerificationToken(notificationId, notification.Email, uniqueId);
-    }
-
-    [Fact]
-    public async Task VerifyNotificationEmail_Calls_Repository()
-    {
-        const string token = "f0f7d306-f114-42c5-adeb-87b67e580f1a";
-        var uniqueId = Guid.Parse(token);
-
-        var notificationRepository = Substitute.For<INotificationRepository>();
-
-        var service = new ProviderDataServiceBuilder()
-            .Build(
-                notificationRepository: notificationRepository);
-
-        await service.VerifyNotificationEmail(token);
-
-        await notificationRepository
-            .Received(1)
-            .VerifyEmailToken(uniqueId);
     }
 }

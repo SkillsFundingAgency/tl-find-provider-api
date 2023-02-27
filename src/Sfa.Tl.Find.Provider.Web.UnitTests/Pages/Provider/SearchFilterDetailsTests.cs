@@ -39,13 +39,13 @@ public class SearchFilterDetailsTests
             .Build();
         var id = searchFilter.LocationId;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var searchFilterService = Substitute.For<ISearchFilterService>();
+        searchFilterService
             .GetSearchFilter(id)
             .Returns(searchFilter);
 
         var detailsModel = new SearchFilterDetailsModelBuilder()
-            .Build(providerDataService);
+            .Build(searchFilterService: searchFilterService);
 
         await detailsModel.OnGet(id);
 
@@ -63,13 +63,13 @@ public class SearchFilterDetailsTests
             .Build();
         var id = searchFilter.LocationId;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var searchFilterService = Substitute.For<ISearchFilterService>();
+        searchFilterService
             .GetSearchFilter(id)
             .Returns(searchFilter);
 
         var searchFilterDetailsModel = new SearchFilterDetailsModelBuilder()
-            .Build(providerDataService, settings);
+            .Build(searchFilterService: searchFilterService, providerSettings: settings);
 
         await searchFilterDetailsModel.OnGet(id);
 
@@ -106,14 +106,15 @@ public class SearchFilterDetailsTests
 
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService
-            .GetSearchFilter(id)
-            .Returns(searchFilter);
-        providerDataService
             .GetRoutes()
             .Returns(routes);
+        var searchFilterService = Substitute.For<ISearchFilterService>();
+        searchFilterService
+            .GetSearchFilter(id)
+            .Returns(searchFilter);
 
         var searchFilterDetailsModel = new SearchFilterDetailsModelBuilder()
-            .Build(providerDataService, settings);
+            .Build(providerDataService, searchFilterService, settings);
 
         await searchFilterDetailsModel.OnGet(id);
 
@@ -122,16 +123,14 @@ public class SearchFilterDetailsTests
         var skillAreas = searchFilterDetailsModel.Input.SkillAreas;
 
         skillAreas!.Length.Should().Be(routes.Count);
-        
-        skillAreas[0].Should().Match<SelectListItem>(x =>
-            x.Text == "Agriculture, environment and animal care" && x.Value == "1");
 
-        var orderedRoutes = routes.OrderBy(r => r.Name).ToArray();
-        for (var i = 1; i < skillAreas.Length; i++)
+        var i = 0;
+        foreach (var route in routes.OrderBy(r => r.Name))
         {
             skillAreas[i].Should().Match<SelectListItem>(x =>
-                x.Text == orderedRoutes[i].Name && 
-                x.Value == orderedRoutes[i].Id.ToString());
+                x.Text == route.Name &&
+                x.Value == route.Id.ToString());
+            i++;
         }
     }
 
@@ -145,13 +144,13 @@ public class SearchFilterDetailsTests
             .Build();
         var id = searchFilter.LocationId;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var searchFilterService = Substitute.For<ISearchFilterService>();
+        searchFilterService
             .GetSearchFilter(id)
             .Returns(searchFilter);
 
         var searchFilterDetailsModel = new SearchFilterDetailsModelBuilder()
-            .Build(providerDataService, settings);
+            .Build(searchFilterService: searchFilterService, providerSettings: settings);
 
         await searchFilterDetailsModel.OnGet(id);
 
@@ -171,13 +170,13 @@ public class SearchFilterDetailsTests
             .Build();
         var id = searchFilter.LocationId;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var searchFilterService = Substitute.For<ISearchFilterService>();
+        searchFilterService
             .GetSearchFilter(id)
             .Returns(searchFilter);
 
         var searchFilterDetailsModel = new SearchFilterDetailsModelBuilder()
-            .Build(providerDataService, settings);
+            .Build(searchFilterService: searchFilterService, providerSettings: settings);
 
         await searchFilterDetailsModel.OnGet(id);
 
@@ -191,13 +190,13 @@ public class SearchFilterDetailsTests
     {
         const int id = 999;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var searchFilterService = Substitute.For<ISearchFilterService>();
+        searchFilterService
             .GetSearchFilter(id)
             .Returns(null as SearchFilter);
 
         var detailsModel = new SearchFilterDetailsModelBuilder()
-            .Build(providerDataService);
+            .Build(searchFilterService: searchFilterService);
 
         var result = await detailsModel.OnGet(id);
 
@@ -209,13 +208,13 @@ public class SearchFilterDetailsTests
     [Fact]
     public async Task SearchFilterDetailsModel_OnPost_Calls_Service()
     {
-        var providerDataService = Substitute.For<IProviderDataService>();
+        var searchFilterService = Substitute.For<ISearchFilterService>();
 
         var detailsModel = new SearchFilterDetailsModelBuilder()
-            .Build(providerDataService);
+            .Build(searchFilterService: searchFilterService);
 
-        var id = 10;
-        var searchRadius = 30;
+        const int id = 10;
+        const int searchRadius = 30;
 
         var skillAreas = new SelectListItem[]
         {
@@ -235,13 +234,13 @@ public class SearchFilterDetailsTests
 
         await detailsModel.OnPost();
         
-        await providerDataService
+        await searchFilterService
             .Received(1)
             .SaveSearchFilter(Arg.Is<SearchFilter>(
                 s => s.LocationId == id &&
                      s.SearchRadius == searchRadius));
 
-        await providerDataService
+        await searchFilterService
             .Received(1)
             .SaveSearchFilter(Arg.Is<SearchFilter>(
                 s => s.Routes.Count == 2 &&

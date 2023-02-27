@@ -76,6 +76,6 @@ public class LocationsController : ControllerBase
 
         return result
             ? Ok()
-            : new StatusCodeResult(StatusCodes.Status422UnprocessableEntity);
+            : NotFound();
     }
 }

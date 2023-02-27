@@ -47,6 +47,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             UniqueId = uniqueId,
                             OrganisationName = employerInterest.OrganisationName,
                             ContactName = employerInterest.ContactName,
+                            LocationName = employerInterest.LocationName,
                             Postcode = geoLocation.Location,
                             Latitude = geoLocation.Latitude,
                             Longitude = geoLocation.Longitude,
@@ -186,21 +187,23 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                 date
             });
 
-            var itemsToDelete = (await 
+            var itemsToDelete = (await
                 _dbContextWrapper.QueryAsync<ExpiredEmployerInterestDto>(
                     connection,
-                    "SELECT Id, UniqueId, OrganisationName, Postcode, Email " +
-                    "FROM [dbo].[EmployerInterest] " +
+                    "SELECT ei.Id, ei.UniqueId, ei.OrganisationName, eil.Postcode, ei.Email " +
+                    "FROM [dbo].[EmployerInterest] ei " +
+                    "LEFT JOIN [dbo].[EmployerInterestLocation] eil " +
+                    "ON eil.[EmployerInterestId] = ei.[Id]" +
                     "WHERE [ExpiryDate] < @date",
-                     new { date },
+                    _dynamicParametersWrapper.DynamicParameters,
                     transaction
                     ))?.ToList();
 
-           if(itemsToDelete != null && itemsToDelete.Any())
-           {
-               await PerformDelete(itemsToDelete.Select(x => x.Id), 
-                   connection, transaction);
-           }
+            if (itemsToDelete != null && itemsToDelete.Any())
+            {
+                await PerformDelete(itemsToDelete.Select(x => x.Id),
+                    connection, transaction);
+            }
 
             transaction.Commit();
 
@@ -211,31 +214,6 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             _logger.LogError(ex, "An error occurred when deleting employer interest before date {date}", date);
             throw;
         }
-    }
-
-    public async Task<IEnumerable<EmployerInterest>> GetAll()
-    {
-        using var connection = _dbContextWrapper.CreateConnection();
-
-        return await _dbContextWrapper.QueryAsync<EmployerInterest>(
-            connection,
-            "SELECT Id, " +
-            "UniqueId, " +
-            "OrganisationName, " +
-            "ContactName, " +
-            "Postcode, " +
-            "HasMultipleLocations, " +
-            "LocationCount, " +
-            "IndustryId,  " +
-            "AdditionalInformation, " +
-            "Email, " +
-            "Telephone, " +
-            "ContactPreferenceType, " +
-            "ExpiryDate, " +
-            "CreatedOn, " +
-            "ModifiedOn " +
-            "FROM dbo.EmployerInterest " +
-            "ORDER BY OrganisationName");
     }
 
     public async Task<EmployerInterestDetail> GetDetail(int id)
@@ -261,6 +239,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                             UniqueId = e.UniqueId,
                             OrganisationName = e.OrganisationName,
                             ContactName = e.ContactName,
+                            LocationName = e.LocationName,
                             Postcode = e.Postcode,
                             Latitude = e.Latitude,
                             Longitude = e.Longitude,
@@ -317,6 +296,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
                                 UniqueId = e.UniqueId,
                                 OrganisationName = e.OrganisationName,
                                 ContactName = e.ContactName,
+                                LocationName = e.LocationName,
                                 Postcode = e.Postcode,
                                 IndustryId = e.IndustryId,
                                 OtherIndustry = e.OtherIndustry,
@@ -455,7 +435,7 @@ public class EmployerInterestRepository : IEmployerInterestRepository
     public async Task<(IEnumerable<EmployerInterestSummary> SearchResults, int TotalResultsCount, bool SearchFiltersApplied)> Search(int locationId, int defaultSearchRadius)
     {
         using var connection = _dbContextWrapper.CreateConnection();
-        
+
         _dynamicParametersWrapper.CreateParameters(new
         {
             locationId,
@@ -513,11 +493,11 @@ public class EmployerInterestRepository : IEmployerInterestRepository
             .ThenByDescending(e => e.CreatedOn)
             .ThenBy(e => e.OrganisationName)
             .ToList();
-        
+
         return (searchResults, totalEmployerInterestsCount, searchFiltersApplied);
     }
 
-    public async Task<bool> ExtendExpiry(
+    public async Task<ExtensionResult> ExtendExpiry(
         Guid uniqueId,
         int numberOfDaysToExtend,
         int expiryNotificationDays,
@@ -529,24 +509,18 @@ public class EmployerInterestRepository : IEmployerInterestRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            uniqueId, 
+            uniqueId,
             numberOfDaysToExtend,
             expiryNotificationDays,
             maximumExtensions
         });
 
-        var rowsAffected = await _dbContextWrapper.ExecuteAsync(
-            connection,
-            "UPDATE dbo.EmployerInterest " +
-            "SET ExpiryDate = DATEADD(day, @numberOfDaysToExtend, ExpiryDate), " +
-            "    ExtensionCount = ExtensionCount + 1, " +
-            "    ModifiedOn = GETUTCDATE() " +
-            "WHERE UniqueId = @uniqueId " +
-            "  AND ExpiryDate < DATEADD(day, @expiryNotificationDays + 1, GETUTCDATE())" +
-            "  AND ExtensionCount < @maximumExtensions",
-            _dynamicParametersWrapper.DynamicParameters);
-
-        return rowsAffected > 0;
+        return (await _dbContextWrapper.QueryAsync<ExtensionResult>(
+                connection,
+                "ExtendEmployerInterestExpiry",
+                _dynamicParametersWrapper.DynamicParameters,
+                commandType: CommandType.StoredProcedure))
+            .SingleOrDefault();
     }
 
     public async Task UpdateExtensionEmailSentDate(int id)

@@ -43,8 +43,9 @@ else
     builder.Services.AddWebDataProtection(siteConfiguration);
 }
 
+builder.Services.AddSingleton<IAuthorizationHandler, AdministratorAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, ProviderUkPrnOrAdministratorAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, ProviderOrAdministratorAuthorizationHandler>();
 builder.Services.AddAuthorizationPolicies();
 
 builder.Services.AddResponseCaching();
@@ -129,7 +130,9 @@ builder.Services
     .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
     .AddTransient<IEmailService, EmailService>()
     .AddTransient<IEmployerInterestService, EmployerInterestService>()
+    .AddTransient<INotificationService, NotificationService>()
     .AddTransient<IProviderDataService, ProviderDataService>()
+    .AddTransient<ISearchFilterService, SearchFilterService>()
     .AddTransient<IEmailTemplateRepository, EmailTemplateRepository>()
     .AddTransient<IEmployerInterestRepository, EmployerInterestRepository>()
     .AddTransient<IIndustryRepository, IndustryRepository>()

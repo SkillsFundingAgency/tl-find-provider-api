@@ -10,7 +10,7 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class RemoveNotificationModelBuilder
 {
     public RemoveNotificationModel Build(
-        IProviderDataService? providerDataService = null,
+        INotificationService? notificationService = null,
         ILogger<RemoveNotificationModel>? logger = null,
         PageContext? pageContext = null,
         bool userIsAuthenticated = true,
@@ -26,7 +26,7 @@ public class RemoveNotificationModelBuilder
         pageContext ??= new PageContextBuilder()
             .Build(userIsAuthenticated, claims);
 
-        providerDataService ??= Substitute.For<IProviderDataService>();
+        notificationService ??= Substitute.For<INotificationService>();
         logger ??= Substitute.For<ILogger<RemoveNotificationModel>>();
 
         var tempDataProvider = Substitute.For<ITempDataProvider>();
@@ -35,7 +35,7 @@ public class RemoveNotificationModelBuilder
             tempDataProvider);
 
         var pageModel = new RemoveNotificationModel(
-            providerDataService,
+            notificationService,
             logger)
         {
             PageContext = pageContext,

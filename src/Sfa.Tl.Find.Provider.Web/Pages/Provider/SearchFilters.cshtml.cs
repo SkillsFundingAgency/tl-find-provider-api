@@ -11,11 +11,11 @@ using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
-[Authorize(nameof(PolicyNames.HasProviderAccount))]
+[Authorize(nameof(PolicyNames.IsProvider))]
 [ResponseCache(NoStore = true, Duration = 0, Location = ResponseCacheLocation.None)]
 public class SearchFiltersModel : PageModel
 {
-    private readonly IProviderDataService _providerDataService;
+    private readonly ISearchFilterService _searchFilterService;
     private readonly ProviderSettings _providerSettings;
     private readonly ILogger<SearchFiltersModel> _logger;
 
@@ -23,11 +23,11 @@ public class SearchFiltersModel : PageModel
     public IEnumerable<SearchFilter>? SearchFilterList { get; private set; }
 
     public SearchFiltersModel(
-        IProviderDataService providerDataService,
+        ISearchFilterService searchFilterService,
         IOptions<ProviderSettings> providerOptions,
         ILogger<SearchFiltersModel> logger)
     {
-        _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
+        _searchFilterService = searchFilterService?? throw new ArgumentNullException(nameof(searchFilterService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));
@@ -38,7 +38,7 @@ public class SearchFiltersModel : PageModel
         var ukPrn = HttpContext.User.GetUkPrn();
         if (ukPrn is not null && ukPrn > 0)
         {
-            SearchFilterList = await _providerDataService.GetSearchFilterSummaryList(ukPrn.Value);
+            SearchFilterList = await _searchFilterService.GetSearchFilterSummaryList(ukPrn.Value);
         }
 
         DefaultSearchRadius = _providerSettings.DefaultSearchRadius > 0

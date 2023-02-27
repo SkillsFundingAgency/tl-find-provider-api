@@ -24,13 +24,13 @@ public  class RemoveNotificationTests
 
         var notificationId = notification.Id!.Value;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(notificationId)
             .Returns(notification);
 
         var removeNotificationModel = new RemoveNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         await removeNotificationModel.OnGet(notificationId);
 
@@ -44,13 +44,13 @@ public  class RemoveNotificationTests
     {
         const int id = 999;
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(id)
             .Returns(null as Notification);
 
         var removeNotificationModel = new RemoveNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         var result = await removeNotificationModel.OnGet(id);
 
@@ -65,15 +65,15 @@ public  class RemoveNotificationTests
         const int id = 999;
 
         var notification = new NotificationBuilder()
-            .Build();
+        .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(id)
             .Returns(notification);
 
         var removeNotificationModel = new RemoveNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         var result = await removeNotificationModel.OnPost(id);
 
@@ -81,7 +81,7 @@ public  class RemoveNotificationTests
         redirectResult.Should().NotBeNull();
         redirectResult!.PageName.Should().Be("/Provider/Notifications");
 
-        await providerDataService
+        await notificationService
             .Received(1)
             .DeleteNotification(id);
     }
@@ -94,13 +94,13 @@ public  class RemoveNotificationTests
         var notification = new NotificationBuilder()
             .Build();
 
-        var providerDataService = Substitute.For<IProviderDataService>();
-        providerDataService
+        var notificationService = Substitute.For<INotificationService>();
+        notificationService
             .GetNotification(id)
             .Returns(notification);
 
         var removeNotificationModel = new RemoveNotificationModelBuilder()
-            .Build(providerDataService);
+            .Build(notificationService);
 
         await removeNotificationModel.OnPost(id);
 

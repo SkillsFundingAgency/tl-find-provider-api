@@ -161,8 +161,7 @@ public class FakeStartup
                 postcodeLookupService.IsValid(
                         Arg.Any<string>())
                     .Returns(true);
-
-
+                
                 return postcodeLookupService;
             })
             .AddTransient(_ => Substitute.For<IProviderRepository>())

@@ -1,9 +1,11 @@
 ﻿CREATE PROCEDURE [dbo].[GetNotificationSummary]
-	@ukPrn BIGINT,
-	@includeAdditionalData BIT
+	@ukPrn BIGINT
 AS
 	SET NOCOUNT ON;
-		
+	
+	--Set this locally - it will be removed in a future release 
+	DECLARE @includeAdditionalData BIT = 1;
+	
 	WITH ProvidersCTE AS (
 	SELECT	p.[Id],
 			ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum

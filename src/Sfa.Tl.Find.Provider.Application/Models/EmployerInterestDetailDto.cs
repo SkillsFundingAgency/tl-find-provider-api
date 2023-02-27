@@ -11,6 +11,7 @@ public class EmployerInterestDetailDto
     public Guid UniqueId { get; init; }
     public string OrganisationName { get; init; }
     public string ContactName { get; init; }
+    public string LocationName { get; init; }
     public string Postcode { get; init; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }

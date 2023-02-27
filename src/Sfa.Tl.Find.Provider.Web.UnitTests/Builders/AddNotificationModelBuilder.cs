@@ -13,6 +13,7 @@ namespace Sfa.Tl.Find.Provider.Web.UnitTests.Builders;
 public class AddNotificationModelBuilder
 {
     public AddNotificationModel Build(
+        INotificationService? notificationService = null,
         IProviderDataService? providerDataService = null,
         ProviderSettings? providerSettings = null,
         ILogger<AddNotificationModel>? logger = null,
@@ -31,6 +32,7 @@ public class AddNotificationModelBuilder
             .Build(userIsAuthenticated, claims);
 
         providerDataService ??= Substitute.For<IProviderDataService>();
+        notificationService ??= Substitute.For<INotificationService>();
         logger ??= Substitute.For<ILogger<AddNotificationModel>>();
 
         var providerOptions = Options.Create(
@@ -44,6 +46,7 @@ public class AddNotificationModelBuilder
             tempDataProvider);
         
         var pageModel = new AddNotificationModel(
+            notificationService,
             providerDataService,
             providerOptions,
             logger)

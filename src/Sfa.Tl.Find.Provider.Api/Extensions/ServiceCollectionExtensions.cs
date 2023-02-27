@@ -76,10 +76,6 @@ public static class ServiceCollectionExtensions
             {
                 x.ConfigureProviderSettings(siteConfiguration);
             })
-            .Configure<SearchSettings>(x =>
-            {
-                x.ConfigureSearchSettings(siteConfiguration);
-            })
             .Configure<ConnectionStringSettings>(x =>
             {
                 x.ConfigureConnectionStringSettings(siteConfiguration);
@@ -204,121 +200,78 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddQuartzServices(
         this IServiceCollection services,
         string sqlConnectionString,
-        string courseDirectoryImportCronSchedule = null,
-        string townDataImportCronSchedule = null,
-        string employerInterestCleanupCronSchedule = null,
-        string providerNotificationEmailImmediateCronSchedule = null,
-        string providerNotificationEmailDailyCronSchedule = null,
-        string providerNotificationEmailWeeklyCronSchedule = null)
+        string courseDirectoryImportCronSchedule,
+        string employerInterestCleanupCronSchedule,
+        string providerNotificationEmailImmediateCronSchedule,
+        string providerNotificationEmailDailyCronSchedule,
+        string providerNotificationEmailWeeklyCronSchedule)
     {
         services.AddQuartz(q =>
         {
             q.SchedulerName = "Find a Provider Quartz Scheduler";
-
+              
             q.UseMicrosoftDependencyInjectionJobFactory();
 
             q.UsePersistentStore(x =>
             {
                 x.UseProperties = true;
-                x.UseClustering();
+                x.UseClustering(t =>
+                {
+                    //t.CheckinInterval = TimeSpan.FromSeconds(20);
+                    //t.CheckinMisfireThreshold = TimeSpan.FromSeconds(60);
+                });
                 x.UseSqlServer(sqlConnectionString);
                 x.UseJsonSerializer();
             });
 
-            var startupJobKey = new JobKey(JobKeys.StartupTasks);
-            q.AddJob<InitializationJob>(opts =>
-                    opts.WithIdentity(startupJobKey))
-                .AddTrigger(opts => opts
-                    .ForJob(startupJobKey)
-                    .StartNow());
+            //q.AddTriggerListener<QuartzTriggerListener>();
 
-            if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
-            {
-                var courseDataImportJobKey = new JobKey(JobKeys.CourseDirectoryImport);
-                q.AddJob<CourseDataImportJob>(opts =>
-                        opts.WithIdentity(courseDataImportJobKey))
-                    .AddTrigger(opts => opts
-                        .ForJob(courseDataImportJobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(courseDirectoryImportCronSchedule)));
-            }
+            q.AddJobAndTrigger<CourseDataImportJob>(
+                JobKeys.CourseDataImport,
+                courseDirectoryImportCronSchedule);
 
-            // Removed because the ONS API now requires a key. Use the manual file upload instead
-            //if (!string.IsNullOrEmpty(townDataImportCronSchedule))
-            //{
-            //    var townDataImportJobKey = new JobKey(JobKeys.ImportTownData);
-            //    q.AddJob<TownDataImportJob>(opts =>
-            //            opts.WithIdentity(townDataImportJobKey))
-            //        .AddTrigger(opts => opts
-            //            .ForJob(townDataImportJobKey)
-            //            .WithSchedule(
-            //                CronScheduleBuilder
-            //                    .CronSchedule(townDataImportCronSchedule)));
-            //}
-
-            if (!string.IsNullOrEmpty(employerInterestCleanupCronSchedule))
-            {
-                var employerInterestCleanupJobKey = new JobKey(JobKeys.EmployerInterestCleanup);
-                q.AddJob<EmployerInterestCleanupJob>(opts =>
-                        opts.WithIdentity(employerInterestCleanupJobKey))
-                    .AddTrigger(opts => opts
-                        .ForJob(employerInterestCleanupJobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(employerInterestCleanupCronSchedule)));
-            }
-
-            if (!string.IsNullOrEmpty(providerNotificationEmailImmediateCronSchedule))
-            {
-                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailImmediate);
-                q.AddJob<ProviderNotificationEmailJob>(opts =>
+            q.AddJobAndTrigger<EmployerInterestCleanupJob>(
+                JobKeys.EmployerInterestCleanup,
+                employerInterestCleanupCronSchedule);
+            
+            q.AddJobAndTrigger<ProviderNotificationEmailJob>(
+                JobKeys.ProviderNotificationEmailImmediate,
+                providerNotificationEmailImmediateCronSchedule,
+                MisfireInstruction.CronTrigger.DoNothing,
+                new Dictionary<string, string>
+                {
                     {
-                        opts.WithIdentity(jobKey);
-                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
-                            NotificationFrequency.Immediately.ToString());
-                    })
-                    .AddTrigger(opts => opts
-                        .ForJob(jobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailImmediateCronSchedule)));
-            }
+                        JobDataKeys.NotificationFrequency,
+                        NotificationFrequency.Immediately.ToString()
+                    }
+                });
 
-            if (!string.IsNullOrEmpty(providerNotificationEmailDailyCronSchedule))
-            {
-                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailDaily);
-                q.AddJob<ProviderNotificationEmailJob>(opts =>
+            q.AddJobAndTrigger<ProviderNotificationEmailJob>(
+                JobKeys.ProviderNotificationEmailDaily,
+                providerNotificationEmailDailyCronSchedule,
+                MisfireInstruction.CronTrigger.DoNothing,
+                new Dictionary<string, string>
+                {
                     {
-                        opts.WithIdentity(jobKey);
-                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
-                            NotificationFrequency.Daily.ToString());
-                    })
-                    .AddTrigger(opts => opts
-                        .ForJob(jobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailDailyCronSchedule)));
-            }
-
-            if (!string.IsNullOrEmpty(providerNotificationEmailWeeklyCronSchedule))
-            {
-                var jobKey = new JobKey(JobKeys.ProviderNotificationEmailWeekly);
-                q.AddJob<ProviderNotificationEmailJob>(opts =>
+                        JobDataKeys.NotificationFrequency,
+                        NotificationFrequency.Daily.ToString()
+                    }
+                });
+            
+            q.AddJobAndTrigger<ProviderNotificationEmailJob>(
+                JobKeys.ProviderNotificationEmailWeekly,
+                providerNotificationEmailWeeklyCronSchedule,
+                jobDataList: new Dictionary<string, string>
+                {
                     {
-                        opts.WithIdentity(jobKey);
-                        opts.UsingJobData(JobDataKeys.NotificationFrequency,
-                            NotificationFrequency.Weekly.ToString());
-                    })
-                    .AddTrigger(opts => opts
-                        .ForJob(jobKey)
-                        .WithSchedule(
-                            CronScheduleBuilder
-                                .CronSchedule(providerNotificationEmailWeeklyCronSchedule)));
-            }
+                        JobDataKeys.NotificationFrequency,
+                        NotificationFrequency.Weekly.ToString()
+                    }
+                });
         });
 
-        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+        services.AddQuartzHostedService(q => 
+            q.WaitForJobsToComplete = true);
 
         return services;
     }

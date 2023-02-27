@@ -199,7 +199,7 @@ public class EmployerInterestServiceTests
             $"* Website: {employerInterest.Website}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement areas: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {employerInterest.Postcode}\r\n" +
+            $"* Location: {employerInterest.LocationName} - {employerInterest.Postcode}\r\n" +
             $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
 
         await emailService
@@ -295,7 +295,7 @@ public class EmployerInterestServiceTests
             $"* Website: {employerInterest.Website}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement areas: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {expectedPostcode}\r\n" +
+            $"* Location: {expectedPostcode}\r\n" +
             $"* Additional information: {employerInterest.AdditionalInformation}\r\n";
 
         await emailService
@@ -442,7 +442,7 @@ public class EmployerInterestServiceTests
             $"* Organisation name: {employerInterest.OrganisationName}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement area: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {employerInterest.Postcode}\r\n";
+            $"* Location: {employerInterest.Postcode}\r\n";
 
         await emailService
             .Received(1)
@@ -532,6 +532,7 @@ public class EmployerInterestServiceTests
     public async Task ExtendEmployerInterest_By_UniqueId_Calls_Repository()
     {
         var uniqueId = Guid.Parse("5AF374D2-1072-4E98-91CF-6AE765044DBA");
+        var extensionResult = new ExtensionResultBuilder().Build();
 
         var settings = new SettingsBuilder().BuildEmployerInterestSettings();
 
@@ -541,7 +542,7 @@ public class EmployerInterestServiceTests
                 Arg.Any<int>(),
                 Arg.Any<int>(),
                 Arg.Any<int>())
-            .Returns(true);
+            .Returns(extensionResult);
 
         var service = new EmployerInterestServiceBuilder()
             .Build(employerInterestRepository: employerInterestRepository,
@@ -549,7 +550,8 @@ public class EmployerInterestServiceTests
 
         var result = await service.ExtendEmployerInterest(uniqueId);
 
-        result.Should().BeTrue();
+        result.Success.Should().BeTrue();
+        result.ExtensionsRemaining.Should().Be(extensionResult.ExtensionsRemaining);
 
         await employerInterestRepository
             .Received(1)
@@ -763,7 +765,7 @@ public class EmployerInterestServiceTests
             $"* Website: {firstEmployerInterest.Website}\r\n" +
             $"* Organisation’s primary industry: {expectedIndustry}\r\n" +
             $"* Industry placement areas: {expectedSkillAreas}\r\n" +
-            $"* Postcode: {firstEmployerInterest.Postcode}\r\n" +
+            $"* Location: {firstEmployerInterest.LocationName} - {firstEmployerInterest.Postcode}\r\n" +
             $"* Additional information: {firstEmployerInterest.AdditionalInformation}\r\n";
 
         await emailService

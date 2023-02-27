@@ -62,8 +62,7 @@ public class ProviderRepositoryTests
     public async Task GetLocationPostcodes_Returns_Expected_List_For_Single_Result_Row()
     {
         const long ukPrn = 12345678;
-        const bool includeAdditionalData = true;
-
+        
         var locationPostcodes = new LocationPostcodeBuilder()
             .BuildList()
             .ToList();
@@ -82,7 +81,7 @@ public class ProviderRepositoryTests
             .Build(dbContextWrapper);
 
         var results = (await repository
-                .GetLocationPostcodes(ukPrn, includeAdditionalData))
+                .GetLocationPostcodes(ukPrn))
             ?.ToList();
 
         results.Should().NotBeNull();
@@ -300,38 +299,7 @@ public class ProviderRepositoryTests
             null,
             null, 
             0, 
-            5, 
-            false);
-
-        searchResults.Should().NotBeNull();
-        var searchResultsList = searchResults.SearchResults?.ToList();
-        searchResultsList.Should().NotBeNull();
-        searchResultsList!.Count.Should().Be(1);
-        searchResults.TotalResultsCount.Should().Be(totalLocationsCount);
-
-        searchResultsList.First().Validate(expectedResult);
-    }
-
-    [Fact]
-    public async Task Search_Merges_Additional_Data()
-    {
-        var fromGeoLocation = GeoLocationBuilder.BuildValidPostcodeLocation();
-        const int totalLocationsCount = 1234;
-
-        var expectedResult = new ProviderSearchResultBuilder()
-             .BuildSingleSearchResultWithSearchOrigin(fromGeoLocation);
-
-        var repository = await new ProviderRepositoryBuilder()
-            .BuildRepositoryWithDataToSearchProviders(totalLocationsCount);
-
-        var searchResults = await repository
-            .Search(
-                fromGeoLocation,
-                null,
-                null,
-                0,
-                5,
-                true);
+            5);
 
         searchResults.Should().NotBeNull();
         var searchResultsList = searchResults.SearchResults?.ToList();

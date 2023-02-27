@@ -35,7 +35,7 @@
                 <input class="govuk-input govuk-input--width-20" asp-for="Input!.Email" type="email" spellcheck="false" aria-describedby="email-hint email-error" autocomplete="email"
                        sfa-validation-for="Input!.Email" sfa-validationerror-class="govuk-input--error">
             </div>
-            
+
             @if (Model.Locations is not null && Model.Locations.Length > 0)
             {
                 <div class="govuk-form-group">
@@ -97,7 +97,10 @@
                 </fieldset>
             </div>
             <button type="submit" asp-page-handler="" class=" govuk-button govuk-!-margin-right-2">Save and finish</button>
-            <button type="submit" asp-page-handler="AddLocation" class="govuk-button govuk-button--secondary">Add another notification for this email</button>
+            @if (Model.Locations is not null && Model.Locations.Length > 0)
+            {
+                <button type="submit" asp-page-handler="AddLocation" class="govuk-button govuk-button--secondary">Add another notification for this email</button>
+            }
             <a asp-page="./Notifications" class="govuk-link govuk-!-padding-2 tl-display--inline-block">Cancel</a>
         </form>
     </div>

@@ -15,7 +15,6 @@ AS
         [UniqueId], 
         [OrganisationName], 
         [ContactName], 
-        [Postcode], 
         [OtherIndustry],
         [Email], 
         [Telephone], 
@@ -26,7 +25,6 @@ AS
     SELECT [UniqueId], 
         [OrganisationName], 
         [ContactName], 
-        [Postcode], 
         [OtherIndustry],
         [Email], 
         [Telephone], 
@@ -42,11 +40,13 @@ AS
     --Create location record
     INSERT INTO [dbo].[EmployerInterestLocation] (
 	    [EmployerInterestId],
+        [Name],
 	    [Postcode],
 	    [Latitude],
 	    [Longitude],
 	    [Location])
     SELECT @newId,
+        [LocationName],
 	    [Postcode],
 	    [Latitude],
 	    [Longitude],
