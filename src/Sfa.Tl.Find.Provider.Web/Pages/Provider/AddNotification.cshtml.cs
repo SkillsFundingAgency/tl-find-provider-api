@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
-using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Extensions;
 using Sfa.Tl.Find.Provider.Web.Authorization;
+using Sfa.Tl.Find.Provider.Web.Extensions;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
@@ -85,7 +85,7 @@ public class AddNotificationModel : PageModel
     {
         var ukPrn = HttpContext.User.GetUkPrn().Value;
 
-        var routes = GetSelectedSkillAreas(Input!.SkillAreas);
+        var routes = SelectListHelperExtensions.GetSelectedSkillAreas(Input!.SkillAreas);
 
         var notification = new Notification
         {
@@ -118,7 +118,7 @@ public class AddNotificationModel : PageModel
             SelectedLocation = 0
         };
 
-        FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
+        FrequencyOptions = SelectListHelperExtensions.LoadFrequencyOptions(Input.SelectedFrequency);
 
         if (providerLocations.Count == 1)
         {
@@ -126,51 +126,16 @@ public class AddNotificationModel : PageModel
         }
         else
         {
-            Locations = LoadProviderLocationOptions(providerLocations, Input.SelectedLocation);
+            Locations = SelectListHelperExtensions.LoadProviderLocationOptionsWithAllOption(providerLocations, Input.SelectedLocation);
         }
 
-        SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
+        SearchRadiusOptions = SelectListHelperExtensions.LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 
-        Input.SkillAreas = await LoadSkillAreaOptions(new List<Route>());
+        Input.SkillAreas = SelectListHelperExtensions.LoadSkillAreaOptions(
+            await _providerDataService.GetRoutes(),
+            new List<Route>());
     }
-
-    private SelectListItem[] LoadFrequencyOptions(NotificationFrequency selectedValue)
-    {
-        return Enum.GetValues<NotificationFrequency>()
-            .Select(f => new SelectListItem
-            {
-                Value = ((int)f).ToString(),
-                Text = f.ToString(),
-                Selected = f == selectedValue
-            })
-            .ToArray();
-    }
-
-    private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
-    {
-        var values = new List<int> { 5, 10, 20, 30, 40, 50 };
-        return values
-            .Select(p => new SelectListItem(
-                $"{p} miles",
-                p.ToString(),
-                p == (selectedValue ?? values[0]))
-            )
-            .ToArray();
-    }
-
-    private async Task<SelectListItem[]> LoadSkillAreaOptions(IEnumerable<Route> selectedRoutes)
-    {
-        return (await _providerDataService
-                .GetRoutes())
-            .Select(r => new SelectListItem(
-                r.Name,
-                r.Id.ToString(),
-                selectedRoutes.Any(x => r.Id == x.Id))
-            )
-            .OrderBy(x => x.Text)
-            .ToArray();
-    }
-
+    
     private async Task<IEnumerable<LocationPostcode>> GetProviderLocations(long? ukPrn)
     {
         if (ukPrn is null) return Array.Empty<LocationPostcode>();
@@ -178,34 +143,7 @@ public class AddNotificationModel : PageModel
         return await _providerDataService
             .GetLocationPostcodes(ukPrn.Value);
     }
-
-    private SelectListItem[] LoadProviderLocationOptions(IEnumerable<LocationPostcode> providerLocations, int? selectedValue)
-    {
-        return providerLocations.Select(p
-                => new SelectListItem(
-                    $"{p.Name.TruncateWithEllipsis(15).ToUpper()} [{p.Postcode}]",
-                    p.Id.ToString(),
-                    p.Id == selectedValue)
-            )
-            .OrderBy(x => x.Text)
-            .Prepend(new SelectListItem("All", "0", selectedValue is null or 0))
-            .ToArray();
-    }
-
-    private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)
-    {
-        return selectList != null
-            ? selectList
-                .Where(s => s.Selected)
-                .Select(s =>
-                    new Route
-                    {
-                        Id = int.Parse(s.Value)
-                    })
-                .ToList()
-            : new List<Route>();
-    }
-
+    
     public class InputModel
     {
         [Required(ErrorMessage = "Enter an email")]
