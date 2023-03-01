@@ -10,7 +10,7 @@ USING (VALUES
   (2,  N'Agriculture', 0),
   (3,  N'Arts, Entertainment and Recreation', 0),
   (4,  N'Construction', 0),
-  (5,  N'Education and Childcare', 0),
+  (5,  N'Education and Early Years', 0),
   (6,  N'Financial Services', 0),
   (7,  N'Health and Social Care', 0),
   (8,  N'Hospitality', 0),
