@@ -225,12 +225,12 @@ public static class ServiceCollectionExtensions
                 x.UseJsonSerializer();
             });
 
-            var startupJobKey = new JobKey(JobKeys.StartupTasks);
-            q.AddJob<InitializationJob>(opts =>
-                    opts.WithIdentity(startupJobKey))
-                .AddTrigger(opts => opts
-                    .ForJob(startupJobKey)
-                    .StartNow());
+            //var startupJobKey = new JobKey(JobKeys.StartupTasks);
+            //q.AddJob<InitializationJob>(opts =>
+            //        opts.WithIdentity(startupJobKey))
+            //    .AddTrigger(opts => opts
+            //        .ForJob(startupJobKey)
+            //        .StartNow());
 
             if (!string.IsNullOrEmpty(courseDirectoryImportCronSchedule))
             {

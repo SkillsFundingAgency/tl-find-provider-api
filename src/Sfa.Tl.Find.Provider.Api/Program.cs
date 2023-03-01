@@ -177,7 +177,7 @@ catch (Exception ex)
         .GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
     var appInsightsConnectionString = Environment
         .GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
-    if (!string.IsNullOrEmpty(appInsightsInstrumentationKey))
+    if (!string.IsNullOrEmpty(appInsightsConnectionString))
     {
         var client = new TelemetryClient(new TelemetryConfiguration
         {
