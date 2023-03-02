@@ -134,7 +134,7 @@ public class AddAdditionalNotificationTests
 
         await addAdditionalNotificationModel.OnGet(notification.Id.Value);
 
-        addAdditionalNotificationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        addAdditionalNotificationModel.FrequencyOptions.Should().NotBeNullOrEmpty();
         var options = addAdditionalNotificationModel.FrequencyOptions;
 
         options!.Length.Should().Be(3);

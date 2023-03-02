@@ -7,8 +7,8 @@ using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
+using Sfa.Tl.Find.Provider.Web.Extensions;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
-using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
 namespace Sfa.Tl.Find.Provider.Web.Pages.Provider;
 
@@ -36,7 +36,7 @@ public class SearchFilterDetailsModel : PageModel
         ILogger<SearchFilterDetailsModel> logger)
     {
         _providerDataService = providerDataService ?? throw new ArgumentNullException(nameof(providerDataService));
-        _searchFilterService = searchFilterService?? throw new ArgumentNullException(nameof(searchFilterService));
+        _searchFilterService = searchFilterService ?? throw new ArgumentNullException(nameof(searchFilterService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _providerSettings = providerOptions?.Value
                             ?? throw new ArgumentNullException(nameof(providerOptions));
@@ -61,8 +61,10 @@ public class SearchFilterDetailsModel : PageModel
             Input.LocationId = id;
             Input.SelectedSearchRadius = SearchFilter.SearchRadius ?? DefaultSearchRadius;
 
-            SearchRadiusOptions = LoadSearchRadiusOptions(Input?.SelectedSearchRadius);
-            Input.SkillAreas = await LoadSkillAreaOptions(SearchFilter.Routes);
+            SearchRadiusOptions = SelectListHelperExtensions.LoadSearchRadiusOptions(Input?.SelectedSearchRadius);
+            Input.SkillAreas = SelectListHelperExtensions.LoadSkillAreaOptions(
+                await _providerDataService.GetRoutes(),
+                SearchFilter.Routes);
         }
 
         return SearchFilter != null ?
@@ -76,12 +78,12 @@ public class SearchFilterDetailsModel : PageModel
         {
         }
 
-        var routes = GetSelectedSkillAreas(Input?.SkillAreas);
+        var routes = SelectListHelperExtensions.GetSelectedSkillAreas(Input?.SkillAreas);
 
         var searchFilter = new SearchFilter
         {
             LocationId = Input!.LocationId,
-            SearchRadius = Input?.SelectedSearchRadius is not null 
+            SearchRadius = Input?.SelectedSearchRadius is not null
                 ? Input!.SelectedSearchRadius
                 : _providerSettings.DefaultSearchRadius,
             Routes = routes
@@ -90,45 +92,6 @@ public class SearchFilterDetailsModel : PageModel
         await _searchFilterService.SaveSearchFilter(searchFilter);
 
         return RedirectToPage("/Provider/SearchFilters");
-    }
-
-    private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
-    {
-        return new List<int> { 5, 10, 20, 30, 40, 50 }
-            .Select(p => new SelectListItem(
-                $"{p} miles",
-                p.ToString(),
-                p == selectedValue)
-            )
-            .OrderBy(x => int.Parse(x.Value))
-            .ToArray();
-    }
-
-    private async Task<SelectListItem[]> LoadSkillAreaOptions(IEnumerable<Route> selectedRoutes)
-    {
-        return (await _providerDataService
-                .GetRoutes())
-            .Select(r => new SelectListItem(
-                r.Name,
-                r.Id.ToString(),
-                selectedRoutes.Any(x => r.Id == x.Id))
-            )
-            .OrderBy(x => x.Text)
-            .ToArray();
-    }
-
-    private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)
-    {
-        return selectList != null
-            ? selectList
-                .Where(s => s.Selected)
-                .Select(s =>
-                    new Route
-                    {
-                        Id = int.Parse(s.Value)
-                    })
-                .ToList()
-            : new List<Route>();
     }
 
     public class InputModel

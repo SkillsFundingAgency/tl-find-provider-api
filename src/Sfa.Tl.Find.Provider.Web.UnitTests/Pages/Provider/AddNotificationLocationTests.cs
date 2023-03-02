@@ -134,7 +134,7 @@ public class AddNotificationLocationTests
 
         await addNotificationLocationModel.OnGet(notification.Id.Value);
 
-        addNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        addNotificationLocationModel.FrequencyOptions.Should().NotBeNullOrEmpty();
         var options = addNotificationLocationModel.FrequencyOptions;
 
         options!.Length.Should().Be(3);

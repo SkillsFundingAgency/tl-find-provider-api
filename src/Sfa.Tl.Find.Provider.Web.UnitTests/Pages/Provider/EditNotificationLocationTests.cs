@@ -51,7 +51,7 @@ public class EditNotificationLocationTests
 
         await editNotificationLocationModel.OnGet(ProviderNotificationId, notification.Id.Value);
 
-        editNotificationLocationModel.SearchRadiusOptions.Should().NotBeNullOrEmpty();
+        editNotificationLocationModel.FrequencyOptions.Should().NotBeNullOrEmpty();
         var options = editNotificationLocationModel.FrequencyOptions;
 
         options!.Length.Should().Be(3);

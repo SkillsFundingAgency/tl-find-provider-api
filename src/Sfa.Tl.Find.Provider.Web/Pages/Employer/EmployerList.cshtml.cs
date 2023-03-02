@@ -103,7 +103,7 @@ public class EmployerListModel : PageModel
         if (postcodeLocation is not null)
         {
             Input ??= new InputModel();
-            if (ProviderLocations != null && 
+            if (ProviderLocations != null &&
                 ProviderLocations.ContainsKey(postcodeLocation.Postcode) &&
                 postcodeLocation.Id is not null)
             {
@@ -193,14 +193,6 @@ public class EmployerListModel : PageModel
         return RedirectToPage("/Employer/EmployerList");
     }
 
-    private long? GetUkPrn()
-    {
-        var ukPrnClaim = HttpContext.User.GetClaim(CustomClaimTypes.UkPrn);
-        return ukPrnClaim is not null && long.TryParse(ukPrnClaim, out var ukPrn)
-            ? ukPrn
-            : null;
-    }
-
     private async Task LoadProviderPostcodes(long? ukPrn)
     {
         if (ukPrn is null) return;
@@ -232,10 +224,10 @@ public class EmployerListModel : PageModel
 
     private async Task PerformSearch(LocationPostcode postcodeLocation)
     {
-        (EmployerInterestList, _) = 
+        (EmployerInterestList, _) =
             await _employerInterestService
             .FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude);
-        
+
         ZeroResultsFound = !EmployerInterestList.Any();
         SelectedPostcodeHasFilters = false;
     }
