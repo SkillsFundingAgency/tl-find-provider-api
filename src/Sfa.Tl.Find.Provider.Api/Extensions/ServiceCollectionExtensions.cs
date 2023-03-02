@@ -206,10 +206,17 @@ public static class ServiceCollectionExtensions
         string providerNotificationEmailDailyCronSchedule,
         string providerNotificationEmailWeeklyCronSchedule)
     {
+        services.Configure<QuartzOptions>(options =>
+        {
+            options.Scheduling.IgnoreDuplicates = true;
+            options.Scheduling.OverWriteExistingData = true;
+        });
+
         services.AddQuartz(q =>
         {
+            q.SchedulerId = "Find-Provider-Scheduler";
             q.SchedulerName = "Find a Provider Quartz Scheduler";
-              
+
             q.UseMicrosoftDependencyInjectionJobFactory();
 
             q.UsePersistentStore(x =>
@@ -224,8 +231,6 @@ public static class ServiceCollectionExtensions
                 x.UseJsonSerializer();
             });
 
-            //q.AddTriggerListener<QuartzTriggerListener>();
-
             q.AddJobAndTrigger<CourseDataImportJob>(
                 JobKeys.CourseDataImport,
                 courseDirectoryImportCronSchedule);
@@ -233,7 +238,7 @@ public static class ServiceCollectionExtensions
             q.AddJobAndTrigger<EmployerInterestCleanupJob>(
                 JobKeys.EmployerInterestCleanup,
                 employerInterestCleanupCronSchedule);
-            
+
             q.AddJobAndTrigger<ProviderNotificationEmailJob>(
                 JobKeys.ProviderNotificationEmailImmediate,
                 providerNotificationEmailImmediateCronSchedule,
@@ -257,7 +262,7 @@ public static class ServiceCollectionExtensions
                         NotificationFrequency.Daily.ToString()
                     }
                 });
-            
+
             q.AddJobAndTrigger<ProviderNotificationEmailJob>(
                 JobKeys.ProviderNotificationEmailWeekly,
                 providerNotificationEmailWeeklyCronSchedule,
@@ -270,8 +275,10 @@ public static class ServiceCollectionExtensions
                 });
         });
 
-        services.AddQuartzHostedService(q => 
-            q.WaitForJobsToComplete = true);
+        services.AddQuartzHostedService(q =>
+        {
+            q.WaitForJobsToComplete = true;
+        });
 
         return services;
     }
