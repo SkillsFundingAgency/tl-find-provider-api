@@ -206,25 +206,30 @@ public static class ServiceCollectionExtensions
         string providerNotificationEmailDailyCronSchedule,
         string providerNotificationEmailWeeklyCronSchedule)
     {
+        services.Configure<QuartzOptions>(options =>
+        {
+            options.Scheduling.IgnoreDuplicates = true;
+            options.Scheduling.OverWriteExistingData = true;
+        });
+
         services.AddQuartz(q =>
         {
+            q.SchedulerId = "Find-Provider-Scheduler";
             q.SchedulerName = "Find a Provider Quartz Scheduler";
-              
+
             q.UseMicrosoftDependencyInjectionJobFactory();
 
             q.UsePersistentStore(x =>
             {
                 x.UseProperties = true;
-                x.UseClustering(t =>
+                x.UseClustering(c =>
                 {
-                    //t.CheckinInterval = TimeSpan.FromSeconds(20);
-                    //t.CheckinMisfireThreshold = TimeSpan.FromSeconds(60);
+                    c.CheckinMisfireThreshold = TimeSpan.FromSeconds(20);
+                    c.CheckinInterval = TimeSpan.FromSeconds(10);
                 });
                 x.UseSqlServer(sqlConnectionString);
                 x.UseJsonSerializer();
             });
-
-            //q.AddTriggerListener<QuartzTriggerListener>();
 
             q.AddJobAndTrigger<CourseDataImportJob>(
                 JobKeys.CourseDataImport,
@@ -233,7 +238,7 @@ public static class ServiceCollectionExtensions
             q.AddJobAndTrigger<EmployerInterestCleanupJob>(
                 JobKeys.EmployerInterestCleanup,
                 employerInterestCleanupCronSchedule);
-            
+
             q.AddJobAndTrigger<ProviderNotificationEmailJob>(
                 JobKeys.ProviderNotificationEmailImmediate,
                 providerNotificationEmailImmediateCronSchedule,
@@ -257,7 +262,7 @@ public static class ServiceCollectionExtensions
                         NotificationFrequency.Daily.ToString()
                     }
                 });
-            
+
             q.AddJobAndTrigger<ProviderNotificationEmailJob>(
                 JobKeys.ProviderNotificationEmailWeekly,
                 providerNotificationEmailWeeklyCronSchedule,
@@ -270,8 +275,10 @@ public static class ServiceCollectionExtensions
                 });
         });
 
-        services.AddQuartzHostedService(q => 
-            q.WaitForJobsToComplete = true);
+        services.AddQuartzHostedService(q =>
+        {
+            q.WaitForJobsToComplete = true;
+        });
 
         return services;
     }
