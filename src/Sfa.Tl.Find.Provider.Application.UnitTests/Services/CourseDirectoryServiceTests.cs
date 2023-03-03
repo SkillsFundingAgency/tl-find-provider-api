@@ -126,7 +126,7 @@ public class CourseDirectoryServiceTests
 
         receivedQualifications.Should().Contain(q => q.Id == 36 && q.Name == "Design, Surveying and Planning for Construction");
         receivedQualifications.Should().Contain(q => q.Id == 37 && q.Name == "Digital Production, Design and Development");
-        receivedQualifications.Should().Contain(q => q.Id == 38 && q.Name == "Education and Childcare");
+        receivedQualifications.Should().Contain(q => q.Id == 38 && q.Name == "Education and Early Years");
         receivedQualifications.Should().Contain(q => q.Id == 39 && q.Name == "Digital Business Services");
         receivedQualifications.Should().Contain(q => q.Id == 40 && q.Name == "Digital Support Services");
         receivedQualifications.Should().Contain(q => q.Id == 41 && q.Name == "Health");

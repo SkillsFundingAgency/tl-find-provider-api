@@ -6,7 +6,7 @@ MERGE INTO [dbo].[Qualification] AS Target
 USING (VALUES 
   (36, N'Design, Surveying and Planning for Construction', 0),
   (37, N'Digital Production, Design and Development', 0),
-  (38, N'Education and Childcare', 0),
+  (38, N'Education and Early Years', 0),
   (39, N'Digital Business Services', 0),
   (40, N'Digital Support Services', 0),
   (41, N'Health', 0),

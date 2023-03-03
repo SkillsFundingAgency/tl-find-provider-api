@@ -12,7 +12,7 @@ public class QualificationBuilder
             new() { Id = 39, Name = "Digital Business Services", NumberOfQualificationsOffered = 2 },
             new() { Id = 37, Name = "Digital Production, Design and Development", NumberOfQualificationsOffered = 3 },
             new() { Id = 40, Name = "Digital Support Services", NumberOfQualificationsOffered = 4 },
-            new() { Id = 38, Name = "Education and Childcare", NumberOfQualificationsOffered = 5 },
+            new() { Id = 38, Name = "Education and Early Years", NumberOfQualificationsOffered = 5 },
             new() { Id = 41, Name = "Health", NumberOfQualificationsOffered = 6 },
             new() { Id = 42, Name = "Healthcare Science", NumberOfQualificationsOffered = 7 },
             new() { Id = 44, Name = "Onsite Construction", NumberOfQualificationsOffered = 8 },
