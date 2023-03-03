@@ -10,7 +10,7 @@ public class IndustryBuilder
         "Agriculture",
         "Arts, Entertainment and Recreation",
         "Construction",
-        "Education and Childcare",
+        "Education and Early Years",
         "Financial Services",
         "Health and Social Care",
         "Hospitality",

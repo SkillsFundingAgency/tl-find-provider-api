@@ -30,8 +30,8 @@ USING (VALUES
   (6, 37),  -- Digital Production, Design and Development
   (6, 40),  -- Digital Support Services
 
-  -- Education and childcare
-  (7, 38),  -- Education and Childcare
+  -- Education and early years
+  (7, 38),  -- Education and Early Years
 
   -- Engineering and manufacturing
   (8, 48),  -- Design and Development for Engineering and Manufacturing

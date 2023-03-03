@@ -12,7 +12,7 @@ USING (VALUES
   (4, N'Construction and the Built Environment', 0),
   (5, N'Creative and Design', 0),
   (6, N'Digital and IT', 0),
-  (7, N'Education and Childcare', 0),
+  (7, N'Education and Early Years', 0),
   (8, N'Engineering and Manufacturing', 0),
   (9, N'Hair and Beauty', 0),
   (10, N'Health and Science', 0),
