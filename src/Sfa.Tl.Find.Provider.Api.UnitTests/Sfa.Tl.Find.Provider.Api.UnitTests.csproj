@@ -10,10 +10,14 @@
 
   <ItemGroup>
     <None Remove="Builders\Json\Assets\createEmployerInterest.json" />
+    <None Remove="Builders\Json\Assets\createEmployerInterestWithEmptyLocations.json" />
+    <None Remove="Builders\Json\Assets\createEmployerInterestWithNoLocations.json" />
     <None Remove="Builders\Json\Assets\createEmployerInterestWithTwoLocations.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Builders\Json\Assets\createEmployerInterestWithNoLocations.json" />
+    <EmbeddedResource Include="Builders\Json\Assets\createEmployerInterestWithEmptyLocations.json" />
     <EmbeddedResource Include="Builders\Json\Assets\createEmployerInterestWithTwoLocations.json" />
     <EmbeddedResource Include="Builders\Json\Assets\createEmployerInterest.json" />
   </ItemGroup>
@@ -23,6 +27,7 @@
     <PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.18.0" />
     <PackageReference Include="AutoFixture.Idioms" Version="4.18.0" />
     <PackageReference Include="FluentAssertions" Version="6.10.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />

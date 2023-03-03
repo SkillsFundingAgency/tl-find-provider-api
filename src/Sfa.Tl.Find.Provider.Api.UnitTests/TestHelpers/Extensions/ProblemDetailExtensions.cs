@@ -25,8 +25,8 @@ public static class ProblemDetailExtensions
 
         foreach (var (fieldName, errorMessage) in expectedErrors)
         {
-            var pageError = errors.RootElement.GetProperty(fieldName);
-            pageError.EnumerateArray().First().GetString().Should().Be(errorMessage);
+            var error = errors.RootElement.GetProperty(fieldName);
+            error.EnumerateArray().First().GetString().Should().Be(errorMessage);
         }
     }
 }
