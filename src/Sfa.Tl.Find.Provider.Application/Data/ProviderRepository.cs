@@ -37,7 +37,7 @@ public class ProviderRepository : IProviderRepository
         var providerDetailResults = new Dictionary<string, ProviderDetail>();
 
         await _dbContextWrapper
-            .QueryAsync<ProviderDetail, LocationDetail, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>(
+            .QueryAsync<ProviderDetailDto, LocationDetailDto, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>(
                 connection,
                 "GetAllProviders",
                 (p, l, dy, r, q) =>
@@ -45,16 +45,42 @@ public class ProviderRepository : IProviderRepository
                     var key = $"{p.UkPrn}";
                     if (!providerDetailResults.TryGetValue(key, out var provider))
                     {
-                        providerDetailResults.Add(key, provider = p);
+                        providerDetailResults.Add(key, provider = 
+                            new ProviderDetail
+                            {
+                                UkPrn = p.UkPrn,
+                                Name = p.Name,
+                                Postcode = p.Postcode,
+                                AddressLine1 = p.AddressLine1,
+                                AddressLine2 = p.AddressLine2,
+                                Town = p.Town,
+                                County = p.County,
+                                Email = p.Email,
+                                Telephone = p.Telephone,
+                                Website = p.Website,
+                            });
                     }
 
                     var location = provider
                         .Locations
-                        .FirstOrDefault(loc => loc.Postcode == l.Postcode);
+                        .FirstOrDefault(loc => loc.Postcode == l.LocationPostcode);
 
                     if (location == null)
                     {
-                        location = l;
+                        location = new LocationDetail
+                        {
+                            LocationName = l.LocationName,
+                            Postcode = l.LocationPostcode,
+                            AddressLine1 = l.LocationAddressLine1,
+                            AddressLine2 = l.LocationAddressLine2,
+                            Town = l.LocationTown,
+                            County = l.LocationCounty,
+                            Email = l.LocationEmail,
+                            Telephone = l.LocationTelephone,
+                            Website = l.LocationWebsite,
+                            Latitude = l.Latitude,
+                            Longitude = l.Longitude,
+                        };
                         provider.Locations.Add(location);
                     }
 
@@ -86,7 +112,7 @@ public class ProviderRepository : IProviderRepository
 
                     return provider;
                 },
-            splitOn: "UkPrn, Postcode, Year, RouteId, QualificationId",
+            splitOn: "UkPrn, LocationName, Year, RouteId, QualificationId",
             commandType: CommandType.StoredProcedure);
 
         var results = providerDetailResults

@@ -166,8 +166,8 @@ public static class ModelValidationExtensions
     {
         location.Postcode.Should().Be(expected.Postcode);
         location.LocationName.Should().Be(expected.LocationName);
-        location.LocationAddressLine1.Should().Be(expected.LocationAddressLine1);
-        location.LocationAddressLine2.Should().Be(expected.LocationAddressLine2);
+        location.AddressLine1.Should().Be(expected.AddressLine1);
+        location.AddressLine2.Should().Be(expected.AddressLine2);
         location.Town.Should().Be(expected.Town);
         location.County.Should().Be(expected.County);
         location.Email.Should().Be(expected.Email);
