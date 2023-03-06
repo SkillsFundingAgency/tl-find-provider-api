@@ -20,12 +20,9 @@ AS
 	SELECT p.[Id],
 		@email,
 		@emailVerificationToken
-	FROM 	(SELECT	p.[Id],
-				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
-			 FROM	[Provider] p
-			 WHERE	p.[UkPrn] = @ukPrn
-			   AND	p.[IsDeleted] = 0) p
-	  WHERE ProviderRowNum = 1
+	FROM [Provider] p
+	 WHERE	p.[UkPrn] = @ukPrn
+	   AND	p.[IsDeleted] = 0
 
     SELECT @providerNotificationId = SCOPE_IDENTITY();
 

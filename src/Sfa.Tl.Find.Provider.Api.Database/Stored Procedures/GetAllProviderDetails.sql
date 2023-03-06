@@ -8,10 +8,7 @@ AS
 				p.[Name], 
 				p.[Email],
 				p.[Telephone],
-				p.[Website],
-				p.[IsAdditionalData],
-				--Need to filter so providers in the additional data set are overidden by ones in the main data set
-				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
+				p.[Website]
 		FROM	[Provider] p
 		WHERE	p.[IsDeleted] = 0),
 
@@ -27,14 +24,11 @@ AS
 				ISNULL(l.[County], '') AS [County],
 				COALESCE(NULLIF(l.[Email], ''), p.[Email], '') AS [Email],
 				COALESCE(NULLIF(l.[Telephone], ''), p.[Telephone], '') AS [Telephone],
-				COALESCE(NULLIF(l.[Website], ''), p.[Website], '') AS [Website],
-				p.[IsAdditionalData]
+				COALESCE(NULLIF(l.[Website], ''), p.[Website], '') AS [Website]
 		FROM	[ProvidersCTE] p
 		INNER JOIN	[dbo].[Location] l
 		ON		p.[Id] = l.[ProviderId]
 		WHERE	l.[IsDeleted] = 0
-			--Only include the first row to make sure main data set takes priority
-			AND	p.[ProviderRowNum] = 1
 			AND	EXISTS (SELECT	lq.[QualificationId]
 						FROM	[dbo].[LocationQualification] lq
 						INNER JOIN	[dbo].[Qualification] q
@@ -61,7 +55,7 @@ AS
 						l.[Town],
 						t.[Name])
 
-		--Step 2 - add in the qualifications 
+		--Add in the qualifications 
 		SELECT 	[UkPrn],
 				[ProviderName],
 				[Postcode],

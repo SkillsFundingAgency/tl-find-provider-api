@@ -8,10 +8,7 @@ AS
 				p.[Name], 
 				p.[Email],
 				p.[Telephone],
-				p.[Website],
-				p.[IsAdditionalData],
-				--Need to filter so providers in the additional data set are overidden by ones in the main data set
-				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
+				p.[Website]
 		FROM	[Provider] p
 		WHERE	p.[IsDeleted] = 0),
 
@@ -21,7 +18,6 @@ AS
 				p.[Email],
 				p.[Telephone],
 				p.[Website],
-				p.[IsAdditionalData],
 				l.[Id] AS [LocationId],
 				l.[Postcode],
 				l.[Name] AS [LocationName],
@@ -38,8 +34,6 @@ AS
 		INNER JOIN	[dbo].[Location] l
 		ON		p.[Id] = l.[ProviderId]
 		WHERE	l.[IsDeleted] = 0
-			--Only include the first row to make sure main data set takes priority
-			AND	p.[ProviderRowNum] = 1
 			AND	EXISTS (SELECT	lq.[QualificationId]
 						FROM	[dbo].[LocationQualification] lq
 						INNER JOIN	[dbo].[Qualification] q
@@ -87,8 +81,7 @@ AS
 				rq.[RouteId],
 				r.[Name] AS [RouteName],
 				q.[Id] AS [QualificationId],
-				q.[Name] AS [QualificationName],
-				l.[IsAdditionalData]
+				q.[Name] AS [QualificationName]				
 		FROM NearestLocationsCTE l
 		INNER JOIN	[dbo].[LocationQualification] lq
 		ON		lq.[LocationId] = l.[LocationId]
