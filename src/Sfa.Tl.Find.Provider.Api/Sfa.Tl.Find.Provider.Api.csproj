@@ -7,7 +7,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
-		<PackageReference Include="Aspose.Zip" Version="23.2.0" />
 		<PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />

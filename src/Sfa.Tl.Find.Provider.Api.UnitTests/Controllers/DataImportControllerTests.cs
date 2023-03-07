@@ -69,32 +69,7 @@ public class DataImportControllerTests
             .Received(1)
             .ImportTowns(Arg.Any<Stream>());
     }
-
-    [Fact]
-    public async Task UploadTowns_Processes_SevenZip_File()
-    {
-        var townDataService = Substitute.For<ITownDataService>();
-
-        var controller = new DataImportControllerBuilder()
-            .Build(townDataService: townDataService);
-
-        await using var stream = await BuildTestCsvFileStream();
-        var archive = new SevenZipArchiveBuilder()
-            .Build("test.csv", stream);
-
-        var file = new FormFile(archive, 0, archive.Length, "test_form_file", "test.7z");
-
-        var result = await controller.UploadTowns(file);
-
-        var okResult = result as AcceptedResult;
-        okResult.Should().NotBeNull();
-        okResult!.StatusCode.Should().Be(202);
-
-        await townDataService
-            .Received(1)
-            .ImportTowns(Arg.Any<Stream>());
-    }
-
+    
     [Fact]
     public async Task UploadTowns_For_Missing_File_Returns_Returns_BadRequest_Result()
     {
@@ -108,7 +83,25 @@ public class DataImportControllerTests
         badRequestResult!.StatusCode.Should().Be(400);
         badRequestResult!.Value.Should().Be("File is required.");
     }
-    
+
+    [Fact]
+    public async Task UploadTowns_For_Unsupported_File_Extension_Returns_Returns_BadRequest_Result()
+    {
+        var controller = new DataImportControllerBuilder()
+            .Build();
+
+        await using var stream = await "Test".ToStream();
+        var file = new FormFile(stream, 0, stream.Length, "test_form_file", "test.txt");
+
+
+        var result = await controller.UploadTowns(file);
+
+        var badRequestResult = result as BadRequestObjectResult;
+        badRequestResult.Should().NotBeNull();
+        badRequestResult!.StatusCode.Should().Be(400);
+        badRequestResult!.Value.Should().Be("Only csv or zip files are supported.");
+    }
+
     private static async Task<Stream> BuildTestCsvFileStream(
          string content = "col1, col2\r\n123,Test")
     {
