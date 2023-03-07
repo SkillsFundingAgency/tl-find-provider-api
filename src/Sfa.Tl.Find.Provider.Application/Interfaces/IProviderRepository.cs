@@ -20,6 +20,4 @@ public interface IProviderRepository
         IList<int> qualificationIds,
         int page,
         int pageSize);
-
-    Task<int> UpdateProviderContacts(IEnumerable<ProviderContactDto> contacts);
 }

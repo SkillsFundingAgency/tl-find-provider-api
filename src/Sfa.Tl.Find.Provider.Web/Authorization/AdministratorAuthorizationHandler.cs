@@ -20,11 +20,6 @@ public class AdministratorAuthorizationHandler : AuthorizationHandler<Administra
 
     private static bool IsAuthorized(AuthorizationHandlerContext context)
     {
-        var ukPrn = context
-            .User
-            .FindFirst(c => c.Type.Equals(
-                CustomClaimTypes.UkPrn))?.Value;
-
         return context.User.IsInRole(CustomRoles.Administrator);
     }
 }

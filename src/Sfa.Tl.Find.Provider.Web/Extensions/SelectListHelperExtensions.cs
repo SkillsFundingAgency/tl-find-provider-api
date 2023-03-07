@@ -33,7 +33,7 @@ public static class SelectListHelperExtensions
             })
             .ToArray();
     }
-    
+
     public static SelectListItem[] LoadProviderLocationOptions(IList<NotificationLocationName> providerLocations, int? selectedValue)
     {
         var selectList = providerLocations
@@ -67,11 +67,6 @@ public static class SelectListHelperExtensions
 
     public static SelectListItem[] LoadSearchRadiusOptions(int? selectedValue, bool setDefaultSelectedValue = false)
     {
-        if(selectedValue == null)
-        {
-            }
-
-        
         var values = new List<int> { 5, 10, 20, 30, 40, 50 };
         return values
             .Select(p => new SelectListItem(
@@ -82,7 +77,7 @@ public static class SelectListHelperExtensions
             .ToArray();
     }
 
-    public static SelectListItem[] LoadSkillAreaOptions(IEnumerable<Route>  routes, IEnumerable<Route> selectedRoutes)
+    public static SelectListItem[] LoadSkillAreaOptions(IEnumerable<Route> routes, IEnumerable<Route> selectedRoutes)
     {
         return routes
             .Select(r => new SelectListItem(

@@ -5,8 +5,8 @@ namespace Sfa.Tl.Find.Provider.Tests.Common.Builders.Models;
 public class EmployerInterestSummaryBuilder
 {
     private DateTime _creationDate = DateTime.Parse("2022-10-01 12:00");
-    private DateTime? _expiryDate = null;
-    private DateTime? _modificationDate = null;
+    private DateTime? _expiryDate;
+    private DateTime? _modificationDate;
 
     public IEnumerable<EmployerInterestSummary> BuildList() =>
         new List<EmployerInterestSummary>

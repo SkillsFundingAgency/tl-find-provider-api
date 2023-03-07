@@ -338,41 +338,4 @@ public class ProviderRepository : IProviderRepository
 
         return (searchResults, totalLocationsCount);
     }
-
-    public async Task<int> UpdateProviderContacts(IEnumerable<ProviderContactDto> contacts)
-    {
-        using var connection = _dbContextWrapper.CreateConnection();
-        connection.Open();
-
-        var resultCount = 0;
-        foreach (var contact in contacts)
-        {
-            _dynamicParametersWrapper.CreateParameters(new
-            {
-                contact.UkPrn,
-                contact.EmployerContactEmail,
-                contact.EmployerContactTelephone,
-                contact.EmployerContactWebsite,
-                contact.StudentContactEmail,
-                contact.StudentContactTelephone,
-                contact.StudentContactWebsite,
-                currentTime = _dateTimeProvider.UtcNow
-            });
-
-            resultCount += await _dbContextWrapper.ExecuteAsync(
-                connection,
-                "UPDATE dbo.Provider " +
-                "SET EmployerContactEmail = @EmployerContactEmail, " +
-                "    EmployerContactTelephone = @EmployerContactTelephone, " +
-                "    EmployerContactWebsite = @EmployerContactWebsite, " +
-                "    StudentContactEmail = @StudentContactEmail, " +
-                "    StudentContactTelephone = @StudentContactTelephone, " +
-                "    StudentContactWebsite = @StudentContactWebsite, " +
-                "    ModifiedOn = @currentTime " +
-                "WHERE UkPrn = @UkPrn",
-                _dynamicParametersWrapper.DynamicParameters);
-        }
-
-        return resultCount;
-    }
 }

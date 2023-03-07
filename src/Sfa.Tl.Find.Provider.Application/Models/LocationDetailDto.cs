@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text.Json.Serialization;
 
 namespace Sfa.Tl.Find.Provider.Application.Models;
 

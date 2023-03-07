@@ -55,10 +55,9 @@ public class DfeSignInApiServiceTests
 
         user.Should().NotBeNull();
         user.UserId.Should().Be(TestUserId);
-        //TODO: Add commented lines below back
         user.Roles.Should().NotBeNull();
-        //user.Roles.Should().NotBeNullOrEmpty();
-        //user.Roles.Count().Should().Be(1);
-        //user.Roles.First().Name.Should().Be(TestRoleName);
+        user.Roles.Should().NotBeNullOrEmpty();
+        user.Roles.Count().Should().Be(1);
+        user.Roles.First().Name.Should().Be(TestRoleName);
     }
 }
