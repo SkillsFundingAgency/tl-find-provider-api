@@ -40,7 +40,6 @@ public static class SettingsExtensions
         settings.ApiUri = configuration.DfeSignInSettings?.ApiUri;
         settings.ApiSecret = configuration.DfeSignInSettings?.ApiSecret;
         settings.Audience = configuration.DfeSignInSettings?.Audience;
-        settings.Authority = configuration.DfeSignInSettings?.Authority;
         settings.ClientId = configuration.DfeSignInSettings?.ClientId;
         settings.ClientSecret = configuration.DfeSignInSettings?.ClientSecret;
         settings.Issuer = configuration.DfeSignInSettings?.Issuer;
