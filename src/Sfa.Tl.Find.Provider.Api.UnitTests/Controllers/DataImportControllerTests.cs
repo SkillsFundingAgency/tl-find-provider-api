@@ -92,8 +92,7 @@ public class DataImportControllerTests
 
         await using var stream = await "Test".ToStream();
         var file = new FormFile(stream, 0, stream.Length, "test_form_file", "test.txt");
-
-
+        
         var result = await controller.UploadTowns(file);
 
         var badRequestResult = result as BadRequestObjectResult;
