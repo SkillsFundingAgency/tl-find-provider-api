@@ -2,9 +2,9 @@
 
 public static class CustomRoles
 {
-    public const string Administrator = "Administrator";
+    public const string Administrator = "T Levels Provider Support - Administrator";
 
-    public const string ProviderApprover = "Provider Approver";
+    public const string ProviderApprover = "T Levels Provider Support - Approver";
 
-    public const string ProviderEndUser = "Provider End User";
+    public const string ProviderEndUser = "T Levels Provider Support - End User";
 }
