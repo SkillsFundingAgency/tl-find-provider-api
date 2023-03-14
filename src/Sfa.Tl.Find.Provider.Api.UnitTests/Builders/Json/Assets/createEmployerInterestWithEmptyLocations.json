@@ -1,0 +1,13 @@
+{
+  "organisationName": "My Company",
+  "industryId": null,
+  "otherIndustry": "Software Development",
+  "additionalInformation": "I require students for placement in summer 2023",
+  "email": "mike.wild@digital.education.gov.uk",
+  "telephone": "012 345 678",
+  "website": "https://mycompany.co.uk",
+  "contactPreferenceType": 1,
+  "contactName": "Mike Wild",
+  "locations": [ ],
+  "skillAreaIds": [ 9, 11 ]
+}

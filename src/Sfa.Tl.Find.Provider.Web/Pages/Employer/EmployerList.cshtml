@@ -8,13 +8,13 @@
         HttpContext.User);
 }
 
-@if (User.IsInRole(CustomRoles.Administrator))
+@if (Model?.UkPrn is not null)
 {
-    <partial name="_administratorEmployerList" />
+    <partial name="_providerEmployerList" />
 }
 else 
 {
-    <partial name="_providerEmployerList" />
+    <partial name="_administratorEmployerList" />
 }
 
 @section scripts {

@@ -542,19 +542,21 @@ public class ProvidersControllerTests
         var fileContentResult = result as FileContentResult;
         fileContentResult.Should().NotBeNull();
         fileContentResult!.ContentType.Should().Be("text/csv");
-        fileContentResult!.FileDownloadName.Should().Be(expectedFileName);
-        fileContentResult!.FileContents.Should().BeEquivalentTo(bytes);
+        fileContentResult.FileDownloadName.Should().Be(expectedFileName);
+        fileContentResult.FileContents.Should().BeEquivalentTo(bytes);
     }
 
     [Fact]
     public async Task GetProviderDataCsvFileInfo_Returns_Expected_Result()
     {
         var bytes = new byte[] { 104, 101, 108, 108, 111 };
-
+        var fileDate = DateTime.Parse("2022-08-19 10:15:30");
+        
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        dateTimeProvider.Today.Returns(DateTime.Parse("2022-08-19"));
+        dateTimeProvider.Now.Returns(fileDate);
+        dateTimeProvider.Today.Returns(fileDate.Date);
         const string expectedFormattedFileDate = "August 2022";
-
+        
         var providerDataService = Substitute.For<IProviderDataService>();
         providerDataService.GetCsv()
             .Returns(bytes);
@@ -572,23 +574,26 @@ public class ProvidersControllerTests
         var info = okResult.Value as ProviderDataDownloadInfoResponse;
         info.Should().NotBeNull();
         info!.FileSize.Should().Be(bytes.Length);
-        info!.FormattedFileDate.Should().Be(expectedFormattedFileDate);
+        info.FileDate.Should().Be(fileDate);
+        info.FormattedFileDate.Should().Be(expectedFormattedFileDate);
     }
 
     [Fact]
     public async Task GetProviderDataCsvFileInfo_Returns_Expected_Result_From_Cache()
     {
+        var date = DateTime.Parse("2022-08-01");
         const string formattedDate = "August 2022";
         const int fileSize = 10101;
 
         var cachedInfo = new ProviderDataDownloadInfoResponse
             {
+                FileDate = date,
                 FormattedFileDate = formattedDate,
                 FileSize = fileSize
             };
 
         var cacheService = Substitute.For<ICacheService>();
-        cacheService.Get<ProviderDataDownloadInfoResponse?>(CacheKeys.ProviderDataDownloadInfoKey)
+        cacheService.Get<ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey)
             .Returns(cachedInfo);
 
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
@@ -610,7 +615,8 @@ public class ProvidersControllerTests
         var info = okResult.Value as ProviderDataDownloadInfoResponse;
         info.Should().NotBeNull();
         info!.FileSize.Should().Be(fileSize);
-        info!.FormattedFileDate.Should().Be(formattedDate);
+        info.FileDate.Should().Be(date);
+        info.FormattedFileDate.Should().Be(formattedDate);
 
         info.Should().Be(cachedInfo);
         info.Should().BeEquivalentTo(cachedInfo);

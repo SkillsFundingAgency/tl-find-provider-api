@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Microsoft.Extensions.Logging;
 using Polly.Registry;
-using Sfa.Tl.Find.Provider.Api.Models;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
@@ -38,7 +37,7 @@ public class ProviderRepository : IProviderRepository
         var providerDetailResults = new Dictionary<string, ProviderDetail>();
 
         await _dbContextWrapper
-            .QueryAsync<ProviderDetail, LocationDetail, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>(
+            .QueryAsync<ProviderDetailDto, LocationDetailDto, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>(
                 connection,
                 "GetAllProviders",
                 (p, l, dy, r, q) =>
@@ -46,16 +45,42 @@ public class ProviderRepository : IProviderRepository
                     var key = $"{p.UkPrn}";
                     if (!providerDetailResults.TryGetValue(key, out var provider))
                     {
-                        providerDetailResults.Add(key, provider = p);
+                        providerDetailResults.Add(key, provider = 
+                            new ProviderDetail
+                            {
+                                UkPrn = p.UkPrn,
+                                Name = p.Name,
+                                Postcode = p.Postcode,
+                                AddressLine1 = p.AddressLine1,
+                                AddressLine2 = p.AddressLine2,
+                                Town = p.Town,
+                                County = p.County,
+                                Email = p.Email,
+                                Telephone = p.Telephone,
+                                Website = p.Website,
+                            });
                     }
 
                     var location = provider
                         .Locations
-                        .FirstOrDefault(loc => loc.Postcode == l.Postcode);
+                        .FirstOrDefault(loc => loc.Postcode == l.LocationPostcode);
 
                     if (location == null)
                     {
-                        location = l;
+                        location = new LocationDetail
+                        {
+                            LocationName = l.LocationName,
+                            Postcode = l.LocationPostcode,
+                            AddressLine1 = l.LocationAddressLine1,
+                            AddressLine2 = l.LocationAddressLine2,
+                            Town = l.LocationTown,
+                            County = l.LocationCounty,
+                            Email = l.LocationEmail,
+                            Telephone = l.LocationTelephone,
+                            Website = l.LocationWebsite,
+                            Latitude = l.Latitude,
+                            Longitude = l.Longitude,
+                        };
                         provider.Locations.Add(location);
                     }
 
@@ -87,7 +112,7 @@ public class ProviderRepository : IProviderRepository
 
                     return provider;
                 },
-            splitOn: "UkPrn, Postcode, Year, RouteId, QualificationId",
+            splitOn: "UkPrn, LocationName, Year, RouteId, QualificationId",
             commandType: CommandType.StoredProcedure);
 
         var results = providerDetailResults
@@ -127,21 +152,20 @@ public class ProviderRepository : IProviderRepository
                 commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<bool> HasAny(bool isAdditionalData = false)
+    public async Task<bool> HasAny()
     {
         using var connection = _dbContextWrapper.CreateConnection();
 
         var result = await _dbContextWrapper.ExecuteScalarAsync<int>(
             connection,
             "SELECT COUNT(1) " +
-            "WHERE EXISTS (SELECT 1 FROM dbo.Provider WHERE IsAdditionalData = @isAdditionalData)",
-            new { isAdditionalData = isAdditionalData ? 1 : 0 }
+            "WHERE EXISTS (SELECT 1 FROM dbo.Provider)"
         );
 
         return result != 0;
     }
 
-    public async Task Save(IList<Models.Provider> providers, bool isAdditionalData = false)
+    public async Task Save(IList<Models.Provider> providers)
     {
         try
         {
@@ -156,7 +180,7 @@ public class ProviderRepository : IProviderRepository
                     locationQualificationData.AddRange(
                         location
                             .DeliveryYears
-                            .MapToLocationQualificationDtoList(provider.UkPrn, location.Postcode, isAdditionalData));
+                            .MapToLocationQualificationDtoList(provider.UkPrn, location.Postcode));
                 }
             }
 
@@ -164,7 +188,7 @@ public class ProviderRepository : IProviderRepository
 
             await retryPolicy
                 .ExecuteAsync(async _ =>
-                        await PerformSave(providers, locationData, locationQualificationData, isAdditionalData),
+                        await PerformSave(providers, locationData, locationQualificationData),
                     context);
         }
         catch (Exception ex)
@@ -177,8 +201,7 @@ public class ProviderRepository : IProviderRepository
     private async Task PerformSave(
         IEnumerable<Models.Provider> providers,
         IEnumerable<LocationDto> locationData,
-        IEnumerable<LocationQualificationDto> locationQualificationData,
-        bool isAdditionalData = false)
+        IEnumerable<LocationQualificationDto> locationQualificationData)
     {
         using var connection = _dbContextWrapper.CreateConnection();
         connection.Open();
@@ -187,8 +210,7 @@ public class ProviderRepository : IProviderRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            data = providers.AsTableValuedParameter("dbo.ProviderDataTableType"),
-            isAdditionalData
+            data = providers.AsTableValuedParameter("dbo.ProviderDataTableType")
         });
 
         var providerUpdateResult = await _dbContextWrapper
@@ -203,8 +225,7 @@ public class ProviderRepository : IProviderRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            data = locationData.AsTableValuedParameter("dbo.LocationDataTableType"),
-            isAdditionalData
+            data = locationData.AsTableValuedParameter("dbo.LocationDataTableType")
         });
 
         var locationUpdateResult = await _dbContextWrapper
@@ -219,8 +240,7 @@ public class ProviderRepository : IProviderRepository
 
         _dynamicParametersWrapper.CreateParameters(new
         {
-            data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType"),
-            isAdditionalData
+            data = locationQualificationData.AsTableValuedParameter("dbo.LocationQualificationDataTableType")
         });
 
         var locationQualificationUpdateResult = await _dbContextWrapper
@@ -317,42 +337,5 @@ public class ProviderRepository : IProviderRepository
             .ToList();
 
         return (searchResults, totalLocationsCount);
-    }
-
-    public async Task<int> UpdateProviderContacts(IEnumerable<ProviderContactDto> contacts)
-    {
-        using var connection = _dbContextWrapper.CreateConnection();
-        connection.Open();
-
-        var resultCount = 0;
-        foreach (var contact in contacts)
-        {
-            _dynamicParametersWrapper.CreateParameters(new
-            {
-                contact.UkPrn,
-                contact.EmployerContactEmail,
-                contact.EmployerContactTelephone,
-                contact.EmployerContactWebsite,
-                contact.StudentContactEmail,
-                contact.StudentContactTelephone,
-                contact.StudentContactWebsite,
-                currentTime = _dateTimeProvider.UtcNow
-            });
-
-            resultCount += await _dbContextWrapper.ExecuteAsync(
-                connection,
-                "UPDATE dbo.Provider " +
-                "SET EmployerContactEmail = @EmployerContactEmail, " +
-                "    EmployerContactTelephone = @EmployerContactTelephone, " +
-                "    EmployerContactWebsite = @EmployerContactWebsite, " +
-                "    StudentContactEmail = @StudentContactEmail, " +
-                "    StudentContactTelephone = @StudentContactTelephone, " +
-                "    StudentContactWebsite = @StudentContactWebsite, " +
-                "    ModifiedOn = @currentTime " +
-                "WHERE UkPrn = @UkPrn",
-                _dynamicParametersWrapper.DynamicParameters);
-        }
-
-        return resultCount;
     }
 }

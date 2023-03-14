@@ -124,7 +124,7 @@ public class ProviderRepositoryBuilder
         await dbContextWrapper
             .QueryAsync(dbConnection,
                 "GetAllProviders",
-                Arg.Do<Func<ProviderDetail, LocationDetail, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>>(
+                Arg.Do<Func<ProviderDetailDto, LocationDetailDto, DeliveryYearDetail, RouteDetail, QualificationDetail, ProviderDetail>>(
                     x =>
                     {
                         var p = providersPart[callIndex];

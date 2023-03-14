@@ -10,7 +10,6 @@ public static class SecurityPolicies
         "accelerometer=()," +
         "autoplay=()," +
         "camera=()," +
-        "document-domain=()," +
         "encrypted-media=()," +
         "fullscreen=(self)," +
         "geolocation=()," +

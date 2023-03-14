@@ -16,7 +16,6 @@ public class ProviderDetail
     public string Email { get; init; }
     public string Telephone { get; init; }
     public string Website { get; init; }
-    public bool IsAdditionalData { get; init; }
 
     public ICollection<LocationDetail> Locations { get; init; } = new List<LocationDetail>();
 }

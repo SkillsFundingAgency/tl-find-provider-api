@@ -51,7 +51,6 @@ public class SettingsBuilder
     private const string SignInApiUri = "https://test.api.oidc.com";
     private const string SignInApiSecret = "apisecret";
     private const string SignInAudience = "signin.oidc.com";
-    private const string SignInAuthority = "https://test.signin.oidc.com";
     private const string SignInClientId = "testclient";
     private const string SignInIssuer = "testissuer";
     private const string SignInClientSecret = "secretsecret";
@@ -88,7 +87,6 @@ public class SettingsBuilder
         string metadataAddress = SignInMetadataAddress,
         string administrators = SignInAdministrators,
         string audience = SignInAudience,
-        string authority = SignInAuthority,
         string clientId = SignInClientId,
         string clientSecret = SignInClientSecret,
         string apiUri = SignInApiUri,
@@ -98,7 +96,6 @@ public class SettingsBuilder
         {
             Administrators = administrators,
             Audience = audience,
-            Authority = authority,
             ClientId = clientId,
             ClientSecret = clientSecret,
             ApiUri = apiUri,

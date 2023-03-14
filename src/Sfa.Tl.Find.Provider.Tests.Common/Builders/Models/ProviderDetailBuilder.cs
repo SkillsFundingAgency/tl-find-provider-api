@@ -19,15 +19,14 @@ public class ProviderDetailBuilder
                 Email = "email.address@provider1.ac.uk",
                 Telephone = "011 111 1111",
                 Website = "https://www.provider1.ac.uk",
-                IsAdditionalData = true,
                 Locations = new List<LocationDetail>
                 {
                     new()
                     {
                         LocationName = "Location 1",
                         Postcode = "AA1 1BB",
-                        LocationAddressLine1 = "Location 1 Address Line 1",
-                        LocationAddressLine2 = "Location 1 Address Line 2",
+                        AddressLine1 = "Location 1 Address Line 1",
+                        AddressLine2 = "Location 1 Address Line 2",
                         Town = "Location 1 Town",
                         County = "Location 1 County",
                         Email = "location1.email.address@provider1.ac.uk",
@@ -77,15 +76,14 @@ public class ProviderDetailBuilder
                 Email = "email.address@provider2.ac.uk",
                 Telephone = "022 222 2222",
                 Website = "https://www.provider2.ac.uk",
-                IsAdditionalData = false,
                 Locations = new List<LocationDetail>
                 {
                     new()
                         {
                         LocationName = "Location 2",
                         Postcode = "AA1 1BB",
-                        LocationAddressLine1 = "Location 2 Address Line 1",
-                        LocationAddressLine2 = "Location 2 Address Line 2",
+                        AddressLine1 = "Location 2 Address Line 1",
+                        AddressLine2 = "Location 2 Address Line 2",
                         Town = "Location 2 Town",
                         County = "Location 2 County",
                         Email = "location2.email.address@provider2.ac.uk",
@@ -156,15 +154,14 @@ public class ProviderDetailBuilder
                 Email = "email.address@provider1.ac.uk",
                 Telephone = "011 111 1111",
                 Website = "https://www.provider1.ac.uk",
-                IsAdditionalData = true,
                 Locations = new List<LocationDetail>
                 {
                     new()
                     {
                         LocationName = "Location 1",
                         Postcode = "AA1 1BB",
-                        LocationAddressLine1 = "Location 1 Address Line 1",
-                        LocationAddressLine2 = "Location 1 Address Line 2",
+                        AddressLine1 = "Location 1 Address Line 1",
+                        AddressLine2 = "Location 1 Address Line 2",
                         Town = "Location 1 Town",
                         County = "Location 1 County",
                         Email = "location1.email.address@provider1.ac.uk",
@@ -199,8 +196,8 @@ public class ProviderDetailBuilder
                 }
         };
 
-    public IEnumerable<ProviderDetail> BuildProvidersPartOfListWithSingleItem() =>
-        new List<ProviderDetail>
+    public IEnumerable<ProviderDetailDto> BuildProvidersPartOfListWithSingleItem() =>
+        new List<ProviderDetailDto>
         {
             new()
             {
@@ -213,25 +210,24 @@ public class ProviderDetailBuilder
                 County = "Provider 1 County",
                 Email = "email.address@provider1.ac.uk",
                 Telephone = "011 111 1111",
-                Website = "https://www.provider1.ac.uk",
-                IsAdditionalData = true
+                Website = "https://www.provider1.ac.uk"
             }
         };
 
-    public IEnumerable<LocationDetail> BuildLocationsPartOfListWithSingleItem() =>
-        new List<LocationDetail>
+    public IEnumerable<LocationDetailDto> BuildLocationsPartOfListWithSingleItem() =>
+        new List<LocationDetailDto>
         {
             new()
             {
                 LocationName = "Location 1",
-                Postcode = "AA1 1BB",
+                LocationPostcode = "AA1 1BB",
                 LocationAddressLine1 = "Location 1 Address Line 1",
                 LocationAddressLine2 = "Location 1 Address Line 2",
-                Town = "Location 1 Town",
-                County = "Location 1 County",
-                Email = "location1.email.address@provider1.ac.uk",
-                Telephone = "011 111 2222",
-                Website = "https://www.provider1.ac.uk/location1"
+                LocationTown = "Location 1 Town",
+                LocationCounty = "Location 1 County",
+                LocationEmail = "location1.email.address@provider1.ac.uk",
+                LocationTelephone = "011 111 2222",
+                LocationWebsite = "https://www.provider1.ac.uk/location1"
             }
         };
 

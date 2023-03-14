@@ -128,8 +128,7 @@ public class ProviderRepositoryTests
         await dbContextWrapper
             .Received(1)
             .ExecuteScalarAsync<int>(dbConnection,
-                Arg.Is<string>(s => s.Contains("dbo.Provider")),
-                Arg.Is<object>(o => o.GetIsAdditionalDataValueFromAnonymousType() == 0));
+                Arg.Is<string>(s => s.Contains("dbo.Provider")));
     }
 
     [Fact]
@@ -146,14 +145,13 @@ public class ProviderRepositoryTests
 
         var repository = new ProviderRepositoryBuilder().Build(dbContextWrapper);
 
-        var result = await repository.HasAny(true);
+        var result = await repository.HasAny();
         result.Should().BeTrue();
 
         await dbContextWrapper
             .Received(1)
             .ExecuteScalarAsync<int>(dbConnection,
-                Arg.Is<string>(s => s.Contains("dbo.Provider")),
-                Arg.Is<object>(o => o.GetIsAdditionalDataValueFromAnonymousType() == 1));
+                Arg.Is<string>(s => s.Contains("dbo.Provider")));
     }
 
     [Fact]

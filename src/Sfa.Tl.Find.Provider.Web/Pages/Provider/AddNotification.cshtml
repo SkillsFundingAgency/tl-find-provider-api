@@ -83,8 +83,6 @@
                     <div class="govuk-checkboxes govuk-!-margin-top-4" data-module="govuk-checkboxes">
                         @foreach (var skillArea in Model?.Input.SkillAreas.Select((value, i) => (value, i)))
                         {
-                            var elementId = (skillArea.i > 0) ? "skill-area-" + skillArea.i : "skill-area-";
-                            var elementId2 = $"skill-area{((skillArea.i > 0) ? "-" + skillArea.i : null)}";
                             <div class="govuk-checkboxes__item">
                                 <input class="govuk-checkboxes__input" type="checkbox" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">
                                 <label class="govuk-label govuk-checkboxes__label" asp-for="@Model.Input.SkillAreas[skillArea.i].Selected">

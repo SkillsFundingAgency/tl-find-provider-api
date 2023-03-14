@@ -10,9 +10,9 @@ public interface IProviderRepository
 
     Task<IEnumerable<LocationPostcode>> GetLocationPostcodes(long ukPrn);
 
-    Task<bool> HasAny(bool isAdditionalData = false);
+    Task<bool> HasAny();
 
-    Task Save(IList<Models.Provider> providers, bool isAdditionalData = false);
+    Task Save(IList<Models.Provider> providers);
 
     Task<(IEnumerable<ProviderSearchResult> SearchResults, int TotalResultsCount)> Search(
         GeoLocation fromGeoLocation,
@@ -20,6 +20,4 @@ public interface IProviderRepository
         IList<int> qualificationIds,
         int page,
         int pageSize);
-
-    Task<int> UpdateProviderContacts(IEnumerable<ProviderContactDto> contacts);
 }

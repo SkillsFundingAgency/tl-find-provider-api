@@ -1,7 +1,5 @@
 ﻿using System.Globalization;
-using System.Text.Json;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.ClassMaps;
@@ -248,39 +246,6 @@ public class ProviderDataService : IProviderDataService
             .GetLocationPostcodes(ukPrn);
     }
 
-    public async Task ImportProviderContacts(Stream stream)
-    {
-        using var reader = new StreamReader(stream);
-        using var csvReader = new CsvReader(reader,
-            new CsvConfiguration(CultureInfo.CurrentCulture)
-            {
-                PrepareHeaderForMatch = args =>
-                {
-                    if (string.Compare(args.Header, "UKPRN", StringComparison.CurrentCultureIgnoreCase) == 0)
-                    {
-                        return "UkPrn";
-                    }
-
-                    return args.Header
-                            .Replace(" ", "");
-                },
-                MissingFieldFound = _ => { /* ignore empty column values */ }
-            });
-
-        csvReader.Context.TypeConverterOptionsCache.GetOptions<string>()
-            .NullValues
-            .AddRange(new[] { "", "NULL", "NA", "N/A" });
-
-        var contacts = csvReader
-            .GetRecords<ProviderContactDto>()
-            .ToList();
-
-        var resultCount = await _providerRepository.UpdateProviderContacts(contacts);
-
-        _logger.LogInformation("Updated contacts for {resultCount} providers from {contactsCount}.",
-            resultCount, contacts.Count);
-    }
-
     public async Task<bool> HasQualifications()
     {
         return await _qualificationRepository.HasAny();
@@ -289,81 +254,6 @@ public class ProviderDataService : IProviderDataService
     public async Task<bool> HasProviders()
     {
         return await _providerRepository.HasAny();
-    }
-
-    public async Task ImportProviderData(Stream stream, bool isAdditionalData)
-    {
-        var jsonDocument = await JsonDocument
-            .ParseAsync(stream);
-
-        var count = await LoadAdditionalProviderData(jsonDocument);
-        await ClearCaches();
-
-        _logger.LogInformation("Loaded {count} providers from stream.", count);
-    }
-
-    private async Task<int> LoadAdditionalProviderData(JsonDocument jsonDocument)
-    {
-        try
-        {
-            var providers = jsonDocument
-                    .RootElement
-                    .GetProperty("providers")
-                    .EnumerateArray()
-                    .Select(p =>
-                        new Models.Provider
-                        {
-                            UkPrn = p.GetProperty("ukPrn").GetInt64(),
-                            Name = p.GetProperty("name").GetString(),
-                            Postcode = p.SafeGetString("postcode"),
-                            Town = p.SafeGetString("town"),
-                            Email = p.SafeGetString("email"),
-                            Telephone = p.SafeGetString("telephone"),
-                            Website = p.SafeGetString("website"),
-                            IsAdditionalData = true,
-                            Locations = p.GetProperty("locations")
-                                .EnumerateArray()
-                                .Select(l =>
-                                    new Location
-                                    {
-                                        Postcode = l.GetProperty("postcode").GetString(),
-                                        Name = l.SafeGetString("name", defaultValue: p.SafeGetString("name")),
-                                        Town = l.SafeGetString("town"),
-                                        Latitude = l.SafeGetDouble("latitude"),
-                                        Longitude = l.SafeGetDouble("longitude"),
-                                        Email = l.SafeGetString("email"),
-                                        Telephone = l.SafeGetString("telephone"),
-                                        Website = l.SafeGetString("website"),
-                                        IsAdditionalData = true,
-                                        DeliveryYears = l.TryGetProperty("deliveryYears", out var deliveryYears)
-                                            ? deliveryYears.EnumerateArray()
-                                                .Select(d =>
-                                                    new DeliveryYear
-                                                    {
-                                                        Year = d.GetProperty("year").GetInt16(),
-                                                        Qualifications = d.GetProperty("qualifications")
-                                                            .EnumerateArray()
-                                                            .Select(q => new Qualification
-                                                            {
-                                                                Id = q.GetInt32()
-                                                            })
-                                                            .ToList()
-                                                    })
-                                                .ToList()
-                                            : new List<DeliveryYear>()
-                                    }).ToList()
-                        })
-                    .ToList();
-
-            await _providerRepository.Save(providers, true);
-
-            return providers.Count;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"{nameof(LoadAdditionalProviderData)} failed.");
-            throw;
-        }
     }
 
     private async Task<GeoLocation> GetPostcode(string postcode)
@@ -431,12 +321,5 @@ public class ProviderDataService : IProviderDataService
                 { "notifications_uri", notificationsUri.ToString() }
             },
             token.ToString());
-    }
-
-    private async Task ClearCaches()
-    {
-        await _cacheService.Remove<IList<Qualification>>(CacheKeys.QualificationsKey);
-        await _cacheService.Remove<IList<Route>>(CacheKeys.RoutesKey);
-        await _cacheService.Remove<ProviderDataDownloadInfoResponse>(CacheKeys.ProviderDataDownloadInfoKey);
     }
 }

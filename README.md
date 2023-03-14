@@ -116,7 +116,6 @@ Add a new row to the table with:
     "DfeSignInSettings": {
         "MetadataAddress": "https://test-oidc.signin.education.gov.uk/.well-known/openid-configuration",
         "ApiUri": "https://test-api.signin.education.gov.uk",
-        "Authority": "https://test-oidc.signin.education.gov.uk",
         "Issuer": "TLevelsConnect",
         "ClientId": "TLevelsConnect",
         "ClientSecret": "<client secret>",

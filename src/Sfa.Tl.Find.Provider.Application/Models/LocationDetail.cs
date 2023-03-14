@@ -11,9 +11,9 @@ public class LocationDetail
     public string LocationName { get; init; }
     public string Postcode { get; init; }
     [JsonPropertyName("addressLine1")]
-    public string LocationAddressLine1 { get; init; }
+    public string AddressLine1 { get; init; }
     [JsonPropertyName("addressLine2")]
-    public string LocationAddressLine2 { get; init; }
+    public string AddressLine2 { get; init; }
     public string Town { get; init; }
     public string County { get; init; }
     public string Email { get; init; }

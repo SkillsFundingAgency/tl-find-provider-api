@@ -1,5 +1,4 @@
-﻿using Sfa.Tl.Find.Provider.Api.Models;
-using Sfa.Tl.Find.Provider.Application.Models;
+﻿using Sfa.Tl.Find.Provider.Application.Models;
 
 namespace Sfa.Tl.Find.Provider.Application.Extensions;
 
@@ -28,8 +27,7 @@ public static class MappingExtensions
                     Telephone = location.Telephone,
                     Website = location.Website,
                     Latitude = location.Latitude,
-                    Longitude = location.Longitude,
-                    IsAdditionalData = location.IsAdditionalData
+                    Longitude = location.Longitude
                 });
             }
         }
@@ -57,16 +55,14 @@ public static class MappingExtensions
             Telephone = location.Telephone,
             Website = location.Website,
             Latitude = location.Latitude,
-            Longitude = location.Longitude,
-            IsAdditionalData = location.IsAdditionalData
+            Longitude = location.Longitude
         };
     }
 
     public static IEnumerable<LocationQualificationDto> MapToLocationQualificationDtoList(
         this IEnumerable<DeliveryYear> deliveryYears,
         long ukPrn, 
-        string postcode,
-        bool isAdditionalData = false)
+        string postcode)
     {
         var results = new List<LocationQualificationDto>();
 
@@ -81,8 +77,7 @@ public static class MappingExtensions
                         UkPrn = ukPrn,
                         Postcode = postcode,
                         DeliveryYear = deliveryYear.Year,
-                        QualificationId = qualification.Id,
-                        IsAdditionalData = isAdditionalData
+                        QualificationId = qualification.Id
                     });
                 }
             }

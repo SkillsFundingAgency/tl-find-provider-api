@@ -1,5 +1,7 @@
 using System.Reflection;
 using AspNetCoreRateLimit;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -7,6 +9,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Sfa.Tl.Find.Provider.Api.Extensions;
+using Sfa.Tl.Find.Provider.Api.Validators;
 using Sfa.Tl.Find.Provider.Application.Data;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
@@ -40,6 +43,7 @@ try
     });
 
     builder.Services.AddControllers();
+    builder.Services.AddFluentValidationAutoValidation();
 
     builder.Services.AddSwagger("v3",
         "T Levels Find a Provider Api",
@@ -77,6 +81,7 @@ try
         .AddSingleton<IDateTimeProvider, DateTimeProvider>()
         .AddScoped<IDbContextWrapper, DbContextWrapper>()
         .AddScoped<IGuidProvider, GuidProvider>()
+        .AddScoped<IValidator<EmployerInterestInputModel>, EmployerInterestInputModelValidator>()
         .AddTransient<IDynamicParametersWrapper, DynamicParametersWrapper>()
         .AddTransient<IEmailService, EmailService>()
         .AddTransient<IEmailDeliveryStatusService, EmailDeliveryStatusService>()

@@ -153,6 +153,7 @@ public class ProvidersController : ControllerBase
 
             info = new ProviderDataDownloadInfoResponse
             {
+                FileDate = _dateTimeProvider.Now,
                 FormattedFileDate = $"{_dateTimeProvider.Today:MMMM yyyy}",
                 FileSize = bytes.Length
             };
