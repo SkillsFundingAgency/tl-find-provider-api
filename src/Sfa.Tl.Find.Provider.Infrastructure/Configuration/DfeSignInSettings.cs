@@ -1,7 +1,6 @@
 ﻿namespace Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 public class DfeSignInSettings
 {
-    public string? Administrators { get; set; }
     public string? Audience { get; set; }
     public string? ApiUri { get; set; }
     public string? ApiSecret { get; set; }

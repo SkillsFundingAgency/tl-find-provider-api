@@ -182,30 +182,6 @@ public static class AuthenticationExtensions
                         {
                             claims.AddRange(userInfo.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
                         }
-                        //TODO: Remove workaround after DSI roles are ready
-                        else
-                        {
-                            //workaround
-                            // - if has ukprn, add ProviderUser
-                            // - if admin matches, add Administrator role
-                            if (organisationInfo?.UkPrn != null)
-                            {
-                                claims.Add(new Claim(ClaimTypes.Role, CustomRoles.ProviderEndUser));
-                            }
-                            else if (!string.IsNullOrEmpty(signInSettings.Administrators))
-                            {
-                                var admins = signInSettings.Administrators?
-                                    .Split(new[] { ';', ',' },
-                                        StringSplitOptions.RemoveEmptyEntries);
-                                var email = ctx.Principal.FindFirst("email")?.Value;
-
-                                if (admins is not null &&
-                                    admins.Any(a => string.Compare(a.Trim(), email, StringComparison.OrdinalIgnoreCase) == 0))
-                                {
-                                    claims.Add(new Claim(ClaimTypes.Role, CustomRoles.Administrator));
-                                }
-                            }
-                        }
                     }
                     
                     ctx.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationTypeName));
