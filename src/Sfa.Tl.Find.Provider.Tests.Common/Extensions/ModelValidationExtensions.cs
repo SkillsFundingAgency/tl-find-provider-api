@@ -85,7 +85,6 @@ public static class ModelValidationExtensions
         provider.Email.Should().Be(expected.Email);
         provider.Telephone.Should().Be(expected.Telephone);
         provider.Website.Should().Be(expected.Website);
-        provider.IsAdditionalData.Should().Be(expected.IsAdditionalData);
 
         provider.Locations.Should().NotBeNull();
         provider.Locations.Count.Should().Be(expected.Locations.Count);
@@ -167,8 +166,8 @@ public static class ModelValidationExtensions
     {
         location.Postcode.Should().Be(expected.Postcode);
         location.LocationName.Should().Be(expected.LocationName);
-        location.LocationAddressLine1.Should().Be(expected.LocationAddressLine1);
-        location.LocationAddressLine2.Should().Be(expected.LocationAddressLine2);
+        location.AddressLine1.Should().Be(expected.AddressLine1);
+        location.AddressLine2.Should().Be(expected.AddressLine2);
         location.Town.Should().Be(expected.Town);
         location.County.Should().Be(expected.County);
         location.Email.Should().Be(expected.Email);
@@ -185,6 +184,22 @@ public static class ModelValidationExtensions
             var expectedDeliveryYear = expected.DeliveryYears.Single(dy => dy.Year == deliveryYear.Year);
             deliveryYear.Validate(expectedDeliveryYear);
         }
+    }
+
+    public static void Validate(this LocationDto location, Location expected, long expectedUkPrn)
+    {
+        location.UkPrn.Should().Be(expectedUkPrn);
+        location.Postcode.Should().Be(expected.Postcode);
+        location.Name.Should().Be(expected.Name);
+        location.AddressLine1.Should().Be(expected.AddressLine1);
+        location.AddressLine2.Should().Be(expected.AddressLine2);
+        location.Town.Should().Be(expected.Town);
+        location.County.Should().Be(expected.County);
+        location.Email.Should().Be(expected.Email);
+        location.Telephone.Should().Be(expected.Telephone);
+        location.Website.Should().Be(expected.Website);
+        location.Latitude.Should().Be(expected.Latitude);
+        location.Longitude.Should().Be(expected.Longitude);
     }
 
     public static void Validate(this LocationPostcode locationPostcode, LocationPostcode expected)

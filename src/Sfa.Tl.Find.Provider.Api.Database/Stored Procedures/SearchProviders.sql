@@ -9,9 +9,6 @@
 AS
 	SET NOCOUNT ON;
 
-	--Set this locally - it will be removed in a future release 
-	DECLARE @includeAdditionalData BIT = 1;
-
 	DECLARE @fromLocation GEOGRAPHY = geography::Point(@fromLatitude, @fromLongitude, 4326);
 
 	DECLARE @locations TABLE (
@@ -71,13 +68,10 @@ AS
 				p.[EmployerContactWebsite],
 				p.[StudentContactEmail],
 				p.[StudentContactTelephone],
-				p.[StudentContactWebsite],
-				--Need to filter so providers in the additional data set are overidden by ones in the main data set
-				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
+				p.[StudentContactWebsite]
 		FROM	[Provider] p
 		WHERE	p.[IsDeleted] = 0
-		  --If not merging additional data, have to make sure we only include non-additional data
-		  AND	(@includeAdditionalData = 1 OR (@includeAdditionalData = 0 AND p.[IsAdditionalData] = 0))),
+		),
 
 	NearestLocationsCTE_Inner AS (
 		SELECT	p.[UkPrn],
@@ -103,8 +97,6 @@ AS
 		INNER JOIN	[dbo].[Location] l
 		ON		p.[Id] = l.[ProviderId]
 		WHERE	l.[IsDeleted] = 0
-		  --Only include the first row to make sure main data set takes priority
-		  AND	p.[ProviderRowNum] = 1
 		  AND	EXISTS (SELECT	lq.[QualificationId]
 						FROM	[dbo].[LocationQualification] lq
 						INNER JOIN	[dbo].[Qualification] q

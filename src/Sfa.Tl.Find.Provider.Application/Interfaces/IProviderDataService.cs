@@ -34,8 +34,4 @@ public interface IProviderDataService
     Task<bool> HasQualifications();
 
     Task<bool> HasProviders();
-    
-    Task ImportProviderContacts(Stream stream);
-
-    Task ImportProviderData(Stream stream, bool isAdditionalData);
 }

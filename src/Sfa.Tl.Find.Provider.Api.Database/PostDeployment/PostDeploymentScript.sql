@@ -24,10 +24,24 @@ Post-Deployment Script
 ALTER TABLE [dbo].[EmployerInterest] 
 DROP COLUMN IF EXISTS [Postcode];
 
+ALTER TABLE [dbo].[Provider] 
+	DROP COLUMN IF EXISTS [IsAdditionalData];
+ALTER TABLE [dbo].[Location] 
+	DROP COLUMN IF EXISTS [IsAdditionalData];
+ALTER TABLE [dbo].[LocationQualification] 
+	DROP COLUMN IF EXISTS [IsAdditionalData];
+
 --To undo this:
 /*
 ALTER TABLE [dbo].[EmployerInterest] 
 ADD [Postcode] NVARCHAR(10) NULL;
+
+ALTER TABLE [dbo].[Provider] 
+ADD [Postcode] BIT NULL;
+ALTER TABLE [dbo].[Location] 
+ADD [Postcode] BIT NULL;
+ALTER TABLE [dbo].[LocationQualification] 
+ADD [IsAdditionalData] BIT NULL;
 
 WITH cte AS (
 	SELECT EmployerInterestId, Postcode

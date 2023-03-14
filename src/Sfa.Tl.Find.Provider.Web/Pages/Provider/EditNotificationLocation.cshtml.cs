@@ -8,6 +8,7 @@ using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Application.Models.Enums;
 using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Web.Authorization;
+using Sfa.Tl.Find.Provider.Web.Extensions;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
 using Route = Sfa.Tl.Find.Provider.Application.Models.Route;
 
@@ -77,7 +78,7 @@ public class EditNotificationLocationModel : PageModel
 
     private async Task Save()
     {
-        var routes = GetSelectedSkillAreas(Input!.SkillAreas);
+        var routes = SelectListHelperExtensions.GetSelectedSkillAreas(Input!.SkillAreas);
 
         var notification = new Notification
         {
@@ -104,61 +105,13 @@ public class EditNotificationLocationModel : PageModel
             SelectedFrequency = NotificationDetail?.Frequency ?? NotificationFrequency.Immediately
         };
 
-        FrequencyOptions = LoadFrequencyOptions(Input.SelectedFrequency);
+        FrequencyOptions = SelectListHelperExtensions.LoadFrequencyOptions(Input.SelectedFrequency);
 
-        SearchRadiusOptions = LoadSearchRadiusOptions(Input.SelectedSearchRadius);
+        SearchRadiusOptions = SelectListHelperExtensions.LoadSearchRadiusOptions(Input.SelectedSearchRadius);
 
-        Input.SkillAreas = await LoadSkillAreaOptions(NotificationDetail?.Routes ?? new List<Route>());
-    }
-
-    private SelectListItem[] LoadFrequencyOptions(NotificationFrequency selectedValue)
-    {
-        return Enum.GetValues<NotificationFrequency>()
-            .Select(f => new SelectListItem
-            {
-                Value = ((int)f).ToString(),
-                Text = f.ToString(),
-                Selected = f == selectedValue
-            })
-            .ToArray();
-    }
-
-    private SelectListItem[] LoadSearchRadiusOptions(int? selectedValue)
-    {
-        return new List<int> { 5, 10, 20, 30, 40, 50 }
-            .Select(p => new SelectListItem(
-                $"{p} miles",
-                p.ToString(),
-                p == selectedValue)
-            )
-            .ToArray();
-    }
-
-    private async Task<SelectListItem[]> LoadSkillAreaOptions(IEnumerable<Route> selectedRoutes)
-    {
-        return (await _providerDataService
-                .GetRoutes())
-            .Select(r => new SelectListItem(
-                r.Name,
-                r.Id.ToString(),
-                selectedRoutes.Any(x => r.Id == x.Id))
-            )
-            .OrderBy(x => x.Text)
-            .ToArray();
-    }
-    
-    private IList<Route> GetSelectedSkillAreas(SelectListItem[]? selectList)
-    {
-        return selectList != null
-            ? selectList
-                .Where(s => s.Selected)
-                .Select(s =>
-                    new Route
-                    {
-                        Id = int.Parse(s.Value)
-                    })
-                .ToList()
-            : new List<Route>();
+        Input.SkillAreas = SelectListHelperExtensions.LoadSkillAreaOptions(
+            await _providerDataService.GetRoutes(),
+            NotificationDetail?.Routes ?? new List<Route>());
     }
 
     public class InputModel

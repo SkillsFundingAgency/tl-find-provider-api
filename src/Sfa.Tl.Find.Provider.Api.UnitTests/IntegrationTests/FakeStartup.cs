@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Sfa.Tl.Find.Provider.Api.Controllers;
+using Sfa.Tl.Find.Provider.Api.Validators;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
@@ -69,6 +72,8 @@ public class FakeStartup
             //https://stackoverflow.com/questions/58679912/how-to-use-a-controller-in-another-assembly-in-asp-net-core-3-0
             .AddApplicationPart(typeof(ProvidersController).Assembly);
 
+        services.AddFluentValidationAutoValidation();
+
         services.Configure<RouteOptions>(options =>
         {
             options.AppendTrailingSlash = true;
@@ -82,6 +87,8 @@ public class FakeStartup
             .AddSingleton(_ => _testConfigurationSettings)
             .AddScoped(_ => Substitute.For<IDbContextWrapper>())
             .AddScoped<IDateTimeProvider, DateTimeProvider>()
+            .AddScoped<IGuidProvider, GuidProvider>()
+            .AddScoped<IValidator<EmployerInterestInputModel>, EmployerInterestInputModelValidator>()
             .AddTransient(_ =>
             {
                 var providerDataService = Substitute.For<IProviderDataService>();

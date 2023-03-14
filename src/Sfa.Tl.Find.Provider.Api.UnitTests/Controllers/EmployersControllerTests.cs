@@ -53,7 +53,7 @@ public class EmployersControllerTests
 
         okResult!.Value.Should().BeEquivalentTo(expectedResult);
     }
-
+    
     [Fact]
     public async Task DeleteInterest_Returns_NoContent_Result_For_Successful_Deletion()
     {

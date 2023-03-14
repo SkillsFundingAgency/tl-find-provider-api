@@ -21,7 +21,8 @@
 	[Longitude] DECIMAL(9, 6) NOT NULL,
 	[Location] GEOGRAPHY NULL, 
 	[IsDeleted] BIT NOT NULL DEFAULT (0),
-	[IsAdditionalData] BIT NOT NULL DEFAULT (0),
+	--TODO: Remove this column for next release
+	[IsAdditionalData] BIT NULL,
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
 	[ModifiedOn] DATETIME2(7) NULL,
     CONSTRAINT [PK_Location] PRIMARY KEY ([Id]),

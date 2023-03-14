@@ -6,29 +6,35 @@ AS
 		SELECT	p.[Id],
 				p.[UkPrn],
 				p.[Name], 
+				p.[Postcode],
+				p.[AddressLine1],
+				p.[AddressLine2],
+				p.[Town] AS [Town],
+				p.[County] AS [County],
 				p.[Email],
 				p.[Telephone],
-				p.[Website],
-				p.[IsAdditionalData],
-				--Need to filter so providers in the additional data set are overidden by ones in the main data set
-				ROW_NUMBER() OVER(PARTITION BY p.[UkPrn] ORDER BY p.[IsAdditionalData]) AS ProviderRowNum
+				p.[Website]
 		FROM	[Provider] p
 		WHERE	p.[IsDeleted] = 0),
 
 	NearestLocationsCTE AS (
 		SELECT	p.[UkPrn],
 				p.[Name],
+				p.[Postcode],
+				p.[AddressLine1],
+				p.[AddressLine2],
+				p.[Town] AS [Town],
+				p.[County] AS [County],
 				p.[Email],
 				p.[Telephone],
 				p.[Website],
-				p.[IsAdditionalData],
 				l.[Id] AS [LocationId],
-				l.[Postcode],
+				l.[Postcode]  AS [LocationPostcode],
 				l.[Name] AS [LocationName],
 				l.[AddressLine1] AS [LocationAddressLine1],
 				l.[AddressLine2] AS [LocationAddressLine2],
-				l.[Town] AS [Town],
-				l.[County] AS [County],
+				l.[Town] AS [LocationTown],
+				l.[County] AS [LocationCounty],
 				l.[Email] AS [LocationEmail],
 				l.[Telephone] AS [LocationTelephone],
 				l.[Website] AS [LocationWebsite],
@@ -38,8 +44,6 @@ AS
 		INNER JOIN	[dbo].[Location] l
 		ON		p.[Id] = l.[ProviderId]
 		WHERE	l.[IsDeleted] = 0
-			--Only include the first row to make sure main data set takes priority
-			AND	p.[ProviderRowNum] = 1
 			AND	EXISTS (SELECT	lq.[QualificationId]
 						FROM	[dbo].[LocationQualification] lq
 						INNER JOIN	[dbo].[Qualification] q
@@ -51,49 +55,41 @@ AS
 						ON		r.[Id] = rq.[RouteId]
 							AND	r.[IsDeleted] = 0
 						WHERE	lq.[LocationId] = l.[Id])
-		),
+		)
 
-		TownNamesCTE AS (
-			SELECT	[LocationId],
-					COALESCE(t.[Name], l.[Town]) AS [TownName]
-			FROM NearestLocationsCTE l
-			OUTER APPLY (SELECT Top(1) [Name] 
-							FROM [dbo].[Town]
-							WHERE [Name] = l.[Town]
-							OR [Name] = REPLACE(l.[Town], ' ', '-')
-							) t
-			GROUP BY [LocationId],
-						l.[Town],
-						t.[Name])
-
-		--Step 2 - add in the qualifications 
-		SELECT 	[UkPrn],
+		--add in the qualifications 
+		SELECT 	--provider details
+				l.[UkPrn],
 				l.[Name],
-				[Email],
-				[Telephone],
-				[Website],
-				[Postcode],
-				[LocationName],
-				[LocationAddressLine1],
-				[LocationAddressLine2],
-				t.[TownName] AS [Town],
-				[County],
-				[Email],
-				[Telephone],
-				[Website],
+				l.[Postcode],
+				l.[AddressLine1],
+				l.[AddressLine2],
+				l.[Town],
+				l.[County],
+				l.[Email],
+				l.[Telephone],
+				l.[Website],
+				--location details
+				l.[LocationName],
+				l.[LocationPostcode],
+				l.[LocationAddressLine1],
+				l.[LocationAddressLine2],
+				l.[LocationTown],
+				l.[LocationCounty],
+				l.[LocationEmail],
+				l.[LocationTelephone],
+				l.[LocationWebsite],
 				[Latitude],
 				[Longitude],
+				--delivery year details with routes and qualifications
 				lq.[DeliveryYear] AS [Year],
 				rq.[RouteId],
 				r.[Name] AS [RouteName],
 				q.[Id] AS [QualificationId],
-				q.[Name] AS [QualificationName],
-				l.[IsAdditionalData]
+				q.[Name] AS [QualificationName]				
 		FROM NearestLocationsCTE l
 		INNER JOIN	[dbo].[LocationQualification] lq
 		ON		lq.[LocationId] = l.[LocationId]
-		INNER JOIN [TownNamesCTE] t
-		ON		t.[LocationId] = l.[LocationId]
 		INNER JOIN	[dbo].[Qualification] q
 		ON		q.[Id] = lq.[QualificationId]
 			AND	q.[IsDeleted] = 0

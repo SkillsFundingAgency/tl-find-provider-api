@@ -15,7 +15,7 @@ public sealed class OnsLocationApiItemClassMap : ClassMap<OnsLocationApiItem>
         Map(m => m.LocationName).Name("place15nm");
         Map(m => m.CountyName).Name("cty15nm")
             //Return null for missing county, to make sure null will be stored in db
-            .TypeConverterOption.NullValues(string.Empty); 
+            .TypeConverterOption.NullValues(string.Empty);
         Map(m => m.Country).Name("ctry15nm");
         Map(m => m.LocalAuthorityName).Name("ctyltnm");
         Map(m => m.LocalAuthorityDistrictDescription).Name("laddescnm");

@@ -9,7 +9,6 @@ public class EmployerInterestInputModel
     public int Id { get; init; }
     public string OrganisationName { get; init; }
     public string ContactName { get; init; }
-    public string Postcode { get; init; }
     public int? IndustryId { get; init; }
     public string OtherIndustry { get; init; }
     public string Email { get; init; }

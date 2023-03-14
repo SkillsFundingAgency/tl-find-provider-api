@@ -15,11 +15,6 @@
           "type": "string",
           "environmentVariable": "DfeSignIn_Audience"
         },
-        "Authority": {
-          "minLength": 1,
-          "type": "string",
-          "environmentVariable": "DfeSignIn_Authority"
-        },
         "Issuer": {
           "minLength": 1,
           "type": "string",

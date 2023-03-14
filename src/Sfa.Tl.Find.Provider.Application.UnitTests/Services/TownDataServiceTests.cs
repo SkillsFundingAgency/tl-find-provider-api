@@ -277,11 +277,6 @@ public class TownDataServiceTests
     [Fact]
     public async Task ImportTowns_From_Csv_Stream_Creates_Expected_Number_Of_Towns()
     {
-        var responses = new Dictionary<string, string>
-        {
-            { FirstPageUriString, NationalStatisticsJsonBuilder.BuildNationalStatisticsLocationsResponse() }
-        };
-
         IList<Town> receivedTowns = null;
 
         var townRepository = Substitute.For<ITownRepository>();
@@ -289,14 +284,15 @@ public class TownDataServiceTests
             .Save(Arg.Do<IEnumerable<Town>>(
                 x => receivedTowns = x?.ToList()));
 
-        var service = new TownDataServiceBuilder()
-            .Build(responses,
-                townRepository);
+        var stream = IndexOfPlaceNamesCsvBuilder.BuildIndexOfPlaceNamesCsvAsStream();
 
-        await service.ImportTowns();
+        var service = new TownDataServiceBuilder()
+            .Build(townRepository: townRepository);
+
+        await service.ImportTowns(stream);
 
         receivedTowns.Should().NotBeNull();
-        receivedTowns.Count.Should().Be(5);
+        receivedTowns.Count.Should().Be(6);
     }
 
     [Fact]
@@ -339,6 +335,16 @@ public class TownDataServiceTests
                 "Greater London",
                 51.497681M,
                 -0.192782M);
+
+        receivedTowns
+            .SingleOrDefault(t =>
+                t.Id == 10214)
+            .Validate(10214,
+                "Bude",
+                null,
+                "Cornwall",
+                50.825207M,
+                -4.538982M);
 
         receivedTowns
             .SingleOrDefault(t =>
@@ -430,8 +436,7 @@ public class TownDataServiceTests
                 t.Name == "Abberley");
         // ReSharper restore StringLiteralTypo
     }
-
-
+    
     [Fact]
     public async Task ImportTowns_From_Csv_Stream_From_Csv_Stream_Filters_Out_Non_English_Towns()
     {

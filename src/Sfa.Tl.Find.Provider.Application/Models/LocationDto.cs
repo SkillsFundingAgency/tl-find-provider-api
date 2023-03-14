@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 // ReSharper disable All
 
-namespace Sfa.Tl.Find.Provider.Api.Models;
+namespace Sfa.Tl.Find.Provider.Application.Models;
 
 [DebuggerDisplay("UKPRN {" + nameof(UkPrn) + "}" +
                  " {" + nameof(Postcode) + "}" +
@@ -20,5 +20,4 @@ public class LocationDto
     public string Website { get; init; }
     public double Latitude { get; init; }
     public double Longitude { get; init; }
-    public bool IsAdditionalData { get; init; }
 }
