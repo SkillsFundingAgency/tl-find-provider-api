@@ -4,8 +4,6 @@
 	[DeliveryYear] SMALLINT NOT NULL,
 	[LocationId] INT NOT NULL,
 	[QualificationId] INT NOT NULL,
-	--TODO: Remove this column for next release
-	[IsAdditionalData] BIT NULL,
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
 	CONSTRAINT [PK_LocationQualification] PRIMARY KEY ([Id]),
 	CONSTRAINT [FK_LocationQualification_Location] FOREIGN KEY([LocationId]) REFERENCES [dbo].[Location] ([Id]),
