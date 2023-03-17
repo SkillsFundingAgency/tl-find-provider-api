@@ -20,7 +20,10 @@
         <ul class="govuk-list govuk-list--bullet">
             @foreach (var claim in Model.UserClaims.OrderBy(x => x.Key))
             {
-                <li><strong>@claim.Key</strong>: @claim.Value</li>
+                var displayValue = @claim.Key == "ukprn"
+                ? @claim.Value?.PadLeft(8, '0')
+                : @claim.Value;
+                <li><strong>@claim.Key</strong>: @displayValue</li>
             }
         </ul>
     </div>
