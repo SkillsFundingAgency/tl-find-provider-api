@@ -18,8 +18,6 @@
 	[StudentContactTelephone] NVARCHAR(150) NULL,
 	[StudentContactWebsite] NVARCHAR(500) NULL,
 	[IsDeleted] BIT NOT NULL DEFAULT (0),
-	--TODO: Remove this column for next release
-	[IsAdditionalData] BIT NULL,
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
 	[ModifiedOn] DATETIME2(7) NULL,
     CONSTRAINT [PK_Provider] PRIMARY KEY ([Id]),
