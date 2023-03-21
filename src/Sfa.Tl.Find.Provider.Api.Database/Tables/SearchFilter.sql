@@ -5,5 +5,6 @@
 	[SearchRadius] INT NOT NULL,
 	[CreatedOn] DATETIME2(7) NOT NULL DEFAULT (GETUTCDATE()),
 	[ModifiedOn] DATETIME2(7) NULL,
-	CONSTRAINT [PK_SearchFilter] PRIMARY KEY ([Id])
+	CONSTRAINT [PK_SearchFilter] PRIMARY KEY ([Id]),
+	CONSTRAINT [FK_SearchFilter_Location] FOREIGN KEY([LocationId]) REFERENCES [dbo].[Location] ([Id])
 )
