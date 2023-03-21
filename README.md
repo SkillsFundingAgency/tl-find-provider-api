@@ -121,8 +121,7 @@ Add a new row to the table with:
         "ClientSecret": "<client secret>",
         "ApiSecret": "<api secret>",
         "Audience": "signin.education.gov.uk",
-        "Timeout": 30,
-        "Administrators": "<list of administrator email addresses>"
+        "Timeout": 30
     },
     "ProviderSettings": {
         "ConnectSiteUri": "https://test.connect.tlevels.gov.uk/",

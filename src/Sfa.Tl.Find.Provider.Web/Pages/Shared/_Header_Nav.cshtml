@@ -3,7 +3,7 @@
 
 @if (Context.User.Identity!.IsAuthenticated)
 {
-    var ukPrn = Context.User.GetClaim(CustomClaimTypes.UkPrn);
+    var ukPrn = Context.User.GetClaim(CustomClaimTypes.UkPrn)?.PadLeft(8, '0');
 
     <div class="tl-accountbar">
         <p>

@@ -47,7 +47,6 @@ public class SettingsBuilder
 
     private const string SupportEmailAddress = "support@test-email.gov.uk";
 
-    private const string SignInAdministrators = "tester@test.com";
     private const string SignInApiUri = "https://test.api.oidc.com";
     private const string SignInApiSecret = "apisecret";
     private const string SignInAudience = "signin.oidc.com";
@@ -85,7 +84,6 @@ public class SettingsBuilder
 
     public DfeSignInSettings BuildDfeSignInSettings(
         string metadataAddress = SignInMetadataAddress,
-        string administrators = SignInAdministrators,
         string audience = SignInAudience,
         string clientId = SignInClientId,
         string clientSecret = SignInClientSecret,
@@ -94,7 +92,6 @@ public class SettingsBuilder
         string issuer = SignInIssuer,
         int timeout = SignInTimeout) => new()
         {
-            Administrators = administrators,
             Audience = audience,
             ClientId = clientId,
             ClientSecret = clientSecret,
