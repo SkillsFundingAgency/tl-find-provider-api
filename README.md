@@ -294,7 +294,7 @@ If you want to run without starting Azurite, then the other settings can be set.
 
 ```
 {
-  "StubProviderAuth": true,
+  "StubProviderAuth": false,
   "SqlConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TLevelProviders;Integrated Security=True;MultipleActiveResultSets=True;",
   "DfeSignInSettings": {
   },
