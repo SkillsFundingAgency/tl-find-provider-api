@@ -12,9 +12,16 @@ public static class DataProtectionExtensions
 
     public static IServiceCollection AddWebDataProtection(
         this IServiceCollection services,
-        SiteConfiguration configuration)
+        SiteConfiguration configuration,
+        IWebHostEnvironment env)
     {
-        if (!string.IsNullOrEmpty(configuration.BlobStorageConnectionString))
+        if (env.IsDevelopment())
+        {
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "keys")))
+                .SetApplicationName("TLevelsConnect");
+        }
+        else if (!string.IsNullOrEmpty(configuration.BlobStorageConnectionString))
         {
             services.AddDataProtection()
                 .PersistKeysToAzureBlobStorage(
