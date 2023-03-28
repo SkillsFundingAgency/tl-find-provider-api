@@ -8,5 +8,4 @@ public static class JobKeys
     public const string ProviderNotificationEmailImmediate = "Provider Notification Emails - Immediate";
     public const string ProviderNotificationEmailDaily = "Provider Notification Emails - Daily";
     public const string ProviderNotificationEmailWeekly = "Provider Notification Emails - Weekly";
-    public const string StartupTasks = "Perform Startup Tasks";
 }

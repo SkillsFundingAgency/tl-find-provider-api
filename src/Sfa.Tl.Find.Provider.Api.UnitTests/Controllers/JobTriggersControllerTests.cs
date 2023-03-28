@@ -116,26 +116,7 @@ public class JobTriggersControllerTests
             .TriggerJob(Arg.Is<JobKey>(k =>
                 k.Name == JobKeys.ProviderNotificationEmailWeekly));
     }
-
-    [Fact]
-    public async Task TriggerStartupTasksJob_Runs_Job()
-    {
-        var scheduler = Substitute.For<IScheduler>();
-        var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetScheduler()
-            .Returns(Task.FromResult(scheduler));
-
-        var controller = new JobTriggersControllerBuilder()
-            .Build(schedulerFactory);
-
-        await controller.TriggerStartupTasksJob();
-
-        await scheduler
-            .Received(1)
-            .TriggerJob(Arg.Is<JobKey>(k => 
-                k.Name == JobKeys.StartupTasks));
-    }
-
+    
     [Fact]
     public async Task TriggerImportTownDataJob_Runs_Job()
     {
