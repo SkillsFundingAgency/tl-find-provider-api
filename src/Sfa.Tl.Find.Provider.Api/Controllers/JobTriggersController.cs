@@ -50,11 +50,6 @@ public class JobTriggersController : ControllerBase
         await TriggerJob(JobKeys.ProviderNotificationEmailWeekly);
     
     [HttpPost]
-    [Route("startuptasks")]
-    public async Task TriggerStartupTasksJob() =>
-        await TriggerJob(JobKeys.StartupTasks);
-
-    [HttpPost]
     [Route("importtowns")]
     public async Task TriggerImportTownDataJob() => 
         await TriggerJob(JobKeys.ImportTownData);

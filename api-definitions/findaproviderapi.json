@@ -661,28 +661,6 @@
         }
       }
     },
-    "/api/v{version}/jobtriggers/startuptasks": {
-      "post": {
-        "tags": [
-          "JobTriggers"
-        ],
-        "parameters": [
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/api/v{version}/jobtriggers/importtowns": {
       "post": {
         "tags": [

@@ -26,7 +26,7 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
         var claims = new[]
         {
             new Claim(CustomClaimTypes.DisplayName, "Test User"),
-            new Claim(CustomClaimTypes.UkPrn, "10000001"),
+            new Claim(CustomClaimTypes.UkPrn, "10000055"),
             new Claim(ClaimTypes.Role, CustomRoles.ProviderEndUser)
         };
         var identity = new ClaimsIdentity(claims, "Provider-stub");
