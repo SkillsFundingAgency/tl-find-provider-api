@@ -38,9 +38,6 @@ USING (VALUES
   (8, 49),  -- Maintenance, Installation and Repair for Engineering and Manufacturing
   (8, 50),  -- Engineering, Manufacturing, Processing and Control
 
-  -- Hair and beauty
-  (9, 53),  -- Hairdressing, Barbering and Beauty Therapy
-
   -- Health and science
   (10, 41), -- Health
   (10, 42), -- Healthcare Science
