@@ -92,7 +92,8 @@ public class ProviderDataService : IProviderDataService
             await _cacheService.Set(key, qualifications);
         }
 
-        return qualifications;
+        const int HairdressingBarberingAndBeautyTherapyId = 53;
+        return qualifications.Where(q => q.Id != HairdressingBarberingAndBeautyTherapyId).ToList();
     }
 
     public async Task<IEnumerable<Route>> GetRoutes()
