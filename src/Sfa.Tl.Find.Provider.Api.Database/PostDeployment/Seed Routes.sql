@@ -14,7 +14,7 @@ USING (VALUES
   (6, N'Digital and IT', 0),
   (7, N'Education and Early Years', 0),
   (8, N'Engineering and Manufacturing', 0),
-  (9, N'Hair and Beauty', 0),
+  (9, N'Hair and Beauty', 1),
   (10, N'Health and Science', 0),
   (11, N'Legal, Finance and Accounting', 0)
   )
