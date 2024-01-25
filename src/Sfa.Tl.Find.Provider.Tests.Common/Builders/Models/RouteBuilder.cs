@@ -59,12 +59,6 @@ public class RouteBuilder
             },
             new()
             {
-                Id = 9,
-                Name = "Hair and beauty",
-                Qualifications = qualificationBuilder.BuildList(9)
-            },
-            new()
-            {
                 Id = 10,
                 Name = "Health and science",
                 Qualifications = qualificationBuilder.BuildList(10)
