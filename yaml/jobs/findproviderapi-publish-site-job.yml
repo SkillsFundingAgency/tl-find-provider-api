@@ -75,3 +75,9 @@ jobs:
       ResourceGroupName: '$(ResourceGroupName)'
       SpecifySlotOrASE: true
       Slot: 'staging'
+
+  - pwsh: |     
+      Write-Output "Stage Attempt: $(System.StageAttempt)"      
+      Write-Output "Job Attempt: $(System.JobAttempt)"
+      Write-Output "Phase Attempt: $(System.PhaseAttempt)"
+    name: testScript
