@@ -49,11 +49,9 @@
         "apiAppName": "[concat(parameters('resourceNamePrefix'), '-web')]",
         "appInsightName": "[concat(parameters('resourceNamePrefix'), '-ai')]",
         "uiAppName": "[concat(parameters('resourceNamePrefix'), '-ui')]",
-        // "workerFunctionAppName": "[concat(parameters('resourceNamePrefix'), '-func-worker')]",
         "sqlDatabaseName": "[concat(parameters('resourceNamePrefix'), '-sqldb')]",
         "storageAccountName": "[replace(concat(parameters('resourceNamePrefix'), 'str'), '-', '')]",
         "logAnalyticsName": "[concat(parameters('resourceNamePrefix'), '-la')]"
-        // "errorLink": "[concat('https://', variables('apiAppName'), '.scm.azurewebsites.net/detectors?type=tools&name=eventviewer')]"
     },
     "resources": [
         {
@@ -166,32 +164,28 @@
                         "value": "[parameters('sharedEnvResourceGroup')]"
                     },
                     "appServiceAppSettings": {
-                      "value": [
-                        {
-                          "name": "EnvironmentName",
-                          "value": "[toUpper(parameters('environmentNameAbbreviation'))]"
-                        },
-                        {
-                          "name": "ConfigurationStorageConnectionString",
-                          "value": "[parameters('configurationStorageConnectionString')]"
-                        },
-                        {
-                          "name": "Version",
-                          "value": "1.0"
-                        },
-                        {
-                          "name": "ServiceName",
-                          "value": "Sfa.Tl.Find.Provider.Api"
-                        },
-                        {
-                          "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                          "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
-                        }
-                        //{
-                        //  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                        //  "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation')), '2021-04-01').outputs.ConnectionString]"
-                        //}
-                      ]
+                        "value": [
+                            {
+                                "name": "EnvironmentName",
+                                "value": "[toUpper(parameters('environmentNameAbbreviation'))]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "Version",
+                                "value": "1.0"
+                            },
+                            {
+                                "name": "ServiceName",
+                                "value": "Sfa.Tl.Find.Provider.Api"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
+                            }
+                        ]
                     },
                     "customHostName": {
                         "value": "[parameters('apiCustomHostName')]"
@@ -299,73 +293,6 @@
                 "[concat('ui-app-service-certificate','-', parameters('environmentNameAbbreviation'))]"
             ]
         },
-        // {
-        //     "apiVersion": "2021-04-01",
-        //     "name": "[concat('function-app','-', parameters('environmentNameAbbreviation'))]",
-        //     "type": "Microsoft.Resources/deployments",
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "templateLink": {
-        //             "uri": "[concat(variables('deploymentUrlBase'),'function-app.json')]",
-        //             "contentVersion": "1.0.0.0"
-        //         },
-        //         "parameters": {
-        //             "functionAppName": {
-        //                 "value": "[variables('workerFunctionAppName')]"
-        //             },
-        //             "appServicePlanName": {
-        //                 "value": "[parameters('sharedASPName')]"
-        //             },
-        //             "appServicePlanResourceGroup": {
-        //                 "value": "[parameters('sharedEnvResourceGroup')]"
-        //             },
-        //             "functionAppAppSettings": {
-        //                 "value": [
-        //                     {
-        //                         "name": "EnvironmentName",
-        //                         "value": "[toUpper(parameters('environmentNameAbbreviation'))]"
-        //                     },
-        //                     {
-        //                         "name": "ConfigurationStorageConnectionString",
-        //                         "value": "[parameters('configurationStorageConnectionString')]"
-        //                     },
-        //                     {
-        //                         "name": "Version",
-        //                         "value": "1.0"
-        //                     },
-        //                     {
-        //                         "name": "ServiceName",
-        //                         "value": "Sfa.Tl.Find.Provider.Api"
-        //                     },
-        //                     {
-        //                         "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-        //                         "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
-        //                     },
-        //                     {
-        //                         "name": "BlobStorageConnectionString",
-        //                         "value": "[reference(concat('storage-account','-',parameters('environmentNameAbbreviation'))).outputs.storageConnectionString.value]"
-        //                     },
-        //                     {
-        //                         "name": "AzureWebJobsStorage",
-        //                         "value": "[reference(concat('storage-account','-',parameters('environmentNameAbbreviation'))).outputs.storageConnectionString.value]"
-        //                     },
-        //                     {
-        //                         "name": "AzureWebJobsDashboard",
-        //                         "value": "[reference(concat('storage-account','-',parameters('environmentNameAbbreviation'))).outputs.storageConnectionString.value]"
-        //                     },
-        //                     {
-        //                         "name": "WEBSITE_TIME_ZONE",
-        //                         "value": "GMT Standard Time"
-        //                     },
-        //                     {
-        //                         "name": "FUNCTIONS_EXTENSION_VERSION",
-        //                         "value": "~4"
-        //                     }
-        //                 ]
-        //             }
-        //         }
-        //     }
-        // },
         {
             "apiVersion": "2021-04-01",
             "name": "[concat('sql-database','-', parameters('environmentNameAbbreviation'))]",
@@ -427,10 +354,6 @@
             "type": "string",
             "value": "[variables('apiAppName')]"
         },
-        // "workerFunctionAppName": {
-        //     "type": "string",
-        //     "value": "[variables('workerFunctionAppName')]"
-        // },
         "uiAppName": {
             "type": "string",
             "value": "[variables('uiAppName')]"
