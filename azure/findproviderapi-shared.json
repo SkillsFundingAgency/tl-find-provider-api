@@ -51,11 +51,11 @@
         },
         "redisCacheSKU": {
             "type": "string",
-            "allowedValues": ["Basic", "Standard", "Premium"]
+            "allowedValues": [ "Basic", "Standard", "Premium" ]
         },
         "redisCacheFamily": {
             "type": "string",
-            "allowedValues": ["C","P"]
+            "allowedValues": [ "C", "P" ]
         },
         "redisCacheCapacity": {
             "type": "int",
@@ -79,7 +79,7 @@
                 "permissions": {
                     "secrets": [
                         "Get"
-                ]
+                    ]
                 }
             }
         ],
@@ -361,7 +361,7 @@
                         "value": "[parameters('redisCacheCapacity')]"
                     },
                     "redisConfiguration": {
-                        "value": {"maxmemory-policy": "allkeys-lru"}
+                        "value": { "maxmemory-policy": "allkeys-lru" }
                     }
                 }
             }
