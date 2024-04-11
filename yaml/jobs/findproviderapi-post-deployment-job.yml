@@ -1,0 +1,14 @@
+jobs:
+  - job: findproviderPostDeployment
+    pool:
+      name: 'Azure Pipelines'
+      vmImage: 'windows-2019'
+    dependsOn: 
+    - PublishSite_UI
+    - PublishSite_API
+    steps:
+      - checkout: self
+      - pwsh: |
+          'Write-Host "Stage Attempt: $(System.StageAttempt)"'
+          'Write-Host "Job Attempt: $(System.JobAttempt)"'
+        displayName: 'Show Variables'
