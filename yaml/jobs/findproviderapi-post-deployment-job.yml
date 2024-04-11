@@ -1,5 +1,8 @@
 jobs:
   - job: PostDeployment
+    pool:
+        name: 'Azure Pipelines'
+        vmImage: 'windows-2019'
     dependsOn: 
     - PublishSite_UI
     - PublishSite_API
