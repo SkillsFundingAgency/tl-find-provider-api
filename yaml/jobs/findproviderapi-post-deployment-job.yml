@@ -1,0 +1,13 @@
+jobs:
+  - job: PostDeployment
+    dependsOn: 
+    - PublishSite_UI
+    - PublishSite_API
+    steps:
+      - task: GitHubRelease@1
+        displayName: 'GitHub release (create)'
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/feature/TLD-343-update-github-create-release-task') , eq(variables['System.JobAttempt'], '1'))
+        inputs:
+          gitHubConnection: SkillsFundingAgency
+          tagSource: userSpecifiedTag
+          tag: '$(Build.BuildNumber)'
