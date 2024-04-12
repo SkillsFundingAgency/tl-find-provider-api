@@ -73,6 +73,8 @@ stages:
         - GenerateConfigs
       package: 'Sfa.Tl.Find.Provider.Web.zip'
 
+  - template: ../jobs/findproviderapi-post-deployment-job.yml
+
   # - template: ../jobs/findproviderapi-publish-function-job.yml
   #   parameters:
   #     serviceConnection: ${{ parameters.serviceConnection }}
