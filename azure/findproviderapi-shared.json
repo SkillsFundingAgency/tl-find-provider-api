@@ -61,6 +61,10 @@
             "type": "int",
             "minValue": 0,
             "maxValue": 6
+        },
+        "isStorageSecondaryKeyInUse": {
+            "type": "bool",
+            "allowedValues": [ "true", "false"]
         }
     },
     "variables": {
@@ -210,14 +214,8 @@
                     "sqlStorageAccountName": {
                         "value": "[variables('sharedStorageAccountName')]"
                     },
-                    "sqlStorageAccountAccessKey1": {
-                        "value": "[reference(concat('shared-storage-account','-',parameters('environmentNameAbbreviation'))).outputs.sqlStorageAccountAccessKey1.value]"
-                    },
-                    "sqlStorageAccountAccessKey2": {
-                        "value": "[reference(concat('shared-storage-account','-',parameters('environmentNameAbbreviation'))).outputs.sqlStorageAccountAccessKey2.value]"
-                    },
                     "isStorageSecondaryKeyInUse": {
-                        "value": "[true()]"
+                        "value": "[parameters('isStorageSecondaryKeyInUse')]"
                     }
                 }
             },
