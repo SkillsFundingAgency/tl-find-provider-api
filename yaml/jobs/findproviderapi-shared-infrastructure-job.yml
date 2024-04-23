@@ -41,7 +41,8 @@ jobs:
                   -azureWebsitesRPObjectId "$(AzureWebsitesRPObjectId)"
                   -redisCacheSKU "$(RedisCacheSKU)"
                   -redisCacheFamily "$(RedisCacheFamily)"
-                  -redisCacheCapacity "$(RedisCacheCapacity)"'
+                  -redisCacheCapacity "$(RedisCacheCapacity)"
+                  -isStorageSecondaryKeyInUse "$(isStorageSecondaryKeyInUse)"'
                 tags: $(Tags)                
                 processOutputs: true
             - pwsh: Write-Host "##vso[task.setvariable variable=SharedResourceGroup;isOutput=true]$(SharedResourceGroup)"
