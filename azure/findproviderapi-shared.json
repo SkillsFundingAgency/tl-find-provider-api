@@ -65,6 +65,9 @@
         "isStorageSecondaryKeyInUse": {
             "type": "bool",
             "allowedValues": [ true, false ]
+        },
+        "sqlFirewallIpAddressesPredefined": {
+            "type": "array"
         }
     },
     "variables": {
@@ -372,6 +375,29 @@
                     }
                 }
             }
+        },
+        {
+            "apiVersion": "2020-10-01",
+            "name": "[concat('sql-server-firewall-rules','-', parameters('environmentNameAbbreviation'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'sql-server-firewall-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "sqlFirewallIpAddressesPredefined": {
+                        "value": "[parameters('sqlFirewallIpAddressesPredefined')]"
+                    },
+                    "serverName": {
+                        "value": "[variables('sqlServerName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat('sql-server','-', parameters('environmentNameAbbreviation'))]"
+            ]
         }
     ],
     "outputs": {
