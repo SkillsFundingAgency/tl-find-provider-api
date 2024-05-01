@@ -42,6 +42,7 @@ jobs:
                   -redisCacheSKU "$(RedisCacheSKU)"
                   -redisCacheFamily "$(RedisCacheFamily)"
                   -redisCacheCapacity "$(RedisCacheCapacity)"
+                  -sqlFirewallIpAddressesPredefined $(sqlFirewallIpAddresses)
                   -isStorageSecondaryKeyInUse "$(isStorageSecondaryKeyInUse)"'
                 tags: $(Tags)                
                 processOutputs: true

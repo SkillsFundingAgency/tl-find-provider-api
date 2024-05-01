@@ -22,6 +22,8 @@ pr:
   
 
 variables:
-  applicationName: findpvdrapi
+- template: ./Automation/variables/vars-global.yml@devopsTemplates
+- name: applicationName
+  value: findpvdrapi
 stages:
   - template: ./yaml/stages/findproviderapi-master-stage.yml
