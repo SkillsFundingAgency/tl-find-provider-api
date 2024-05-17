@@ -219,6 +219,9 @@
                     },
                     "isStorageSecondaryKeyInUse": {
                         "value": "[parameters('isStorageSecondaryKeyInUse')]"
+                    },
+                    "isManagedIdentityInUse":{
+                        "value": true
                     }
                 }
             },
