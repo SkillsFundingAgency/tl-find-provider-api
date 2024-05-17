@@ -184,6 +184,14 @@
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                                 "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "WEBSITE_SWAP_WARMUP_PING_PATH",
+                                "value": "/api/v3/routes"
+                            },
+                            {
+                                "name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
+                                "value": "401"
                             }
                         ]
                     },
@@ -271,6 +279,14 @@
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                                 "value": "[reference(concat('app-insights','-',parameters('environmentNameAbbreviation'))).outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "WEBSITE_SWAP_WARMUP_PING_PATH",
+                                "value": "/start"
+                            },
+                            {
+                                "name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
+                                "value": "200"
                             }
                         ]
                     },
