@@ -45,6 +45,9 @@
         },
         "configStorageAccountName": {
             "type": "string"
+        },
+        "ipSecurityRestrictions": {
+            "type": "array"
         }
     },
     "variables": {
@@ -206,6 +209,12 @@
                     },
                     "http20Enabled": {
                         "value": true
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('ipSecurityRestrictions')]"
+                    },
+                    "ipSecurityRestrictionsDefaultAction": {
+                        "value": "Deny"
                     }
                 }
             },
@@ -305,6 +314,12 @@
                     },
                     "http20Enabled": {
                         "value": true
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('ipSecurityRestrictions')]"
+                    },
+                    "ipSecurityRestrictionsDefaultAction": {
+                        "value": "Deny"
                     }
                 }
             },
