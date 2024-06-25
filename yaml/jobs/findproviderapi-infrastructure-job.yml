@@ -50,10 +50,13 @@ jobs:
             -apiCustomHostName "$(ApiCustomHostName)"
             -apiCertificateName "$(ApiCertificateName)"
             -uiCustomHostName "$(ConnectCustomHostName)"
-            -uiCertificateName "$(ConnectCertificateName)"'
+            -uiCertificateName "$(ConnectCertificateName)"
+            -ipSecurityRestrictions $(ipSecurityRestrictions)'
+          
             # -bankHolidayGeneratorTrigger "$(BankHolidayGeneratorTrigger)"
             # -employerFeedbackTrigger "$(EmployerFeedbackTrigger)"
             # -providerFeedbackTrigger "$(ProviderFeedbackTrigger)"
             # -providerReferenceTrigger "$(ProviderReferenceTrigger)"'
           tags: $(Tags)
           processOutputs: true
+          
