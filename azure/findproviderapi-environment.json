@@ -489,6 +489,10 @@
         "BlobStorageConnectionString": {
             "type": "string",
             "value": "[reference(concat('storage-account','-', parameters('environmentNameAbbreviation'))).outputs.storageConnectionStringKey2.value]"
+        },
+        "apiManagedServiceIdentityId": {
+            "type": "string",
+            "value": "[reference(concat('api-app-service','-',parameters('environmentNameAbbreviation'))).outputs.managedServiceIdentityId.value]"
         }
     }
 }
