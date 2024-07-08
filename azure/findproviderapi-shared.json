@@ -68,6 +68,9 @@
         },
         "sqlFirewallIpAddressesPredefined": {
             "type": "array"
+        },
+        "environmentPrefix": {
+            "type": "string"
         }
     },
     "variables": {
@@ -79,6 +82,7 @@
         "configStorageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'configstr'), '-', '')]",
         "redisCacheName": "[concat(variables('resourceNamePrefix'), '-shared-redis')]",
         "keyVaultName": "[replace(concat(variables('resourceNamePrefix'), 'sharedkv'), '-', '')]",
+        "entraReaderUserIdentityResourceId": "[resourceId(concat (parameters('environmentPrefix'), '-core'), 'Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('environmentPrefix'), '-id-tlevels-01'))]",
         "keyVaultAccessPolicies": [
             {
                 "objectId": "[parameters('azureWebsitesRPObjectId')]",
@@ -219,6 +223,15 @@
                     },
                     "isStorageSecondaryKeyInUse": {
                         "value": "[parameters('isStorageSecondaryKeyInUse')]"
+                    },
+                    "isManagedIdentityInUse": {
+                        "value": true
+                    },
+                    "identityType": {
+                        "value": "UserAssigned"
+                    },
+                    "entraReaderUmiResourceId": {
+                        "value": "[variables('entraReaderUserIdentityResourceId')]"
                     }
                 }
             },
@@ -428,6 +441,15 @@
         "RedisCacheName": {
             "type": "string",
             "value": "[reference(concat('redis-cache','-',parameters('environmentNameAbbreviation'))).outputs.RedisCacheName.value]"
+        },
+        "EntraReaderUserIdentityResourceId": {
+            "type": "string",
+            "value": "[variables('entraReaderUserIdentityResourceId')]"
+        },
+        "SqlUserIdentityResourceId": {
+            "type": "string",
+            "value": "[reference(concat('sql-server','-', parameters('environmentNameAbbreviation'))).outputs.sqlUserIdentityResourceId.value]"
         }
+
     }
 }
