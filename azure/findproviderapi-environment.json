@@ -210,11 +210,8 @@
                     "http20Enabled": {
                         "value": true
                     },
-                    "ipSecurityRestrictions": {
-                        "value": "[parameters('ipSecurityRestrictions')]"
-                    },
                     "ipSecurityRestrictionsDefaultAction": {
-                        "value": "Deny"
+                        "value": "Allow"
                     }
                 }
             },
