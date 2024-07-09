@@ -51,7 +51,7 @@
         }
     },
     "variables": {
-        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/tl-platform-building-blocks/master/ArmTemplates/",
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/tl-platform-building-blocks/feature/TLD-273-restrict-app-service-ips/ArmTemplates/",
         "apiAppName": "[concat(parameters('resourceNamePrefix'), '-web')]",
         "appInsightName": "[concat(parameters('resourceNamePrefix'), '-ai')]",
         "uiAppName": "[concat(parameters('resourceNamePrefix'), '-ui')]",
@@ -465,6 +465,30 @@
                     },
                     "resourceName": {
                         "value": "[parameters('configStorageAccountName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2021-04-01",
+            "name": "[concat('app-service-ip-restrictions','-', parameters('environmentNameAbbreviation'))]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-ip-restrictions.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "ipRestrictionRuleNamePrefix": {
+                        "value": "AZURE_IP-"
+                    },
+                    "ipAddresses": {
+                        "value": "[reference(concat('api-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value]"
+                    },
+                    "appServiceName": {
+                        "value": "[variables('apiAppName')]"
                     }
                 }
             }
