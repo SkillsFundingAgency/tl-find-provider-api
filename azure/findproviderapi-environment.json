@@ -471,8 +471,7 @@
         },
         {
             "apiVersion": "2021-04-01",
-            "name": "[concat('app-service-ip-restrictions','-', parameters('environmentNameAbbreviation'))]",
-            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "name": "[concat('app-service-ip-restrictions','-', parameters('environmentNameAbbreviation'), copyIndex())]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -484,13 +483,22 @@
                     "ipRestrictionRuleNamePrefix": {
                         "value": "AZURE_IP-"
                     },
-                    "ipAddresses": {
-                        "value": "[reference(concat('api-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value]"
-                    },
                     "appServiceName": {
                         "value": "[variables('apiAppName')]"
+                    },
+                    "ipAddress": {
+                        "value": "[reference(concat('ui-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value[copyIndex()]]"
                     }
                 }
+            },
+            "dependsOn": [
+                "[concat('api-app-service','-', parameters('environmentNameAbbreviation'))]",
+                "[concat('ui-app-service','-', parameters('environmentNameAbbreviation'))]"
+            ],
+            "copy": {
+                "count": "[length(reference(concat('ui-app-service','-',parameters('environmentNameAbbreviation'))).outputs.possibleOutboundIpAddresses.value)]",
+                "mode": "Parallel",
+                "name": "firewallRuleCopy"
             }
         }
     ],
