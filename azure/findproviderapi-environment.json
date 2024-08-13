@@ -48,6 +48,9 @@
         },
         "ipSecurityRestrictions": {
             "type": "array"
+        },
+        "backEndAccessRestrictions": {
+            "type": "array"
         }
     },
     "variables": {
@@ -211,7 +214,10 @@
                         "value": true
                     },
                     "ipSecurityRestrictionsDefaultAction": {
-                        "value": "Allow"
+                        "value": "Deny"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('backEndAccessRestrictions')]"
                     }
                 }
             },
