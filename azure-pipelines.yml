@@ -12,7 +12,8 @@ resources:
       type: github
       endpoint: DfE-Digital
       name: DFE-Digital/operations-devops-tools
-
+      ref: refs/heads/feature/TLD-273-internal-app-service-ip-restrictions
+      
 trigger:
   branches:
     include:

@@ -3,10 +3,22 @@ jobs:
     pool:
         name: 'Azure Pipelines'
         vmImage: 'windows-2019'
-    dependsOn: 
-    - PublishSite_UI
-    - PublishSite_API
+#    dependsOn: 
+#    - PublishSite_UI
+#    - PublishSite_API
     steps:
+      - checkout: devopsTools
+      - task: AzureCLI@2
+        displayName: 'Add internal web app IP restrictions'
+        inputs:
+          azureSubscription: ${{parameters.serviceConnection}}
+          scriptType: 'pscore'
+          scriptLocation: 'ScriptPath'
+          ScriptPath: ./Powershell/AppServiceRestrictions/AddAppServiceIPRestrictions.ps1
+          ScriptArguments: '-SubscriptionId $(SubscriptionId) -ResourceGroupName $(ResourceGroupName) -WebAppServiceName $(WebAppServiceName) -UiAppServiceName $(UiAppServiceName)'
+          azurePowerShellVersion: 'LatestVersion'
+
+
       - task: GitHubRelease@1
         displayName: 'GitHub release (create)'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main') , eq(variables['System.JobAttempt'], '1'), eq(variables['environmentName'], 'prd'))
