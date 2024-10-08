@@ -193,11 +193,11 @@
                             },
                             {
                                 "name": "WEBSITE_SWAP_WARMUP_PING_PATH",
-                                "value": "/api/v3/routes"
+                                "value": "/health"
                             },
                             {
                                 "name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
-                                "value": "401"
+                                "value": "200"
                             }
                         ]
                     },
@@ -215,6 +215,9 @@
                     },
                     "ipSecurityRestrictionsDefaultAction": {
                         "value": "Deny"
+                    },
+                    "healthCheckPath" : {
+                        "value": "/health"
                     }
                 }
             },
@@ -294,7 +297,7 @@
                             },
                             {
                                 "name": "WEBSITE_SWAP_WARMUP_PING_PATH",
-                                "value": "/start"
+                                "value": "/health"
                             },
                             {
                                 "name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
@@ -320,6 +323,9 @@
                     },
                     "ipSecurityRestrictionsDefaultAction": {
                         "value": "Deny"
+                    },
+                    "healthCheckPath" : {
+                        "value": "/health"
                     }
                 }
             },
