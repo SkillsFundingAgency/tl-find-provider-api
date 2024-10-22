@@ -49,10 +49,7 @@ USING (VALUES
   --Legal, finance and accounting
   (11, 46), -- Finance
   (11, 47), -- Accounting
-  (11, 52),  -- Legal Services
-
-  -- Sales, Marketing and Procurement
-  (12, 59) -- Marketing
+  (11, 52)  -- Legal Services
   )
   AS Source ([RouteId], [QualificationId])
 ON Target.[RouteId] = Source.[RouteId] 
