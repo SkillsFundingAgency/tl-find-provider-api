@@ -16,8 +16,7 @@ USING (VALUES
   (8, N'Engineering and Manufacturing', 0),
   (9, N'Hair and Beauty', 0),
   (10, N'Health and Science', 0),
-  (11, N'Legal, Finance and Accounting', 0),
-  (12, N'Sales, Marketing and Procurement', 0)
+  (11, N'Legal, Finance and Accounting', 0)
   )
   AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 
