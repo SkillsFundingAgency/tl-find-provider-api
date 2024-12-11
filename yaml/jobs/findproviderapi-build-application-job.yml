@@ -1,5 +1,7 @@
 jobs:
 - job: 'CodeBuild'
+  variables:
+    NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
   pool:
       name: 'Azure Pipelines'
       vmImage: 'windows-2019'
@@ -23,6 +25,12 @@ jobs:
       inputs:
         versionSpec: '16.x'
 
+    - task: Npm@1
+      displayName: 'npm install'
+      inputs:
+        workingDir: src/Sfa.Tl.Find.Provider.Web
+        verbose: false
+
     - task: UseDotNet@2
       displayName: 'Use .NET SDK $(dotnetVersion)'
       inputs:
@@ -30,24 +38,27 @@ jobs:
         version: $(dotnetVersion)
         installationPath: $(Agent.ToolsDirectory)/dotnet
 
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: restore
-        projects: 'src/**/*.csproj'
-        noCache: false
-
-    - task: Npm@1
-      displayName: 'npm install'
-      inputs:
-        workingDir: src/Sfa.Tl.Find.Provider.Web
-        verbose: false
-
     - task: Gulp@0
       displayName: gulp
       inputs:
         gulpFile: src/Sfa.Tl.Find.Provider.Web/gulpfile.js
         targets: default
+
+    - task: Cache@2
+      displayName: Cache
+      inputs:
+        key: 'nuget | "$(Agent.OS)" | src\Sfa.Tl.Find.Provider.Web\package-lock.json'
+        restoreKeys: |
+          nuget | "$(Agent.OS)"
+          nuget
+        path: '$(NUGET_PACKAGES)'
+        cacheHitVar: 'CACHE_RESTORED'      
+
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: 'src/**/*.csproj'
 
     - task: DotNetCoreCLI@2
       displayName: Build
@@ -60,7 +71,7 @@ jobs:
       inputs:
         command: test
         projects: '**/*.UnitTests.csproj'
-        arguments: '--configuration $(buildConfiguration)'
+        arguments: '--configuration $(buildConfiguration) --no-build'
 
     # - task: DotNetCoreCLI@2
     #   displayName: Integration Tests
