@@ -25,14 +25,6 @@ jobs:
     steps:
       - checkout: self
       - checkout: devopsTools
-      - pwsh: |
-          'Write-Host "SharedResourceGroup variable: $(SharedResourceGroup)"'
-          'Write-Host "SharedASPName variable: $(SharedASPName)"'
-          'Write-Host "SharedKeyVaultName variable: $(SharedKeyVaultName)"'
-          'Write-Host "SharedSQLServerName variable: $(SharedSQLServerName)"'
-          'Write-Host "ConfigurationStorageConnectionString variable: $(ConfigurationStorageConnectionString)"'
-        displayName: 'Show Variables'
-
       - task: AzureCLI@2
         displayName: Create temporary SQL firewall rule to allow Azure service connections
         inputs:
