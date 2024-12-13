@@ -21,13 +21,6 @@ jobs:
     - DeployfindproviderapiInfrastructure
     - DeploySQLDatabase
   steps:
-    - pwsh: | 
-        'Write-Host "ConfigStorageAccountName variable: $(ConfigStorageAccountName)"'
-        'Write-Host "SqlConnectionString variable: $(SqlConnectionString)"'
-        'Write-Host "BlobStorageConnectionString variable: $(BlobStorageConnectionString)"'
-        'Write-Host "RedisCacheName variable: $(RedisCacheName)"'
-      name: SetVariables
-
     - task: AzurePowerShell@5
       inputs: 
         azurePowerShellVersion: 'LatestVersion'
