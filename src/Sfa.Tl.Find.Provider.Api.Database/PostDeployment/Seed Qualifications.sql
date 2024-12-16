@@ -12,7 +12,6 @@ USING (VALUES
   (41, N'Health', 0),
   (42, N'Healthcare Science', 0),
   (43, N'Science', 0),
-  (44, N'Onsite Construction', 0),
   (45, N'Building Services Engineering for Construction', 0),
   (46, N'Finance', 0),
   (47, N'Accounting', 0),
