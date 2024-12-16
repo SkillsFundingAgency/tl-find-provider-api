@@ -19,7 +19,6 @@ USING (VALUES
   -- Construction and the built environment
   (4, 45),  -- Building Services Engineering for Construction
   (4, 36),  -- Design, Surveying and Planning for Construction
-  (4, 44),  -- Onsite Construction
 
   -- Creative and design
   (5, 54),  -- Craft and Design
