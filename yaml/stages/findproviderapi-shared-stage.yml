@@ -39,3 +39,4 @@ stages:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
       environmentName: ${{parameters.environmentName}}
+      globalSignServiceAccountPassword: $($GlobalSignServiceAccountPassword)
