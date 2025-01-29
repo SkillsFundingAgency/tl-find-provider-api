@@ -6,14 +6,19 @@ parameters:
   - name: tableName
     type: string
     default: 'configuration'
+  - name: environmentName
+    type: string
+  - name: ConfigurationSecrets
+    type: object
+    default: {}
 jobs:
 - job: GenerateConfigs
   variables:
     ConfigStorageAccountName:     $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.ConfigStorageAccountName'] ]
     SqlConnectionString:          $[ dependencies.DeploySQLDatabase.outputs['SqlVariables.SqlConnectionString'] ]
     BlobStorageConnectionString : $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.BlobStorageConnectionString'] ]
-    RedisCacheName:               $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.RedisCacheName'] ]
-    
+    RedisCacheConnectionString:   $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.RedisConnectionString'] ]
+
   pool:
     name: 'Azure Pipelines'
     vmImage: 'windows-2019'
@@ -21,31 +26,29 @@ jobs:
     - DeployfindproviderapiInfrastructure
     - DeploySQLDatabase
   steps:
-    - task: AzurePowerShell@5
-      inputs: 
-        azurePowerShellVersion: 'LatestVersion'
-        azureSubscription: ${{ parameters.serviceConnection }}
-        scriptType: 'InlineScript'
-        Inline: |
-          $variableName = "RedisCacheConnectionString"
-          Write-Host "Obtaining the connection string for $(RedisCacheName) and setting $variableName"
-          $redisCache = Get-AzRedisCache -Name $(RedisCacheName)
-          $primaryKey = (Get-AzRedisCacheKey -Name $(RedisCacheName)).PrimaryKey
-          $connectionString = $redisCache.HostName + ":" + $redisCache.SslPort + ",password=" + $primaryKey + ",ssl=True,abortConnect=False"
-          Write-Output "##vso[task.setvariable variable=$variableName;issecret=true]$connectionString"
-          Write-Host "Variable $variableName set"
-
+    - checkout: self
+    - checkout: devopsTools
     - task: DownloadBuildArtifacts@0
       inputs:
         buildType: 'current'
         downloadType: 'single'
         artifactName: 'appdrop'
         downloadPath: '$(System.ArtifactsDirectory)'
-    
-    - task: GenerateEnvironmentConfiguration@3
-      displayName: 'Process schemas in $(System.ArtifactsDirectory)/appdrop/config'
+
+    - task: AzurePowerShell@5
+      displayName: 'Generate Configuration'
       inputs:
-        SourcePath: '$(System.ArtifactsDirectory)/appdrop/config'
-        ServiceConnectionName: ${{ parameters.serviceConnection}}
-        StorageAccountName: '$(ConfigStorageAccountName)'
-        TableName: Configuration
+        azureSubscription: ${{ parameters.ServiceConnection }}
+        ScriptType: 'FilePath'
+        scriptPath: './operations-devops-tools/Powershell/GenerateConfig/New-ConfigurationTableEntry.ps1'
+        scriptArguments:
+          -SourcePath "$(System.ArtifactsDirectory)/appdrop/config"
+          -TargetFilename "*.schema.json"
+          -StorageAccountName "$(ConfigStorageAccountName)"
+          -StorageAccountResourceGroup "$(SharedResourceGroup)"
+          -EnvironmentName ${{ parameters.environmentName }}
+          -TableName "Configuration"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
+        FailOnStandardError: true
+      env: ${{ parameters.ConfigurationSecrets }}

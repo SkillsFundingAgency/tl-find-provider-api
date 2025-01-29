@@ -13,6 +13,8 @@ parameters:
   type: string
 - name: variableTemplates
   type: object
+- name: applicationName
+  type: string
 
 stages:
 - stage: Deploy_${{parameters.environmentId}}
@@ -34,6 +36,11 @@ stages:
       value: ${{parameters.environmentTagName}}
     - '${{ each variableTemplate in parameters.variableTemplates }}':
       - template: '${{variableTemplate}}'
+    - name: SharedBaseName
+      value: "s126${{parameters.sharedEnvironmentId}}-${{parameters.applicationName}}"
+    - name: SharedResourceGroup
+      value: '$(SharedBaseName)-shared' 
+
 
   displayName: '${{parameters.environmentName}} [${{parameters.environmentId}}] deployment'
   jobs:
@@ -53,6 +60,16 @@ stages:
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
+      environmentName: ${{parameters.environmentName}}
+      ConfigurationSecrets:
+        ApiSettings_ApiKey: $(ApiSettings_ApiKey)
+        ApiSettings_AppId: $(ApiSettings_AppId)
+        CourseDirectoryApiSettings_ApiKey: $(CourseDirectoryApiSettings_ApiKey)
+        DfeSignIn_ApiSecret: $(DfeSignIn_ApiSecret)
+        DfeSignIn_ClientSecret: $(DfeSignIn_ClientSecret)
+        EmailSettings_GovNotifyApiKey: $(EmailSettings_GovNotifyApiKey)
+        SQLServerAdminPassword: $(SQLServerAdminPassword)
+        GoogleMapsApiSettings_ApiKey: $(GoogleMapsApiSettings_ApiKey)
 
   - template: ../jobs/findproviderapi-publish-site-job.yml
     parameters:
