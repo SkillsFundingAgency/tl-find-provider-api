@@ -6,6 +6,11 @@ parameters:
   - name: tableName
     type: string
     default: 'configuration'
+  - name: environmentName
+    type: string
+  - name: ConfigurationSecrets
+    type: object
+    default: {}
 jobs:
 - job: GenerateConfigs
   variables:
@@ -13,7 +18,8 @@ jobs:
     SqlConnectionString:          $[ dependencies.DeploySQLDatabase.outputs['SqlVariables.SqlConnectionString'] ]
     BlobStorageConnectionString : $[ dependencies.DeployfindproviderapiInfrastructure.outputs['armOutputs.armOutput.BlobStorageConnectionString'] ]
     RedisCacheName:               $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.RedisCacheName'] ]
-    
+    RedisCacheConnection:         $[ stageDependencies.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.outputs['DeploySharedInfrastructure_${{parameters.sharedEnvironmentId}}.armOutputs.armOutput.RedisConnectionString'] ]
+
   pool:
     name: 'Azure Pipelines'
     vmImage: 'windows-2019'
@@ -21,6 +27,8 @@ jobs:
     - DeployfindproviderapiInfrastructure
     - DeploySQLDatabase
   steps:
+    - checkout: self
+    - checkout: devopsTools
     - task: AzurePowerShell@5
       inputs: 
         azurePowerShellVersion: 'LatestVersion'
@@ -41,11 +49,39 @@ jobs:
         downloadType: 'single'
         artifactName: 'appdrop'
         downloadPath: '$(System.ArtifactsDirectory)'
-    
-    - task: GenerateEnvironmentConfiguration@3
-      displayName: 'Process schemas in $(System.ArtifactsDirectory)/appdrop/config'
+
+    - task: AzurePowerShell@5
+      displayName: 'Generate API Configuration'
       inputs:
-        SourcePath: '$(System.ArtifactsDirectory)/appdrop/config'
-        ServiceConnectionName: ${{ parameters.serviceConnection}}
-        StorageAccountName: '$(ConfigStorageAccountName)'
-        TableName: Configuration
+        azureSubscription: ${{ parameters.ServiceConnection }}
+        ScriptType: 'FilePath'
+        scriptPath: './operations-devops-tools/Powershell/GenerateConfig/New-ConfigurationTableEntry.ps1'
+        scriptArguments:
+          -SourcePath "$(System.ArtifactsDirectory)/appdrop/config"
+          -TargetFilename "Sfa.Tl.Find.Provider.Api.schema.json"
+          -StorageAccountName "$(ConfigStorageAccountName)"
+          -StorageAccountResourceGroup "$(SharedResourceGroup)"
+          -EnvironmentName ${{ parameters.environmentName }}
+          -TableName "Configuration"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
+        FailOnStandardError: true
+      env: ${{ parameters.ConfigurationSecrets }}
+
+    - task: AzurePowerShell@5
+      displayName: 'Generate Web Configuration'
+      inputs:
+        azureSubscription: ${{ parameters.ServiceConnection }}
+        ScriptType: 'FilePath'
+        scriptPath: './operations-devops-tools/Powershell/GenerateConfig/New-ConfigurationTableEntry.ps1'
+        scriptArguments:
+          -SourcePath "$(System.ArtifactsDirectory)/appdrop/config"
+          -TargetFilename "Sfa.Tl.Find.Provider.Web.schema.json"
+          -StorageAccountName "$(ConfigStorageAccountName)"
+          -StorageAccountResourceGroup "$(SharedResourceGroup)"
+          -EnvironmentName ${{ parameters.environmentName }}
+          -TableName "Configuration"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
+        FailOnStandardError: true
+      env: ${{ parameters.ConfigurationSecrets }}
