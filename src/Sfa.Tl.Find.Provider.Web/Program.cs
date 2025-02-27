@@ -75,7 +75,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddPageRoute("/Provider/RemoveNotification", "/notifications-remove");
     options.Conventions.AddPageRoute("/Provider/AddNotificationLocation", "/notifications-edit-campus-add");
     options.Conventions.AddPageRoute("/Provider/EditNotificationLocation", "/notifications-edit-campus");
-    
+
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Start");
     options.Conventions.AllowAnonymousToPage("/AccessibilityStatement");
@@ -153,26 +153,19 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    app.UseHsts();
+    app.SetStrictTransportSecurityHeader();
 }
 
 app.UseXContentTypeOptions()
     .UseReferrerPolicy(opts => opts.NoReferrer());
 
+app.UseXfo(xfo => xfo.Deny());
+
 app.UseWhen(ctx =>
         ctx.Request.Path.Value.DoesNotMatch(Constants.CssPathPattern, Constants.JsPathPattern, Constants.FontsPathPattern),
         appBuilder =>
             appBuilder
-                .UseCsp(options => options
-                    .FrameAncestors(s => s.None())
-                    .ObjectSources(s => s.None())
-                    .ScriptSources(s => s
-                        .CustomSources("https:",
-                            "https://www.google-analytics.com/analytics.js",
-                            "https://www.googletagmanager.com/",
-                            "https://tagmanager.google.com/")
-                        .UnsafeInline()
-                    ))
+                .SetConfigSecurityPolicyHeader()
                 .Use(async (context, next) =>
                 {
                     context.Response.Headers.Add("Expect-CT", "max-age=0, enforce");
