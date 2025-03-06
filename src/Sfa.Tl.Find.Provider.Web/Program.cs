@@ -12,6 +12,7 @@ using Sfa.Tl.Find.Provider.Infrastructure.Services;
 using Sfa.Tl.Find.Provider.Web.Authorization;
 using Sfa.Tl.Find.Provider.Web.Extensions;
 using Sfa.Tl.Find.Provider.Web.Filters;
+using Sfa.Tl.Find.Provider.Web.Middleware;
 using Sfa.Tl.Find.Provider.Web.Security;
 using ConfigurationConstants = Sfa.Tl.Find.Provider.Infrastructure.Configuration.Constants;
 using Constants = Sfa.Tl.Find.Provider.Application.Models.Constants;
@@ -191,6 +192,7 @@ app.UseWhen(ctx =>
 app.UseRouting();
 
 app.UseSession();
+app.UseMiddleware<SessionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
