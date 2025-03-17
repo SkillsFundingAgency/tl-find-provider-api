@@ -21,7 +21,8 @@ public static class ApplicationBuilderExtensions
         return app.UseCsp(options => options
             .ScriptSources(conf => conf
                 .StrictDynamic()
-                .CustomSources(strictDynamicCustomSources))
+                .CustomSources(strictDynamicCustomSources)
+                .UnsafeInline())
             .ObjectSources(s => s.None()));
     }
 }
