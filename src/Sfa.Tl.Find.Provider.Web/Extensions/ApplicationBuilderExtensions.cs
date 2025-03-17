@@ -19,8 +19,8 @@ public static class ApplicationBuilderExtensions
         string[] strictDynamicCustomSources = { "https:", "https://www.google-analytics.com/analytics.js", "https://www.googletagmanager.com/", "https://tagmanager.google.com/" };
 
         return app.UseCsp(options => options
+            .FrameAncestors(s => s.None())
             .ScriptSources(conf => conf
-                .StrictDynamic()
                 .CustomSources(strictDynamicCustomSources)
                 .UnsafeInline())
             .ObjectSources(s => s.None()));
