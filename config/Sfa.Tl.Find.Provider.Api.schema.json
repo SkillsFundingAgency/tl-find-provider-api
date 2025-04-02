@@ -13,12 +13,12 @@
         "AppId": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "ApiSettings_AppId"
+          "environmentVariable": "ApiSettingsAppId"
         },
         "ApiKey": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "ApiSettings_ApiKey"
+          "environmentVariable": "ApiSettingsApiKey"
         }
       },
       "additionalProperties": false,
@@ -38,7 +38,7 @@
         "ApiKey": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "CourseDirectoryApiSettings_ApiKey"
+          "environmentVariable": "CourseDirectoryApiSettingsApiKey"
         }
       },
       "additionalProperties": false,
@@ -52,7 +52,7 @@
       "properties": {
         "GovNotifyApiKey": {
           "type": "string",
-          "environmentVariable": "EmailSettings_GovNotifyApiKey"
+          "environmentVariable": "EmailSettingsGovNotifyApiKey"
         },
         "DeliveryStatusToken": {
           "type": "string",
@@ -115,7 +115,7 @@
       "properties": {
         "ApiKey": {
           "type": "string",
-          "environmentVariable": "GoogleMapsApiSettings_ApiKey"
+          "environmentVariable": "GoogleMapsApiSettingsApiKey"
         },
         "BaseUri": {
           "type": "string",

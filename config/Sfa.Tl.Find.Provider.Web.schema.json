@@ -28,7 +28,7 @@
         "ClientSecret": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "DfeSignIn_ClientSecret"
+          "environmentVariable": "DfeSignInClientSecret"
         },
         "ApiUri": {
           "minLength": 1,
@@ -38,7 +38,7 @@
         "ApiSecret": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "DfeSignIn_ApiSecret"
+          "environmentVariable": "DfeSignInApiSecret"
         },
         "Timeout": {
           "minLength": 1,
@@ -62,7 +62,7 @@
       "properties": {
         "GovNotifyApiKey": {
           "type": "string",
-          "environmentVariable": "EmailSettings_GovNotifyApiKey"
+          "environmentVariable": "EmailSettingsGovNotifyApiKey"
         }
       },
       "additionalProperties": false,
