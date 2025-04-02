@@ -26,6 +26,7 @@ stages:
     - group: platform-global-findproviderapi
     - group: platform-${{parameters.environmentName}}
     - group: platform-${{parameters.environmentName}}-findproviderapi
+    - group: platform-${{parameters.environmentName}}-findproviderapi-kv
     - name: BaseName
       value: "s126${{parameters.environmentId}}-fprapi-${{parameters.environmentName}}"
     - name: ResourceGroupName
@@ -62,14 +63,14 @@ stages:
       sharedEnvironmentId: ${{ parameters.sharedEnvironmentId }}
       environmentName: ${{parameters.environmentName}}
       ConfigurationSecrets:
-        ApiSettings_ApiKey: $(ApiSettings_ApiKey)
-        ApiSettings_AppId: $(ApiSettings_AppId)
-        CourseDirectoryApiSettings_ApiKey: $(CourseDirectoryApiSettings_ApiKey)
-        DfeSignIn_ApiSecret: $(DfeSignIn_ApiSecret)
-        DfeSignIn_ClientSecret: $(DfeSignIn_ClientSecret)
-        EmailSettings_GovNotifyApiKey: $(EmailSettings_GovNotifyApiKey)
+        ApiSettingsApiKey: $(ApiSettingsApiKey)
+        ApiSettingsAppId: $(ApiSettingsAppId)
+        CourseDirectoryApiSettingsApiKey: $(CourseDirectoryApiSettingsApiKey)
+        DfeSignInApiSecret: $(DfeSignInApiSecret)
+        DfeSignInClientSecret: $(DfeSignInClientSecret)
+        EmailSettingsGovNotifyApiKey: $(EmailSettingsGovNotifyApiKey)
         SQLServerAdminPassword: $(SQLServerAdminPassword)
-        GoogleMapsApiSettings_ApiKey: $(GoogleMapsApiSettings_ApiKey)
+        GoogleMapsApiSettingsApiKey: $(GoogleMapsApiSettingsApiKey)
 
   - template: ../jobs/findproviderapi-publish-site-job.yml
     parameters:
