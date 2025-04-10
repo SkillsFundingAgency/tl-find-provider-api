@@ -23,12 +23,6 @@ public class RouteBuilder
             },
             new()
             {
-                Id = 3,
-                Name = "Catering",
-                Qualifications = qualificationBuilder.BuildList(3)
-            },
-            new()
-            {
                 Id = 4,
                 Name = "Construction and the built environment",
                 Qualifications = qualificationBuilder.BuildList(4)
