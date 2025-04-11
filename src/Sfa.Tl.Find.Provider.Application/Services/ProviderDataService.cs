@@ -1,16 +1,16 @@
-﻿using System.Globalization;
-using CsvHelper;
+﻿using CsvHelper;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sfa.Tl.Find.Provider.Application.ClassMaps;
 using Sfa.Tl.Find.Provider.Application.Extensions;
 using Sfa.Tl.Find.Provider.Application.Interfaces;
 using Sfa.Tl.Find.Provider.Application.Models;
-using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Application.Models.Exceptions;
 using Sfa.Tl.Find.Provider.Infrastructure.Caching;
+using Sfa.Tl.Find.Provider.Infrastructure.Configuration;
 using Sfa.Tl.Find.Provider.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.WebUtilities;
+using System.Globalization;
 
 namespace Sfa.Tl.Find.Provider.Application.Services;
 
@@ -108,10 +108,14 @@ public class ProviderDataService : IProviderDataService
         if (routes is null)
         {
             const int HairAndBeautyRouteId = 9;
+            const int CateringIdRouteId = 3;
+            const int SalesMarketingProcurementRouteId = 12;
+
+            var excludedRoutes = new int[] { HairAndBeautyRouteId, CateringIdRouteId, SalesMarketingProcurementRouteId };
 
             routes = (await _routeRepository
                 .GetAll())
-                .Where(r => r.Id != HairAndBeautyRouteId)
+                .Where(r => !excludedRoutes.Contains(r.Id))
                 .ToList();
             await _cacheService.Set(key, routes);
         }
