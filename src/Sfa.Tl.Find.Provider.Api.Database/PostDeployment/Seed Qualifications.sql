@@ -23,7 +23,7 @@ USING (VALUES
   (53, N'Hairdressing, Barbering and Beauty Therapy', 0),
   (54, N'Craft and Design', 0),
   (55, N'Media, Broadcast and Production', 0),
-  (56, N'Catering', 0),
+  (56, N'Catering', 1),
   (57, N'Agriculture, Land Management and Production', 0),
   (58, N'Animal Care and Management', 0)
   )

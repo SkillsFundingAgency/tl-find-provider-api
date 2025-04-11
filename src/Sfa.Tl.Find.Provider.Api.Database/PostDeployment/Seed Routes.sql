@@ -8,7 +8,7 @@ MERGE INTO [dbo].[Route] AS Target
 USING (VALUES 
   (1, N'Agriculture, Environment and Animal Care', 0),
   (2, N'Business and Administration', 0),
-  (3, N'Catering', 0),
+  (3, N'Catering', 1),
   (4, N'Construction and the Built Environment', 0),
   (5, N'Creative and Design', 0),
   (6, N'Digital and IT', 0),
