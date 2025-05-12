@@ -26,13 +26,27 @@ public class EmployerListModel : PageModel
     private readonly ILogger<EmployerListModel> _logger;
 
     public const string SessionKeyPostcodeLocation = "_EmployerList_PostcodeLocation";
+    public const string SessionKeySelectedSortColumn = "_EmployerList_SelectedSortColumn";
     public const string EnterPostcodeValue = "Enter postcode";
+
+    public const string SortColumnOrganisationName = "OrganisationName";
+    public const string SortColumnDistance = "Distance";
+    public const string SortColumnExpiryDate = "ExpiryDate";
+
+    public Dictionary<string, string> SortColumnMappings { get; } = new()
+    {
+        { SortColumnOrganisationName, "Organisation" },
+        { SortColumnDistance, "Distance" },
+        { SortColumnExpiryDate, "Expiry Date" }
+    };
 
     public IEnumerable<EmployerInterestSummary>? EmployerInterestList { get; private set; }
 
     public IDictionary<string, LocationPostcode>? ProviderLocations { get; private set; }
 
     public SelectListItem[]? Postcodes { get; private set; }
+
+    public SelectListItem[]? SortColumns { get; private set; }
 
     public int? SelectedLocationId { get; private set; }
 
@@ -77,6 +91,9 @@ public class EmployerListModel : PageModel
     public async Task OnGet()
     {
         UkPrn = HttpContext.User.GetUkPrn();
+
+        MapSortColumns();
+
         if (UkPrn is not null && UkPrn > 0)
         {
             await LoadProviderView(UkPrn.Value);
@@ -84,6 +101,16 @@ public class EmployerListModel : PageModel
         else if (User.IsInRole(CustomRoles.Administrator))
         {
             await LoadAdministratorView();
+        }
+    }
+
+    private void MapSortColumns()
+    {
+        SortColumns = Array.Empty<SelectListItem>();
+
+        foreach (var item in SortColumnMappings)
+        {
+            SortColumns = SortColumns.Append(new SelectListItem(item.Value, item.Key)).ToArray();
         }
     }
 
@@ -99,6 +126,7 @@ public class EmployerListModel : PageModel
         await LoadProviderPostcodes(ukPrn);
 
         var postcodeLocation = _sessionService.Get<LocationPostcode>(SessionKeyPostcodeLocation);
+        var selectedSortColumn = _sessionService.Get<string?>(SessionKeySelectedSortColumn);
 
         if (postcodeLocation is not null)
         {
@@ -109,12 +137,14 @@ public class EmployerListModel : PageModel
             {
                 Input.SelectedPostcode = postcodeLocation.Postcode;
                 SelectedLocationId = postcodeLocation.Id;
+                Input.SelectedSortColumn = selectedSortColumn;
                 await PerformSearch(postcodeLocation.Id.Value);
             }
             else
             {
                 Input.SelectedPostcode = EnterPostcodeValue;
                 Input.CustomPostcode = postcodeLocation.Postcode;
+                Input.SelectedSortColumn = selectedSortColumn;
                 await PerformSearch(postcodeLocation);
             }
         }
@@ -125,6 +155,8 @@ public class EmployerListModel : PageModel
         UkPrn = HttpContext.User.GetUkPrn();
         await LoadProviderPostcodes(UkPrn);
         ZeroResultsFound = false;
+
+        var selectedSortColumn = Input?.SelectedSortColumn;
 
         LocationPostcode? postcodeLocation = null;
 
@@ -189,6 +221,7 @@ public class EmployerListModel : PageModel
         }
 
         _sessionService.Set(SessionKeyPostcodeLocation, postcodeLocation);
+        _sessionService.Set(SessionKeySelectedSortColumn, selectedSortColumn);
 
         return RedirectToPage("/Employer/EmployerList");
     }
@@ -214,10 +247,25 @@ public class EmployerListModel : PageModel
             .ToArray();
     }
 
+    private static IEnumerable<EmployerInterestSummary> SortEmployerInterestList(
+        IEnumerable<EmployerInterestSummary> employerInterestList,
+        string? selectedSortColumn)
+    {
+        return selectedSortColumn switch
+        {
+            SortColumnOrganisationName => employerInterestList.OrderBy(x => x.OrganisationName),
+            SortColumnDistance => employerInterestList.OrderBy(x => x.Distance),
+            SortColumnExpiryDate => employerInterestList.OrderBy(x => x.ExpiryDate),
+            _ => employerInterestList
+        };
+    }
+
     private async Task PerformSearch(int locationId)
     {
         (EmployerInterestList, _, SelectedPostcodeHasFilters) =
             await _employerInterestService.FindEmployerInterest(locationId);
+
+        EmployerInterestList = SortEmployerInterestList(EmployerInterestList, Input?.SelectedSortColumn).ToList();
 
         ZeroResultsFound = !EmployerInterestList.Any();
     }
@@ -228,6 +276,8 @@ public class EmployerListModel : PageModel
             await _employerInterestService
             .FindEmployerInterest(postcodeLocation.Latitude, postcodeLocation.Longitude);
 
+        EmployerInterestList = SortEmployerInterestList(EmployerInterestList, Input?.SelectedSortColumn).ToList();
+
         ZeroResultsFound = !EmployerInterestList.Any();
         SelectedPostcodeHasFilters = false;
     }
@@ -237,5 +287,7 @@ public class EmployerListModel : PageModel
         public string? SelectedPostcode { get; set; }
 
         public string? CustomPostcode { get; set; }
+
+        public string? SelectedSortColumn { get; set; }
     }
 }

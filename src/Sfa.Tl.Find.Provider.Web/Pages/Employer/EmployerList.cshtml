@@ -27,6 +27,18 @@ else
                 }
                 $(".tl-employers--search").toggleClass('active', inputval === "Enter postcode");
             });
+
+            $("#Input_SelectedSortColumn").change(function () {
+                let inputval = $(this).val();
+                let postCodeVal = $("#Input_SelectedPostcode").val();
+                if(postCodeVal && postCodeVal != "Enter postcode")
+                {
+                    $("#Input_SelectedPostcode").val(postCodeVal);
+                }
+                $(".tl-employers--search").toggleClass('active', inputval === "Enter postcode");
+                $("#postcode-form").submit();
+
+            });
         </script>
     }
 }
