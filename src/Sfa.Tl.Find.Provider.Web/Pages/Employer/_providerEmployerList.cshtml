@@ -44,12 +44,25 @@
                     <button type="submit" id="tl-employers--postcode--submit" class="govuk-button govuk-!-margin-bottom-2">Search</button>
                 </div>
             </div>
+            @if (Model.EmployerInterestList != null && Model.EmployerInterestList.Any())
+            {
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-!-font-weight-bold" for="selectedsortcolumn" asp-for="Input!.SelectedSortColumn">
+                        Sort by
+                    </label>
+
+                    <select class="govuk-select" aria-describedby="within-hint" asp-for="Input!.SelectedSortColumn" asp-items="Model.SortColumns">
+                        <option value="">Select order</option>
+                    </select>
+                </div>
+            }
         </form>
     </div>
 </div>
 @if (Model.EmployerInterestList != null && Model.EmployerInterestList.Any())
 {
     <div class="govuk-grid-row">
+
         <div class="govuk-grid-column-full">
             <table class="govuk-table tl-employers--table">
                 <thead class="govuk-table__head">
@@ -124,7 +137,7 @@ else if (Model.ZeroResultsFound == true)
                 to be alerted when there are new employers in your area.
             </p>
         }
-        else 
+        else
         {
             <p class="govuk-body" govuk-!-margin-bottom-0>
                 <strong>There are currently no employers within @Model.SearchRadius miles who have expressed interest in T Levels.</strong><br>

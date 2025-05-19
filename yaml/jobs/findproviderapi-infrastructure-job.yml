@@ -53,7 +53,7 @@ jobs:
             -configStorageAccountName "$(ConfigStorageAccountName)"
             -apiCustomHostName "$(ApiCustomHostName)"
             -apiCertificateName "$(ApiCertificateName)"
-            -uiCustomHostName "$(ConnectCustomHostName)"
+            -uiCustomHostname "$(ConnectCustomHostName)"
             -uiCertificateName "$(ConnectCertificateName)"
             -ipSecurityRestrictions $(ipSecurityRestrictions)'
           
