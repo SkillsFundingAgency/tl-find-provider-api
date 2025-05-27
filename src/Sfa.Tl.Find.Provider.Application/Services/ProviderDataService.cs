@@ -109,9 +109,8 @@ public class ProviderDataService : IProviderDataService
         {
             const int HairAndBeautyRouteId = 9;
             const int CateringIdRouteId = 3;
-            const int SalesMarketingProcurementRouteId = 12;
 
-            var excludedRoutes = new int[] { HairAndBeautyRouteId, CateringIdRouteId, SalesMarketingProcurementRouteId };
+            var excludedRoutes = new int[] { HairAndBeautyRouteId, CateringIdRouteId };
 
             routes = (await _routeRepository
                 .GetAll())
