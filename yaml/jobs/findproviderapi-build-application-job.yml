@@ -4,7 +4,7 @@ jobs:
     NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
   pool:
       name: 'Azure Pipelines'
-      vmImage: 'windows-2019'
+      vmImage: 'windows-latest'
   workspace:
     clean: all
   steps:
