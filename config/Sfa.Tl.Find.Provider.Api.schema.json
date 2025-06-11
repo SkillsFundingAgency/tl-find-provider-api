@@ -33,7 +33,7 @@
         "BaseUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "CourseDirectoryApiSettings_BaseUri"
+          "environmentVariable": "CourseDirectoryApiSettingsBaseUri"
         },
         "ApiKey": {
           "minLength": 1,
@@ -56,11 +56,11 @@
         },
         "DeliveryStatusToken": {
           "type": "string",
-          "environmentVariable": "EmailSettings_DeliveryStatusToken"
+          "environmentVariable": "EmailSettingsDeliveryStatusToken"
         },
         "SupportEmailAddress": {
           "type": "string",
-          "environmentVariable": "EmailSettings_SupportEmailAddress"
+          "environmentVariable": "EmailSettingsSupportEmailAddress"
         }
       },
       "additionalProperties": false,
@@ -73,39 +73,39 @@
       "properties": {
         "CleanupJobSchedule": {
           "type": "string",
-          "environmentVariable": "EmployerInterestSettings_CleanupJobSchedule"
+          "environmentVariable": "EmployerInterestSettingsCleanupJobSchedule"
         },
         "EmployerSupportSiteUri": {
           "type": "string",
-          "environmentVariable": "EmployerInterestSettings_EmployerSupportSiteUri"
+          "environmentVariable": "EmployerInterestSettingsEmployerSupportSiteUri"
         },
         "UnsubscribeEmployerUri": {
           "type": "string",
-          "environmentVariable": "EmployerInterestSettings_UnsubscribeEmployerUri"
+          "environmentVariable": "EmployerInterestSettingsUnsubscribeEmployerUri"
         },
         "ExtendEmployerUri": {
           "type": "string",
-          "environmentVariable": "EmployerInterestSettings_ExtendEmployerUri"
+          "environmentVariable": "EmployerInterestSettingsExtendEmployerUri"
         },
         "ExpiryNotificationDays": {
           "type": "integer",
-          "environmentVariable": "EmployerInterestSettings_ExpiryNotificationDays"
+          "environmentVariable": "EmployerInterestSettingsExpiryNotificationDays"
         },
         "MaximumExtensions": {
           "type": "integer",
-          "environmentVariable": "EmployerInterestSettings_MaximumExtensions"
+          "environmentVariable": "EmployerInterestSettingsMaximumExtensions"
         },
         "RegisterInterestUri": {
           "type": "string",
-          "environmentVariable": "EmployerInterestSettings_RegisterInterestUri"
+          "environmentVariable": "EmployerInterestSettingsRegisterInterestUri"
         },
         "RetentionDays": {
           "type": "integer",
-          "environmentVariable": "EmployerInterestSettings_RetentionDays"
+          "environmentVariable": "EmployerInterestSettingsRetentionDays"
         },
         "SearchRadius": {
           "type": "integer",
-          "environmentVariable": "EmployerInterestSettings_SearchRadius"
+          "environmentVariable": "EmployerInterestSettingsSearchRadius"
         }
       },
       "additionalProperties": false,
@@ -119,7 +119,7 @@
         },
         "BaseUri": {
           "type": "string",
-          "environmentVariable": "GoogleMapsApiSettings_BaseUri"
+          "environmentVariable": "GoogleMapsApiSettingsBaseUri"
         }
       },
       "additionalProperties": false,
@@ -130,7 +130,7 @@
         "BaseUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "PostcodeApiSettings_BaseUri"
+          "environmentVariable": "PostcodeApiSettingsBaseUri"
         }
       },
       "additionalProperties": false,
@@ -144,19 +144,19 @@
         "ConnectSiteUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "ProviderSettings_ConnectSiteUri"
+          "environmentVariable": "ProviderSettingsConnectSiteUri"
         },
         "NotificationEmailImmediateSchedule": {
           "type": "string",
-          "environmentVariable": "ProviderSettings_NotificationEmailImmediateSchedule"
+          "environmentVariable": "ProviderSettingsNotificationEmailImmediateSchedule"
         },
         "NotificationEmailDailySchedule": {
           "type": "string",
-          "environmentVariable": "ProviderSettings_NotificationEmailDailySchedule"
+          "environmentVariable": "ProviderSettingsNotificationEmailDailySchedule"
         },
         "NotificationEmailWeeklySchedule": {
           "type": "string",
-          "environmentVariable": "ProviderSettings_NotificationEmailWeeklySchedule"
+          "environmentVariable": "ProviderSettingsNotificationEmailWeeklySchedule"
         }
       },
       "additionalProperties": false,
