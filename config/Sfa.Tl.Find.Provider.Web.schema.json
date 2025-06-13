@@ -8,22 +8,22 @@
         "MetadataAddress": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "DfeSignIn_MetadataAddress"
+          "environmentVariable": "DfeSignInMetadataAddress"
         },
         "Audience": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "DfeSignIn_Audience"
+          "environmentVariable": "DfeSignInAudience"
         },
         "Issuer": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "DfeSignIn_Issuer"
+          "environmentVariable": "DfeSignInIssuer"
         },
         "ClientId": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "DfeSignIn_ClientId"
+          "environmentVariable": "DfeSignInClientId"
         },
         "ClientSecret": {
           "minLength": 1,
@@ -33,7 +33,7 @@
         "ApiUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "DfeSignIn_ApiUri"
+          "environmentVariable": "DfeSignInApiUri"
         },
         "ApiSecret": {
           "minLength": 1,
@@ -43,7 +43,7 @@
         "Timeout": {
           "minLength": 1,
           "type": "integer",
-          "environmentVariable": "DfeSignIn_Timeout"
+          "environmentVariable": "DfeSignInTimeout"
         }
       },
       "additionalProperties": false,
@@ -75,15 +75,15 @@
       "properties": {
         "EmployerSupportSiteUri": {
           "type": "string",
-          "environmentVariable": "EmployerInterestSettings_EmployerSupportSiteUri"
+          "environmentVariable": "EmployerInterestSettingsEmployerSupportSiteUri"
         },
         "RetentionDays": {
           "type": "integer",
-          "environmentVariable": "EmployerInterestSettings_RetentionDays"
+          "environmentVariable": "EmployerInterestSettingsRetentionDays"
         },
         "SearchRadius": {
           "type": "integer",
-          "environmentVariable": "EmployerInterestSettings_SearchRadius"
+          "environmentVariable": "EmployerInterestSettingsSearchRadius"
         }
       },
       "additionalProperties": false,
@@ -94,7 +94,7 @@
         "BaseUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "PostcodeApiSettings_BaseUri"
+          "environmentVariable": "PostcodeApiSettingsBaseUri"
         }
       },
       "additionalProperties": false,
@@ -108,22 +108,22 @@
         "ConnectSiteUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "ProviderSettings_ConnectSiteUri"
+          "environmentVariable": "ProviderSettingsConnectSiteUri"
         },
         "DefaultSearchRadius": {
           "minLength": 1,
           "type": "integer",
-          "environmentVariable": "ProviderSettings_DefaultSearchRadius"
+          "environmentVariable": "ProviderSettingsDefaultSearchRadius"
         },
         "DefaultNotificationSearchRadius": {
           "minLength": 1,
           "type": "integer",
-          "environmentVariable": "ProviderSettings_DefaultNotificationSearchRadius"
+          "environmentVariable": "ProviderSettingsDefaultNotificationSearchRadius"
         },
         "SupportSiteAccessConnectHelpUri": {
           "minLength": 1,
           "type": "string",
-          "environmentVariable": "ProviderSettings_SupportSiteAccessConnectHelpUri"
+          "environmentVariable": "ProviderSettingsSupportSiteAccessConnectHelpUri"
         }
       },
       "additionalProperties": false,
