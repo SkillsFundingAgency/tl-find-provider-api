@@ -3,7 +3,7 @@
   - job: 'DACPACBuild'
     pool:
       name: 'Azure Pipelines'
-      vmImage: 'windows-latest'
+      vmImage: 'windows-2025'
     workspace:
       clean: all
     steps:

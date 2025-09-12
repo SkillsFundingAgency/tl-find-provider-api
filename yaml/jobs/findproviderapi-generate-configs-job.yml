@@ -21,7 +21,7 @@ jobs:
 
   pool:
     name: 'Azure Pipelines'
-    vmImage: 'windows-latest'
+    vmImage: 'windows-2025'
   dependsOn: 
     - DeployfindproviderapiInfrastructure
     - DeploySQLDatabase
