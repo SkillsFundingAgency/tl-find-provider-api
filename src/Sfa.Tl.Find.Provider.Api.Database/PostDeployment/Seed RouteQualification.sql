@@ -25,6 +25,9 @@ USING (VALUES
   (6, 39),  -- Digital Business Services
   (6, 37),  -- Digital Production, Design and Development
   (6, 40),  -- Digital Support Services
+  (6, 61),  -- Digital – Digital Software Development
+  (6, 62),  -- Digital – Digital Support and Security
+  (6, 63),  -- Digital – Digital Data Analytics
 
   -- Education and early years
   (7, 38),  -- Education and Early Years
