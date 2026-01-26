@@ -26,7 +26,10 @@ USING (VALUES
   (56, N'Catering', 1),
   (57, N'Agriculture, Land Management and Production', 0),
   (58, N'Animal Care and Management', 0),
-  (59, N'Marketing', 0)
+  (59, N'Marketing', 0),
+  (61, N'Digital – Digital Software Development', 0),
+  (62, N'Digital – Digital Support and Security', 0),
+  (63, N'Digital – Digital Data Analytics', 0)
   )
   AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 
