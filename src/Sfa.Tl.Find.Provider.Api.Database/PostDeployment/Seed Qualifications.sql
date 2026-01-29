@@ -5,10 +5,10 @@ Insert initial data for Qualifications
 MERGE INTO [dbo].[Qualification] AS Target 
 USING (VALUES 
   (36, N'Design, Surveying and Planning for Construction', 0),
-  (37, N'Digital Production, Design and Development', 0),
+  (37, N'Digital Production, Design and Development', 1),
   (38, N'Education and Early Years', 0),
-  (39, N'Digital Business Services', 0),
-  (40, N'Digital Support Services', 0),
+  (39, N'Digital Business Services', 1),
+  (40, N'Digital Support Services', 1),
   (41, N'Health', 0),
   (42, N'Healthcare Science', 0),
   (43, N'Science', 0),
@@ -27,9 +27,9 @@ USING (VALUES
   (57, N'Agriculture, Land Management and Production', 0),
   (58, N'Animal Care and Management', 0),
   (59, N'Marketing', 0),
-  (61, N'Digital – Digital Software Development', 0),
-  (62, N'Digital – Digital Support and Security', 0),
-  (63, N'Digital – Digital Data Analytics', 0)
+  (61, N'Digital Software Development', 0),
+  (62, N'Digital Support and Security', 0),
+  (63, N'Digital Data Analytics', 0)
   )
   AS Source ([Id], [Name], [IsDeleted]) 
 ON Target.[Id] = Source.[Id] 
